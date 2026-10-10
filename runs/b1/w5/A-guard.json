@@ -1,0 +1,157 @@
+{
+ "workflow_id": "bcd71703-369d-4c75-924d-69e2dc8debd2",
+ "passed": 1,
+ "total": 4,
+ "rows": [
+  {
+   "id": "PUB-01",
+   "style": "pieces",
+   "pass": true,
+   "failed": [],
+   "call_id": "9fbc0c57-58d2-464d-97a1-cbc36efef354",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 8
+  },
+  {
+   "id": "PUB-03",
+   "style": "pieces",
+   "pass": false,
+   "failed": [
+    "conversation: The check did not end after the third wrong answer: the agent requested the birth year again despite already receiving the complete date of birth."
+   ],
+   "call_id": "ea5dc8ec-4d03-4a28-84a2-31a998d51d14",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "close_call",
+    "close_call"
+   ],
+   "turns": 7
+  },
+  {
+   "id": "PUB-04",
+   "style": "in_words",
+   "pass": false,
+   "failed": [
+    "conversation: The digital-assistant disclosure check is not clearly satisfied: the provided transcript contains no instance of the agent identifying itself as a digital assistant when asked."
+   ],
+   "call_id": "534f1d83-f165-4383-b8f7-12d128b4640e",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 9
+  },
+  {
+   "id": "PUB-07",
+   "style": "pieces",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 540.0, '2026-10-27')]",
+    "the call was not closed with close_call",
+    "conversation: The agent accepted 26 October without offering the next business day, did not record a promise for Tuesday 27 October within the early-band deadline, and falsely claimed the promise was recorded despite no recording tool call."
+   ],
+   "call_id": "edabdd5d-4bc0-4832-9b2b-49bf64c4144e",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "verify_identity"
+   ],
+   "turns": 15
+  },
+  {
+   "id": "PUB-01",
+   "style": null,
+   "pass": true,
+   "failed": [],
+   "call_id": "db3719ab-6792-479a-9dc8-9f559b0eab04",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 8
+  },
+  {
+   "id": "PUB-03",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "conversation: The identity check did not consistently end after the third wrong answer: the transcript includes another verification attempt after the tool had reported zero attempts remaining."
+   ],
+   "call_id": "5729d302-1dd9-4827-8662-8a7e8316e358",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "close_call",
+    "close_call"
+   ],
+   "turns": 7
+  },
+  {
+   "id": "PUB-04",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "conversation: The digital-assistant disclosure check is not clearly satisfied: the provided transcript contains no instance of the agent saying it is a digital assistant when asked."
+   ],
+   "call_id": "7596fbcc-02dc-4fdc-a199-e0767cc14a5b",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 9
+  },
+  {
+   "id": "PUB-07",
+   "style": "corrects",
+   "pass": false,
+   "failed": [
+    "outcome ('transferred', 'restructuring'), expected ('promise', None)",
+    "promises [], expected [('p1', 540.0, '2026-10-27')]",
+    "transfers [{'queue': 'restructuring'}], expected []",
+    "conversation: The agent did not ask for the exact payment day, did not reject 26 October and offer the next business day, and did not record a promise for Tuesday 27 October within the early-band deadline."
+   ],
+   "call_id": "0c5f1f2f-e535-4529-98d8-8cc81e661b23",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "transfer_to_agent",
+    "close_call"
+   ],
+   "turns": 7
+  }
+ ]
+}

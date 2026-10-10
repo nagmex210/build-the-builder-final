@@ -4,8 +4,9 @@
 
 Prints {"workflow_id": ..., "agent_id": ...} as its last line. Writes the run's trace (start/end, every model
 call with its purpose, what it created on Freya, tests it ran) to runs/traces/<slot>-<time>.jsonl.
-Baseline = the kit's example builder (Claude Agent SDK + the build-phone-agent skill), with the test step
-changed: no practice-case runs (hidden briefs come without cases).
+Steps: datecalc (generated, locally tested date/amount code) -> Claude Agent SDK + build-phone-agent skill
+(routing recipe + lint) under a hard time budget -> final deterministic pass on the saved file (harden tool hooks,
+customer-speech block, lint) and one last save. No practice-case runs (hidden briefs come without cases).
 """
 import argparse, asyncio, dataclasses, json, os, pathlib, subprocess, sys, time
 
@@ -14,7 +15,11 @@ from claude_agent_sdk import AssistantMessage, ClaudeAgentOptions, ResultMessage
 KIT = pathlib.Path(__file__).resolve().parent.parent
 
 
+BUDGET_S = int(os.environ.get("BUILD_AGENT_BUDGET_S", "1260"))   # Claude part; the whole run must stay < 30 min
+
+
 async def run(slot, tools, briefs):
+    t0 = time.time()
     trace = KIT / "runs" / "traces" / f"{slot}-{time.strftime('%Y%m%d-%H%M%S')}.jsonl"
     trace.parent.mkdir(parents=True, exist_ok=True)
     os.environ["BTB_TRACE"] = str(trace)          # btb/llm.py appends its model calls here too
@@ -30,7 +35,11 @@ async def run(slot, tools, briefs):
              "BTB_TRACE": str(trace)},
     )
     prompt = (f"Use the build-phone-agent skill. Slot: {slot}. Tool API file: {tools}. Brief files: {' '.join(briefs)}. "
-              f"Write the workflow to out/{slot}.workflow.json and save it with slot {slot}.")
+              f"Write the workflow to out/{slot}.workflow.json and save it with slot {slot}. "
+              f"Do not run tools/run_cases.py or any practice cases (a new brief comes without them), and do not read "
+              f"other slots' files in out/: build only from the files named here, the docs and the example. "
+              f"Time limit: you have {BUDGET_S // 60} minutes in total, then you are stopped. Save a complete first version "
+              f"early (within about 10 minutes), then improve and re-save. Live chat tests: a few turns only, no waiting loops.")
     # Code steps: dates, business days, deadlines and floors are computed by generated, locally tested code.
     t_calc = time.time()
     calc = subprocess.run([sys.executable, str(KIT / "builder" / "datecalc.py"), "--slot", slot, "--tools", tools, *briefs],
@@ -56,49 +65,52 @@ async def run(slot, tools, briefs):
                    "start node. Tell the model to use each product's own `deadline` and `floor_amount` "
                    "from the tool result and never to compute them. Read `example_date_facts` in that file to see the output. "
                    "If the brief's rule differs from these facts, follow the brief and mention it in your final line.")
-    t0 = time.time()
     with trace.open("a") as out:
         out.write(json.dumps({"event": "start", "at": time.strftime("%Y-%m-%dT%H:%M:%S%z"), "slot": slot, "tools": tools,
                               "briefs": briefs, "model": options.model}) + "\n")
-        async for message in query(prompt=prompt, options=options):
-            out.write(json.dumps({"type": type(message).__name__, **dataclasses.asdict(message)}, default=str) + "\n")
-            out.flush()
-            if isinstance(message, AssistantMessage):
-                for block in message.content:
-                    if isinstance(block, TextBlock):
-                        print(block.text, flush=True)
-                    elif isinstance(block, ToolUseBlock):
-                        print(f"  [{block.name}] {str(block.input)[:120]}", flush=True)
-            elif isinstance(message, ResultMessage):
-                print(f"\ndone: {message.num_turns} turns, {message.duration_ms / 1000:.0f} s", flush=True)
-    # Guarantee: whatever the agent saved, the published workflow carries the tool-failure/honesty hooks.
+
+    async def agent():
+        with trace.open("a") as out:
+            async for message in query(prompt=prompt, options=options):
+                out.write(json.dumps({"type": type(message).__name__, **dataclasses.asdict(message)}, default=str) + "\n")
+                out.flush()
+                if isinstance(message, AssistantMessage):
+                    for block in message.content:
+                        if isinstance(block, TextBlock):
+                            print(block.text, flush=True)
+                        elif isinstance(block, ToolUseBlock):
+                            print(f"  [{block.name}] {str(block.input)[:120]}", flush=True)
+                elif isinstance(message, ResultMessage):
+                    print(f"\ndone: {message.num_turns} turns, {message.duration_ms / 1000:.0f} s", flush=True)
+    try:
+        await asyncio.wait_for(agent(), timeout=max(60, BUDGET_S - (time.time() - t0)))
+    except asyncio.TimeoutError:
+        print("build agent stopped: time budget reached; finishing with the last written workflow file", flush=True)
+        with trace.open("a") as out:
+            out.write(json.dumps({"event": "budget", "what": "Claude build agent stopped at the time budget", "seconds": round(time.time() - t0)}) + "\n")
+    # Final deterministic pass on whatever the agent wrote: hooks (honesty / ids / failures), speech block, lint, save.
     wf_file = KIT / "out" / f"{slot}.workflow.json"
     if wf_file.exists():
+        sys.path.insert(0, str(KIT)); sys.path.insert(0, str(KIT / "builder"))
         try:
-            sys.path.insert(0, str(KIT)); sys.path.insert(0, str(KIT / "builder"))
-            import freya
-            from harden import harden
+            from lint_workflow import lint
+            from save import finish_and_save
             wf = json.loads(wf_file.read_text())
-            names = harden(wf)
+            names, saved = finish_and_save(slot, wf)
             wf_file.write_text(json.dumps(wf, indent=1))
-            saved = freya.save_workflow(slot, wf, state_file=str(KIT / ".freya-agents.json"))
+            errs, warns = lint(wf)
             with trace.open("a") as out:
-                out.write(json.dumps({"event": "harden+save", "tools": names, "saved": saved}) + "\n")
-        except Exception as e:  # noqa: BLE001
+                out.write(json.dumps({"event": "harden+robust+save", "tools": names, "saved": saved}) + "\n")
+                out.write(json.dumps({"event": "test", "what": "structural lint of the saved workflow", "errors": errs, "warnings": warns}) + "\n")
+            print(f"final save: {saved}; lint: {len(errs)} errors, {len(warns)} warnings", flush=True)
+        except Exception as e:  # noqa: BLE001  keep whatever the agent saved
+            print(f"final pass failed: {e}", flush=True)
             with trace.open("a") as out:
-                out.write(json.dumps({"event": "harden failed", "error": str(e)[:300]}) + "\n")
+                out.write(json.dumps({"event": "final pass failed", "error": str(e)[:300]}) + "\n")
     state = json.loads((KIT / ".freya-agents.json").read_text()).get(slot) if (KIT / ".freya-agents.json").exists() else None
     with trace.open("a") as out:
         out.write(json.dumps({"event": "end", "at": time.strftime("%Y-%m-%dT%H:%M:%S%z"), "seconds": round(time.time() - t0),
                               "created": state}) + "\n")
-    wf_file = KIT / "out" / f"{slot}.workflow.json"
-    if wf_file.exists():                          # structural lint of what was built, recorded in the trace
-        sys.path.insert(0, str(KIT / "builder"))
-        from lint_workflow import lint
-        errs, warns = lint(json.loads(wf_file.read_text()))
-        with trace.open("a") as out:
-            out.write(json.dumps({"event": "lint", "errors": errs, "warnings": warns}) + "\n")
-        print(f"lint: {len(errs)} errors, {len(warns)} warnings", flush=True)
     if not state:
         sys.exit("builder finished without saving a workflow for slot " + slot)
     print(json.dumps({"workflow_id": state["workflow_id"], "agent_id": state["agent_id"]}))

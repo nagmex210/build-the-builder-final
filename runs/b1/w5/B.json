@@ -1,0 +1,145 @@
+{
+ "workflow_id": "4cbc6e50-8882-424c-b069-7090b541b5e4",
+ "passed": 1,
+ "total": 3,
+ "rows": [
+  {
+   "id": "PUB-11",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "the call was not closed with close_call",
+    "conversation: All three products were not clearly stated before the first payment ask, and create_promise was called three times per product rather than once.",
+    "harness: chat turn timed out and no reply appeared"
+   ],
+   "call_id": "0f8325c1-cf6a-4318-9c73-aac502152da8",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call",
+    "create_promise",
+    "create_promise",
+    "create_promise"
+   ],
+   "turns": 10
+  },
+  {
+   "id": "PUB-12",
+   "style": "in_words",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "notes [('p2', 'refused'), ('p2', 'refused'), ('p3', 'refused'), ('p3', 'refused')], expected [('p2', 'refused'), ('p3', 'refused')]",
+    "the call was not closed with close_call",
+    "conversation: The phone-question retry is not shown, and two successful refused notes were recorded for each loan rather than exactly one.",
+    "harness: chat turn timed out and no reply appeared"
+   ],
+   "call_id": "0ae5d30f-8e4f-461f-be77-3d5e477ee976",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "add_note",
+    "add_note",
+    "add_note",
+    "add_note",
+    "create_promise"
+   ],
+   "turns": 11
+  },
+  {
+   "id": "PUB-13",
+   "style": "talkative",
+   "pass": true,
+   "failed": [],
+   "call_id": "db9f216c-828f-474b-ab1e-26eb8539fa8d",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 11
+  },
+  {
+   "id": "PUB-11",
+   "style": "in_words",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 220.0, '2026-10-16'), ('p2', 640.0, '2026-10-16'), ('p3', 75.0, '2026-10-16')]",
+    "the call was not closed with close_call",
+    "conversation: The combined read-back and confirmation check is not clearly satisfied because no customer confirmation follows, and no create_promise call was made for any product.",
+    "harness: chat turn kept timing out"
+   ],
+   "call_id": "d27f590a-dce5-4a8d-ac95-0ba28df1e87c",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account"
+   ],
+   "turns": 7
+  },
+  {
+   "id": "PUB-12",
+   "style": "pieces",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 510.0, '2026-10-15')]",
+    "notes [], expected [('p2', 'refused'), ('p3', 'refused')]",
+    "the call was not closed with close_call",
+    "conversation: No credit-card promise was recorded by a tool, neither loan has a recorded 'refused' note, and only one personal-loan persuasion attempt and no car-loan persuasion attempt are shown.",
+    "harness: chat turn kept timing out"
+   ],
+   "call_id": "8fef94fe-7e0b-4e3d-8903-7c741fe9a708",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account"
+   ],
+   "turns": 9
+  },
+  {
+   "id": "PUB-13",
+   "style": "talkative",
+   "pass": true,
+   "failed": [],
+   "call_id": "b6774eb2-4d2c-476c-aba0-c5d3262d6e64",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 15
+  }
+ ]
+}
