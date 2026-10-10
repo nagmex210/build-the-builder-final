@@ -52,7 +52,7 @@ wf = {"nodes": {"n": {"tools": [
     for n, ks in (("get_acc", ["x"]), ("promise", ["ref", "amt", "on"]), ("cb", ["day", "at"]))]}}}
 guards.find_noop = lambda u: "/health"
 done = guards.install(wf, SPEC)
-check(set(done) == {"get_acc", "promise", "cb"}, f"guarded {done}")
+check(set(done) == {"get_acc", "promise", "cb", "check_promise_date"}, f"guarded {done}")
 T = {t["function"]["name"]: t for t in wf["nodes"]["n"]["tools"]}
 gv = {"now": now}
 exec(T["get_acc"]["post_process_code"], {"vars": gv, "result": json.loads(json.dumps(res))})
@@ -77,6 +77,25 @@ r = {"status": "success", "status_code": 200, "data": {"ok": True}}
 exec(T["promise"]["post_process_code"], {"vars": gv, "result": r})
 check(r["data"].get("ok") is False and r["data"].get("offer_instead") == "amount 155.0" and "Offer exactly" in r["data"]["tool_outcome"], "post: " + json.dumps(r))
 check(call("cb", {"day": "2027-03-05", "at": "15:30"}) == "", "valid callback blocked: " + gv.get("guard_block_cb", ""))
+# code-only date check tool next to the promise tool
+wf["nodes"]["n"]["task_message"] = "x"
+done2 = guards.install(wf, SPEC)
+check("check_promise_date" in done2, f"check tool not added: {done2}")
+T = {t["function"]["name"]: t for t in wf["nodes"]["n"]["tools"]}
+check(T["check_promise_date"]["function"]["parameters"]["properties"]["url"]["default"] == "https://bank.example/health", "check url")
+def chk(body):
+    cfg = {"url": "https://bank.example/health", "body": body}
+    exec(T["check_promise_date"]["pre_process_code"], {"vars": gv, "config": cfg})
+    r = {"status": "success", "data": {}}
+    exec(T["check_promise_date"]["post_process_code"], {"vars": gv, "result": r})
+    return r["data"]
+c = chk({"product_id": "B", "date": "2027-03-10"})      # holiday -> next business day
+check(c.get("can_record") is False and c.get("offer_date") == "2027-03-11", f"check holiday: {c}")
+c = chk({"product_id": "A", "date": "2027-03-11"})      # valid -> keep it
+check(c.get("can_record") is True and "Keep" in c.get("say", ""), f"check valid: {c}")
+c = chk({"product_id": "A", "date": "2027-03-20"})      # after k1's deadline -> the deadline
+check(c.get("can_record") is False and c.get("offer_date") == "2027-03-12", f"check after deadline: {c}")
+check(guards.install(wf, SPEC).count("check_promise_date") == 1 and sum(t["function"]["name"] == "check_promise_date" for t in wf["nodes"]["n"]["tools"]) == 1, "check tool duplicated on re-save")
 # spec without any of the new rules: nothing changes (no new lines, guards as before)
 plain = {k: v for k, v in SPEC.items() if k not in ("promise_cutoff_time", "promise_dates_min_gap_days", "rule_coverage")}
 plain["bands"] = [{**b, "if_not_business_day": "none"} for b in SPEC["bands"]]

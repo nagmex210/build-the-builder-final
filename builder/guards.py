@@ -246,6 +246,117 @@ except Exception:
 '''
 
 
+CHECK_NAME = "check_promise_date"
+# A code-only lookup (A: "code answers"): the model sends the date the CUSTOMER named, code says whether it can be
+# recorded and, if not, the ONE date to offer. The request goes to the no-op path (nothing reaches the bank).
+CHECK_PRE = r'''
+try:
+    _gb = config.get('body') if isinstance(config, dict) else None
+    _G = SPEC.get('guards') or dict()
+    _out = dict()
+    if isinstance(_gb, dict):
+        _t = today_of(vars.get(SPEC.get('now_variable') or 'now'))
+        _pid = str(_gb.get('product_id') or '')
+        try:
+            _prods = json.loads(vars.get('guard_products') or '[]')
+        except Exception:
+            _prods = dict()
+        _p = _prods.get(_pid) if isinstance(_prods, dict) else None
+        _ds = str(_gb.get('date') or '').strip()[:10]
+        try:
+            _d = D.fromisoformat(_ds)
+        except Exception:
+            _d = None
+        if _d is None:
+            _out = dict(ok=False, can_record=False, say='Ask the customer for the exact day (the date "' + _ds + '" is not a date in YYYY-MM-DD form).')
+        elif not isinstance(_p, dict):
+            _out = dict(ok=False, can_record=False, say='Unknown product_id "' + _pid + '": copy it exactly from the account result.')
+        else:
+            _dl = D.fromisoformat(_p['deadline']) if _p.get('deadline') else None
+            _why = []
+            _o = _d
+            if _d < _t:
+                _why.append(fmt(_d) + ' is in the past')
+                _o = _t
+            if _dl is not None and _d > _dl:
+                _why.append(fmt(_d) + ' is after the deadline of this product (' + fmt(_dl) + ')')
+            if (SPEC.get('promise_cutoff_time') or SPEC.get('promise_min_days_ahead')):
+                _ep = earliest_promise(vars.get(SPEC.get('now_variable') or 'now'))
+                if _d < _ep:
+                    _why.append(fmt(_d) + ' is too early (earliest ' + fmt(_ep) + ')')
+                    _o = max(_o, _ep)
+            if not is_bd(_d):
+                _why.append(fmt(_d) + ' is not a business day')
+            _nb = str(_G.get('promise_non_business_day_offer') or 'next').lower()
+            if not is_bd(_o):
+                _o = prev_bd(_o) if (_nb == 'previous' and prev_bd(_o) >= _t) else (next_bd(_o) if _nb != 'none' else _o)
+            if _dl is not None and _o > _dl:
+                _o = _dl if is_bd(_dl) else prev_bd(_dl)
+            if not _why:
+                _out = dict(ok=True, can_record=True, date=_d.isoformat(), say='CAN BE RECORDED: ' + fmt(_d) + ' is a valid promise date for product ' + _pid +
+                            '. Keep the customer\'s date: read back ' + fmt(_d) + ' (do not offer the deadline or any other date).')
+            else:
+                _out = dict(ok=True, can_record=False, offer_date=_o.isoformat(), say='CANNOT BE RECORDED: ' + '; '.join(_why) +
+                            '. CODE COMPUTED THE DATE TO OFFER: ' + fmt(_o) + '. Tell the customer in one short sentence why, and offer exactly ' +
+                            fmt(_o) + ' (no other date).')
+    vars['guard_check_result'] = json.dumps(_out)
+    config['url'] = noop_url(config.get('url'))
+except Exception:
+    pass
+'''
+
+CHECK_POST = r'''
+try:
+    _o = json.loads(vars.get('guard_check_result') or '{}')
+    if isinstance(result, dict) and _o:
+        result.pop('header', None)
+        result['status'] = 'success'
+        result['status_code'] = 200
+        result['message'] = 'checked in code'
+        result['data'] = _o
+except Exception:
+    pass
+'''
+
+
+def _add_check_tool(wf, promise, g, noop):
+    """Next to every copy of the promise tool, a code-only check tool (same host, no-op path)."""
+    import copy
+    if not noop or not g.get("promise_date_field") or not g.get("promise_product_field"):
+        return False
+    u = _url(promise).split("/")
+    added = False
+    for node in (wf.get("nodes") or {}).values():
+        tools = node.get("tools") or []
+        names = [((t.get("function") or {}).get("name")) for t in tools]
+        if promise["function"]["name"] not in names or CHECK_NAME in names:
+            continue
+        t = {"type": "function", "config": copy.deepcopy(promise.get("config") or {"timeoutMs": 12000, "maxRetries": 0}),
+             "function": {"name": CHECK_NAME, "handler": "__function__:api_call",
+                          "description": "Code check of a promise date, BEFORE you answer the customer. Call it as soon as the customer "
+                                         "names a day (after looking the day up in DATE FACTS), with the product_id and that date as YYYY-MM-DD. "
+                                         "The result says CAN BE RECORDED (keep the customer's date) or CANNOT BE RECORDED with the one date "
+                                         "to offer. Say what `say` tells you. It records nothing.",
+                          "parameters": {"type": "object", "properties": {
+                              "url": {"type": "string", "default": u[0] + "//" + u[2] + noop},
+                              "method": {"type": "string", "default": "POST"},
+                              "headers": {"type": "object", "properties": {"Content-Type": {"type": "string", "default": "application/json"}}},
+                              "body": {"type": "object", "required": ["product_id", "date"], "properties": {
+                                  "product_id": {"type": "string", "default": "{{product_id}}", "description": "product_id copied exactly from the account result."},
+                                  "date": {"type": "string", "default": "{{date}}", "description": "the day the customer named, YYYY-MM-DD"}}}},
+                              "required": ["body"]}}}
+        tools.append(t)
+        node["tools"] = tools
+        tm = node.get("task_message")
+        if isinstance(tm, str) and CHECK_NAME not in tm:
+            node["task_message"] = (tm.rstrip() + "\nDATE CHECK IN CODE: whenever the customer names a payment day, call " + CHECK_NAME +
+                                    " (product_id, date) BEFORE you answer, and say what its result tells you: keep their date when it "
+                                    "CAN BE RECORDED, otherwise offer exactly its offer_date. Never offer the deadline instead of a date "
+                                    "the check accepted.")
+        added = True
+    return added
+
+
 def _snip(spec, body, tool=None, noop=""):
     code = (MARK + "\nSPEC_HEX = '" + json.dumps(spec).encode().hex() + "'\nBLOCK_URL = " + repr(BLOCK_URL) +
             "\nNOOP_PATH = " + repr(noop) + "\n" + NOOP_FN + LIB +
@@ -326,4 +437,15 @@ def install(wf, spec):
                 old = (t.get(key) or "").split("try:\n    " + MARK)[0]      # replace an earlier guard block
                 t[key] = (old.rstrip() + "\n" + _snip(s, body, name, find_noop(_url(t)) if pre else "")).lstrip("\n")
         done.append(name)
+    promise = next((t for n, t in _tools(wf) if n and n == g.get("promise_tool")), None)
+    if promise is not None and g.get("promise_date_field") in _body_fields(promise):
+        noop = find_noop(_url(promise))
+        _add_check_tool(wf, promise, g, noop)
+        if any(n == CHECK_NAME for n, _ in _tools(wf)):          # every save: our hooks only (harden must not add 'recorded')
+            s = {**spec, "guards": g}
+            for n, t in _tools(wf):
+                if n == CHECK_NAME:
+                    t["pre_process_code"] = _snip(s, CHECK_PRE, n, noop)
+                    t["post_process_code"] = _snip(s, CHECK_POST, n, noop)
+            done.append(CHECK_NAME)
     return done
