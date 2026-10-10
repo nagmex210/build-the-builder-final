@@ -11,12 +11,16 @@ Work from the kit folder. Use only what the brief and the tool API file say. Do 
 
 1. Read the brief files you were given, then the tool API file you were given (default `tools/openapi.json`). Take every tool field and allowed value from THAT file.
 2. Read `docs/workflow-format.md` and `docs/tools-and-code.md`.
-3. Read `examples/base-agent.json`. It is a small working agent with two steps. Use it as the pattern for the JSON, not as the answer.
+3. Read `.claude/skills/build-phone-agent/routing.md`: the node-per-stage structure and the exact routing patterns to use.
+   Read `examples/base-agent.json`. It is a small working agent with two steps. Use it as the pattern for the JSON, not as the answer.
 4. Write the workflow to `out/<slot>.workflow.json`. `<slot>` is the slot you were given.
-   - One step per stage of the call. Identity comes first.
-   - Move to the next step on a tool result, not on what the customer says.
+   - Follow routing.md: one conversation node per stage (opening, identity, negotiation), a passthrough account
+     lookup + code node between identity and negotiation, a close tool in every stage that can close, and a
+     transition on the close tool's result to an `end_call` node.
+   - Move to the next step on a tool result or an extracted enum variable, not on `matches_intent`.
    - Take every tool field and allowed value from the tool API file you were given.
    - Leave `agent_config` out.
+   - Run `python3 builder/lint_workflow.py out/<slot>.workflow.json` and fix every ERROR before saving.
 5. Save it: `python3 -c "import freya,json,sys; print(json.dumps(freya.save_workflow(sys.argv[1], json.load(open(sys.argv[2])))))" <slot> out/<slot>.workflow.json`
    It prints `workflow_id` and `agent_id`. The same slot updates the same workflow.
 6. Check it starts: one chat turn, `python3 -c "import freya,json; print(freya.api('POST','/api/v2/chat/message',{'workflowId':'<workflow_id>','message':'Hello?','customerVariables':{'customer_id':'c_test','first_name':'Ann','last_name':'Lee','title':'Ms','now':'2026-10-14T11:00'}}))"`. A 500 means the workflow cannot start a call: fix and save again.

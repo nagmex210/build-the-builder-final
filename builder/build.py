@@ -50,6 +50,14 @@ async def run(slot, tools, briefs):
     with trace.open("a") as out:
         out.write(json.dumps({"event": "end", "at": time.strftime("%Y-%m-%dT%H:%M:%S%z"), "seconds": round(time.time() - t0),
                               "created": state}) + "\n")
+    wf_file = KIT / "out" / f"{slot}.workflow.json"
+    if wf_file.exists():                          # structural lint of what was built, recorded in the trace
+        sys.path.insert(0, str(KIT / "builder"))
+        from lint_workflow import lint
+        errs, warns = lint(json.loads(wf_file.read_text()))
+        with trace.open("a") as out:
+            out.write(json.dumps({"event": "lint", "errors": errs, "warnings": warns}) + "\n")
+        print(f"lint: {len(errs)} errors, {len(warns)} warnings", flush=True)
     if not state:
         sys.exit("builder finished without saving a workflow for slot " + slot)
     print(json.dumps({"workflow_id": state["workflow_id"], "agent_id": state["agent_id"]}))
