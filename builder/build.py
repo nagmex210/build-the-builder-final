@@ -50,13 +50,15 @@ async def self_simulate(slot, tools, briefs, trace, wf_file, final_pass, options
         failed=r1["n_failed"], checks_failed=r1["n_checks_failed"], seconds=round(time.time() - t_start), rows=r1["rows"])
     print(f"self-test 1 ({r1['where']}): {r1['n_failed']}/{r1['n']} personas failed a check ({r1['n_checks_failed']} checks)", flush=True)
     (KIT / "out" / f"{slot}.selftest1.json").write_text(json.dumps({"personas": personas, **r1}, indent=1, default=str))
-    if not r1["n_failed"] or r1["n"] < len(personas) or left() < ROUND_S + 180:
+    r1_s = time.time() - t_start
+    retest_s = min(ROUND_S, r1_s + 60)          # the re-test takes about as long as round 1 did (platform load)
+    if not r1["n_failed"] or r1["n"] < len(personas) or left() < retest_s + 90:
         log(trace, event="ship", what="no fix round", why="no failed check" if not r1["n_failed"] else
             ("too few valid chats" if r1["n"] < len(personas) else "no time left"))
         return
     best = wf_file.read_text()
     fails = selftest.failure_text(r1)
-    fix_s = max(90, min(300, left() - ROUND_S - 30))
+    fix_s = max(90, min(300, left() - retest_s))
     options = dataclasses.replace(options_base, skills=None, allowed_tools=["Read", "Edit", "Grep", "Bash"], max_turns=60)
     prompt = (f"You fix a Freya phone-agent workflow after a self-simulation. The workflow file is out/{slot}.workflow.json. "
               f"Brief files: {' '.join(briefs)}. Tool API file: {tools}. Docs: docs/. Test personas written from the brief talked to it; "
