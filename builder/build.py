@@ -250,6 +250,10 @@ async def run(slot, tools, briefs):
         print("build agent stopped: time budget reached; finishing with the last written workflow file", flush=True)
         with trace.open("a") as out:
             out.write(json.dumps({"event": "budget", "what": "Claude build agent stopped at the time budget", "seconds": round(time.time() - t0)}) + "\n")
+    except Exception as e:  # noqa: BLE001  an SDK/quota error must not skip the final pass on the last written file
+        print(f"build agent failed: {str(e)[:300]}; finishing with the last written workflow file", flush=True)
+        with trace.open("a") as out:
+            out.write(json.dumps({"event": "agent failed", "error": str(e)[:300], "seconds": round(time.time() - t0)}) + "\n")
     # Final deterministic pass on whatever the agent wrote: hooks (honesty / ids / failures), speech block, lint, save.
     wf_file = KIT / "out" / f"{slot}.workflow.json"
     try:
