@@ -76,3 +76,14 @@ Our builds are all the same 6-node shape, so explore other shapes:
   run each through a few brief-derived scripted chats, ship the best, all inside 30 min.
 - A8 Honest self-tests: tests come from the brief only. When agent and test disagree, fix the agent; never weaken
   an assertion or invent a rule to make a test pass (the paper saw builders cheat themselves this way).
+- A9 Assumption log: no client to ask, so the builder lists every ambiguity or conflict in the brief and how it
+  resolved it (memo beats base policy; the narrower rule wins), and the trace carries the list.
+- A10 Path enumeration for self-tests (JourneyBench, 2601.00596): turn the brief's procedure into a graph, enumerate
+  every customer path through it (incl. uncooperative behaviour, ToolRACER 2610.09163), generate one scripted chat
+  per path; keep half for fixing and half held out inside the build.
+- A11 Score self-tests the way we are scored: each scripted chat 3x on the real Freya model, pass only if all 3 pass;
+  expected ledger computed by code from the brief, LLM judge only for wording/honesty.
+- A12 Label before patching (Evidence-in-the-Loop, 2607.18039): classify each failure (misread rule, wrong route,
+  tool error, arithmetic, honesty, wording) and fix only the matching component.
+- A13 Probe the tool API file before wiring: read every field, enum and error shape; build calls that read back
+  status after an ambiguous write (quiet API defects were the failures tau^tau builders missed).
