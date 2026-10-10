@@ -319,7 +319,10 @@ def _run_one(workflow_id, sc, lib):
             led = ledger(sess["customer_id"])
             if led.get("calls") and led["calls"][-1]["tool"] == "close_call":
                 break
-            if msg.strip().lower().startswith("thank you, goodbye") or time.time() - t0 > CHAT_S:
+            if msg.strip().lower().startswith("thank you, goodbye"):
+                break
+            if time.time() - t0 > CHAT_S:      # platform too slow: an unfinished chat says nothing about the agent
+                err = f"chat stopped at the {CHAT_S} s limit after {len(turns) // 2} turns (platform load)"
                 break
             hist += [{"role": "user", "content": agent or "(silence)"}]
             msg = chat([{"role": "system", "content": persona}] + hist, tier="fast", purpose="self-simulation: persona turn",

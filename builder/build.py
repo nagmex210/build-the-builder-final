@@ -56,7 +56,9 @@ def tail_model_calls(trace, stop):
 BUDGET_S = int(os.environ.get("BUILD_AGENT_BUDGET_S", "720"))    # Claude build part; the whole run must stay < 30 min
 SELFTEST = os.environ.get("BUILD_SELFTEST", "1") != "0"
 SELFTEST_N = int(os.environ.get("BUILD_SELFTEST_N", "6"))
-SELFTEST_BUDGET_S = int(os.environ.get("BUILD_SELFTEST_BUDGET_S", "900"))   # self-test + fix + re-test, at most
+SELFTEST_BUDGET_S = int(os.environ.get("BUILD_SELFTEST_BUDGET_S", "1320"))   # self-test + fix + re-test, at most
+BUILD_TOTAL_S = int(os.environ.get("BUILD_TOTAL_S", "1620"))     # the whole run must end before 30 min (1800 s)
+BUILD_T0 = time.time()
 ROUND_S = 420                                                      # one round of parallel chats, worst case
 
 
@@ -69,7 +71,8 @@ async def self_simulate(slot, tools, briefs, trace, wf_file, final_pass, options
     """A17: personas from the brief -> chats in workspace 2 -> deterministic checks -> one EDIT fix round -> re-test."""
     import selftest
     t_start = time.time()
-    left = lambda: SELFTEST_BUDGET_S - (time.time() - t_start)
+    # whichever ends first: the self-test budget or the whole build's 30 min (minus a margin for the final save/export)
+    left = lambda: min(SELFTEST_BUDGET_S - (time.time() - t_start), BUILD_TOTAL_S - (time.time() - BUILD_T0))
     text = "\n\n".join(pathlib.Path(b).read_text() for b in briefs)
     calc_file = KIT / "out" / f"{slot}.calc.json"
     loop = asyncio.get_running_loop()
