@@ -1,0 +1,37 @@
+FAIL PUB-11 0/2 | 
+       - [asks_back] outcome (None, None), expected ('promise', None)
+       - [asks_back] promises [], expected [('p1', 220.0, '2026-10-16'), ('p2', 640.0, '2026-10-16'), ('p3', 75.0, '2026-10-16')]
+       - [asks_back] the call was not closed with close_call
+       - [asks_back] conversation: The agent asked an identity question before stating all three products, and there was no read-back, confirmation for all three, or create_promise call per product.
+       - [asks_back] harness: POST /api/v2/chat/message -> 503: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"c08884de-e864-432c-9d79-5a53a851d0c1"}}}
+       - [pieces] outcome (None, None), expected ('promise', None)
+       - [pieces] promises [], expected [('p1', 220.0, '2026-10-16'), ('p2', 640.0, '2026-10-16'), ('p3', 75.0, '2026-10-16')]
+       - [pieces] the call was not closed with close_call
+       - [pieces] conversation: The agent asked for identity confirmation before stating all three products, and there was no read-back, confirmation for all three, or create_promise call per product.
+       - [pieces] harness: POST /api/v2/chat/message -> 503: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"115c6b08-7ab1-481b-a641-b86104611e50"}}}
+FAIL PUB-12 0/2 | 
+       - [plain] outcome (None, None), expected ('promise', None)
+       - [plain] promises [], expected [('p1', 510.0, '2026-10-15')]
+       - [plain] notes [], expected [('p2', 'refused'), ('p3', 'refused')]
+       - [plain] the call was not closed with close_call
+       - [plain] conversation: The transcript does not show the required repeated phone question, exactly one credit-card promise, one refused note for each other product, or two late-band personal-loan attempts and one early-band car-loan attempt.
+       - [plain] harness: POST /api/v2/chat/message -> 503: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"9d0a081b-bb30-4b57-b61a-53cfb2911b6b"}}}
+       - [asks_back] outcome (None, None), expected ('promise', None)
+       - [asks_back] promises [], expected [('p1', 510.0, '2026-10-15')]
+       - [asks_back] notes [], expected [('p2', 'refused'), ('p3', 'refused')]
+       - [asks_back] the call was not closed with close_call
+       - [asks_back] conversation: The agent did not repeat the phone question once, record exactly one credit card promise, record one refused note for each of the other two products, or make two late-band personal loan attempts and one early-band car loan attempt.
+       - [asks_back] harness: POST /api/v2/chat/message -> 503: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"47de166e-3002-450b-9635-80966dbbffc2"}}}
+FAIL PUB-13 0/2 | 
+       - [talkative] outcome (None, None), expected ('promise', None)
+       - [talkative] promises [], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]
+       - [talkative] the call was not closed with close_call
+       - [talkative] conversation: Neither the credit card payment on 30 October nor the loan payment on its deadline of 23 October was recorded, and no read-back named both dates.
+       - [talkative] harness: POST /api/v2/chat/message -> 503: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"9d1a62b1-42c3-4a65-b754-e8d7dbdf8d85"}}}
+       - [corrects] outcome (None, None), expected ('promise', None)
+       - [corrects] promises [], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]
+       - [corrects] the call was not closed with close_call
+       - [corrects] conversation: The transcript does not show the credit card recorded for 30 October, the loan recorded for its 23 October deadline, or a read-back naming both dates.
+       - [corrects] harness: POST /api/v2/chat/message -> 503: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"0b36e7b3-10cf-4e3b-ae84-cb138638136a"}}}
+
+fast_eval: 0 / 3 passed (2 rep(s), all reps must pass), 13 s

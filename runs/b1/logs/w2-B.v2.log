@@ -1,0 +1,51 @@
+  [Skill] {'skill': 'build-phone-agent', 'args': 'Slot: w2-B. Tool API file: tools/openapi.json. Brief files: briefs/brief-a.md br
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; cat briefs/brief-a.md; echo ======; cat briefs/brief-b.md; echo =====; cat tools/o
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; cat docs/workflow-format.md docs/tools-and-code.md .claude/skills/build-phone-agen
+  [Read] {'file_path': '/home/ubuntu/.claude/projects/-home-ubuntu-btb-wt2/32587147-c3ec-458b-ad59-0c6185f39b74/tool-results/b75t
+  [Read] {'file_path': '/home/ubuntu/.claude/projects/-home-ubuntu-btb-wt2/32587147-c3ec-458b-ad59-0c6185f39b74/tool-results/b75t
+I've read the briefs, the tool API and the docs. Next I'm checking the existing output file and the lint script, then I'll write the workflow.
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; ls -la out; git status --short; python3 builder/lint_workflow.py out/w2-B.workflow
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; cat builder/lint_workflow.py; ls runs | head; python3 -c "import freya; print(frey
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; U=https://freya-bank-mock.freyavoice.workers.dev/v1; for p in "create_promise {\\"
+Writing the workflow generator now (a Python script outside the repo that writes `out/w2-B.workflow.json`).
+  [Bash] {'command': 'mkdir -p /tmp/w2B'}
+  [Write] {'file_path': '/tmp/w2B/gen.py', 'content': 'import json, sys\n\nBASE = "https://freya-bank-mock.freyavoice.workers.dev/
+  [Bash] {'command': "cd /home/ubuntu/btb/wt2; python3 /tmp/w2B/gen.py out/w2-B.workflow.json && python3 builder/lint_workflow.py
+Local tests of the code and hooks look right. Small cleanup in the verify hook, then I'll save.
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; python3 - <<\'EOF\'\np=\'/tmp/w2B/gen.py\'; s=open(p).read()\nold="        elif le
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; python3 -c "import freya,json; print(json.dumps(freya.api(\'POST\',\'/api/v2/chat/
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; sleep 20; python3 -c "import freya,json; print(json.dumps(freya.api(\'POST\',\'/ap
+Still a 503. Checking whether this happens for other saved workflows too, or only mine.
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; cat .freya-agents.json; for s in w2-A w2-rB; do id=$(python3 -c "import json;print
+The chat endpoint returns 503 for every workflow, so the problem is on the platform side, not in my file. I'll run a dry-run validation instead.
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; python3 -c "import freya,json; print(str(freya.validate_workflow(\'w2-B-check\', j
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; python3 - <<\'EOF\'\np=\'/tmp/w2B/gen.py\'; s=open(p).read()\nold=\'\'\'"descripti
+I saved the w2-B workflow (version 5, 0 lint errors) and the platform's dry-run says it is valid. I could not check that a call actually starts: the chat endpoint returns 503 on every try, and it does the same for the other saved workflows (w2-A, w2-rB). So the fault looks like it's on the platform side, but a working first turn is still unconfirmed. Rerun step 6 once the endpoint is back.
+
+**Which brief it follows.** It follows Brief B, which is Brief A plus up to three products. A one-product customer therefore also gets an `add_note` for a product without a promise, as B rule 8 says. Brief A says it never uses `add_note`, so if any test customers are graded against Brief A alone, those calls would break that rule.
+
+**Shape** (in `out/w2-B.workflow.json`):
+- **Start:** a code step works out today, the next business day and the callback window from `now`.
+- **Opening:** the fixed first line, then "Am I speaking with {title} {last_name}?". It moves on only when the extracted `party` value equals `customer`. The other-person cases are handled here: callback, wrong number, deceased, unclear.
+- **Identity:** asks date of birth, then the last four phone digits, with one `verify_identity` call per answer. A date of birth said as numbers is converted to `YYYY-MM-DD`, day first. It moves on when the result says both checks passed.
+- **Account:** `get_account` runs automatically, then a code step works out each product's band, floor, deadline and offer dates, plus a calendar and a "this/next weekday" table. The agent then reads out every late product in a fixed sentence.
+- **Negotiation:** has `create_promise`, `add_note`, `transfer_to_agent` and `close_call`. Every stage that can close the call moves to the hang-up node when `close_call` returns ok.
+
+**Rules enforced in code rather than in the prompt:**
+- A promise below the floor, above the past-due amount, in the past, on a weekend or holiday, after the deadline, or for a product that already has one is blocked. The bank records nothing, and the agent is told what to offer instead.
+- A callback outside today or the next business day, 10:00–19:00 and later than `now`, is blocked.
+- Before `close_call` goes out, the outcome is corrected: `transferred` (with its reason) after any transfer, `promise` if any promise was recorded, and `paid` or the first product's reason when every product has a note. `reason` is dropped for `promise` and `paid`.
+- Notes are blocked after a transfer.
+- Every tool result carries one plain instruction for the agent, including "say the promise is recorded" only when it actually is, and "try once more" then "say it could not be recorded".
+
+**Not tested on the platform:**
+- **Remembered state:** recorded promises, notes and the transfer are passed from one tool's code to the next through stored values, and I haven't confirmed the platform keeps them between calls. My local tests passed. If it doesn't keep them, the outcome correction and the "already recorded" block stop working, and the prompt rules are the only safeguard left.
+- **Prompt-only rules:** the number of persuasion attempts and the count of identity asks are only in the prompts.
+
+The generator is at `/tmp/w2B/gen.py`, outside the repo.
+
+workflow_id `4f8a3d12-421f-4165-b57f-c8bdfa2327ec`, agent_id `0ff14fe6-34a6-4040-8894-d0d0f47637eb`
+
+done: 19 turns, 373 s
+lint: 0 errors, 0 warnings
+{"workflow_id": "4f8a3d12-421f-4165-b57f-c8bdfa2327ec", "agent_id": "0ff14fe6-34a6-4040-8894-d0d0f47637eb"}

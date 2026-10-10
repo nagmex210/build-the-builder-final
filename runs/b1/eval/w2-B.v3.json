@@ -1,0 +1,115 @@
+{
+ "workflow_id": "4f8a3d12-421f-4165-b57f-c8bdfa2327ec",
+ "passed": 0,
+ "total": 3,
+ "rows": [
+  {
+   "id": "PUB-11",
+   "style": "corrects",
+   "pass": true,
+   "failed": [],
+   "call_id": "45921aa3-dbb4-49f2-9b95-9c4de3c64319",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 9
+  },
+  {
+   "id": "PUB-12",
+   "style": "talkative",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 510.0, '2026-10-15')]",
+    "notes [], expected [('p2', 'refused'), ('p3', 'refused')]",
+    "the call was not closed with close_call",
+    "conversation: The identity-question repetition is not established by the truncated transcript, no credit-card promise or refused notes were successfully recorded, the agent made three personal-loan attempts and two car-loan attempts instead of two and one, and claimed to have noted the credit-card payment before "
+   ],
+   "call_id": "f2de0d28-2240-4774-8dfe-144c0f1a9dbf",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account"
+   ],
+   "turns": 14
+  },
+  {
+   "id": "PUB-13",
+   "style": "in_words",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]",
+    "the call was not closed with close_call",
+    "conversation: The credit card was not recorded for 30 October, the loan was not recorded for 23 October, and no read-back named both dates.",
+    "harness: POST /api/v2/chat/message -> 503: {\"success\":false,\"data\":{\"message\":\"Internal server error\",\"result\":{\"requestId\":\"38e8917a-86fe-4efe-95a0-e970dc6b3f6c\"}}}"
+   ],
+   "call_id": "e03e248c-2245-494a-8884-a54f4f9cab15",
+   "tools": [
+    "verify_identity"
+   ],
+   "turns": 3
+  },
+  {
+   "id": "PUB-11",
+   "style": "talkative",
+   "pass": false,
+   "failed": [
+    "outcome ('no_promise', 'service_error'), expected ('promise', None)",
+    "promises [('p1', 220.0, '2026-10-16')], expected [('p1', 220.0, '2026-10-16'), ('p2', 640.0, '2026-10-16'), ('p3', 75.0, '2026-10-16')]",
+    "conversation: The one create_promise per product check failed because the agent made repeated calls for the credit card and car loan, and every create_promise attempt failed."
+   ],
+   "call_id": "7013e942-47cc-4b6d-aa44-425e566e4852",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 7
+  },
+  {
+   "id": "PUB-12",
+   "style": "corrects",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 510.0, '2026-10-15')]",
+    "notes [], expected [('p2', 'refused'), ('p3', 'refused')]",
+    "the call was not closed with close_call",
+    "conversation: The phone question was not asked or repeated, no credit-card promise or refused notes were recorded, and neither the two late-band personal-loan attempts nor the one early-band car-loan attempt occurred.",
+    "harness: POST /api/v2/chat/message -> 503: {\"success\":false,\"data\":{\"message\":\"Internal server error\",\"result\":{\"requestId\":\"8bc0ba73-8d82-47b2-86ae-dd98d72b7b26\"}}}"
+   ],
+   "call_id": "ede575ce-0310-4f27-b4b7-662eae0a232b",
+   "tools": [],
+   "turns": 2
+  },
+  {
+   "id": "PUB-13",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "promises [('p1', 300.0, '2026-11-02'), ('p2', 900.0, '2026-10-30')], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]",
+    "conversation: Neither payment was recorded by a tool call, and the read-back named November 2 for the credit card and October 30 for the loan instead of the required October 30 and October 23, respectively."
+   ],
+   "call_id": "3bed4c8d-a428-4289-af6a-1d55f881d9b8",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 9
+  }
+ ]
+}

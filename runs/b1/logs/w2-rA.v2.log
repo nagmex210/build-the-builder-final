@@ -1,0 +1,48 @@
+  [Skill] {'skill': 'build-phone-agent', 'args': 'Slot: w2-rA. Tool API file: tools/openapi.json. Brief files: btb/briefs_raw/brie
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; ls; ls btb btb/briefs_raw out docs examples builder tools 2>&1; cat btb/briefs_raw
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; cat docs/workflow-format.md docs/tools-and-code.md .claude/skills/build-phone-agen
+  [Read] {'file_path': '/home/ubuntu/.claude/projects/-home-ubuntu-btb-wt2/f3a7ba6a-cbc9-4f37-bdad-ce1ec06fe634/tool-results/bp0f
+  [Read] {'file_path': '/home/ubuntu/.claude/projects/-home-ubuntu-btb-wt2/f3a7ba6a-cbc9-4f37-bdad-ce1ec06fe634/tool-results/bp0f
+I've read the brief, the format docs and the routing guide. Next I'm reading the rest of the tool API file, then I'll write the workflow.
+  [Read] {'file_path': '/home/ubuntu/.claude/projects/-home-ubuntu-btb-wt2/f3a7ba6a-cbc9-4f37-bdad-ce1ec06fe634/tool-results/bp0f
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; git status --short | head; git log --oneline -3; ls -la out; head -c 600 out/w2-rA
+Now writing the workflow generator.
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; sed -n 60,200p builder/lint_workflow.py; grep -n "def save_workflow\\|def api" -A1
+  [Write] {'file_path': '/tmp/w2rA/build.py', 'content': 'import json, sys\n\nBASE = "https://freya-bank-mock.freyavoice.workers.d
+  [Bash] {'command': 'cd /tmp/w2rA && python3 - <<\'EOF\'\nimport re\ns=open(\'build.py\').read()\ns=s.replace("""        elif d.
+  [Read] {'file_path': '/tmp/w2rA/build.py', 'offset': 488, 'limit': 8}
+  [Edit] {'replace_all': False, 'file_path': '/tmp/w2rA/build.py', 'old_string': '"unclear", "none"],\n                   "descri
+  [Bash] {'command': "python3 /tmp/w2rA/build.py out/w2-rA.workflow.json && python3 builder/lint_workflow.py out/w2-rA.workflow.j
+Builds, lints cleanly, and the hooks and date calculations work locally. Saving and checking that it starts.
+  [Bash] {'command': 'python3 -c "import freya,json,sys; print(json.dumps(freya.save_workflow(sys.argv[1], json.load(open(sys.arg
+  [Bash] {'command': 'python3 -c "import freya,json; print(json.dumps(freya.api(\'POST\',\'/api/v2/chat/message\',{\'workflowId\'
+  [Bash] {'command': 'sleep 20; python3 -c "import freya,json; print(json.dumps(freya.api(\'POST\',\'/api/v2/chat/message\',{\'wo
+  [Bash] {'command': 'cat .freya-agents.json | python3 -c "import json,sys; d=json.load(sys.stdin); [print(k,v[\'workflow_id\']) 
+  [Bash] {'command': 'python3 -c "\nimport freya,json\nfor wid in [\'217d660d-d50d-4364-9eee-ee4dd622ecbe\']:\n    try:\n        
+The chat endpoint returns 503 for every workflow, including the known-good base one, so the outage is on the platform side. I'll validate my workflow with a dry run instead.
+  [Bash] {'command': 'python3 -c "\nimport freya,json\nw=json.load(open(\'out/w2-rA.workflow.json\'))\nprint(str(freya.validate_w
+  [Bash] {'command': 'sleep 60; python3 -c "import freya,json; print(json.dumps(freya.api(\'POST\',\'/api/v2/chat/message\',{\'wo
+  [Bash] {'command': 'python3 -c "import freya; print(freya.api(\'POST\',\'/api/v2/chat/end\',{\'callId\':\'57852cea-75cc-4787-84
+I built the Brief A phone agent, saved it under slot w2-rA, and it starts a call. It opens with: "Hello, this is Freya Bank's digital assistant calling, and this call is recorded. Am I speaking with Ms Lee?" I have not run it against the practice customers, so how it does on whole calls is still untested.
+
+The first two start checks got a 503 error. The known-good base agent got the same error at that point, so the problem was on the platform side, not in this workflow. A dry-run validation passed, and the third check a minute later worked.
+
+**How it's built** (`out/w2-rA.workflow.json`, lint: 0 errors, 0 warnings):
+- **Stages:** a dates step, then the opening, the security check, the account lookup, and the negotiation, with a separate step if the account can't be loaded. The call only ends after a successful `close_call`, and every step that can end the call has that tool.
+- **Dates:** the amended deadlines are calculated in code from the supplied `now`: 12 business days for 1–7 days late, 7 for 8–45, skipping the bank holidays. The code also works out the callback window, the first persuasion date, a day-by-day calendar and what "this/next <weekday>" means. The agent reads these as facts and never does date maths itself.
+- **Hard checks before tool calls:**
+  - A promise is blocked if the date isn't an allowed business day up to the deadline, the amount is below the floor or above the past-due amount, or a promise already exists.
+  - A callback is blocked if it falls outside today or the next business day, 10:00–19:00, later than now.
+  - `close_call` is blocked if the outcome and reason don't match the code sheet. It is forced to `transferred` with the matching reason after a transfer, and to `not_verified`/`failed` after three wrong security answers.
+  - Dates of birth are converted to `YYYY-MM-DD`, reading number-only dates as day, month, year.
+- **Failures:** after every tool result the agent gets a plain instruction on what to say next. It only says a promise is recorded when the bank returns `ok: true`. A failed save is tried once more, then the call closes as `no_promise`/`service_error`. `add_note` is never used.
+
+**Left to the agent's prompt rather than enforced in code:** counting persuasion attempts, deciding whether a confirmation is clear, and recognising hardship, dispute, "already paid" and human requests.
+
+I overwrote the earlier `out/w2-rA.workflow.json`. The script that generates it is outside the repo at `/tmp/w2rA/build.py`.
+
+workflow_id: d25011bb-adca-4e99-be82-6278c7280f99, agent_id: 53e6966f-0232-41ee-89f9-550493263e94
+
+done: 23 turns, 427 s
+lint: 0 errors, 0 warnings
+{"workflow_id": "d25011bb-adca-4e99-be82-6278c7280f99", "agent_id": "53e6966f-0232-41ee-89f9-550493263e94"}

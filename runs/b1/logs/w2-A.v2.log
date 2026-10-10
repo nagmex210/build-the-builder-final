@@ -1,0 +1,46 @@
+  [Skill] {'skill': 'build-phone-agent', 'args': 'Slot: w2-A. Tool API file: tools/openapi.json. Brief files: briefs/brief-a.md. W
+  [Bash] {'command': 'cat briefs/brief-a.md && cat tools/openapi.json && cat docs/workflow-format.md docs/tools-and-code.md .clau
+  [Read] {'file_path': '/home/ubuntu/.claude/projects/-home-ubuntu-btb-wt2/3ba5c15c-a00c-4ac9-be5d-88d7df1db0cd/tool-results/bdp7
+  [Read] {'file_path': '/home/ubuntu/.claude/projects/-home-ubuntu-btb-wt2/3ba5c15c-a00c-4ac9-be5d-88d7df1db0cd/tool-results/bdp7
+  [Bash] {'command': 'git status --short | head; git log --oneline | head -5; ls -la out; head -50 builder/build.py; wc -l builde
+  [Bash] {'command': 'sed -n 80,151p builder/lint_workflow.py; ls; python3 -c "import freya; help(freya.save_workflow)" | head -2
+  [Write] {'file_path': '/tmp/w2A/gen.py', 'content': '"""Generate out/w2-A.workflow.json for Brief A."""\nimport json, sys\n\nBAS
+  [Bash] {'command': 'cd /tmp/w2A && python3 - <<\'EOF\'\nimport re\ns=open(\'gen.py\').read()\ns=s.replace("""    if pid and not
+Now a local test of the code snippets and hooks with sample data.
+  [Bash] {'command': "python3 - <<'EOF'\nimport json\nw=json.load(open('out/w2-A.workflow.json'))\nn=w['nodes']\nsetup=n['setup']
+Hooks and date logic behave correctly. Saving and running the start check.
+  [Bash] {'command': 'python3 -c "import freya,json,sys; print(json.dumps(freya.save_workflow(sys.argv[1], json.load(open(sys.arg
+  [Bash] {'command': 'python3 -c "import freya,json; print(json.dumps(freya.api(\'POST\',\'/api/v2/chat/message\',{\'workflowId\'
+  [Bash] {'command': 'sleep 20; python3 -c "import freya,json; print(json.dumps(freya.api(\'POST\',\'/api/v2/chat/message\',{\'wo
+  [Bash] {'command': 'python3 -c "\nimport json; d=json.load(open(\'.freya-agents.json\')); print({k:v.get(\'workflow_id\') for k
+  [Bash] {'command': 'sed -n 236,260p docs/api.md; python3 -c "\nimport freya,json\nfor w in [\'217d660d-d50d-4364-9eee-ee4dd622e
+  [Bash] {'command': 'python3 - <<\'EOF\'\np=\'/tmp/w2A/gen.py\'; s=open(p).read()\ns=s.replace(\'"Today is {{today_spoken}}. Use
+Saved as version 3. The chat endpoint still returns 503. I'm trying once more after a short wait, against both my workflow and the base agent.
+  [Bash] {'command': 'sleep 120; python3 -c "\nimport freya,json\nfor w in [\'4b5eb075-a0af-4c9a-bf1d-9f0ba94dd086\',\'217d660d-d
+The workflow for Brief A is built and saved (version 3), but I couldn't run the start check. The chat endpoint returned 503 on every try over several minutes, for this workflow and for the kit's base agent alike, so it looks like a platform outage. A 503 isn't the 500 that means a workflow can't start, but it hasn't had a single turn and no practice customers were run. Re-run the step 6 chat command once the platform is back.
+
+**What's in `out/w2-A.workflow.json`** (lint: 0 errors, 0 warnings):
+- **Setup:** a code step works out today and the callback window from `now`.
+- **Opening:** a fixed first line (digital assistant, Freya Bank, call recorded, "Am I speaking with…"). It moves on only when the customer clearly confirms who they are. It handles relatives, callbacks, wrong numbers, deaths, unclear answers and requests for a human.
+- **Identity:** asks date of birth, then the last four phone digits, with one `verify_identity` call per answer. It handles the day/month swap hint, three wrong answers and refusals. It moves on only when the service says both answers passed.
+- **Account:** looks up the account, then a code step works out the product name, the lowest amount that can be recorded, the early/late band, the deadline, the two persuasion offers and a day-by-day calendar. The agent gets finished dates and never does calendar maths itself.
+- **Negotiation:** states the debt in a fixed line, then runs the brief's promise rules and the other situations (already paid, dispute, hardship, new payment plan, human request).
+- **Hang-up:** every stage that can end the call moves here only after `close_call` succeeds.
+
+Some rules are enforced in code, so the bank system records nothing that breaks them:
+- **Promises:** a date outside the allowed business days, an amount below the lowest allowed or above the past-due amount, or a second promise is not recorded. The agent is told why and what to offer instead.
+- **Callbacks:** anything outside today or the next business day, 10:00–19:00 and later than `now`, is not booked.
+- **Closing:** an outcome with a reason that doesn't match the brief's table is not accepted. After a recorded promise the outcome is forced to `promise`, and after a transfer the reason is set from the queue.
+- **Identity answers:** dates and phone digits are cleaned up before they're sent.
+
+Some of this depends on the hooks sharing values between calls, which the docs only partly confirm. If that doesn't work, the date and amount checks still stop a bad promise, but the agent gets a vaguer explanation. The "try once more, then give up" count for a failed promise could also keep resetting. A simulation run would show which.
+
+I went through the brief rule by rule against the workflow. One judgement call: if, during the security questions, the person says they aren't the customer after all, I close as `not_reached` / `unclear`, because the brief doesn't cover that case.
+
+The generator script that writes the file is at `/tmp/w2A/gen.py`, outside the repo, so copy it in if you want to keep it.
+
+workflow_id: 4b5eb075-a0af-4c9a-bf1d-9f0ba94dd086, agent_id: 8bb3f92a-09f3-4a92-ab39-7cab30b89a56
+
+done: 18 turns, 529 s
+lint: 0 errors, 0 warnings
+{"workflow_id": "4b5eb075-a0af-4c9a-bf1d-9f0ba94dd086", "agent_id": "8bb3f92a-09f3-4a92-ab39-7cab30b89a56"}

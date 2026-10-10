@@ -1,0 +1,47 @@
+  [Skill] {'skill': 'build-phone-agent', 'args': 'Slot: w2-B. Tool API file: tools/openapi.json. Brief files: briefs/brief-a.md br
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; cat briefs/brief-a.md; echo ======; cat briefs/brief-b.md; echo =====; cat tools/o
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; cat docs/workflow-format.md; echo =====; cat docs/tools-and-code.md; echo =====; c
+  [Read] {'file_path': '/home/ubuntu/.claude/projects/-home-ubuntu-btb-wt2/da55b499-e84a-4dc4-ab2d-1adbaf7232b6/tool-results/b1zf
+  [Read] {'file_path': '/home/ubuntu/.claude/projects/-home-ubuntu-btb-wt2/da55b499-e84a-4dc4-ab2d-1adbaf7232b6/tool-results/b1zf
+I've read both briefs, the tool API and the format docs. Next I'll check the lint script and existing builder, then write the workflow.
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; wc -l builder/*.py; cat builder/lint_workflow.py; ls; ls freya* 2>/dev/null; grep 
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; sed -n 1,80p README.md; python3 -c "\nimport json;d=json.load(open(\'public-test-s
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; grep -n "customer\\|mock\\|def " tools/run_cases.py | head -60; ls runs | head; ca
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; sed -n 1,25p tools/run_cases.py; sed -n 84,96p tools/run_cases.py'}
+Now writing the workflow generator (kept outside the kit in /tmp).
+  [Write] {'file_path': '/tmp/w2b/gen.py', 'content': '"""Generate out/w2-B.workflow.json for Brief B (on top of Brief A)."""\nimp
+  [Bash] {'command': "cd /home/ubuntu/btb/wt2; mkdir -p out; python3 /tmp/w2b/gen.py out/w2-B.workflow.json && python3 builder/li
+Lint is clean and the hooks behave locally. Saving and checking that it starts.
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; ls env.sh 2>/dev/null; [ -f env.sh ] && source env.sh; python3 -c "import freya,js
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; grep -n -i -A25 "chat/message" docs/api.md | head -60; python3 -c "\nimport json;[
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; source env.sh; cat > /tmp/w2b/chat.py <<\'EOF\'\nimport sys, json\nsys.path.insert
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; python3 -c "\nimport json;c=[c for c in json.load(open(\'public-test-set.json\')) 
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; python3 /tmp/w2b/chat.py 4f8a3d12-421f-4165-b57f-c8bdfa2327ec PUB-13 "Hello?" "Yes
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; python3 - <<\'EOF\'\np=\'/tmp/w2b/chat.py\';s=open(p).read()\ns=s.replace("    r=f
+Hooks and routing work end to end against the mock (verify → account → notes → close). The test script's own replies were off, so I'm tightening the read-back wording and running it again.
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; python3 - <<\'EOF\'\np=\'/tmp/w2b/gen.py\';s=open(p).read()\ns=s.replace("""- When
+The multi-product case passes: two promises, the loan moved to its own deadline, outcome `promise`. One more fix: the close hook should force `transferred` with the right reason after any transfer.
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; python3 - <<\'EOF\'\np=\'/tmp/w2b/gen.py\';s=open(p).read()\ns=s.replace("""TRANSF
+I built the Brief B phone agent and saved it as slot w2-B. The workflow is in `out/w2-B.workflow.json`. The lint shows 0 errors and 0 warnings, and the start check returns the opening line.
+
+I did not run the practice-customer suite. I ran four calls by hand against the practice bank, all on practice customer PUB-13 (two products, one date for both):
+- **First call:** I used a made-up date of birth. The agent counted it as a wrong answer and asked again.
+- **Second call:** it cut out after a server error (502), before anything was recorded.
+- **Third call:** my scripted replies were wrong, so the customer seemed to say goodbye mid-negotiation. The agent added a `refused` note for each product and closed as `no_promise` / `refused`. That is what the rules say for a customer who leaves, but it means the outcome logic worked, not that this case passed.
+- **Fourth call, after fixes:** both promises were recorded as the practice case expects: credit card 300 on 30 October, loan 900 moved to its own deadline of 23 October. The call closed as `promise`.
+
+**How it's built:** an opening step (who is on the line, callbacks, wrong number, deceased), an identity step, an account lookup, a step that works out all the dates and amounts, and a negotiation step. Every step that can end the call routes to the hang-up step once the close tool succeeds.
+
+**Rules enforced in code rather than in prompts:**
+- **Promises:** a promise is blocked if the amount is below the floor or above the past-due amount, or if the date is in the past, not a business day, or after that product's deadline. A second promise on the same product is also blocked. Blocked calls never reach the bank.
+- **Callbacks:** a callback outside today or the next business day, 10:00 to 19:00 and later than now, is blocked.
+- **Notes:** no note can be added after a transfer, and none on a product that already has a promise or a note.
+- **Close outcome:** after any transfer it is forced to `transferred` with the matching reason. Otherwise any recorded promise means `promise`, all products noted `paid` means `paid`, and anything else is `no_promise` with the reason of the first product noted as not paid.
+
+**Decision for you:** Brief A says it never uses `add_note`, but Brief B requires a note for every product without a promise, even when there is only one product. I followed Brief B, so single-product customers who end without a promise also get a note. If those customers should be scored under Brief A, those notes would be wrong.
+
+workflow_id `4f8a3d12-421f-4165-b57f-c8bdfa2327ec`, agent_id `0ff14fe6-34a6-4040-8894-d0d0f47637eb`
+
+done: 21 turns, 464 s
+lint: 0 errors, 0 warnings
+{"workflow_id": "4f8a3d12-421f-4165-b57f-c8bdfa2327ec", "agent_id": "0ff14fe6-34a6-4040-8894-d0d0f47637eb"}

@@ -1,0 +1,49 @@
+FAIL PUB-01 1/2 | verify_identity > verify_identity > get_account > create_promise > close_call
+       - [corrects] conversation: create_promise was never called, and the text-message sentence was not said after a promise.
+FAIL PUB-02 0/2 | schedule_callback > close_call
+       - [asks_back] conversation: The callback was scheduled for 2026-10-15 at 11:00, not clearly the next business day, and the agent incorrectly described that date as tomorrow.
+       - [corrects] outcome ('not_verified', 'declined'), expected ('not_reached', 'callback')
+       - [corrects] callbacks [], expected [{'date': '2026-10-15', 'time': '11:00'}]
+       - [corrects] conversation: The required callback for the next business day at 11:00 was never scheduled.
+FAIL PUB-03 0/2 | verify_identity > verify_identity > close_call
+       - [talkative] conversation: The check ending after the third wrong answer is not clearly satisfied because the third answer was never submitted to verify_identity, so only two answers were confirmed wrong.
+       - [talkative] outcome (None, None), expected ('not_verified', 'failed')
+       - [talkative] the call was not closed with close_call
+       - [talkative] conversation: The transcript does not establish that the check ends after the third wrong answer or that the customer is told to use the app or a branch.
+       - [talkative] harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"1645f788-b1e4-47a1-8b1f-b928ad7b3a88"}}}
+FAIL PUB-04 1/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [asks_back] promises [], expected [('p1', 1250.0, '2026-10-23')]
+       - [asks_back] conversation: The promise-date check failed because the agent accepted 6 November instead of the required late-band deadline of 23 October.
+FAIL PUB-05 0/2 | verify_identity > verify_identity > get_account
+       - [pieces] outcome (None, None), expected ('no_promise', 'hardship')
+       - [pieces] the call was not closed with close_call
+       - [pieces] harness: POST /api/v2/chat/message -> 503: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"0519406c-ee8e-4f63-a202-5baa6372bb70"}}}
+       - [in_words] outcome (None, None), expected ('no_promise', 'hardship')
+       - [in_words] the call was not closed with close_call
+       - [in_words] conversation: The call fails because no sentence of sympathy was given and the support team was not offered once.
+       - [in_words] harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"b6dea68e-e6d1-45bd-beeb-66ab1126569c"}}}
+FAIL PUB-06 0/2 | verify_identity > verify_identity
+       - [corrects] outcome (None, None), expected ('promise', None)
+       - [corrects] promises [], expected [('p1', 637.5, '2026-10-16')]
+       - [corrects] the call was not closed with close_call
+       - [corrects] conversation: The agent never offered a minimum payment with notice that the remainder stays overdue, and no promise for 637.50 on Friday 16 October was agreed or recorded.
+       - [talkative] outcome (None, None), expected ('promise', None)
+       - [talkative] promises [], expected [('p1', 637.5, '2026-10-16')]
+       - [talkative] the call was not closed with close_call
+       - [talkative] conversation: The agent did not offer the minimum payment with notice that the rest stays overdue or establish a promise for 637.50 on Friday 16 October.
+       - [talkative] harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"34cd0282-9680-4772-8588-de95e0af5495"}}}
+FAIL PUB-07 1/2 | verify_identity > verify_identity > get_account > create_promise > close_call
+       - [plain] promises [], expected [('p1', 540.0, '2026-10-27')]
+       - [plain] conversation: The agent did not reject 26 October or offer the next business day, and no promise was recorded for Tuesday 27 October inside the early-band deadline.
+FAIL PUB-08 1/2 | verify_identity > verify_identity > get_account > close_call
+       - [plain] conversation: The agent never says that payments can take one business day to appear.
+PASS PUB-09 2/2 | verify_identity > verify_identity > get_account > transfer_to_agent > close_call
+FAIL PUB-10 0/2 | verify_identity
+       - [asks_back] outcome (None, None), expected ('promise', None)
+       - [asks_back] promises [], expected [('p1', 365.0, '2026-10-16')]
+       - [asks_back] the call was not closed with close_call
+       - [asks_back] conversation: Exactly one promise in the ledger after the retry is not established, and the agent says 'recorded' before any successful tool call.
+       - [asks_back] harness: chat turn timed out and no reply appeared
+       - [talkative] conversation: The agent says “this call is recorded” in the opening before any successful tool call, failing the check that the agent does not say “recorded” before a successful call.
+
+fast_eval: 1 / 10 passed (2 rep(s), all reps must pass), 912 s
