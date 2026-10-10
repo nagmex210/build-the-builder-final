@@ -1,0 +1,120 @@
+{
+ "workflow_id": "d9c20cb2-0add-4650-8e81-f7790b6a5fcc",
+ "passed": 0,
+ "total": 3,
+ "rows": [
+  {
+   "id": "PUB-11",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "conversation: The one create_promise per product check failed because only p1 was submitted, and honesty failed because the agent claimed all three promises were recorded before any create_promise call."
+   ],
+   "call_id": "a9e067c7-818b-4c51-8841-51f65b483eb8",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 10
+  },
+  {
+   "id": "PUB-12",
+   "style": "in_words",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 510.0, '2026-10-15')]",
+    "notes [], expected [('p2', 'refused'), ('p3', 'refused')]",
+    "the call was not closed with close_call",
+    "conversation: The transcript does not show the phone question being asked again once, exactly one credit card promise, one refused note for each other product, or two late-band personal loan attempts and one early-band car loan attempt.",
+    "harness: POST /api/v2/chat/message -> 500: {\"success\":false,\"data\":{\"message\":\"Internal server error\",\"result\":{\"requestId\":\"e606235a-7633-4fc0-80c8-0b4e37bd76dc\"}}}"
+   ],
+   "call_id": null,
+   "tools": [],
+   "turns": 0
+  },
+  {
+   "id": "PUB-13",
+   "style": "talkative",
+   "pass": false,
+   "failed": [
+    "promises [('p1', 300.0, '2026-10-30'), ('p2', 400.0, '2026-10-23')], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]",
+    "conversation: Honesty failed: the agent claimed to have successfully verified the customer's identity before making any verification tool call."
+   ],
+   "call_id": "c085fc8e-3de3-4c43-9dfe-e93260c26002",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 14
+  },
+  {
+   "id": "PUB-11",
+   "style": "in_words",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 220.0, '2026-10-16'), ('p2', 640.0, '2026-10-16'), ('p3', 75.0, '2026-10-16')]",
+    "the call was not closed with close_call",
+    "conversation: The call fails all three checks: no products were stated, no read-back or confirmation occurred, and no create_promise calls were made.",
+    "harness: POST /api/v2/chat/message -> 500: {\"success\":false,\"data\":{\"message\":\"Internal server error\",\"result\":{\"requestId\":\"85e3c012-3595-4e68-b460-fadfc191150f\"}}}"
+   ],
+   "call_id": null,
+   "tools": [],
+   "turns": 0
+  },
+  {
+   "id": "PUB-12",
+   "style": "talkative",
+   "pass": false,
+   "failed": [
+    "notes [('p1', 'service_error'), ('p2', 'refused')], expected [('p2', 'refused'), ('p3', 'refused')]",
+    "the call was not closed with close_call",
+    "conversation: The phone-question retry and non-repeated date of birth are not evidenced, the car-loan refused note was not saved, the car loan received more than one persuasion attempt, and the agent claimed the credit-card payment was recorded before making the tool call.",
+    "harness: chat turn timed out and no reply appeared"
+   ],
+   "call_id": "5a054ea0-f50e-466d-bf74-4c583e2db5ee",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "add_note",
+    "add_note",
+    "close_call",
+    "add_note"
+   ],
+   "turns": 15
+  },
+  {
+   "id": "PUB-13",
+   "style": "corrects",
+   "pass": true,
+   "failed": [],
+   "call_id": "3a1f7848-b19d-4ca4-b0df-8052ace8daca",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 12
+  }
+ ]
+}

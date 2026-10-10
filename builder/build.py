@@ -7,7 +7,7 @@ call with its purpose, what it created on Freya, tests it ran) to runs/traces/<s
 Baseline = the kit's example builder (Claude Agent SDK + the build-phone-agent skill), with the test step
 changed: no practice-case runs (hidden briefs come without cases).
 """
-import argparse, asyncio, dataclasses, json, os, pathlib, sys, time
+import argparse, asyncio, dataclasses, json, os, pathlib, subprocess, sys, time
 
 from claude_agent_sdk import AssistantMessage, ClaudeAgentOptions, ResultMessage, TextBlock, ToolUseBlock, query
 
@@ -31,6 +31,31 @@ async def run(slot, tools, briefs):
     )
     prompt = (f"Use the build-phone-agent skill. Slot: {slot}. Tool API file: {tools}. Brief files: {' '.join(briefs)}. "
               f"Write the workflow to out/{slot}.workflow.json and save it with slot {slot}.")
+    # Code steps: dates, business days, deadlines and floors are computed by generated, locally tested code.
+    t_calc = time.time()
+    calc = subprocess.run([sys.executable, str(KIT / "builder" / "datecalc.py"), "--slot", slot, "--tools", tools, *briefs],
+                          cwd=KIT, capture_output=True, text=True, env={**os.environ, "BTB_TRACE": str(trace)})
+    calc_file = KIT / "out" / f"{slot}.calc.json"
+    calc_ok = calc_file.exists() and json.loads(calc_file.read_text()).get("ok")
+    with trace.open("a") as out:
+        out.write(json.dumps({"event": "test", "what": "datecalc: extract calendar/amount spec, generate code node + account hook, "
+                              "run both locally on 5 dates and fake products", "ok": bool(calc_ok),
+                              "seconds": round(time.time() - t_calc), "output": calc.stdout[-1500:] + calc.stderr[-800:]}) + "\n")
+    if calc_ok:
+        prompt += (f" CODE STEPS (tested, use them as given): {calc_file} holds a ready `code_node` and an `account_post_process_code` hook. "
+                   "(1) Put `code_node` into the workflow as the START node (set its two '<NEXT NODE>' fields to your opening node); "
+                   "do not edit its code. It writes `date_facts`: today, anchor dates (next business day, last business day of this/next week/month), "
+                   "the deadline per band, callback days, what 'this/next <weekday>' means, and a day-by-day calendar with business-day flags. "
+                   "Put {{date_facts}} in the task_message of every node that handles callbacks, dates or promises, and tell the model there: "
+                   "'Never compute a date yourself. Look every date up in DATE FACTS: a named weekday via WEEKDAY WORDS, whether a day is a business "
+                   "day and the next business day via CALENDAR, deadlines and attempt dates via the anchor lines.' "
+                   "(2) Set `account_post_process_code` verbatim as the `post_process_code` of the tool named in `account_tool` "
+                   "(if you need more hook logic, append it after this code, do not change it). It adds to every product: `band`, `deadline`, "
+                   "`deadline_weekday`, `persuasion_attempts`, `floor_amount`, and puts the same DATE FACTS block into the result as `date_facts` "
+                   "(and into the variable date_facts): this is the reliable copy after identity, because the platform may skip the code of the "
+                   "start node. Tell the model to use each product's own `deadline` and `floor_amount` "
+                   "from the tool result and never to compute them. Read `example_date_facts` in that file to see the output. "
+                   "If the brief's rule differs from these facts, follow the brief and mention it in your final line.")
     t0 = time.time()
     with trace.open("a") as out:
         out.write(json.dumps({"event": "start", "at": time.strftime("%Y-%m-%dT%H:%M:%S%z"), "slot": slot, "tools": tools,
