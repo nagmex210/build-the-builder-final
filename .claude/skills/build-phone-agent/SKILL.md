@@ -23,6 +23,14 @@ Work from the kit folder. Use only what the brief and the tool API file say. Do 
 7. Re-read the brief rule by rule against your workflow and fix every rule that is not enforced. Do this once.
 8. Finish with one line: the `workflow_id` and the `agent_id`.
 
+## Customers talk like people
+
+Real customers give numbers and dates in two parts, correct themselves, say amounts and dates in words, ask a question back, and chat about unrelated things (and mention unrelated dates). The builder adds a general block about this to `system_prompt` after you save, so do not write your own copy. But make the structure robust to it:
+- `extraction_schema` descriptions: say the value is the customer's final, corrected value, converted from words to digits, joined from pieces given across turns, in the exact format the tool wants.
+- Transitions that fire on what the customer says must not fire on half an answer, a question back or small talk. Prefer transitions on tool results and variables.
+- In nodes that check answers or record values, the `task_message` says: wait until the value is complete; use the last corrected value; read amount and date back before recording.
+- Give conversation nodes that collect values enough `max_node_turns` (at least 8) so a chatty customer does not hit the cap.
+
 ## Rules
 
 - Never edit the agent on the platform by hand. Change the file and save it.

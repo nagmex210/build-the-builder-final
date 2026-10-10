@@ -14,6 +14,34 @@ from claude_agent_sdk import AssistantMessage, ClaudeAgentOptions, ResultMessage
 KIT = pathlib.Path(__file__).resolve().parent.parent
 
 
+ROBUST = (pathlib.Path(__file__).resolve().parent / "robustness.md").read_text().strip()
+
+
+def add_robustness(slot, trace):
+    """Deterministic post-step: put the brief-agnostic block on how customers talk into the workflow's global
+    prompt (the dialogue model sees it in every step) and re-save the same slot, so no build can forget it."""
+    sys.path.insert(0, str(KIT))
+    import freya
+    f = KIT / "out" / f"{slot}.workflow.json"
+    if not f.exists():
+        return None
+    wf = json.loads(f.read_text())
+    sp = wf.get("system_prompt") or ""
+    if ROBUST.splitlines()[0] in sp:
+        return None
+    wf["system_prompt"] = (sp.rstrip() + "\n\n" + ROBUST).strip()
+    f.write_text(json.dumps(wf, indent=1))
+    cwd = os.getcwd(); os.chdir(KIT)
+    try:
+        state = freya.save_workflow(slot, wf)
+    finally:
+        os.chdir(cwd)
+    with trace.open("a") as out:
+        out.write(json.dumps({"event": "post-step", "what": "added customer-speech robustness block to system_prompt, re-saved",
+                              "created": state}) + "\n")
+    return state
+
+
 async def run(slot, tools, briefs):
     trace = KIT / "runs" / "traces" / f"{slot}-{time.strftime('%Y%m%d-%H%M%S')}.jsonl"
     trace.parent.mkdir(parents=True, exist_ok=True)
@@ -47,6 +75,8 @@ async def run(slot, tools, briefs):
             elif isinstance(message, ResultMessage):
                 print(f"\ndone: {message.num_turns} turns, {message.duration_ms / 1000:.0f} s", flush=True)
     state = json.loads((KIT / ".freya-agents.json").read_text()).get(slot) if (KIT / ".freya-agents.json").exists() else None
+    if state:
+        state = add_robustness(slot, trace) or state
     with trace.open("a") as out:
         out.write(json.dumps({"event": "end", "at": time.strftime("%Y-%m-%dT%H:%M:%S%z"), "seconds": round(time.time() - t0),
                               "created": state}) + "\n")
