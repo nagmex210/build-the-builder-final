@@ -10,11 +10,16 @@ sys.path.insert(0, str(KIT)); sys.path.insert(0, str(KIT / "builder"))
 import freya                      # noqa: E402
 from harden import harden         # noqa: E402
 from robust import robustify      # noqa: E402
+from canned import apply as apply_canned  # noqa: E402
 
 
-def finish_and_save(slot, wf):
+def finish_and_save(slot, wf, canned=None):
     names = harden(wf)
     robustify(wf)
+    if canned is None:
+        f = KIT / "out" / f"{slot}.canned.json"
+        canned = json.loads(f.read_text()) if f.exists() else None
+    names = names + apply_canned(wf, canned)    # after harden: the say_now hook reads harden's tool_outcome
     state = freya.save_workflow(slot, wf, state_file=str(KIT / ".freya-agents.json"))
     return names, state
 
