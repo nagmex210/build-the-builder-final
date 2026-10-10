@@ -33,8 +33,8 @@ Work from the kit folder. Use only what the brief and the tool API file say. Do 
   was recorded: never say it was recorded, booked or done." Do not write your own retry loop in a hook.
 - Find the brief's rule for a failed tool call (how many attempts, what to tell the customer, which outcome/reason to
   close with) and write it into the prompt of every node that can call a write tool, and into routing where possible
-  (the engine counts `<tool>_failure_count` per tool; a transition on it can move to the closing node with the brief's
-  failure outcome). Writes are never retried by the platform (`maxRetries: 0`); the model makes each attempt itself.
+  (a transition can move to the closing node with the brief's failure outcome; test, in one OR group, both the
+  engine's counter `<tool>_failure_count` and the hook's counter `tool_failures_<tool>`, each with `greater_than`). Writes are never retried by the platform (`maxRetries: 0`); the model makes each attempt itself.
   If the brief has no such rule: try once more, then tell the customer it could not be done.
 - Only after a SUCCESS result may the agent say a thing is recorded, booked, scheduled, transferred or sent. Never
   announce it before the call ("I have recorded..." while calling the tool is a lie if it then fails).
