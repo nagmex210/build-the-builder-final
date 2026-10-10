@@ -141,6 +141,13 @@ def harden(wf):
             continue
         name = fn.get("name") or "tool"
         write = not name.startswith("get_")
+        # A body leaf without `default` is dropped from the request on this platform (seen b1 merge: verify_identity
+        # sent only customer_id). The kit's working pattern: a model-filled field gets "default": "{{<field>}}".
+        body = (((fn.get("parameters") or {}).get("properties") or {}).get("body") or {})
+        for fld, leaf in (body.get("properties") or {}).items():
+            if isinstance(leaf, dict) and "default" not in leaf and leaf.get("type") != "object":
+                leaf.pop("const", None)
+                leaf["default"] = "{{" + fld + "}}"
         cfg = t.setdefault("config", {})
         if write:
             cfg["maxRetries"] = 0

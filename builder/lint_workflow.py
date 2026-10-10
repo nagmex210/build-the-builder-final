@@ -100,6 +100,11 @@ def lint(w):
             for m in tool.get("response_mapping", []) or []:
                 if not str(m.get("path", "")).startswith("data."):
                     warns.append(f"{k}/{name}: response_mapping path {m.get('path')!r} should start with 'data.'")
+            if f.get("handler") == "__function__:api_call":
+                bp = (((f.get("parameters") or {}).get("properties") or {}).get("body") or {}).get("properties") or {}
+                for fld, leaf in bp.items():
+                    if isinstance(leaf, dict) and "default" not in leaf:
+                        errs.append(f"{k}/{name}: body field {fld!r} has no default (the platform drops it; use \"{{{{{fld}}}}}\")")
             if "const" in json.dumps(f.get("parameters", {})):
                 warns.append(f"{k}/{name}: uses 'const' (use 'default')")
         for m in n.get("response_mapping", []) or []:

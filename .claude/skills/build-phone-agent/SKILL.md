@@ -19,6 +19,7 @@ Work from the kit folder. Use only what the brief and the tool API file say. Do 
      transition on the close tool's result to an `end_call` node.
    - Move to the next step on a tool result or an extracted enum variable, not on `matches_intent`.
    - Take every tool field and allowed value from the tool API file you were given.
+   - Every `api_call` body leaf needs a `default`: model-filled fields use `"default": "{{<field name>}}"` (a leaf without `default` is dropped from the request).
    - Leave `agent_config` out.
    - Run `python3 builder/lint_workflow.py out/<slot>.workflow.json` and fix every ERROR before saving.
 5. Save it: `python3 builder/save.py <slot> out/<slot>.workflow.json`
