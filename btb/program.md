@@ -80,6 +80,12 @@ will score zero on Sunday. The merger rejects such changes.
    `python3 btb/official_ws2.py main-B --brief B --reps 2 > runs/<batch>/official-B.txt &` then `wait`.
    (`official_ws2.py` copies the slot's workflow into our second workspace and scores it there.)
    Keep (commit to `main`, push) only if official A+B passes do not drop vs the champion.
+4b. HELD-OUT CHECK (merger only, every batch): build the merged builder on brief C
+   (`python3 builder/build.py --slot main-C --tools btb/brief_c/openapi-c.json btb/brief_c/brief-c.md`) and score it:
+   `python3 btb/fast_eval.py <wf> --cases btb/brief_c/cases-c.json --bank $(cat btb/brief_c/BANK_URL) --reps 1`
+   (if the tunnel is down: `bash btb/brief_c/start.sh`, then rebuild). Brief C is a hidden-like brief with rules A/B do
+   not have. Write the C score in the description column and the journal. A change that helps A/B but drops C is
+   suspect (it is fitting A/B). Never show brief C content to workers and never write it into builder/.
 5. Append a row to `results.tsv`: `batch	commit	fast_A	fast_B	fast_rawA	fast_rawB	official_A	official_B	build_s	status	description`.
 6. Journal entry: what each worker tried, measured numbers, what was kept and why, hypotheses (marked) for next batch.
 7. Assign the next batch's five idea families in `runs/next_families.txt` (one per line), covering different parts:
