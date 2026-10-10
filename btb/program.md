@@ -55,7 +55,7 @@ will score zero on Sunday. The merger rejects such changes.
 
 ## WORKER (you were started in a git worktree `wt<N>` on branch `idea/<batch>-<N>`)
 
-1. Read: this file, `journal.md` (what was tried; do not repeat a discard unless the mechanism changes),
+1. Read: this file, `btb/ideas.md` (idea bank), `journal.md` (what was tried; do not repeat a discard unless the mechanism changes),
    the last batch's reports, `builder/`.
 2. Your idea family is given in your prompt. Pick ONE concrete idea in it, the one you believe moves the score most.
 3. Implement it in `builder/`. Commit.
@@ -89,3 +89,7 @@ will score zero on Sunday. The merger rejects such changes.
 
 At **Sun 11 Oct 16:30 UTC** stop all work. `main` is the submission builder. Write `FINAL.md`: how to run it,
 champion scores, known weaknesses.
+
+## Builder login
+
+If the builder's Claude is not logged in inside your shell: `export CLAUDE_CODE_OAUTH_TOKEN=$(aws ssm get-parameter --region eu-central-1 --name /video-iq/claude_token --with-decryption --query Parameter.Value --output text)`.
