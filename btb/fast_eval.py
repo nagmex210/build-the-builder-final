@@ -114,7 +114,32 @@ def bank(path, body=None):
             time.sleep(5 + 5 * k)
 
 
+SLOTS = int(os.environ.get("BTB_EVAL_SLOTS", "8"))
+
+
+def _slot():
+    """Box-wide cap on simultaneous chat conversations (all workers share Freya; ~25 at once saturated it in b3)."""
+    import fcntl
+    d = "/home/ubuntu/btb/evalslots"; os.makedirs(d, exist_ok=True)
+    while True:
+        for i in range(SLOTS):
+            f = open(f"{d}/{i}", "w")
+            try:
+                fcntl.flock(f, fcntl.LOCK_EX | fcntl.LOCK_NB); return f
+            except OSError:
+                f.close()
+        time.sleep(2)
+
+
 def run_case(workflow_id, case, style=None):
+    s = _slot()
+    try:
+        return _run_case(workflow_id, case, style)
+    finally:
+        s.close()
+
+
+def _run_case(workflow_id, case, style=None):
     sess = bank("/v1/practice/sessions", {"case": case["id"]})["variables"]
     persona = persona_for(case, {"identity": case["identity"]}, None if style in EXTRA_STYLES else style)["prompt"]
     if style in EXTRA_STYLES:
