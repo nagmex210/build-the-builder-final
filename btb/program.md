@@ -86,6 +86,9 @@ will score zero on Sunday. The merger rejects such changes.
    `python3 btb/official_ws2.py main-B --brief B --reps 2 > runs/<batch>/official-B.txt &` then `wait`.
    (`official_ws2.py` copies the slot's workflow into our second workspace and scores it there.)
    Keep (commit to `main`, push) only if official A+B passes do not drop vs the champion.
+   ACCEPT RULE (results vary a lot run to run): never keep a change because it wins by one case. Keep it only with
+   (a) an improvement that repeats, (b) fixes across more than one failure kind, or (c) a mechanistic reason it
+   generalises (say which). Merge harness/* branches (e.g. harness/dspy) only if their report shows a held-out gain.
 4b. HELD-OUT CHECK (merger only, every batch): build the merged builder on brief C
    (`python3 builder/build.py --slot main-C --tools btb/brief_c/openapi-c.json btb/brief_c/brief-c.md`) and score it:
    `python3 btb/fast_eval.py <wf> --cases btb/brief_c/cases-c.json --bank $(cat btb/brief_c/BANK_URL) --reps 1`
