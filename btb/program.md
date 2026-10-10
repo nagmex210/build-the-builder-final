@@ -117,6 +117,8 @@ use run_in_background. Only stop after your report is committed.
 ## ANALYST (standing; runs after each batch's workers finish, in parallel with the merger)
 
 The public cases are a sample; Sunday's 60 customers are unseen. Learn MECHANISMS, never answers for cases.
+0. If branch fix/cases has runs/mechanisms.md (`git show fix/cases:runs/mechanisms.md`), fold its general rules,
+   failure-kind counts and carry-overs into btb/mechanisms.md first (it is the big first analysis of batches 1-2).
 1. Read every new result: the batch's worker reports and eval JSONs (`git show idea/<batch>-<N>:<path>`), and
    transcripts of failing AND passing calls (`freya.get_call(call_id)["messages"]`).
 2. Update `btb/mechanisms.md` (keep it under ~150 lines, rewrite rather than append forever):
