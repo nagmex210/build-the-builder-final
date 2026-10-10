@@ -1,0 +1,38 @@
+  [Skill] {'skill': 'build-phone-agent', 'args': 'Slot: w3-rB. Tool API file: tools/openapi.json. Brief files: btb/briefs_raw/brie
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt3; ls btb/briefs_raw; wc -c btb/briefs_raw/brief-a-raw.md btb/briefs_raw/brief-b-raw.
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt3; cat .claude/skills/build-phone-agent/routing.md; cat tools/openapi.json | python3 
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt3; cat examples/base-agent.json; python3 -c "\nimport json;d=json.load(open(\'out/w3-
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt3; grep -n "^#" docs/workflow-format.md docs/tools-and-code.md | head -80; python3 -c
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt3; sed -n 143,340p docs/tools-and-code.md; sed -n 367,500p docs/tools-and-code.md'}
+Reading done; now writing the workflow generator.
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt3; sed -n 528,660p docs/workflow-format.md'}
+  [Bash] {'command': 'mkdir -p /tmp/w3rB && cat > /tmp/w3rB/gen.py <<\'EOF\'\nimport json\ncalc=json.load(open(\'/home/ubuntu/btb
+  [Bash] {'command': 'sed -i "s/ or \'{{\' in str(b.get(\'reason\'))/ or chr(123)*2 in str(b.get(\'reason\'))/" /tmp/w3rB/gen.py 
+Saved. Quick start check.
+  [Bash] {'command': 'timeout 90 python3 -c "import freya,json; print(json.dumps(freya.api(\'POST\',\'/api/v2/chat/message\',{\'w
+I built the workflow for slot w3-rB and saved it. One chat turn starts correctly: the agent says it is Freya Bank's digital assistant, that the call is recorded, and asks "Am I speaking with Ms Lee?". That turn is the only test I ran: no practice cases, and no live conversation past the opening.
+
+**How it is set up:**
+- The call runs through these steps in order:
+  1. The date code step you supplied runs first and leads to the opening.
+  2. Opening: who is on the line, plus callbacks, wrong number and deceased.
+  3. Security check.
+  4. A silent account lookup.
+  5. A short code step that lists each product with its id, amount, days late, band, minimum amount and deadline.
+  6. One negotiation stage.
+  7. The end of the call.
+- The account hook is attached to `get_account` exactly as given. Every stage that deals with dates, callbacks or promises shows DATE FACTS and the rule never to compute a date.
+- The call moves between stages only on tool results or on a clear "this is the customer" answer. It moves on to the account lookup only once both security answers are verified. It ends when `close_call` succeeds.
+- Following the memos, a failed promise recording is tried once more. After a second failure that product counts as a service error. Transfers never add notes.
+
+**Brief conflicts:**
+- **Notes on single-product calls:** Brief A says never use `add_note`, but Brief B replaces that and requires a note for every product without a promise. I followed Brief B, so notes are also written when there is only one product. If this agent is scored on Brief A single-product calls, those notes will count against it.
+- **Deadlines:** the supplied date facts already use the amended deadlines (12 and 7 business days), which match the brief. No other differences.
+
+Workflow file: `out/w3-rB.workflow.json`
+
+workflow_id: d9c20cb2-0add-4650-8e81-f7790b6a5fcc, agent_id: 38468986-5212-4079-ae8f-543e6c3f702b
+
+done: 12 turns, 116 s
+final save: {'workflow_id': 'd9c20cb2-0add-4650-8e81-f7790b6a5fcc', 'agent_id': '38468986-5212-4079-ae8f-543e6c3f702b', 'version': 6}; lint: 0 errors, 0 warnings
+{"workflow_id": "d9c20cb2-0add-4650-8e81-f7790b6a5fcc", "agent_id": "38468986-5212-4079-ae8f-543e6c3f702b"}

@@ -1,0 +1,67 @@
+{
+ "opening": "I am a digital assistant calling from Freya Bank, and this call is recorded. Am I speaking with {{title}} {{last_name}}?",
+ "lines": [
+  {
+   "text": "I am Freya Bank's digital assistant.",
+   "when": "The customer asks whether the caller is a robot or an AI.",
+   "tool": "",
+   "outcome": ""
+  },
+  {
+   "text": "I am sorry for your loss.",
+   "when": "Someone says the customer has died.",
+   "tool": "",
+   "outcome": ""
+  },
+  {
+   "text": "Please use the mobile app or visit a branch.",
+   "when": "Identity verification ends after three wrong answers in total.",
+   "tool": "",
+   "outcome": ""
+  },
+  {
+   "text": "These security questions protect your account.",
+   "when": "The customer first declines a security question or asks what the call is about instead of answering.",
+   "tool": "",
+   "outcome": ""
+  },
+  {
+   "text": "You can change your recorded promise in the mobile app.",
+   "when": "The customer asks to change or cancel a promise already recorded during the call.",
+   "tool": "",
+   "outcome": ""
+  },
+  {
+   "text": "I could not record your promise.",
+   "when": "The second attempt to record a promise for a product fails.",
+   "tool": "",
+   "outcome": ""
+  },
+  {
+   "text": "You will receive a text message confirming this promise.",
+   "when": "A payment promise has been successfully recorded.",
+   "tool": "create_promise",
+   "outcome": "success"
+  },
+  {
+   "text": "Payments can take one business day to appear.",
+   "when": "The customer says they already paid the past-due amount, rather than claiming the product was previously closed or paid off.",
+   "tool": "",
+   "outcome": ""
+  },
+  {
+   "text": "You can verify this call by phoning Freya Bank's customer service number.",
+   "when": "The customer asks whether the call is a scam.",
+   "tool": "",
+   "outcome": ""
+  },
+  {
+   "text": "I do not have that information.",
+   "when": "The customer asks a question that cannot be answered from the tools.",
+   "tool": "",
+   "outcome": ""
+  }
+ ],
+ "goodbye": "Thank you for your time, and goodbye.",
+ "close_tool": "close_call"
+}

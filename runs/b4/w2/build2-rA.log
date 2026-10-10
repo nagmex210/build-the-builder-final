@@ -1,0 +1,32 @@
+  [Skill] {'skill': 'build-phone-agent', 'args': 'Slot: w2-rA. Tool API file: tools/openapi.json. Brief: btb/briefs_raw/brief-a-ra
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; cat btb/briefs_raw/brief-a-raw.md; cat tools/openapi.json; cat .claude/skills/buil
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; cat btb/briefs_raw/brief-a-raw.md'}
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; cat .claude/skills/build-phone-agent/routing.md; python3 -c "\nimport json;d=json.
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; cat out/w2-rA.calc.json | head -c 6000; echo; python3 -c "\nimport json;d=json.loa
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; cat examples/base-agent.json; wc -c docs/*.md; python3 -c "\nimport json;d=json.lo
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; grep -n -i -A12 "api_request\\b\\|response_mapping\\"" docs/workflow-format.md | h
+I've read the brief, the API file and the date code; now I'm writing the workflow with a script.
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; grep -n \'"extraction_schema": \\[\' -A10 docs/workflow-format.md | head -25; grep
+  [Bash] {'command': 'mkdir -p /tmp/gen_w2rA && cat > /tmp/gen_w2rA/gen.py <<\'EOF\'\nimport json\ncalc=json.load(open(\'/home/ub
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; grep -n -i "alwaysRunsAt" -A3 docs/*.md | head -20; python3 builder/save.py w2-rA 
+Saved a first version. Fixing one issue: the close tool as written was hidden from the model, so I'm moving it into every stage.
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; python3 - <<\'EOF\'\np=\'/tmp/gen_w2rA/gen.py\'; s=open(p).read()\ns=s.replace(\'c
+I built the phone agent for brief A, saved it as slot w2-rA, and it starts: a one-turn chat test returned the correct opening line, "Hello, this is Freya Bank's digital assistant, and this call is recorded. Am I speaking with Ms Lee?" That one turn is the only test run. Identity checks, promises, callbacks and transfers have not been tried in a live chat yet. The lint check shows no errors.
+
+- **Structure:** the date code node runs first and leads into the opening. Calls then pass through opening, identity, the account lookup and negotiation. The account lookup uses the hook you supplied, unchanged. Each conversation stage has its own tools, including the close tool, and closing the call goes to a silent hang-up node.
+- **Routing:** the call moves to the identity check only when the person clearly confirms they are the customer. It moves to the account lookup only when the identity check reports all answers verified.
+- **Dates:** every stage that deals with dates gets the DATE FACTS block and your "never compute a date yourself" instruction. The negotiation uses each product's own deadline, floor and number of persuasion attempts from the lookup result.
+- **Honesty:** before telling the customer anything, the agent checks whether each tool call succeeded or failed. A failed promise is tried once more; if it fails again, the call closes as "no promise, service error". A promise is only described as recorded after the recording tool succeeds.
+
+**Gap:** the agent itself does not block a promise below the floor, after the deadline or on a non-business day. Only the prompt enforces those three rules.
+
+**Fix:** the first save had the close tool set to run automatically at the end of the call. That setting hides the tool from the model, so the agent could never close a call itself. I removed it and saved again (version 12).
+
+The brief's amendment memo changes the deadlines to 12 business days (1–7 days late) and 7 business days (8–45 days late). The date facts already use these values, so nothing differed from the brief.
+
+workflow_id d25011bb-adca-4e99-be82-6278c7280f99, agent_id 53e6966f-0232-41ee-89f9-550493263e94
+
+done: 13 turns, 107 s
+final save (build): {'workflow_id': 'd25011bb-adca-4e99-be82-6278c7280f99', 'agent_id': '53e6966f-0232-41ee-89f9-550493263e94', 'version': 12}; lint: 0 errors, 0 warnings
+self-test 1 (workspace 2): 8/12 personas failed a check (16 checks)
+{"workflow_id": "d25011bb-adca-4e99-be82-6278c7280f99", "agent_id": "53e6966f-0232-41ee-89f9-550493263e94"}

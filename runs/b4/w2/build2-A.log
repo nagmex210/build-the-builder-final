@@ -1,0 +1,36 @@
+  [Skill] {'skill': 'build-phone-agent', 'args': 'Slot w2-A, tools/openapi.json, briefs/brief-a.md'}
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; cat briefs/brief-a.md; cat tools/openapi.json; cat .claude/skills/build-phone-agen
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; cat docs/workflow-format.md docs/tools-and-code.md; cat examples/base-agent.json'}
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; cat out/w2-A.calc.json'}
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; cat examples/base-agent.json; ls builder'}
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; grep -n -i -A3 "api_request\\|response_mapping\\|end_call\\"" docs/workflow-format
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; sed -n 610,640p docs/workflow-format.md; sed -n 725,780p docs/workflow-format.md; 
+I've read the brief, API and docs; now writing the workflow generator.
+  [Bash] {'command': 'mkdir -p /home/ubuntu/btb/wt2/tmp_gen && cat > /home/ubuntu/btb/wt2/tmp_gen/gen_w2A.py <<\'EOF\'\nimport js
+  [Bash] {'command': 'python3 builder/save.py w2-A out/w2-A.workflow.json 2>&1 | tail -5'}
+  [Bash] {'command': 'timeout 60 python3 -c "import freya,json; print(freya.api(\'POST\',\'/api/v2/chat/message\',{\'workflowId\'
+I built the brief A phone agent, saved it as slot w2-A, and it starts: one test message got back the opening line ("Hello, I am a digital assistant calling from Freya Bank. This call is recorded. Am I speaking with Ms Lee?"). The workflow file is `out/w2-A.workflow.json` and the linter shows 0 errors. Beyond that one turn I ran no chat tests and no practice cases, so the identity, debt and promise stages have not been checked in a live chat.
+
+**How it's built:**
+- **Start:** the date code node from the calc file comes first, unedited, and leads into the opening.
+- **Stages:** after the opening come identity, then a silent account lookup and a small prep step, then negotiation. The negotiation step lists the product with its name, past-due amount, days late, floor, deadline and exact `product_id`.
+- **Moving on:** the call moves from opening to identity on a clear "yes, that's me". It moves from identity to negotiation only when `verify_identity` returns all verified.
+- **Closing:** every stage can close the call. A successful close ends the call, and only one close is accepted.
+- **Dates and deadlines:** the account hook is set verbatim on `get_account`. The opening and negotiation prompts include the date facts and the "never compute a date yourself" instruction, and they tell the model to use each product's own deadline and floor.
+
+**Checks in code:**
+- **Promises:** a promise below the floor, above the past-due amount, after the deadline or in the past is refused before it reaches the bank. So is a second promise for the same product. After two failed promise attempts the agent is told to close as `no_promise` / `service_error`.
+- **Callbacks:** a callback time outside 10:00–19:00, or not later than now, is refused. The agent is then told to ask once for another time.
+
+**Gaps:**
+- **No failure routes:** I did not add the routing-level failure transitions on the `<tool>_failure_count` and `tool_failures_<tool>` counters. Failed writes are handled by prompts and the tool hooks only.
+- **Callback day not checked in code:** the callback check doesn't reject a day other than today or the next business day. That limit is only in the prompt.
+
+The brief's date rules match the date facts, so nothing needed overriding. I left the generator script in `tmp_gen/gen_w2A.py`.
+
+workflow_id 4b5eb075-a0af-4c9a-bf1d-9f0ba94dd086, agent_id 8bb3f92a-09f3-4a92-ab39-7cab30b89a56
+
+done: 12 turns, 103 s
+final save (build): {'workflow_id': '4b5eb075-a0af-4c9a-bf1d-9f0ba94dd086', 'agent_id': '8bb3f92a-09f3-4a92-ab39-7cab30b89a56', 'version': 11}; lint: 0 errors, 0 warnings
+self-test 1 (workspace 2): 9/12 personas failed a check (23 checks)
+{"workflow_id": "4b5eb075-a0af-4c9a-bf1d-9f0ba94dd086", "agent_id": "8bb3f92a-09f3-4a92-ab39-7cab30b89a56"}

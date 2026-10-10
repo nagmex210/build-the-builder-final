@@ -1,0 +1,20 @@
+ws2 w2-rB -> f844d4cb-54f3-4c64-b317-b0e682f34ea1
+FAIL PUB-11 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > create_promise > create_promise > create_promise > create_promise > close_call
+       - [corrects] conversation: The truncated transcript does not clearly establish that all three products were stated before any ask, that one combined read-back and confirmation occurred, or that exactly one create_promise call was made per product.
+       - [asks_back] conversation: The transcript does not show all three products stated before any ask or one combined read-back and customer confirmation for all three.
+FAIL PUB-12 0/2 | verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > add_note > create_promise > add_note > add_note > close_call
+       - [talkative] outcome ('no_promise', 'service_error'), expected ('promise', None)
+       - [talkative] notes [('cl_5678', 'refused'), ('p1', 'service_error'), ('pl_1234', 'refused')], expected [('p2', 'refused'), ('p3', 'refused')]
+       - [talkative] conversation: The phone-question retry and absence of a DOB retry are not demonstrated, two personal-loan attempts are not shown, and the refused notes use incorrect product IDs rather than p2 and p3.
+       - [plain] notes [('cl_5678', 'refused'), ('pl_1234', 'refused')], expected [('p2', 'refused'), ('p3', 'refused')]
+       - [plain] conversation: The truncated transcript does not establish the required phone-question repeat or two personal-loan attempts, and the refused notes use product IDs pl_1234 and cl_5678 rather than the actual loan IDs p2 and p3.
+FAIL PUB-13 0/2 | verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > create_promise > create_promise > create_promise > close_call > create_promise
+       - [talkative] the call was not closed with close_call
+       - [talkative] conversation: The credit card is not clearly shown successfully recorded for 30 October, and no customer-facing read-back names both 30 October and 23 October.
+       - [talkative] harness: chat turn timed out and no reply appeared
+       - [asks_back] outcome ('no_promise', 'service_error'), expected ('promise', None)
+       - [asks_back] promises [], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]
+       - [asks_back] notes [('cc_6604', 'service_error'), ('pl_1234', 'service_error')], expected []
+       - [asks_back] conversation: Neither the credit card promise for 30 October nor the loan promise for its 23 October deadline was recorded because the tool calls failed, and the read-back did not name both dates.
+
+fast_eval: 0 / 3 passed (2 rep(s), all reps must pass), 2768 s

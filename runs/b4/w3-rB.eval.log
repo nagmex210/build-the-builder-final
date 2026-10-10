@@ -1,0 +1,14 @@
+FAIL PUB-11 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > create_promise > create_promise > close_call
+       - [pieces] conversation: The one create_promise per product check failed because the credit card had two create_promise calls: a failed attempt using cc_2288 and a successful retry using p1.
+       - [asks_back] conversation: The call fails the single read-back and confirmation check because confirmation was requested and given twice, and the one create_promise per product check because each product required two attempts.
+FAIL PUB-12 1/2 | verify_identity > verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > add_note > add_note > close_call
+       - [asks_back] conversation: The agent did not make the required two persuasion attempts on the late-band personal loan or one persuasion attempt on the early-band car loan after the customer's refusal.
+FAIL PUB-13 0/2 | verify_identity > verify_identity > get_account > create_promise > create_promise > create_promise > close_call > add_note > close_call > add_note
+       - [pieces] promises [('p2', 900.0, '2026-10-23')], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]
+       - [pieces] the call was not closed with close_call
+       - [pieces] conversation: The credit card promise for 30 October was not recorded: create_promise failed with an unknown product_id and no successful retry was made.
+       - [pieces] harness: chat turn timed out and no reply appeared
+       - [talkative] promises [('p1', 300.0, '2026-11-02'), ('p2', 900.0, '2026-10-23')], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]
+       - [talkative] conversation: The credit card was recorded for 2 November rather than 30 October, and the read-back named 23 October and 2 November rather than both required dates.
+
+fast_eval: 0 / 3 passed (2 rep(s), all reps must pass), 1302 s

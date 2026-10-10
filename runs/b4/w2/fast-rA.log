@@ -1,0 +1,36 @@
+ws2 w2-rA -> 79095aaf-a27d-4667-b2d7-e017631f5b4d
+FAIL PUB-01 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [in_words] conversation: The text-message sentence was not said after the promise, and the truncated transcript does not clearly establish that both security questions passed before get_account or that 'collections' was never said before verification.
+       - [corrects] conversation: The truncated transcript does not clearly establish that both security questions passed before get_account or that 'collections' was not said before identity verification.
+PASS PUB-02 2/2 | schedule_callback > close_call
+FAIL PUB-03 0/2 | verify_identity > verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [plain] outcome ('promise', None), expected ('not_verified', 'failed')
+       - [plain] promises [('p1', 95.0, '2026-10-14')], expected []
+       - [plain] conversation: The transcript does not clearly establish that the identity check ended after the third wrong answer, the agent disclosed the credit card ending 0377 and past-due amount of 95, and the customer was not told to use the app or a branch.
+       - [plain] conversation: The identity check did not end after the third wrong answer: the customer supplied 1990-07-21, but the agent skipped verification of that answer and continued asking security questions.
+FAIL PUB-04 0/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+       - [corrects] outcome ('no_promise', 'refused'), expected ('promise', None)
+       - [corrects] promises [], expected [('p1', 1250.0, '2026-10-23')]
+       - [corrects] conversation: The customer's own date was counted as a refusal in close_call, no promise for 23 October was recorded, and the provided transcript does not establish that the agent identified itself as a digital assistant when asked.
+       - [plain] conversation: The transcript does not clearly establish that the customer's own date was not counted as a refusal or that the agent identified itself as a digital assistant when asked.
+PASS PUB-05 2/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+FAIL PUB-06 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [talkative] promises [('p1', 150.0, '2026-10-16')], expected [('p1', 637.5, '2026-10-16')]
+       - [talkative] conversation: The minimum payment of 637.50 was not clearly offered once with notice that the rest stays overdue, and the confirmed and recorded promise for Friday 16 October 2026 was for 150.00 rather than 637.50.
+       - [pieces] promises [('p1', 500.0, '2026-10-16')], expected [('p1', 637.5, '2026-10-16')]
+       - [pieces] conversation: The promise recorded for Friday 16 October was for 500 rather than 637.50, and the transcript does not clearly show the minimum payment offered once with notice that the rest stays overdue.
+FAIL PUB-07 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [talkative] promises [('p1', 540.0, '2026-11-02')], expected [('p1', 540.0, '2026-10-27')]
+       - [talkative] conversation: The transcript does not clearly show the agent asking once for the exact day, the agent offers November 2 instead of the next business day Tuesday October 27, and the promise is recorded for November 2 rather than October 27.
+       - [plain] promises [('p1', 540.0, '2026-10-23')], expected [('p1', 540.0, '2026-10-27')]
+       - [plain] conversation: The transcript does not clearly show the agent asking once for the exact day, the agent offers October 23 rather than the next business day after October 26 (Tuesday October 27), and the successful promise is recorded for October 23 instead of Oc
+FAIL PUB-08 1/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+       - [in_words] conversation: The agent never says that payments can take one business day to appear.
+FAIL PUB-09 0/2 | verify_identity > verify_identity > verify_identity > get_account > verify_identity > verify_identity > close_call
+       - [plain] outcome ('no_promise', 'refused'), expected ('transferred', 'restructuring')
+       - [plain] transfers [], expected [{'queue': 'restructuring'}]
+       - [plain] conversation: The required transfer_to_agent call with queue restructuring was never made.
+       - [plain] conversation: The agent describes a plan of its own by offering a minimum payment of 400 today with the remainder staying overdue.
+PASS PUB-10 2/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > close_call
+
+fast_eval: 3 / 10 passed (2 rep(s), all reps must pass), 2048 s

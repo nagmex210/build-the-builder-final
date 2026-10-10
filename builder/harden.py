@@ -7,7 +7,9 @@ What it adds to every `api_call` tool (in node `tools`, node `pre_actions` and w
 - a post-hook that turns every failed call (HTTP error, envelope status not success, `ok: false`) into an explicit
   `tool_outcome` line: FAILED, nothing was recorded, failure number N of this tool in the call, do not claim it;
   and, for pure acknowledgement writes (`{ok, <x>_id}` responses), a SUCCESS line so the model speaks after it.
-  Read tools (`get_*`) also store every `*_id` they return as the call's known ids.
+  Read tools (`get_*`) also store every `*_id` they return as the call's known ids. A response with `verified: true`
+  adds the passed question to `verified_items` in the call variables and a `verified_so_far` line, so the model
+  never re-asks a passed security question (seen: the same question verified up to 8 times in one call).
 - a pre-hook that repairs an id field the model filled with something that is not a known id (case, or the only
   id there is), so ids always come from the account lookup.
 - `maxRetries: 0` on every tool that is not a `get_*` read: retries of a failed write follow the brief's own rule,
@@ -58,6 +60,21 @@ try:
             if __WRITE__ and all(str(k).endswith('_id') for k in _keys):
                 _d['tool_outcome'] = ('SUCCESS: ' + _t + ' was carried out and recorded. Only now may you tell the '
                                       'customer it is recorded. Speak to the customer now.')
+            if _v is not None and str(_d.get('verified')).lower() == 'true':
+                # Identity memory (b4-5): a passed question is stored in the call's variables, so a repeated or
+                # replayed turn never asks it again. The pre-hook stashed the request's selector values.
+                _done = [x for x in str(_v.get('verified_items') or '').split('|') if x]
+                _sel = str(_v.get('last_request_' + _t) or '')
+                if _sel and _sel not in _done:
+                    _done.append(_sel)
+                _v['verified_items'] = '|'.join(_done)
+                _all = str(_d.get('all_verified')).lower() == 'true'
+                if _all:
+                    _v['identity_verified'] = 'true'
+                _d['verified_so_far'] = ('Already passed in this call (never ask these again): '
+                                         + (', '.join(_done) or str(len(_done)) + ' question(s)')
+                                         + ('. Identity is fully verified: do not ask any security question again.' if _all else
+                                            '. Ask only a question that is not in this list.'))
             if _t.startswith('get_') and _v is not None:
                 _known = {}
                 _stack = [_d]
@@ -94,6 +111,14 @@ try:
                     _b0[_k0] = _cand[0]
                 else:
                     _b0[_k0] = ''
+except Exception:
+    pass
+try:
+    _b1 = config.get('body') if isinstance(config, dict) else None
+    if isinstance(_b1, dict):
+        _sel1 = [str(_x1) for _k1, _x1 in _b1.items() if isinstance(_x1, str) and _x1
+                 and not str(_k1).endswith('_id') and not any(w in str(_k1).lower() for w in ('answer', 'value', 'response', 'digits', 'dob', 'date', 'amount'))]
+        vars['last_request_' + __TOOL__] = ' '.join(_sel1)[:60]
 except Exception:
     pass
 try:

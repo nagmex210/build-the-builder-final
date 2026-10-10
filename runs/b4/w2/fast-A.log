@@ -1,0 +1,28 @@
+ws2 w2-A -> f6965b97-5ba0-49f2-b19e-5595194b0169
+FAIL PUB-01 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [asks_back] conversation: The truncated transcript does not clearly establish that both security questions passed before get_account or that 'collections' was not said before identity verification.
+       - [talkative] conversation: The truncated transcript does not clearly establish that both security questions passed before get_account or that 'collections' was not said before identity verification.
+FAIL PUB-02 1/2 | schedule_callback > close_call
+       - [plain] conversation: The callback was not scheduled for the next business day, October 15, 2026, at 11:00; the agent only proposed that time and made no scheduling tool call.
+PASS PUB-03 2/2 | verify_identity > verify_identity > verify_identity > close_call
+FAIL PUB-04 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [corrects] promises [('p1', 200.0, '2026-10-23')], expected [('p1', 1250.0, '2026-10-23')]
+       - [corrects] conversation: The digital-assistant disclosure check is not clearly satisfied: the provided transcript contains no statement identifying the agent as a digital assistant when asked.
+       - [pieces] promises [('p1', 400.0, '2026-10-23')], expected [('p1', 1250.0, '2026-10-23')]
+       - [pieces] conversation: The truncated transcript does not clearly establish that her own date was not counted as a refusal or that the agent identified itself as a digital assistant when asked.
+PASS PUB-05 2/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+FAIL PUB-06 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [plain] promises [('p1', 150.0, '2026-10-16')], expected [('p1', 637.5, '2026-10-16')]
+       - [plain] conversation: The minimum payment of 637.50 was not offered with notice that the rest stays overdue, and the recorded promise for Friday 16 October was for 150.00 rather than 637.50.
+       - [asks_back] promises [('p1', 200.0, '2026-10-14')], expected [('p1', 637.5, '2026-10-16')]
+       - [asks_back] conversation: The minimum payment was not clearly offered once with notice that the rest stays overdue, and the recorded promise was for 200 on 14 October 2026 rather than 637.50 on Friday 16 October 2026.
+FAIL PUB-07 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [in_words] promises [('p1', 540.0, '2026-11-02')], expected [('p1', 540.0, '2026-10-27')]
+       - [in_words] conversation: The transcript does not clearly show the agent asking once for the exact day or rejecting 26 October and offering the next business day, and the promise was recorded for 2 November rather than Tuesday 27 October.
+       - [talkative] promises [('p1', 540.0, '2026-11-02')], expected [('p1', 540.0, '2026-10-27')]
+       - [talkative] conversation: The transcript does not show the agent asking once for the exact day or rejecting 26 October and offering the next business day, and the promise was recorded for 2 November rather than Tuesday 27 October.
+PASS PUB-08 2/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+PASS PUB-09 2/2 | verify_identity > verify_identity > verify_identity > get_account > transfer_to_agent > close_call
+PASS PUB-10 2/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > close_call
+
+fast_eval: 5 / 10 passed (2 rep(s), all reps must pass), 2507 s

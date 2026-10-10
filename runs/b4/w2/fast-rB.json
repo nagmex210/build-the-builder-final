@@ -1,0 +1,156 @@
+{
+ "workflow_id": "f844d4cb-54f3-4c64-b317-b0e682f34ea1",
+ "passed": 0,
+ "total": 3,
+ "rows": [
+  {
+   "id": "PUB-11",
+   "style": "corrects",
+   "pass": false,
+   "failed": [
+    "conversation: The truncated transcript does not clearly establish that all three products were stated before any ask, that one combined read-back and confirmation occurred, or that exactly one create_promise call was made per product."
+   ],
+   "call_id": "3b17b2db-6f03-43bc-b609-f5f7b3cdf9ce",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 9
+  },
+  {
+   "id": "PUB-12",
+   "style": "talkative",
+   "pass": false,
+   "failed": [
+    "outcome ('no_promise', 'service_error'), expected ('promise', None)",
+    "notes [('cl_5678', 'refused'), ('p1', 'service_error'), ('pl_1234', 'refused')], expected [('p2', 'refused'), ('p3', 'refused')]",
+    "conversation: The phone-question retry and absence of a DOB retry are not demonstrated, two personal-loan attempts are not shown, and the refused notes use incorrect product IDs rather than p2 and p3."
+   ],
+   "call_id": "cdf14523-38fb-4827-b8c8-a3c03e2dd148",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "add_note",
+    "create_promise",
+    "add_note",
+    "add_note",
+    "close_call"
+   ],
+   "turns": 14
+  },
+  {
+   "id": "PUB-13",
+   "style": "talkative",
+   "pass": false,
+   "failed": [
+    "the call was not closed with close_call",
+    "conversation: The credit card is not clearly shown successfully recorded for 30 October, and no customer-facing read-back names both 30 October and 23 October.",
+    "harness: chat turn timed out and no reply appeared"
+   ],
+   "call_id": "98c80fd1-d3f5-489b-97d2-91481876dcea",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call",
+    "create_promise"
+   ],
+   "turns": 13
+  },
+  {
+   "id": "PUB-11",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "conversation: The transcript does not show all three products stated before any ask or one combined read-back and customer confirmation for all three."
+   ],
+   "call_id": "c60afbed-e8ca-4a44-b3ea-c2a51aaa394d",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 6
+  },
+  {
+   "id": "PUB-12",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "notes [('cl_5678', 'refused'), ('pl_1234', 'refused')], expected [('p2', 'refused'), ('p3', 'refused')]",
+    "conversation: The truncated transcript does not establish the required phone-question repeat or two personal-loan attempts, and the refused notes use product IDs pl_1234 and cl_5678 rather than the actual loan IDs p2 and p3."
+   ],
+   "call_id": "fbc1373d-98ba-432e-a2f8-06d960d77049",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "add_note",
+    "add_note",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 11
+  },
+  {
+   "id": "PUB-13",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "outcome ('no_promise', 'service_error'), expected ('promise', None)",
+    "promises [], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]",
+    "notes [('cc_6604', 'service_error'), ('pl_1234', 'service_error')], expected []",
+    "conversation: Neither the credit card promise for 30 October nor the loan promise for its 23 October deadline was recorded because the tool calls failed, and the read-back did not name both dates."
+   ],
+   "call_id": "b31f0860-b7c0-4328-9471-11ef6e52b889",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "add_note",
+    "add_note",
+    "close_call"
+   ],
+   "turns": 8
+  }
+ ]
+}

@@ -1,0 +1,343 @@
+{
+ "workflow_id": "928d91fb-c293-40e1-8d02-a1d00032b051",
+ "passed": 2,
+ "total": 10,
+ "rows": [
+  {
+   "id": "PUB-01",
+   "style": "in_words",
+   "pass": true,
+   "failed": [],
+   "call_id": "c1394838-b30f-4482-b1bb-871f877cb74e",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 6
+  },
+  {
+   "id": "PUB-02",
+   "style": "pieces",
+   "pass": true,
+   "failed": [],
+   "call_id": "cc1f5949-ce1f-4f07-93af-436b46eb201f",
+   "tools": [
+    "schedule_callback",
+    "close_call"
+   ],
+   "turns": 4
+  },
+  {
+   "id": "PUB-03",
+   "style": "pieces",
+   "pass": true,
+   "failed": [],
+   "call_id": "3d5bdee4-fab5-4f83-b241-58f395ade257",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "close_call"
+   ],
+   "turns": 5
+  },
+  {
+   "id": "PUB-04",
+   "style": null,
+   "pass": true,
+   "failed": [],
+   "call_id": "c7180cea-7d6c-4149-8d4b-3b0fe2ea1561",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 8
+  },
+  {
+   "id": "PUB-05",
+   "style": "asks_back",
+   "pass": true,
+   "failed": [],
+   "call_id": "63e73e20-fa36-4c8b-a981-f854bc101d39",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 6
+  },
+  {
+   "id": "PUB-06",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "conversation: The minimum payment was offered twice, first for today and then for Friday 16 October, so the check that it be offered once fails."
+   ],
+   "call_id": "f6be0aa9-8ba6-4a8a-a526-1b4c9a78b3ef",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 8
+  },
+  {
+   "id": "PUB-07",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "promises [('p1', 540.0, '2026-11-02')], expected [('p1', 540.0, '2026-10-27')]",
+    "conversation: The agent did not offer Tuesday 27 October as the next business day after 26 October, and no promise was recorded for Tuesday 27 October."
+   ],
+   "call_id": "5ff122fb-bd3e-40d9-8342-d0ca650a9397",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 10
+  },
+  {
+   "id": "PUB-08",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "conversation: The agent never says payments can take one business day to appear."
+   ],
+   "call_id": "b259bb16-aa43-403e-b3a7-b381736bcb23",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 5
+  },
+  {
+   "id": "PUB-09",
+   "style": "talkative",
+   "pass": false,
+   "failed": [
+    "conversation: The required transfer_to_agent call with queue restructuring was never made."
+   ],
+   "call_id": "dc2bc4a3-27da-4c1b-bea3-e2a946bb3714",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "transfer_to_agent",
+    "close_call"
+   ],
+   "turns": 6
+  },
+  {
+   "id": "PUB-10",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "conversation: The check requiring exactly one promise in the ledger after the retry is not satisfied because no create_promise call or retry occurred."
+   ],
+   "call_id": "8f1e99b2-a59d-4d4b-8b62-0ec7bb086cc4",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 7
+  },
+  {
+   "id": "PUB-01",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "conversation: create_promise was never called, and no text-message sentence was said after the promise."
+   ],
+   "call_id": "dc97a212-fc15-4731-a88f-484dc6868722",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 6
+  },
+  {
+   "id": "PUB-02",
+   "style": "corrects",
+   "pass": false,
+   "failed": [
+    "callbacks [], expected [{'date': '2026-10-15', 'time': '11:00'}]",
+    "conversation: No callback was scheduled for the next business day, October 15, 2026, at 11:00."
+   ],
+   "call_id": "df65282a-e0fc-44e6-bcaa-ef43c9bfc163",
+   "tools": [
+    "close_call"
+   ],
+   "turns": 5
+  },
+  {
+   "id": "PUB-03",
+   "style": "in_words",
+   "pass": false,
+   "failed": [
+    "conversation: The transcript does not establish that the check ends after the third wrong answer, and the customer was not told to use the app or a branch."
+   ],
+   "call_id": "97f34e43-98b5-4c35-a51b-d62167c9a4de",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "close_call"
+   ],
+   "turns": 5
+  },
+  {
+   "id": "PUB-04",
+   "style": "in_words",
+   "pass": true,
+   "failed": [],
+   "call_id": "2928e289-2607-4ce6-82f3-4f71c1a0c4b6",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 7
+  },
+  {
+   "id": "PUB-05",
+   "style": "asks_back",
+   "pass": true,
+   "failed": [],
+   "call_id": "4c332067-f04c-4cac-aa41-54ad238c0e66",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 7
+  },
+  {
+   "id": "PUB-06",
+   "style": "in_words",
+   "pass": false,
+   "failed": [
+    "conversation: The minimum payment was offered twice, first for today and then for Friday 16 October, rather than once."
+   ],
+   "call_id": "ddca4d69-2910-41a5-9401-ed88b061292d",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 8
+  },
+  {
+   "id": "PUB-07",
+   "style": "in_words",
+   "pass": false,
+   "failed": [
+    "promises [('p1', 540.0, '2026-11-02')], expected [('p1', 540.0, '2026-10-27')]",
+    "conversation: The agent did not offer Tuesday 27 October as the next business day after the 26 October holiday, and no promise was recorded for Tuesday 27 October."
+   ],
+   "call_id": "ee85c1cc-966f-4369-9267-4421fffd00a7",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 10
+  },
+  {
+   "id": "PUB-08",
+   "style": "talkative",
+   "pass": false,
+   "failed": [
+    "conversation: The agent never says that payments can take one business day to appear."
+   ],
+   "call_id": "6ef2130f-fc29-4270-8116-104961c6d5c7",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 5
+  },
+  {
+   "id": "PUB-09",
+   "style": "corrects",
+   "pass": false,
+   "failed": [
+    "outcome ('no_promise', 'refused'), expected ('transferred', 'restructuring')",
+    "transfers [], expected [{'queue': 'restructuring'}]",
+    "conversation: The required transfer_to_agent call with queue restructuring was never made."
+   ],
+   "call_id": "a77a60ca-4873-487d-8d8f-c500891fab67",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 8
+  },
+  {
+   "id": "PUB-10",
+   "style": "in_words",
+   "pass": false,
+   "failed": [
+    "conversation: The check requiring exactly one promise in the ledger after the retry fails because no create_promise call, retry, or successful ledger entry is shown."
+   ],
+   "call_id": "e3f99901-1f66-4590-a7f8-71df01b6080c",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 7
+  }
+ ]
+}
