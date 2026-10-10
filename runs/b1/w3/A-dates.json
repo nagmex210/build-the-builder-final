@@ -1,0 +1,66 @@
+{
+ "workflow_id": "928d91fb-c293-40e1-8d02-a1d00032b051",
+ "passed": 0,
+ "total": 4,
+ "rows": [
+  {
+   "id": "PUB-01",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 420.0, '2026-10-14')]",
+    "the call was not closed with close_call",
+    "conversation: The transcript does not establish both security questions passing before get_account, create_promise was never called, and no text-message sentence was said after a promise.",
+    "harness: POST /api/v2/chat/message -> 503: {\"success\":false,\"data\":{\"message\":\"Internal server error\",\"result\":{\"requestId\":\"1b8bea21-49e5-4977-a0c7-c475289ee8c4\"}}}"
+   ],
+   "call_id": "08c18845-7c4e-4c71-ae0a-fc3df6921e53",
+   "tools": [],
+   "turns": 2
+  },
+  {
+   "id": "PUB-02",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('not_reached', 'callback')",
+    "callbacks [], expected [{'date': '2026-10-15', 'time': '11:00'}]",
+    "the call was not closed with close_call",
+    "conversation: No callback was scheduled for the next business day at 11:00.",
+    "harness: POST /api/v2/chat/message -> 503: {\"success\":false,\"data\":{\"message\":\"Internal server error\",\"result\":{\"requestId\":\"e6b6fe78-a2a8-41d0-914a-8479f04c041d\"}}}"
+   ],
+   "call_id": null,
+   "tools": [],
+   "turns": 0
+  },
+  {
+   "id": "PUB-04",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 1250.0, '2026-10-23')]",
+    "the call was not closed with close_call",
+    "conversation: The transcript does not establish that her own date is not counted as a refusal or that the promise date is 23 October.",
+    "harness: POST /api/v2/chat/message -> 503: {\"success\":false,\"data\":{\"message\":\"Internal server error\",\"result\":{\"requestId\":\"508d12fc-b634-45c3-834f-5f495bad2bf3\"}}}"
+   ],
+   "call_id": "92aa15b9-797b-4c4d-a037-0b20cac2adb1",
+   "tools": [],
+   "turns": 2
+  },
+  {
+   "id": "PUB-08",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('paid', None)",
+    "the call was not closed with close_call",
+    "conversation: The agent did not say that payments can take one business day to appear.",
+    "harness: POST /api/v2/chat/message -> 503: {\"success\":false,\"data\":{\"message\":\"Internal server error\",\"result\":{\"requestId\":\"91347c8d-f3c6-4195-8611-53f1e5ab35d4\"}}}"
+   ],
+   "call_id": null,
+   "tools": [],
+   "turns": 0
+  }
+ ]
+}
