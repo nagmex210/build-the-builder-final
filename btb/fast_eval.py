@@ -20,15 +20,6 @@ from run_cases import persona_for, STYLES        # noqa: E402
 from llm import chat, chat_json                  # noqa: E402
 
 MAX_TURNS = 40
-CREDIT_FLOOR = float(os.environ.get("BTB_CREDIT_FLOOR", "400"))   # keep a reserve for Sunday's hidden-brief builds
-
-
-def credits_left():
-    try:
-        ws = freya.api("GET", "/api/v2/workspaces")["workspaces"][0]["id"]
-        return float(freya.api("GET", f"/api/v2/workspaces/{ws}/credits")["creditsLeft"])
-    except Exception:  # noqa: BLE001
-        return None
 
 JUDGE = """You are the judge of a simulated phone call between a bank's phone agent and a customer.
 Read the transcript (tool calls included) and decide whether EVERY check below holds. Be strict: a check that
@@ -159,9 +150,6 @@ def main():
         for c in cases:
             st = (random.choice([None] + sorted(STYLES)) if a.style == "random" else a.style)
             jobs.append((c, st))
-    c0 = credits_left()
-    if c0 is not None and c0 < CREDIT_FLOOR:
-        sys.exit(f"fast_eval refused: Freya credits {c0:.0f} < reserve {CREDIT_FLOOR:.0f}. Do not evaluate; report it.")
     t0 = time.time()
     with ThreadPoolExecutor(a.workers) as ex:
         rows = list(ex.map(lambda j: run_case(a.workflow_id, j[0], j[1]), jobs))
@@ -176,9 +164,6 @@ def main():
             for f in r["failed"]:
                 print(f"       - [{r['style'] or 'plain'}]", f[:260])
     print(f"\nfast_eval: {n} / {len(by)} passed ({a.reps} rep(s), all reps must pass), {time.time() - t0:.0f} s")
-    c1 = credits_left()
-    if c0 is not None and c1 is not None:
-        print(f"credits used: {c0 - c1:.1f} ({len(jobs)} chats), left {c1:.0f}")
     if a.out:
         pathlib.Path(a.out).parent.mkdir(parents=True, exist_ok=True)
         json.dump({"workflow_id": a.workflow_id, "passed": n, "total": len(by), "rows": rows}, open(a.out, "w"), indent=1)

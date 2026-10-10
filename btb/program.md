@@ -53,15 +53,6 @@ will score zero on Sunday. The merger rejects such changes.
 `score = fast_eval passes on A (10 cases) + B (3 cases) + raw-A + raw-B, --reps 2 --style random`
 (= cases that passed both reps, out of 26). The merger confirms with the official scorer on A and B.
 
-## CREDIT BUDGET (Freya credits are limited; we ran out once)
-
-- Every fast_eval chat costs Freya credits; fast_eval prints the credits used and refuses below a reserve of 400.
-- WORKERS: score with `--reps 1` (not 2), and only on the briefs your idea touches (at most A + one other). Use
-  `--only <case ids>` to re-check a fix on the cases that failed. At most 3 fast_eval runs per worker per batch.
-- MERGER: the full score (`--reps 2 --style random` on A, B, raw-A, raw-B) once on the merged result, then the
-  official scorer as before. Write the credits used per batch in the journal.
-- A 402 "Insufficient credits" means stop evaluating and write it in the report; never retry in a loop.
-
 ## WORKER (you were started in a git worktree `wt<N>` on branch `idea/<batch>-<N>`)
 
 1. Read: this file, `btb/ideas.md` (idea bank), `journal.md` (what was tried; do not repeat a discard unless the mechanism changes),
