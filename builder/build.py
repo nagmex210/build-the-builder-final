@@ -263,6 +263,11 @@ async def run(slot, tools, briefs):
     with trace.open("a") as out:
         out.write(json.dumps({"event": "test", "what": "A3 canned sentences extracted (opening tts, say_now hooks, goodbye, FIXED SENTENCES)",
                               "ok": old_canned.exists(), "error": (canned_err or "")[-400:]}) + "\n")
+        if old_canned.exists():   # brief self-conflicts: assumption log (pairs a literal judge can read as contradicting)
+            cj = json.loads(old_canned.read_text())
+            out.write(json.dumps({"event": "assumptions", "what": "brief self-conflicts and how both rules hold",
+                                  "gated_words": cj.get("gated_words"), "conflicts": cj.get("conflicts"),
+                                  "deterministic_check": cj.get("self_conflict_check")}) + "\n")
     sys.path.insert(0, str(KIT)); sys.path.insert(0, str(KIT / "builder"))
 
     def final_pass(tag):
