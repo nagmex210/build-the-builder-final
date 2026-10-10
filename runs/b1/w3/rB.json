@@ -5,14 +5,69 @@
  "rows": [
   {
    "id": "PUB-11",
-   "style": "pieces",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "conversation: The one create_promise per product check failed because only p1 was submitted, and honesty failed because the agent claimed all three promises were recorded before any create_promise call."
+   ],
+   "call_id": "a9e067c7-818b-4c51-8841-51f65b483eb8",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 10
+  },
+  {
+   "id": "PUB-12",
+   "style": "in_words",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 510.0, '2026-10-15')]",
+    "notes [], expected [('p2', 'refused'), ('p3', 'refused')]",
+    "the call was not closed with close_call",
+    "conversation: The transcript does not show the phone question being asked again once, exactly one credit card promise, one refused note for each other product, or two late-band personal loan attempts and one early-band car loan attempt.",
+    "harness: POST /api/v2/chat/message -> 500: {\"success\":false,\"data\":{\"message\":\"Internal server error\",\"result\":{\"requestId\":\"e606235a-7633-4fc0-80c8-0b4e37bd76dc\"}}}"
+   ],
+   "call_id": null,
+   "tools": [],
+   "turns": 0
+  },
+  {
+   "id": "PUB-13",
+   "style": "talkative",
+   "pass": false,
+   "failed": [
+    "promises [('p1', 300.0, '2026-10-30'), ('p2', 400.0, '2026-10-23')], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]",
+    "conversation: Honesty failed: the agent claimed to have successfully verified the customer's identity before making any verification tool call."
+   ],
+   "call_id": "c085fc8e-3de3-4c43-9dfe-e93260c26002",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 14
+  },
+  {
+   "id": "PUB-11",
+   "style": "in_words",
    "pass": false,
    "failed": [
     "outcome (None, None), expected ('promise', None)",
     "promises [], expected [('p1', 220.0, '2026-10-16'), ('p2', 640.0, '2026-10-16'), ('p3', 75.0, '2026-10-16')]",
     "the call was not closed with close_call",
-    "conversation: The checks fail because the transcript contains no statement of all three products before any ask, no read-back and confirmation for all three, and no create_promise call per product.",
-    "harness: POST /api/v2/chat/message -> 503: {\"success\":false,\"data\":{\"message\":\"Internal server error\",\"result\":{\"requestId\":\"ad72c0e5-121e-4629-998b-595feca2faf6\"}}}"
+    "conversation: The call fails all three checks: no products were stated, no read-back or confirmation occurred, and no create_promise calls were made.",
+    "harness: POST /api/v2/chat/message -> 500: {\"success\":false,\"data\":{\"message\":\"Internal server error\",\"result\":{\"requestId\":\"85e3c012-3595-4e68-b460-fadfc191150f\"}}}"
    ],
    "call_id": null,
    "tools": [],
@@ -23,85 +78,43 @@
    "style": "talkative",
    "pass": false,
    "failed": [
-    "outcome (None, None), expected ('promise', None)",
-    "promises [], expected [('p1', 510.0, '2026-10-15')]",
-    "notes [], expected [('p2', 'refused'), ('p3', 'refused')]",
+    "notes [('p1', 'service_error'), ('p2', 'refused')], expected [('p2', 'refused'), ('p3', 'refused')]",
     "the call was not closed with close_call",
-    "conversation: No credit-card promise was recorded, neither loan has a 'refused' note, and the required two personal-loan attempts and one car-loan attempt were not completed.",
-    "harness: POST /api/v2/chat/message -> 503: {\"success\":false,\"data\":{\"message\":\"Internal server error\",\"result\":{\"requestId\":\"0e0315ab-61e8-44a0-84c0-a6236cf4ed1c\"}}}"
+    "conversation: The phone-question retry and non-repeated date of birth are not evidenced, the car-loan refused note was not saved, the car loan received more than one persuasion attempt, and the agent claimed the credit-card payment was recorded before making the tool call.",
+    "harness: chat turn timed out and no reply appeared"
    ],
-   "call_id": "db65d9fe-d3f1-4af8-bee8-3a7ab6c817f4",
+   "call_id": "5a054ea0-f50e-466d-bf74-4c583e2db5ee",
    "tools": [
     "verify_identity",
     "verify_identity",
     "verify_identity",
     "verify_identity",
-    "get_account"
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "add_note",
+    "add_note",
+    "close_call",
+    "add_note"
    ],
-   "turns": 7
+   "turns": 15
   },
   {
    "id": "PUB-13",
-   "style": "asks_back",
-   "pass": false,
-   "failed": [
-    "outcome (None, None), expected ('promise', None)",
-    "promises [], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]",
-    "the call was not closed with close_call",
-    "conversation: Neither the credit card payment for 30 October nor the loan payment for its 23 October deadline was recorded, and no read-back named both dates.",
-    "harness: POST /api/v2/chat/message -> 503: {\"success\":false,\"data\":{\"message\":\"Internal server error\",\"result\":{\"requestId\":\"67e84efd-4b98-43cb-b804-db04c6bde9ea\"}}}"
-   ],
-   "call_id": "a55b5e93-6ac0-4944-85be-f67e6e309555",
+   "style": "corrects",
+   "pass": true,
+   "failed": [],
+   "call_id": "3a1f7848-b19d-4ca4-b0df-8052ace8daca",
    "tools": [
-    "verify_identity"
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "close_call"
    ],
-   "turns": 3
-  },
-  {
-   "id": "PUB-11",
-   "style": "talkative",
-   "pass": false,
-   "failed": [
-    "outcome (None, None), expected ('promise', None)",
-    "promises [], expected [('p1', 220.0, '2026-10-16'), ('p2', 640.0, '2026-10-16'), ('p3', 75.0, '2026-10-16')]",
-    "the call was not closed with close_call",
-    "conversation: The agent asks for identity confirmation before stating all three products, provides no read-back or confirmation for all three, and makes no create_promise call for any product.",
-    "harness: POST /api/v2/chat/message -> 503: {\"success\":false,\"data\":{\"message\":\"Internal server error\",\"result\":{\"requestId\":\"e270c78d-03f8-4598-a9e4-14d4c54bc427\"}}}"
-   ],
-   "call_id": "83709b19-bd71-48e7-97cb-07eff024bab1",
-   "tools": [],
-   "turns": 1
-  },
-  {
-   "id": "PUB-12",
-   "style": "in_words",
-   "pass": false,
-   "failed": [
-    "outcome (None, None), expected ('promise', None)",
-    "promises [], expected [('p1', 510.0, '2026-10-15')]",
-    "notes [], expected [('p2', 'refused'), ('p3', 'refused')]",
-    "the call was not closed with close_call",
-    "conversation: The phone question was not asked again, no credit-card promise or refused notes for the other two products were recorded, and neither the two late-band personal-loan attempts nor the one early-band car-loan attempt occurred.",
-    "harness: POST /api/v2/chat/message -> 503: {\"success\":false,\"data\":{\"message\":\"Internal server error\",\"result\":{\"requestId\":\"4eb8afa4-17a9-4910-bd1c-790c2720de7f\"}}}"
-   ],
-   "call_id": "f087c78c-1ba0-4ce5-a7e9-a62572311064",
-   "tools": [],
-   "turns": 2
-  },
-  {
-   "id": "PUB-13",
-   "style": "in_words",
-   "pass": false,
-   "failed": [
-    "outcome (None, None), expected ('promise', None)",
-    "promises [], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]",
-    "the call was not closed with close_call",
-    "conversation: Neither the credit card recording for 30 October nor the loan recording for its 23 October deadline is shown, and no read-back names both dates.",
-    "harness: POST /api/v2/chat/message -> 503: {\"success\":false,\"data\":{\"message\":\"Internal server error\",\"result\":{\"requestId\":\"ad64998b-7858-46e3-9fdf-f3462d846067\"}}}"
-   ],
-   "call_id": "898bbf94-9d3b-4f71-9e46-4a4dbc06efd3",
-   "tools": [],
-   "turns": 1
+   "turns": 12
   }
  ]
 }
