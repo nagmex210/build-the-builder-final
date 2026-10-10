@@ -5,6 +5,10 @@ talking to the published workflow through POST /api/v2/chat/message, then the ki
 judge over the transcript against the case's checks. All cases run in parallel.
 
     python3 btb/fast_eval.py <workflow_id> --brief A [--cases public-test-set.json] [--reps 2] [--style random] [--out x.json]
+    python3 btb/fast_eval.py <workflow_id> --cases btb/brief_c/cases-c.json --bank $(cat btb/brief_c/BANK_URL)   # held-out brief C
+
+--bank points the practice sessions and ledgers at another mock bank (default: the kit's). If a score_<brief>.py
+sits next to the cases file (btb/brief_c/score_c.py), its score_ledger replaces the kit's (--scorer overrides).
 
 This approximates tools/run_cases.py (the official scorer, Freya's simulator and judge). Use it to rank ideas
 fast; confirm a winner with tools/run_cases.py --reps 3.
@@ -15,11 +19,13 @@ from concurrent.futures import ThreadPoolExecutor
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT)); sys.path.insert(0, str(ROOT / "tools")); sys.path.insert(0, str(ROOT / "btb"))
 import freya                                     # noqa: E402
+import score                                     # noqa: E402
 from score import http, score_ledger             # noqa: E402
 from run_cases import persona_for, STYLES        # noqa: E402
 from llm import chat, chat_json                  # noqa: E402
 
 MAX_TURNS = 40
+SCORER = score_ledger
 
 JUDGE = """You are the judge of a simulated phone call between a bank's phone agent and a customer.
 Read the transcript (tool calls included) and decide whether EVERY check below holds. Be strict: a check that
@@ -120,10 +126,10 @@ def run_case(workflow_id, case, style=None):
         except Exception:  # noqa: BLE001
             pass
     led = http("/v1/practice/ledger/" + sess["customer_id"])
-    res = score_ledger(case, led)
+    res = SCORER(case, led)
     tx = transcript_text(call_id, convo) if call_id else "\n".join(f"{r}: {t}" for r, t in convo)
     try:
-        j = chat_json([{"role": "user", "content": JUDGE.format(now=sess.get("now", "unknown"), checks="\n".join("- " + c for c in case["checks"]),
+        j = chat_json([{"role": "user", "content": JUDGE.format(now=sess.get("now") or sess.get("call_time") or "unknown", checks="\n".join("- " + c for c in case["checks"]),
                                                                   transcript=tx[-30000:])}],
                       tier="strong", purpose="judge", effort="low")
     except Exception as e:  # noqa: BLE001
@@ -143,7 +149,20 @@ def main():
     ap.add_argument("--only"); ap.add_argument("--reps", type=int, default=1); ap.add_argument("--style", default=None,
                     help="a style name, 'random' (a random style or none per run) or omitted")
     ap.add_argument("--workers", type=int, default=6); ap.add_argument("--out")
+    ap.add_argument("--bank", help="base URL of another mock bank (practice sessions + ledger), e.g. brief C's")
+    ap.add_argument("--scorer", help="a .py file whose score_ledger replaces the kit's")
     a = ap.parse_args()
+    global SCORER
+    if a.bank:
+        score.HOST = a.bank.rstrip("/").removesuffix("/v1")
+    cases_dir = pathlib.Path(a.cases).resolve().parent
+    found = sorted(cases_dir.glob("score_*.py")) if cases_dir != ROOT else []
+    scorer = a.scorer or (str(found[0]) if found else None)
+    if scorer:
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("brief_scorer", scorer); mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod); SCORER = mod.score_ledger
+        print("scorer:", scorer, "| bank:", score.HOST)
     cases = [c for c in json.load(open(a.cases)) if (not a.brief or c["brief"] in a.brief.split(",")) and (not a.only or c["id"] in a.only.split(","))]
     jobs = []
     for rep in range(a.reps):

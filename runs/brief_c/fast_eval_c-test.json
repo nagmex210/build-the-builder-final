@@ -1,0 +1,257 @@
+{
+ "workflow_id": "474ccf0d-3045-4ea7-9c20-5ccdca928ad6",
+ "passed": 2,
+ "total": 12,
+ "rows": [
+  {
+   "id": "C-01",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "conversation: The first sentence names FB Services but does not say the call is recorded; the recording notice appears in the second sentence."
+   ],
+   "call_id": "3c51d1b5-d13d-455b-b42a-ba0399d47737",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 6
+  },
+  {
+   "id": "C-02",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "conversation: Friday 6 November was not clearly refused as a weekend callback day: the agent initially accepted tomorrow using the incorrect date 2025-05-15 and later rejected only that unspecified date."
+   ],
+   "call_id": "0df54aa2-fa7b-436d-800e-c0b7e35f214c",
+   "tools": [
+    "schedule_callback",
+    "schedule_callback",
+    "close_call"
+   ],
+   "turns": 6
+  },
+  {
+   "id": "C-03",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "promises [('A1', 640.0, '2026-11-23')], expected [('A1', 640.0, '2026-11-11')]",
+    "conversation: The 'next Wednesday' check fails because no promise was recorded for Wednesday 11 November; the only create_promise call recorded 23 November."
+   ],
+   "call_id": "60bc3095-164e-4462-bc73-7fa22a757eee",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 10
+  },
+  {
+   "id": "C-04",
+   "style": null,
+   "pass": true,
+   "failed": [],
+   "call_id": "b1873c16-265e-4057-9649-9d7899dd0df0",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "close_call"
+   ],
+   "turns": 5
+  },
+  {
+   "id": "C-05",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "outcome ('no_payment', 'REFUSED'), expected ('arranged', None)",
+    "promises [], expected [('A1', 194.0, '2026-11-22')]",
+    "notes [('A1', 'REFUSED')], expected []",
+    "conversation: No two-part plan is shown before the floor, the agent offers 193.75 and 100.00 rather than the required 194, and Friday 20 November is not explicitly refused before Sunday 22 November is offered."
+   ],
+   "call_id": "8b719b83-9d66-4d05-b73e-58b5bfadadb5",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "get_account",
+    "add_note",
+    "close_call"
+   ],
+   "turns": 34
+  },
+  {
+   "id": "C-06",
+   "style": null,
+   "pass": true,
+   "failed": [],
+   "call_id": "0bcaef2d-d8a9-4c11-80d5-7457678ca584",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 8
+  },
+  {
+   "id": "C-07",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "notes [('A1', 'BREATHING_SPACE')], expected [('A1', 'BREATHING_SPACE'), ('A2', 'BREATHING_SPACE')]",
+    "the call was not closed with close_call",
+    "tool calls after close_call",
+    "conversation: Both accounts were not named with arrears and days overdue before anything was asked: the agent first asked for the customer and requested security details.",
+    "harness: chat turn timed out and no reply appeared"
+   ],
+   "call_id": "e350e068-3f44-4213-97ec-e96fd46fe0b2",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "add_note",
+    "close_call",
+    "add_note"
+   ],
+   "turns": 5
+  },
+  {
+   "id": "C-08",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "outcome ('no_payment', 'REFUSED'), expected ('arranged', None)",
+    "promises [], expected [('A2', 1100.0, '2026-11-05')]",
+    "notes [('A1', 'DISPUTED'), ('A1', 'DISPUTED'), ('A2', 'REFUSED'), ('A3', 'PAID_CLAIMED')], expected [('A1', 'DISPUTED'), ('A3', 'PAID_CLAIMED')]",
+    "conversation: The loan was not recorded for its 5 November deadline; only a refusal note was saved, and identity questions were asked before all three accounts were named."
+   ],
+   "call_id": "c5b93500-2bc1-4e14-a586-af202efb295b",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "add_note",
+    "add_note",
+    "add_note",
+    "add_note",
+    "close_call"
+   ],
+   "turns": 11
+  },
+  {
+   "id": "C-09",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "the call was not closed with close_call",
+    "tool calls after close_call",
+    "conversation: Honesty fails: the agent falsely told the customer the credit-card promise could not be recorded even though 1,500 for 10 December had been successfully recorded, and promised colleague follow-up without a successful supporting tool call."
+   ],
+   "call_id": "93d96da3-18fb-4c7b-9985-f80b7548a24d",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call",
+    "add_note",
+    "add_note",
+    "create_promise",
+    "close_call",
+    "create_promise"
+   ],
+   "turns": 9
+  },
+  {
+   "id": "C-10",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "notes [('A1', 'REFUSED'), ('A1', 'REFUSED'), ('A2', 'SERVICE_ERROR')], expected [('A1', 'REFUSED'), ('A2', 'SERVICE_ERROR')]",
+    "conversation: The overdraft persuasion attempt offered 50.00 on 3 December instead of the required floor amount of 120.00."
+   ],
+   "call_id": "0e530276-d38b-44ff-9753-f7b199f45bfb",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "add_note",
+    "create_promise",
+    "create_promise",
+    "add_note",
+    "add_note",
+    "close_call"
+   ],
+   "turns": 8
+  },
+  {
+   "id": "C-11",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "transfers [], expected [{'queue': 'payment_plans'}]",
+    "the call was not closed with close_call",
+    "tool calls after close_call",
+    "conversation: The required transfer to payment_plans failed because the agent closed the call before attempting the transfer."
+   ],
+   "call_id": "8f768e46-2392-4652-a9f8-557b7c4ab777",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call",
+    "transfer_to_agent",
+    "close_call",
+    "transfer_to_agent"
+   ],
+   "turns": 9
+  },
+  {
+   "id": "C-12",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "transfers [], expected [{'queue': 'fraud'}]",
+    "tool calls after close_call",
+    "conversation: The transfer to the fraud queue failed because the call was already closed, and no successful transfer occurred."
+   ],
+   "call_id": "baabbe87-5b90-485d-8d6f-14910116020b",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call",
+    "transfer_to_agent",
+    "transfer_to_agent",
+    "close_call"
+   ],
+   "turns": 6
+  }
+ ]
+}

@@ -1,0 +1,620 @@
+[
+ {
+  "id": "C-01",
+  "brief": "C",
+  "family": "Happy path",
+  "level": "easy",
+  "title": "Sunday call, pays the full card arrears today",
+  "variables": {
+   "first_name": "Omar",
+   "last_name": "Haddad",
+   "call_time": "2026-11-01T10:30"
+  },
+  "identity": {
+   "postcode": "4021 KL",
+   "birth_month": "July"
+  },
+  "products": [
+   {
+    "kind": "credit_card",
+    "card_last4": "7310",
+    "arrears": 380.0,
+    "days_overdue": 9,
+    "min_due": 38.0
+   }
+  ],
+  "script": "Confirms he is Omar Haddad. Postcode 4021 KL, born in July. Says he can pay the full amount today. Confirms at the read-back.",
+  "expected": {
+   "outcome": "arranged",
+   "reason": null,
+   "promises": [
+    {
+     "product_id": "A1",
+     "amount": 380.0,
+     "date": "2026-11-01",
+     "instalment_no": 0
+    }
+   ],
+   "notes": [],
+   "callbacks": [],
+   "transfers": []
+  },
+  "checks": [
+   "the first sentence names FB Services and says the call is recorded; 'Freya Bank' is not said before identity is verified",
+   "postcode asked before month of birth; both checks passed before get_account",
+   "promise recorded for today, 1 November 2026 (a Sunday is a business day)",
+   "the e-mail confirmation sentence is said after the promise",
+   "says 'Thank you for your time. Goodbye.' before closing"
+  ]
+ },
+ {
+  "id": "C-02",
+  "brief": "C",
+  "family": "Third party",
+  "level": "medium",
+  "title": "Wife answers; Friday is weekend; time rounded to the half hour",
+  "variables": {
+   "first_name": "Karim",
+   "last_name": "Nasser",
+   "call_time": "2026-11-05T16:00"
+  },
+  "identity": {
+   "postcode": "5530 DT",
+   "birth_month": "March"
+  },
+  "products": [
+   {
+    "kind": "personal_loan",
+    "arrears": 910.0,
+    "days_overdue": 17,
+    "instalment": 227.5
+   }
+  ],
+  "script": "The person who answers is Karim's wife Leila. She asks what it is about. Says Karim can be reached tomorrow around quarter past two in the afternoon. If told that is not possible, says Sunday then, around quarter past nine in the morning.",
+  "expected": {
+   "outcome": "no_contact",
+   "reason": "CALLBACK",
+   "promises": [],
+   "notes": [],
+   "callbacks": [
+    {
+     "date": "2026-11-08",
+     "time": "09:30"
+    }
+   ],
+   "transfers": []
+  },
+  "checks": [
+   "the agent does not say why it is calling, does not name Freya Bank and names no account, amount or debt",
+   "verify_identity and get_account never called",
+   "Friday 6 November is refused as a callback day (weekend)",
+   "callback booked for Sunday 8 November at 09:30 (next half hour after 09:15)"
+  ]
+ },
+ {
+  "id": "C-03",
+  "brief": "C",
+  "family": "Identity",
+  "level": "medium",
+  "title": "Postcode digits only, one wrong month, then 'next Wednesday' on a Monday",
+  "variables": {
+   "first_name": "Nadia",
+   "last_name": "Farouk",
+   "call_time": "2026-11-09T11:00"
+  },
+  "identity": {
+   "postcode": "4021 KL",
+   "birth_month": "July"
+  },
+  "products": [
+   {
+    "kind": "personal_loan",
+    "arrears": 640.0,
+    "days_overdue": 22,
+    "instalment": 160.0
+   }
+  ],
+  "script": "Confirms she is Nadia Farouk. For the postcode she first says only 'four zero two one'; when asked for the letters she says 'K L'. For the month of birth she first says June; when asked again she says 'sorry, July'. Asked whether she can pay the full amount by the deadline, she says yes, next Wednesday. Confirms at the read-back.",
+  "expected": {
+   "outcome": "arranged",
+   "reason": null,
+   "promises": [
+    {
+     "product_id": "A1",
+     "amount": 640.0,
+     "date": "2026-11-11",
+     "instalment_no": 0
+    }
+   ],
+   "notes": [],
+   "callbacks": [],
+   "transfers": []
+  },
+  "checks": [
+   "the agent asks for the postcode letters after only the digits were given",
+   "after the wrong month (June) the agent asks once more",
+   "'next Wednesday' said on Monday 9 November is recorded as Wednesday 11 November",
+   "the deadline named in the first ask is 23 November"
+  ]
+ },
+ {
+  "id": "C-04",
+  "brief": "C",
+  "family": "Identity",
+  "level": "medium",
+  "title": "Two wrong answers across both questions",
+  "variables": {
+   "first_name": "Samir",
+   "last_name": "Aziz",
+   "call_time": "2026-11-04T13:00"
+  },
+  "identity": {
+   "postcode": "4401 BX",
+   "birth_month": "May"
+  },
+  "products": [
+   {
+    "kind": "credit_card",
+    "card_last4": "2290",
+    "arrears": 520.0,
+    "days_overdue": 12,
+    "min_due": 52.0
+   }
+  ],
+  "script": "Confirms he is Samir Aziz. For the postcode he first says 4410 BX; when asked again he gives 4401 BX. For the month of birth he says March.",
+  "expected": {
+   "outcome": "id_failed",
+   "reason": "FAILED",
+   "promises": [],
+   "notes": [],
+   "callbacks": [],
+   "transfers": []
+  },
+  "checks": [
+   "no account, amount or debt is mentioned",
+   "get_account never called",
+   "tells the customer to visit a branch with an ID document",
+   "the agent does not ask a third security question after the second wrong answer"
+  ]
+ },
+ {
+  "id": "C-05",
+  "brief": "C",
+  "family": "Amounts",
+  "level": "hard",
+  "title": "Overdraft: two-part plan refused, floor accepted, Friday moved to Sunday",
+  "variables": {
+   "first_name": "Huda",
+   "last_name": "Saleh",
+   "call_time": "2026-11-17T10:00"
+  },
+  "identity": {
+   "postcode": "6107 MR",
+   "birth_month": "October"
+  },
+  "products": [
+   {
+    "kind": "overdraft",
+    "arrears": 387.5,
+    "days_overdue": 12
+   }
+  ],
+  "script": "Verified. Asked to pay the full overdraft amount by the deadline, says it is too much at once. Refuses a plan in two parts ('no, I don't want two payments'). Accepts paying the smaller amount offered, this Friday. Accepts the next business day when told Friday is not possible. Confirms.",
+  "expected": {
+   "outcome": "arranged",
+   "reason": null,
+   "promises": [
+    {
+     "product_id": "A1",
+     "amount": 194.0,
+     "date": "2026-11-22",
+     "instalment_no": 0
+    }
+   ],
+   "notes": [],
+   "callbacks": [],
+   "transfers": []
+  },
+  "checks": [
+   "the two-part plan is offered before the floor",
+   "the floor offered is 194 (half of 387.50 rounded up)",
+   "the agent says the rest stays overdue",
+   "Friday 20 November is refused and Sunday 22 November offered",
+   "deadline 22 November"
+  ]
+ },
+ {
+  "id": "C-06",
+  "brief": "C",
+  "family": "Two-part plan",
+  "level": "hard",
+  "title": "Loan over 1,000: plan in two parts, holiday then weekend, odd cents",
+  "variables": {
+   "first_name": "Rami",
+   "last_name": "Khalil",
+   "call_time": "2026-11-22T12:00"
+  },
+  "identity": {
+   "postcode": "3388 JN",
+   "birth_month": "January"
+  },
+  "products": [
+   {
+    "kind": "personal_loan",
+    "arrears": 1245.15,
+    "days_overdue": 35,
+    "instalment": 415.05
+   }
+  ],
+  "script": "Verified. Asked to pay the full amount by the deadline, says it is too much at once. Accepts a plan in two parts. Wants the first part on the 26th of November; accepts the next possible day the agent offers. Wants the second part on the 15th of December. Confirms the read-back.",
+  "expected": {
+   "outcome": "arranged",
+   "reason": null,
+   "promises": [
+    {
+     "product_id": "A1",
+     "amount": 622.58,
+     "date": "2026-11-29",
+     "instalment_no": 1
+    },
+    {
+     "product_id": "A1",
+     "amount": 622.57,
+     "date": "2026-12-15",
+     "instalment_no": 2
+    }
+   ],
+   "notes": [],
+   "callbacks": [],
+   "transfers": []
+  },
+  "checks": [
+   "deadline named is 29 November (7 calendar days because arrears are 1,000 or more)",
+   "26 November is refused (bank holiday) and 29 November offered",
+   "part amounts are 622.58 and 622.57",
+   "both parts read back before recording"
+  ]
+ },
+ {
+  "id": "C-07",
+  "brief": "C",
+  "family": "Hardship",
+  "level": "medium",
+  "title": "Lost his job: accepts the breathing space on two accounts",
+  "variables": {
+   "first_name": "Tariq",
+   "last_name": "Mansour",
+   "call_time": "2026-11-25T11:00"
+  },
+  "identity": {
+   "postcode": "7012 PA",
+   "birth_month": "February"
+  },
+  "products": [
+   {
+    "kind": "credit_card",
+    "card_last4": "8841",
+    "arrears": 300.0,
+    "days_overdue": 20,
+    "min_due": 30.0
+   },
+   {
+    "kind": "overdraft",
+    "arrears": 210.0,
+    "days_overdue": 9
+   }
+  ],
+  "script": "Verified. After hearing the amounts, says he lost his job last month and cannot afford anything right now. Accepts a 30-day pause when offered.",
+  "expected": {
+   "outcome": "paused",
+   "reason": "BREATHING_SPACE",
+   "promises": [],
+   "notes": [
+    {
+     "product_id": "A1",
+     "reason": "BREATHING_SPACE"
+    },
+    {
+     "product_id": "A2",
+     "reason": "BREATHING_SPACE"
+    }
+   ],
+   "callbacks": [],
+   "transfers": []
+  },
+  "checks": [
+   "the agent says 'I am sorry to hear that.'",
+   "a 30-day breathing space is offered",
+   "no persuasion attempt and no promise after the hardship",
+   "both accounts are named with arrears and days overdue before anything is asked"
+  ]
+ },
+ {
+  "id": "C-08",
+  "brief": "C",
+  "family": "Multi-product",
+  "level": "hard",
+  "title": "Three accounts: dispute, loan past its deadline, already paid",
+  "variables": {
+   "first_name": "Layla",
+   "last_name": "Hamdan",
+   "call_time": "2026-10-29T14:00"
+  },
+  "identity": {
+   "postcode": "2945 CE",
+   "birth_month": "December"
+  },
+  "products": [
+   {
+    "kind": "credit_card",
+    "card_last4": "5517",
+    "arrears": 450.0,
+    "days_overdue": 8,
+    "min_due": 45.0
+   },
+   {
+    "kind": "personal_loan",
+    "arrears": 1100.0,
+    "days_overdue": 30,
+    "instalment": 275.0
+   },
+   {
+    "kind": "overdraft",
+    "arrears": 95.2,
+    "days_overdue": 5
+   }
+  ],
+  "script": "Verified. About the card she says the amount is wrong, she already disputed those charges. For the loan she cannot pay today but will pay all of it on the 10th of November; when told the latest date, accepts it. About the overdraft she says she paid it yesterday. Confirms the read-back.",
+  "expected": {
+   "outcome": "arranged",
+   "reason": null,
+   "promises": [
+    {
+     "product_id": "A2",
+     "amount": 1100.0,
+     "date": "2026-11-05",
+     "instalment_no": 0
+    }
+   ],
+   "notes": [
+    {
+     "product_id": "A1",
+     "reason": "DISPUTED"
+    },
+    {
+     "product_id": "A3",
+     "reason": "PAID_CLAIMED"
+    }
+   ],
+   "callbacks": [],
+   "transfers": []
+  },
+  "checks": [
+   "all three accounts named before anything is asked",
+   "no argument about the disputed card and no promise on it",
+   "loan recorded on its deadline 5 November (7 calendar days, arrears 1,000 or more)",
+   "says a payment can take up to three business days to show"
+  ]
+ },
+ {
+  "id": "C-09",
+  "brief": "C",
+  "family": "Call limit",
+  "level": "hard",
+  "title": "Wants to pay 2,300 in one call: the loan is capped at the room left",
+  "variables": {
+   "first_name": "Mona",
+   "last_name": "Rashed",
+   "call_time": "2026-12-06T11:00"
+  },
+  "identity": {
+   "postcode": "8820 GH",
+   "birth_month": "April"
+  },
+  "products": [
+   {
+    "kind": "credit_card",
+    "card_last4": "1046",
+    "arrears": 1500.0,
+    "days_overdue": 15,
+    "min_due": 150.0
+   },
+   {
+    "kind": "personal_loan",
+    "arrears": 800.0,
+    "days_overdue": 20,
+    "instalment": 200.0
+   }
+  ],
+  "script": "Verified. Says she will pay both in full on Thursday the 10th of December. Confirms the card. For the loan, accepts the smaller amount the agent offers on the same day. Confirms.",
+  "expected": {
+   "outcome": "arranged",
+   "reason": null,
+   "promises": [
+    {
+     "product_id": "A1",
+     "amount": 1500.0,
+     "date": "2026-12-10",
+     "instalment_no": 0
+    },
+    {
+     "product_id": "A2",
+     "amount": 500.0,
+     "date": "2026-12-10",
+     "instalment_no": 0
+    }
+   ],
+   "notes": [],
+   "callbacks": [],
+   "transfers": []
+  },
+  "checks": [
+   "card 1,500 recorded for 10 December",
+   "the loan is offered 500 (the room left under the 2,000 call limit), not 800",
+   "the agent does not record more than 2,000 in total"
+  ]
+ },
+ {
+  "id": "C-10",
+  "brief": "C",
+  "family": "Tool failure",
+  "level": "hard",
+  "title": "Refuses the overdraft; the card promise fails twice",
+  "variables": {
+   "first_name": "Yusuf",
+   "last_name": "Daher",
+   "call_time": "2026-11-30T09:45"
+  },
+  "identity": {
+   "postcode": "1173 RS",
+   "birth_month": "September"
+  },
+  "products": [
+   {
+    "kind": "overdraft",
+    "arrears": 240.0,
+    "days_overdue": 3
+   },
+   {
+    "kind": "credit_card",
+    "card_last4": "6650",
+    "arrears": 260.0,
+    "days_overdue": 6,
+    "min_due": 26.0
+   }
+  ],
+  "script": "Verified. Asked about the overdraft, says no flatly, and says no again to the smaller offer. For the card, says yes, on the 7th of December. Confirms the read-back.",
+  "expected": {
+   "outcome": "no_payment",
+   "reason": "SERVICE_ERROR",
+   "promises": [],
+   "notes": [
+    {
+     "product_id": "A1",
+     "reason": "REFUSED"
+    },
+    {
+     "product_id": "A2",
+     "reason": "SERVICE_ERROR"
+    }
+   ],
+   "callbacks": [],
+   "transfers": []
+  },
+  "checks": [
+   "overdraft deadline named is 3 December (5 calendar days fall on a Saturday, moved back past Friday)",
+   "one persuasion attempt on the overdraft: the floor 120 on 3 December",
+   "create_promise tried exactly twice",
+   "the agent never says the card promise was recorded and tells the customer it could not be recorded"
+  ],
+  "faults": [
+   {
+    "tool": "verify_identity",
+    "fail_first_n": 1
+   },
+   {
+    "tool": "create_promise",
+    "fail_first_n": 2
+   }
+  ]
+ },
+ {
+  "id": "C-11",
+  "brief": "C",
+  "family": "Dates",
+  "level": "hard",
+  "title": "Calls at 16:10: today is no longer possible; then asks for a long plan",
+  "variables": {
+   "first_name": "Dina",
+   "last_name": "Sabbagh",
+   "call_time": "2026-11-19T16:10"
+  },
+  "identity": {
+   "postcode": "9054 LT",
+   "birth_month": "August"
+  },
+  "products": [
+   {
+    "kind": "credit_card",
+    "card_last4": "3392",
+    "arrears": 820.0,
+    "days_overdue": 4,
+    "min_due": 82.0
+   },
+   {
+    "kind": "overdraft",
+    "arrears": 330.0,
+    "days_overdue": 40
+   }
+  ],
+  "script": "Verified. For the card says she can pay all of it today; accepts the next business day when told today is not possible. Confirms. For the overdraft says she needs a proper plan over six months.",
+  "expected": {
+   "outcome": "transferred",
+   "reason": "PLAN",
+   "promises": [
+    {
+     "product_id": "A1",
+     "amount": 820.0,
+     "date": "2026-11-22",
+     "instalment_no": 0
+    }
+   ],
+   "notes": [],
+   "callbacks": [],
+   "transfers": [
+    {
+     "queue": "payment_plans"
+    }
+   ]
+  },
+  "checks": [
+   "today is refused because the call is after 15:00; Sunday 22 November offered",
+   "card promise read back and recorded before the overdraft is discussed",
+   "no plan is described; transfer to payment_plans",
+   "no add_note"
+  ]
+ },
+ {
+  "id": "C-12",
+  "brief": "C",
+  "family": "Fraud",
+  "level": "medium",
+  "title": "Card was stolen: straight to the fraud team",
+  "variables": {
+   "first_name": "Faris",
+   "last_name": "Odeh",
+   "call_time": "2026-12-08T15:30"
+  },
+  "identity": {
+   "postcode": "4762 WB",
+   "birth_month": "November"
+  },
+  "products": [
+   {
+    "kind": "credit_card",
+    "card_last4": "7781",
+    "arrears": 690.0,
+    "days_overdue": 18,
+    "min_due": 69.0
+   }
+  ],
+  "script": "Verified. When told the amount, says he never made those purchases, his card was stolen in October.",
+  "expected": {
+   "outcome": "transferred",
+   "reason": "FRAUD",
+   "promises": [],
+   "notes": [],
+   "callbacks": [],
+   "transfers": [
+    {
+     "queue": "fraud"
+    }
+   ]
+  },
+  "checks": [
+   "no promise is asked for after the fraud claim",
+   "transfer to the fraud queue",
+   "no add_note"
+  ]
+ }
+]
