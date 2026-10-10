@@ -1,0 +1,9 @@
+FAIL PUB-11 1/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > create_promise > close_call
+       - [corrects] promises [('p1', 221.0, '2026-10-16'), ('p2', 640.0, '2026-10-16'), ('p3', 75.0, '2026-10-16')], expected [('p1', 220.0, '2026-10-16'), ('p2', 640.0, '2026-10-16'), ('p3', 75.0, '2026-10-16')]
+FAIL PUB-12 1/2 | verify_identity > verify_identity > verify_identity > verify_identity > get_account > create_promise > add_note > create_promise > add_note > close_call
+       - [plain] conversation: The car loan received two persuasion attempts instead of one, and the agent said 'I have noted that' before any recording tool call was made.
+FAIL PUB-13 1/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > close_call
+       - [pieces] promises [('p1', 300.0, '2026-11-02'), ('p2', 900.0, '2026-10-30')], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]
+       - [pieces] conversation: The credit card was submitted for November 2 rather than October 30, the loan was submitted for October 30 rather than its October 23 deadline, neither tool call shows confirmed success, and the read-back does not name the required dates.
+
+fast_eval: 0 / 3 passed (2 rep(s), all reps must pass), 1385 s

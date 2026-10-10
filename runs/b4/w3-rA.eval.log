@@ -1,0 +1,36 @@
+FAIL PUB-01 1/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [pieces] conversation: create_promise was never called, and no text-message sentence was said after the promise.
+FAIL PUB-02 1/2 | schedule_callback > close_call
+       - [talkative] conversation: No tool call scheduled the callback for the next business day, October 15, 2026, at 11:00.
+FAIL PUB-03 1/2 | verify_identity > verify_identity > verify_identity > close_call
+       - [in_words] outcome ('no_promise', 'refused'), expected ('not_verified', 'failed')
+       - [in_words] conversation: The identity check did not end after the third wrong answer (1990-07-21 was skipped), the agent disclosed the credit card and amounts owed, and the customer was not directed to the app or a branch.
+FAIL PUB-04 1/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+       - [corrects] outcome ('no_promise', 'refused'), expected ('promise', None)
+       - [corrects] promises [], expected [('p1', 1250.0, '2026-10-23')]
+       - [corrects] conversation: The promise-date check fails because no promise for 23 October was agreed or recorded.
+FAIL PUB-05 1/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+       - [talkative] conversation: The one-sentence-of-sympathy check fails because the agent gave two sympathy sentences, one about the hectic day and another about the job loss.
+FAIL PUB-06 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [in_words] promises [('p1', 637.5, '2026-10-23')], expected [('p1', 637.5, '2026-10-16')]
+       - [in_words] conversation: The minimum payment was offered twice rather than once, and the recorded promise for 637.50 was for Friday 23 October instead of Friday 16 October.
+       - [plain] conversation: The minimum payment was offered twice rather than once, and no tool call created the confirmed promise for 637.50 on Friday 16 October.
+FAIL PUB-07 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [talkative] promises [('p1', 540.0, '2026-11-02')], expected [('p1', 540.0, '2026-10-27')]
+       - [talkative] conversation: The agent did not offer Tuesday 27 October as the next business day after 26 October, and no promise was recorded for Tuesday 27 October within the early-band deadline.
+       - [corrects] promises [('p1', 540.0, '2026-11-02')], expected [('p1', 540.0, '2026-10-27')]
+       - [corrects] conversation: The agent did not ask once to clarify the exact payment day, did not offer Tuesday 27 October as the next business day after the 26 October holiday, and never recorded a promise for Tuesday 27 October.
+FAIL PUB-08 0/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+       - [plain] conversation: The agent never says that payments can take one business day to appear.
+       - [pieces] conversation: The agent did not say that payments can take one business day to appear.
+FAIL PUB-09 0/2 | verify_identity > verify_identity > verify_identity > get_account > transfer_to_agent > close_call
+       - [in_words] conversation: The required transfer_to_agent call with queue restructuring was never made.
+       - [in_words] outcome ('promise', None), expected ('transferred', 'restructuring')
+       - [in_words] promises [('p1', 700.0, '2026-10-16')], expected []
+       - [in_words] transfers [], expected [{'queue': 'restructuring'}]
+       - [in_words] conversation: The agent never called transfer_to_agent with queue restructuring, proposed its own payment plan of 700 on 2026-10-16, and successfully recorded a promise using create_promise.
+FAIL PUB-10 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > close_call
+       - [asks_back] conversation: The check requiring exactly one promise in the ledger after the retry fails because no create_promise call, retry, or successful ledger entry is shown.
+       - [corrects] conversation: The exactly-one-promise-after-retry check fails because the only create_promise call failed with nothing recorded, and no retry or successful ledger entry is shown.
+
+fast_eval: 0 / 10 passed (2 rep(s), all reps must pass), 516 s

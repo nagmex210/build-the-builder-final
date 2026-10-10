@@ -200,6 +200,12 @@ async def run(slot, tools, briefs):
     old_wf = KIT / "out" / f"{slot}.workflow.json"
     if old_wf.exists():
         old_wf.replace(old_wf.with_suffix(".prev.json"))
+    # A3 canned sentences: extracted by Azure in parallel with everything else, applied in the final pass.
+    old_canned = KIT / "out" / f"{slot}.canned.json"
+    if old_canned.exists():
+        old_canned.unlink()
+    canned_proc = subprocess.Popen([sys.executable, str(KIT / "builder" / "canned.py"), "extract", "--slot", slot, "--tools", tools, *briefs],
+                                   cwd=KIT, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True, env={**os.environ, "BTB_TRACE": str(trace)})
     # Code steps: dates, business days, deadlines and floors are computed by generated, locally tested code.
     t_calc = time.time()
     calc = subprocess.run([sys.executable, str(KIT / "builder" / "datecalc.py"), "--slot", slot, "--tools", tools, *briefs],
@@ -243,6 +249,13 @@ async def run(slot, tools, briefs):
             out.write(json.dumps({"event": "budget", "what": "Claude build agent stopped at the time budget", "seconds": round(time.time() - t0)}) + "\n")
     # Final deterministic pass on whatever the agent wrote: hooks (honesty / ids / failures), speech block, lint, save.
     wf_file = KIT / "out" / f"{slot}.workflow.json"
+    try:
+        canned_err = canned_proc.communicate(timeout=240)[1]
+    except subprocess.TimeoutExpired:
+        canned_proc.kill(); canned_err = "timeout"
+    with trace.open("a") as out:
+        out.write(json.dumps({"event": "test", "what": "A3 canned sentences extracted (opening tts, say_now hooks, goodbye, FIXED SENTENCES)",
+                              "ok": old_canned.exists(), "error": (canned_err or "")[-400:]}) + "\n")
     sys.path.insert(0, str(KIT)); sys.path.insert(0, str(KIT / "builder"))
 
     def final_pass(tag):

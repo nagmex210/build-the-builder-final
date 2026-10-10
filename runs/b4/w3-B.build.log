@@ -1,0 +1,35 @@
+  [Skill] {'skill': 'build-phone-agent', 'args': 'Slot: w3-B. Tool API file: tools/openapi.json. Brief files: briefs/brief-a.md br
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt3; cat briefs/brief-a.md briefs/brief-b.md; cat tools/openapi.json', 'description': '
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt3; cat docs/workflow-format.md docs/tools-and-code.md .claude/skills/build-phone-agen
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt3; wc -c docs/workflow-format.md docs/tools-and-code.md .claude/skills/build-phone-ag
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt3; cat examples/base-agent.json; python3 -c "\nimport json;d=json.load(open(\'out/w3-
+Read the briefs, API, routing guide and calc file; now skimming the docs for response_mapping / hook details, then writing the workflow.
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt3; grep -n -i -A3 "response_mapping\\|api_request\\|pre_actions\\|vars\\[" docs/workf
+Writing the workflow generator now.
+  [Bash] {'command': 'mkdir -p /home/ubuntu/btb/wt3/build_w3B && cat > /home/ubuntu/btb/wt3/build_w3B/gen.py <<\'EOF\'\nimport js
+  [Bash] {'command': 'python3 -c "\nimport json;n=json.load(open(\'out/w3-B.workflow.json\'))[\'nodes\'][\'date_facts_setup\'];pr
+Saved. Fixing the end_call node's `terminal` object, then a chat test.
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt3; sed -n 615,650p docs/workflow-format.md', 'description': 'Read end_call node forma
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt3; python3 - <<\'EOF\'\np=\'build_w3B/gen.py\'; s=open(p).read()\ns=s.replace(\'\'\'"
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt3; python3 -c "\nimport freya,json\nr=freya.api(\'POST\',\'/api/v2/chat/message\',{\'
+I built the phone agent for slot w3-B and saved it. It passes the lint check and starts a call. In two live chat turns it gave the right opening sentence, and after "Yes, speaking." it moved to the security questions. Nothing past identity was tried live: no verification, account lookup, promise, callback or failure path. As you asked, no practice cases were run.
+
+- **Structure:** the call runs through these steps in order:
+  1. Your date-facts code node is the start node, unchanged, and points to the opening.
+  2. Opening: who is on the line, callbacks, wrong number, deceased, unclear.
+  3. Identity checks.
+  4. A silent account lookup with your hook code unchanged.
+  5. One negotiation step for all products.
+  6. Hang up, reached only after `close_call` succeeds.
+- **Checks in code:** before a callback or a promise is sent to the bank, a hook checks it against the brief. Callbacks must be today or the next business day, 10:00–19:00 and later than now. Promises must be on a business day, not in the past, not after that product's deadline, and between the floor and the past-due amount. A request that breaks a rule gets no date, so the bank records nothing and the agent is told why.
+- **Retries:** the brief's "try once more, then service_error" rule is in the prompts and in what each tool result tells the agent. It is not also enforced by a routing rule on the failure counters.
+- **Brief A vs Brief B:** I followed Brief B throughout, because it extends A. So the agent calls `add_note` for every product without a promise, even single-product customers, and it adds no notes on any transfer. Brief A says it never uses `add_note`, so if single-product calls are scored under Brief A, those notes may count against it.
+- **Date rules:** the brief's date rules match the date facts, including the callback window.
+
+The generator script is at `build_w3B/gen.py`. It rebuilds `out/w3-B.workflow.json`, then save again with `python3 builder/save.py w3-B out/w3-B.workflow.json`.
+
+workflow_id: 45b479a7-6323-4580-b0f5-fca4e82e0125, agent_id: 148e9dfa-ee41-4f91-b6c2-68fe3febe63a
+
+done: 13 turns, 132 s
+final save: {'workflow_id': '45b479a7-6323-4580-b0f5-fca4e82e0125', 'agent_id': '148e9dfa-ee41-4f91-b6c2-68fe3febe63a', 'version': 15}; lint: 0 errors, 0 warnings
+{"workflow_id": "45b479a7-6323-4580-b0f5-fca4e82e0125", "agent_id": "148e9dfa-ee41-4f91-b6c2-68fe3febe63a"}

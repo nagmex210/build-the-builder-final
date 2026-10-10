@@ -1,0 +1,41 @@
+  [Skill] {'skill': 'build-phone-agent', 'args': 'Slot: w3-rA. Tool API file: tools/openapi.json. Brief files: btb/briefs_raw/brie
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt3; ls; ls btb/briefs_raw; cat btb/briefs_raw/brief-a-raw.md; cat tools/openapi.json'}
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt3; cat docs/workflow-format.md docs/tools-and-code.md .claude/skills/build-phone-agen
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt3; cat examples/base-agent.json; python3 -c "\nimport json;d=json.load(open(\'out/w3-
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt3; cat .claude/skills/build-phone-agent/routing.md; wc -c docs/*.md'}
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt3; grep -n "^#" docs/workflow-format.md docs/tools-and-code.md | head -80'}
+I've read the brief, the tool API file, routing.md and the calc file. Next I'm skimming the docs on pre_actions and response_mapping, then I'll write the workflow.
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt3; sed -n 143,340p docs/tools-and-code.md; sed -n 367,470p docs/tools-and-code.md'}
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt3; grep -n "pre_process_code\\|post_process_code\\|def " builder/save.py | head -40; 
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt3; grep -n "pre_process_code\\|post_process_code" builder/harden.py | head -20; sed -
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt3; python3 -c "\nimport json;d=json.load(open(\'out/w3-rA.calc.json\'));c=d[\'account
+  [Bash] {'command': 'mkdir -p /home/ubuntu/btb/wt3/gen_w3rA && cat > /home/ubuntu/btb/wt3/gen_w3rA/gen.py <<\'EOF\'\nimport json
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt3; grep -n "terminal" builder/lint_workflow.py docs/workflow-format.md | head'}
+Workflow is generated; fixing the one lint error (end node needs a `terminal` block), then saving.
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt3; sed -n 611,650p docs/workflow-format.md'}
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt3; python3 - <<\'EOF\'\np=\'gen_w3rA/gen.py\'; s=open(p).read()\ns=s.replace(\'\'\'"p
+Saved. Quick start check:
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt3; timeout 90 python3 -c "import freya,json; print(json.dumps(freya.api(\'POST\',\'/a
+I built the workflow for slot w3-rA and saved it. It passes the lint check, and one live chat turn starts correctly: the agent said it is Freya Bank's digital assistant, that the call is recorded, and asked "Am I speaking with Ms Lee?". I ran no other chat turns and no practice cases, so the identity, negotiation and closing paths have not been tested live.
+
+How it is built:
+- **Start:** the date code node runs first, unchanged, and then hands over to the opening.
+- **Opening:** handles callbacks, wrong numbers, deceased customers, unclear answers and human requests. It moves on to identity only when the person clearly confirms they are the customer.
+- **Identity:** asks date of birth, then the last four digits of the phone, one at a time, and moves on only when the bank's check says both passed.
+- **Account lookup:** runs automatically after identity. The account hook is on that lookup unchanged, so each product's deadline, floor and number of attempts come from the hook, not the model.
+- **Negotiation:** covers clauses 17–47.
+- **Repeated promise failure:** if recording the promise fails twice, the call moves to a separate step that closes it as `no_promise` / `service_error`.
+- **Ending:** every stage that can end the call has the close tool, and a successful close hangs up.
+- **Dates:** every stage that deals with callbacks or dates shows the date facts with the "never compute a date yourself" instruction.
+
+**Brief vs date facts:** they differ only in the deadlines, and the date facts already use the memo's amended values (12th business day for 1–7 days late, 7th for 8–45). Both follow the brief, so I changed nothing.
+
+**Not enforced in code:** nothing technically blocks a promise dated on a holiday, after the deadline, or below the floor; only the prompt rules prevent it. I left out a blocking check because a blocked call would count as a failure. Two of those would wrongly close the call as `service_error`.
+
+The generator script is `gen_w3rA/gen.py` and the workflow is `out/w3-rA.workflow.json`.
+
+workflow_id: 593c5d40-2694-48d4-845b-94cf2204f21c, agent_id: 674c4909-80ab-4a7c-a545-47494fdb5e7a
+
+done: 17 turns, 137 s
+final save: {'workflow_id': '593c5d40-2694-48d4-845b-94cf2204f21c', 'agent_id': '674c4909-80ab-4a7c-a545-47494fdb5e7a', 'version': 10}; lint: 0 errors, 0 warnings
+{"workflow_id": "593c5d40-2694-48d4-845b-94cf2204f21c", "agent_id": "674c4909-80ab-4a7c-a545-47494fdb5e7a"}

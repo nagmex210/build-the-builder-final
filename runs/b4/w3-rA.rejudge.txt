@@ -1,0 +1,10 @@
+PUB-08 None REJUDGE pass
+PUB-09 in_words REJUDGE pass
+PUB-10 asks_back REJUDGE pass
+PUB-01 pieces REJUDGE pass
+PUB-02 talkative REJUDGE fail: The callback was scheduled for 2026-10-15 at 11:00, which is not clearly established as the next business day after the call.
+PUB-05 talkative REJUDGE fail: The one-sentence-of-sympathy check fails because the agent gives two sympathy sentences, one about the customer's hectic day and another about his job loss.
+PUB-06 None REJUDGE fail: The minimum payment was offered twice rather than once: first as 637.50 with the overdue-balance warning, then again as 637.50 for Friday 16 October.
+PUB-08 pieces REJUDGE pass
+PUB-10 corrects REJUDGE pass
+rejudged: 3 / 10 {'PUB-01': [True, True], 'PUB-02': [True, False], 'PUB-03': [True, False], 'PUB-04': [False, True], 'PUB-05': [True, False], 'PUB-06': [False, False], 'PUB-07': [False, False], 'PUB-08': [True, True], 'PUB-09': [True, False], 'PUB-10': [True, True]}
