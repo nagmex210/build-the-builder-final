@@ -1,0 +1,28 @@
+I built best-of-N into the builder and it runs end to end on all four slots, but **I couldn't measure the score**. From about 18:20 UTC Freya's chat endpoint timed out on nearly every turn, with about 15 evals from all workers running at once. I recommend not merging it as the default.
+
+**What changed** (branch `idea/b3-4`, report in `runs/b3/w4.md`):
+- **`builder/build.py`:** the date code is generated once. Then 3 Claude builds run in parallel with the same prompt, each in its own slot (`<slot>.c1` to `.c3`). While they build, 4 scripted customer chats are written from the brief, reusing b2-4's `selftest.py`. Every candidate plays the same 4 chats. The one with the fewest failed chats per valid chat (then fewest judge mistakes) is saved under `<slot>`. Chats the platform broke are re-run once if there's time. The whole run stops at 28 min. `BUILD_CANDIDATES=1` goes back to the old single build.
+- **`builder/save.py`:** a file lock, because the parallel candidates all write the shared slot file.
+- **`btb/bestofn_repick.py`** (harness only): re-runs the pick on a build's candidates, to measure how stable it is.
+- **Brief-agnostic:** yes, the scenarios are written from whichever brief is being built. One caveat for Sunday: the chats use the kit's practice customers. If a hidden brief's tool API differs, every candidate may fail them and the pick won't tell them apart.
+
+**Scores** (fast_eval, reps 2):
+
+| slot | w4 | champion |
+|---|---|---|
+| A | 0/10 | 3 |
+| B | 0/3 | 0 |
+| raw-A | not finished by 19:15 | 1 |
+| raw-B | 0/3 | 0 |
+
+Every one of these runs timed out with 0–3 turns and no tool call, so the zeros are platform failures, not a result. I also started an eval of a candidate the self-test didn't pick, to check the pick against fast_eval. It never finished, and the second A build re-saved that slot while it ran, so it says nothing either. I stopped both unfinished evals at the end to take load off the platform.
+
+**How stable the pick is:**
+- **Builds:** each candidate took 1.5–4 min. A whole build took 600 s on a light load and 1139 s on a heavy one, against about 150 s for a single build. That's inside the 30-minute limit but costs on the build-time tie-break.
+- **Valid chats:** only 22 of the first build's 48 scripted chats ran; the rest timed out. Every valid chat of every candidate was judged failed. So the pick came down to judge mistake counts on 1–3 chats.
+- **Re-runs:** A picked candidate 2 in the first build, again on a re-run with the same chats, and again in a second full build. But in that re-run one workflow scored both "1 of 1 failed, 5 mistakes" and "2 of 2 failed, 6 mistakes", so the noise is as large as the gaps the pick relies on.
+- **Shared failures:** all candidates had the same faults, which best-of-N can't fix: a callback booked outside the brief's callback window, the recording notice not in the first sentence, and extra identity checks.
+
+My guesses for next time: same-prompt builds differ too little to make the pick matter. It would need candidates with different shapes, or b2-4's fix round. Simple ledger checks (call closed last, no tool error, no duplicate write) would probably pick more steadily than an AI judge's mistake counts on so few chats.
+
+Everything is committed on `idea/b3-4`.

@@ -1,0 +1,41 @@
+  [Skill] {'skill': 'build-phone-agent'}
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat briefs/brief-a.md; cat tools/openapi.json; cat .claude/skills/build-phone-age
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat out/main-A.wording.json; python3 -c "\nimport json;d=json.load(open(\'out/mai
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat examples/base-agent.json; wc -l docs/workflow-format.md docs/tools-and-code.m
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; grep -n -i "post_process\\|pre_process\\|extraction_schema\\|response_mapping\\|m
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; sed -n 186,280p docs/workflow-format.md; grep -n "api_request" -A40 docs/tools-an
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; python3 -c "\nimport json;d=json.load(open(\'out/main-A.calc.json\'));c=d[\'accou
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; grep -n -i "extraction_schema\\b" -B2 -A25 docs/workflow-format.md | grep -n "\\"
+I'm building the workflow now (generator script), then lint, gate and save.
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; sed -n 530,565p docs/workflow-format.md; sed -n 613,640p docs/workflow-format.md'
+  [Bash] {'command': 'mkdir -p /home/ubuntu/btb/gen && cat > /home/ubuntu/btb/gen/gen_main_a.py <<\'EOF\'\nimport json, copy\nR=\
+  [Bash] {'command': "sed -i 's/ e.g. 120.50;/;/' /home/ubuntu/btb/gen/gen_main_a.py && python3 /home/ubuntu/btb/gen/gen_main_a.p
+  [Bash] {'command': 'timeout 90 python3 -c "\nimport freya,json\nr=freya.api(\'POST\',\'/api/v2/chat/message\',{\'workflowId\':\
+  [Bash] {'command': 'timeout 90 python3 -c "\nimport freya,json\nr=freya.api(\'POST\',\'/api/v2/chat/message\',{\'workflowId\':\
+I built and saved the main-A workflow, and it starts correctly. I ran only two live chat turns. The opening line was right, and "Yes, speaking." moved the call to the first security question. Nothing after that has been tested live, and I ran no practice cases. Lint and the wording gate both show 0 errors and 0 warnings.
+
+The call goes through these steps:
+1. **Start:** the `code_node` from `out/main-A.calc.json` runs first, unchanged, then hands over to the opening.
+2. **Opening:** the agent says it is a digital assistant calling from Freya Bank, that the call is recorded, and asks "Am I speaking with {title} {last_name}?". This step also handles someone else answering: callbacks, wrong number and a death in the family.
+3. **Identity:** the two security questions, one `verify_identity` call per answer. The call moves on only when the tool reports both answers verified, not on what the customer says.
+4. **Account:** `get_account` runs silently, with `account_post_process_code` as its hook, verbatim.
+5. **Negotiation:** states the debt and handles dates, amounts, persuasion attempts, confirmation, recording the promise, transfers and every other closing case.
+6. **End:** the call hangs up only after `close_call` succeeds.
+
+Every exact sentence from the wording file is in its stage's prompt with "say exactly", and `{{date_facts}}` is in the opening and negotiation prompts. Only outcome and reason codes from the brief are used.
+
+On top of the prompts, I added three checks that run before a tool call reaches the bank:
+- **Promises:** a promise is not recorded if its date is in the past, not a business day or after that product's deadline, or if its amount is below the floor or above the past-due amount. The agent is told why so it can offer a valid one.
+- **Callbacks:** a callback outside today or the next business day, 10:00–19:00 and later than now, is not booked.
+- **Promise retries:** the brief's rule (try once more, then close as `no_promise` / `service_error`) is in the prompt only, not in routing. A promise blocked by the check above returns a failed result, so routing on the failure count could close a valid call as a service error too early.
+
+The brief's date rules match the date facts, so nothing needed changing there.
+
+Generator script: `/home/ubuntu/btb/gen/gen_main_a.py`
+
+workflow_id: c591c751-dc19-4660-9955-f9a4d750213d, agent_id: d7b2b782-a1c2-42ce-b004-ab865e0186de
+
+done: 15 turns, 172 s
+wording gate: 0 errors, 0 warnings
+final save: {'workflow_id': 'c591c751-dc19-4660-9955-f9a4d750213d', 'agent_id': 'd7b2b782-a1c2-42ce-b004-ab865e0186de', 'version': 12}; lint: 0 errors, 0 warnings
+{"workflow_id": "c591c751-dc19-4660-9955-f9a4d750213d", "agent_id": "d7b2b782-a1c2-42ce-b004-ab865e0186de"}

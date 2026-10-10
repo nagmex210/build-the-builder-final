@@ -1,0 +1,20 @@
+I built the state machine and all four agents built with it, but I have **no score**: Freya's chat endpoint was down (504 on every turn) for most of my eval window. The report is in `runs/b3/w3.md`, committed on `idea/b3-3`, which started from `main`.
+
+**What I built:**
+- **The state machine:** a new code node, `decide` (`builder/statemachine.py`), runs after every result from a tool that changes something at the bank (a promise, note, callback, transfer). It keeps track of which product is current, each product's status (open, promised, noted, refused) and failures per tool. It then sends the call either to `work_item`, which talks about one product only, or to `wrap_up`, which reads back the promises and closes the call. The only part that depends on the brief is a small config that the building Claude fills in from the brief.
+- **Supporting changes:**
+  - `builder/harden.py` now sets the variables `decide` reads after each such tool result, and saves the product list from the account lookup.
+  - The routing recipe describes the new shape.
+  - The lint reports an error if the `decide` node or its wiring is missing.
+- **A builder bug fix:** the A build was cut off by the shared Claude session limit after it had already written a complete workflow. `build.py` only handled the time-budget stop, so it exited without saving. It now runs the final save on the last written file whenever the build agent fails. For A, I ran that same final save by hand.
+
+**Builds:** all four slots (w3-A, w3-B, w3-rA, w3-rB) took about 250–320 s and had 0 lint errors. Each followed the new shape on the first try. One looks wrong: the raw-B build set "4 failures of the note tool" as the point to stop negotiating, which looks like a misreading of the brief.
+
+**Evals:** Freya returned 504 from about 18:20 to 18:44 and again from about 18:55. Another worker's agent failed the same way, so it was the platform, not this design. I restarted all four evals at 18:45, but none finished. I stopped them at 19:19. The champion's score to compare against is 4/26 (b1); the discarded b2 candidate scored 9/26.
+
+**Untested live:**
+- Whether the variable set after a tool result moves the call to `decide` in the same turn. If it doesn't, the move happens one customer turn late.
+- After a failed write, the agent may re-introduce the product instead of retrying.
+- In B and raw-B, any note finishes the current product, even one written for another reason.
+
+**Brief-agnostic:** yes. The new code reads only the workflow's own tool names and the shape of the account response. Everything specific to a brief is filled in at build time.

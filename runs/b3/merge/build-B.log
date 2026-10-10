@@ -1,0 +1,35 @@
+  [Skill] {'skill': 'build-phone-agent', 'args': 'Slot: main-B. Tool API file: tools/openapi.json. Brief files: briefs/brief-a.md 
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat briefs/brief-a.md briefs/brief-b.md; wc -c tools/openapi.json docs/*.md .clau
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat .claude/skills/build-phone-agent/routing.md; cat out/main-B.wording.json'}
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat tools/openapi.json; cat examples/base-agent.json'}
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; python3 -c "\nimport json;d=json.load(open(\'out/main-B.calc.json\'));print(d.key
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; grep -n -i -A40 \'"node_type": "api_request"\' docs/workflow-format.md | head -80
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; sed -n 525,560p docs/workflow-format.md; grep -n "end_call" docs/workflow-format.
+I've read the briefs, API and docs; now writing the workflow generator.
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; sed -n 610,640p docs/workflow-format.md'}
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; grep -n "post_process_code" docs/tools-and-code.md | head -5; python3 -c "\nimpor
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; sed -n 370,400p docs/tools-and-code.md'}
+  [Write] {'file_path': '/home/ubuntu/btb/gen_mainB/gen.py', 'content': 'import json\nR = \'/home/ubuntu/btb/repo/\'\ncalc = json.
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; python3 /home/ubuntu/btb/gen_mainB/gen.py && python3 builder/lint_workflow.py out
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; python3 - <<\'E\'\np=\'/home/ubuntu/btb/gen_mainB/gen.py\';s=open(p).read()\ns=s.
+Saved the first version; now running a quick start check.
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; timeout 90 python3 -c "import freya,json; print(freya.api(\'POST\',\'/api/v2/chat
+The workflow is saved for slot main-B and it starts: a one-turn chat test opened with "Hello, I am a digital assistant calling from Freya Bank. This call is recorded. Am I speaking with Ms Lee?" I sent only that one turn. No full conversation was tested, and as asked I did not run any practice cases.
+
+- **Structure:** the call starts in the date-facts code node. It then goes to an opening node (who is on the line, callbacks, wrong number, deceased, unclear), then identity (the two security questions). Next comes a silent `get_account` lookup with the post-process hook you supplied, then a single negotiation node for all products. A hang-up node comes last.
+- **Routing:** the call moves to identity only when the customer clearly confirms who they are. It moves on from identity only when the identity check reports both answers verified. Every stage that can close sends the call to the hang-up node once `close_call` succeeds.
+- **Code steps and wording:** both code pieces are in unchanged. `{{date_facts}}` and the "never compute a date" instruction are in the nodes that handle dates. The exact sentences are quoted with "say exactly", and only the brief's outcome and reason codes are used.
+- **Checks:** the lint and the wording gate both pass with 0 errors and 0 warnings.
+
+Brief B's per-product rules (notes, read-back, failures) are written into the negotiation prompt. The routes don't enforce them.
+
+The date facts and the brief agree, so I made no exceptions to the brief's rules.
+
+I wrote the workflow with a small generator script at `/home/ubuntu/btb/gen_mainB/gen.py`, outside the repo; rerun it before re-saving.
+
+workflow_id: 0e92e0fa-2e50-4314-8434-33760d22f246, agent_id: bce0c1bc-a68b-436e-a37b-88db6b717c99
+
+done: 16 turns, 121 s
+wording gate: 0 errors, 0 warnings
+final save: {'workflow_id': '0e92e0fa-2e50-4314-8434-33760d22f246', 'agent_id': 'bce0c1bc-a68b-436e-a37b-88db6b717c99', 'version': 9}; lint: 0 errors, 0 warnings
+{"workflow_id": "0e92e0fa-2e50-4314-8434-33760d22f246", "agent_id": "bce0c1bc-a68b-436e-a37b-88db6b717c99"}

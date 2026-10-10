@@ -1,0 +1,34 @@
+  [Skill] {'skill': 'build-phone-agent', 'args': 'Slot: main-C. Tool API file: btb/brief_c/openapi-c.json. Brief: btb/brief_c/brie
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat btb/brief_c/brief-c.md; cat btb/brief_c/openapi-c.json; cat .claude/skills/bu
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat out/main-C.wording.json; python3 -c "\nimport json;d=json.load(open(\'out/mai
+  [Read] {'file_path': '/home/ubuntu/.claude/projects/-home-ubuntu-btb-repo/bd7d7d4c-2c2d-46c2-837c-02c7a64470b7/tool-results/brq
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat examples/base-agent.json | head -c 9000; wc -c docs/*.md examples/base-agent.
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; python3 -c "\nimport json;d=json.load(open(\'examples/base-agent.json\'));print([
+Reading the brief, API file and docs is done; now checking the format for the account lookup step, then writing the workflow.
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; sed -n 140,240p docs/tools-and-code.md; sed -n 611,660p docs/workflow-format.md; 
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; python3 -c "\nimport json;d=json.load(open(\'out/main-C.calc.json\'));c=d[\'accou
+  [Bash] {'command': 'mkdir -p /home/ubuntu/btb/gen; cat > /home/ubuntu/btb/gen/build_c.py <<\'EOF\'\nimport json, copy\nR=\'/hom
+  [Bash] {'command': 'python3 builder/save.py main-C out/main-C.workflow.json 2>&1 | tail -5'}
+  [Bash] {'command': 'timeout 90 python3 -c "import freya,json; print(json.dumps(freya.api(\'POST\',\'/api/v2/chat/message\',{\'w
+Saved and starts. Quick check of the hook's deadline rule (brief: weekend deadline moves back):
+  [Bash] {'command': 'cd /tmp && python3 -I -c "\nimport json;d=json.load(open(\'/home/ubuntu/btb/repo/out/main-C.calc.json\'))\n
+  [Bash] {'command': 'cat > /home/ubuntu/btb/gen/fix.py <<\'EOF\'\nFIX = r\'\'\'\n# --- brief C fixes appended: deadline moves BA
+  [Bash] {'command': 'python3 - <<\'EOF\'\np=\'/home/ubuntu/btb/gen/build_c.py\'; s=open(p).read()\ns=s.replace(\'"PER ACCOUNT: {
+  [Bash] {'command': 'timeout 150 python3 -c "\nimport freya,json\nW=\'3f1e0c2c-d777-4204-bbf2-39eac684c2a5\';cv={\'customer_id\'
+  [Bash] {'command': 'python3 - <<\'EOF\'\np=\'/home/ubuntu/btb/gen/build_c.py\'; s=open(p).read()\ns=s.replace(\' "10. A request
+I built and saved the main-C workflow; the latest save is version 3. Lint and the wording gate both show 0 errors and 0 warnings. A short live chat starts correctly: the opening sentence is right and "Yes, speaking" moves on to the postcode question. In that chat, when asked why it was calling, the agent gave a vague answer instead of the brief's "a private matter for Omar Haddad". I added that rule to the identity step and saved again, but haven't re-run the chat since. The rest of the call — the account statement, negotiation, promises, notes, transfers and closing — has not been run. As instructed, I ran no practice cases.
+
+The call has five steps: the date-facts code step first, then opening (callback and who's on the line), identity (postcode then month of birth), the account lookup, and negotiation. A final node hangs up after `close_call` succeeds.
+
+**Where the brief differs from the provided account hook:** I left the hook code unchanged and appended a fix after it for two points:
+- **Weekend deadlines (rule 22):** the hook leaves a deadline on a Friday or Saturday. The brief says it moves back to the last business day before. For example, a personal loan on 2026-10-10 got Saturday 2026-10-24 and is now Thursday 2026-10-22.
+- **Overdraft floor (rule 30):** the hook used half the arrears unrounded (387.50 → 193.75). The brief says round up to a whole unit, so it is now 194.00.
+
+Each account's corrected deadline and floor are listed in the negotiation step, and the agent is told they override the DEADLINE lines in DATE FACTS. Those lines come from the unchanged hook and can still show the old weekend date.
+
+workflow_id: 3f1e0c2c-d777-4204-bbf2-39eac684c2a5, agent_id: 19f66fd3-5ec8-4112-ae07-970f744fd17d — brief differs from the hook on weekend deadlines (rule 22) and the overdraft floor rounding (rule 30); the brief is followed in both.
+
+done: 18 turns, 206 s
+wording gate: 0 errors, 0 warnings
+final save: {'workflow_id': '3f1e0c2c-d777-4204-bbf2-39eac684c2a5', 'agent_id': '19f66fd3-5ec8-4112-ae07-970f744fd17d', 'version': 4}; lint: 0 errors, 0 warnings
+{"workflow_id": "3f1e0c2c-d777-4204-bbf2-39eac684c2a5", "agent_id": "19f66fd3-5ec8-4112-ae07-970f744fd17d"}

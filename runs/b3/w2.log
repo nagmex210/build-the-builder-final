@@ -1,0 +1,12 @@
+I couldn't measure the per-item ledger idea. No fast_eval finished before the 19:25 limit, so there is no score to compare with the champion b1 (4 of 26). The report is committed on `idea/b3-2` at `runs/b3/w2.md` (commit `41afc45`).
+
+**What's on the branch:**
+- **The idea, reused from the earlier worker (`f22684a`).** `builder/items.py` keeps one row per product in code: its own latest date, its own attempt count, floor, and whether it is still open, promised or noted. A row only changes when the bank confirms the write. The model sees this list on every turn and in each tool result. It is aimed at PUB-12/13, where items took each other's dates and attempt counts, and at the single read-back with each item's own date. All tool names, fields and band rules come from the brief at build time. An offline test with a two-product account gave the correct per-item dates, attempts and statuses.
+- **A builder bug fix (`7291288`, `builder/build.py`).** If the inner Claude failed with anything other than a timeout (here, the subscription session limit), the build crashed. The final pass (harden, guards, items, wording, save) never ran, so no agent was saved. Now the build finishes with the last workflow file the agent wrote. This could matter on Sunday if the shared Claude quota runs out during a build.
+
+**Why there are no scores:**
+- The Claude session limit (resets 19:20 UTC) hit about 2 minutes into the four parallel builds. Only the B slot (briefs A + B) built fully. For A, raw-A and raw-B I ran the final pass by hand on the early drafts the agent had saved, so those agents are weaker than a real build.
+- The first B and raw-B evals scored 0/3 each, but every case failed at the first turn with "chat turn kept timing out". Freya was returning 503/504 errors with about 20 evals from all workers running at once. Worker 1's B evals from the same time failed the same way, so these are not real scores.
+- The A and raw-A evals, and a B / raw-B re-run with 3 workers, were still running at 19:14. They keep running on their own and write `runs/b3/w2/eval-*.json` / `eval2-*.json` in wt2 when done. Those files are not committed; the merger can read them there.
+
+My recommendation to the merger: take the `build.py` fix regardless. Take `items.py` only after a full rebuild once the quota resets and a fast_eval run on a less loaded platform shows it does no harm.

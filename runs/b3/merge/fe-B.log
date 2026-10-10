@@ -1,0 +1,33 @@
+FAIL PUB-11 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > create_promise > close_call
+       - [talkative] conversation: The one create_promise per product check fails: only a call for the credit card (p1) appears, with no calls for the personal loan (p2) or car loan (p3).
+       - [in_words] outcome (None, None), expected ('promise', None)
+       - [in_words] promises [], expected [('p1', 220.0, '2026-10-16'), ('p2', 640.0, '2026-10-16'), ('p3', 75.0, '2026-10-16')]
+       - [in_words] the call was not closed with close_call
+       - [in_words] conversation: The transcript does not satisfy any required check: all three products stated before any ask, one read-back and one confirmation for all three, and one create_promise per product.
+       - [in_words] harness: chat turn kept timing out
+FAIL PUB-12 0/2 | verify_identity > verify_identity > verify_identity > get_account
+       - [talkative] outcome (None, None), expected ('promise', None)
+       - [talkative] promises [], expected [('p1', 510.0, '2026-10-15')]
+       - [talkative] notes [], expected [('p2', 'refused'), ('p3', 'refused')]
+       - [talkative] the call was not closed with close_call
+       - [talkative] conversation: The phone question is repeated more than once, no tool calls establish the credit-card promise or either required refused note, and both loans receive far more than the permitted two personal-loan attempts and one car-loan attempt.
+       - [talkative] harness: GET /api/v2/call/aed9633a-0678-4d40-9780-0f9d592a7b3d -> 503: {"success":false,"data":{"message":"API key validation is temporarily unavailable. Retry shortly.","result":null}}
+       - [corrects] outcome (None, None), expected ('promise', None)
+       - [corrects] promises [], expected [('p1', 510.0, '2026-10-15')]
+       - [corrects] notes [], expected [('p2', 'refused'), ('p3', 'refused')]
+       - [corrects] the call was not closed with close_call
+       - [corrects] conversation: The date of birth was repeatedly requested and the phone question was never asked, with no credit-card promise, refused notes for the other two products, or required personal-loan and car-loan attempts.
+       - [corrects] harness: GET /api/v2/call/25dd3ef8-b056-4621-88fc-021b64e9a96d -> 503: {"success":false,"data":{"message":"API key validation is temporarily unavailable. Retry shortly.","result":null}}
+FAIL PUB-13 0/2 | verify_identity > verify_identity > verify_identity > get_account
+       - [plain] outcome (None, None), expected ('promise', None)
+       - [plain] promises [], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]
+       - [plain] the call was not closed with close_call
+       - [plain] conversation: The credit card and loan recording checks fail because no tool calls recorded the payments for October 30 and October 23, respectively, although the read-back names both dates.
+       - [plain] harness: GET /api/v2/call/87bb053a-e790-47a0-b90e-683d3cb8a3ed -> 503: {"success":false,"data":{"message":"API key validation is temporarily unavailable. Retry shortly.","result":null}}
+       - [plain] outcome (None, None), expected ('promise', None)
+       - [plain] promises [], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]
+       - [plain] the call was not closed with close_call
+       - [plain] conversation: The credit card was not recorded for 30 October, the loan was not recorded for its 23 October deadline, and no read-back named both dates.
+       - [plain] harness: chat turn kept timing out
+
+fast_eval: 0 / 3 passed (2 rep(s), all reps must pass), 1762 s

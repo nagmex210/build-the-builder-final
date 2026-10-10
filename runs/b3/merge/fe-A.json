@@ -1,0 +1,319 @@
+{
+ "workflow_id": "c591c751-dc19-4660-9955-f9a4d750213d",
+ "passed": 0,
+ "total": 10,
+ "rows": [
+  {
+   "id": "PUB-01",
+   "style": "corrects",
+   "pass": false,
+   "failed": [
+    "conversation: The text-message sentence was not said after the promise."
+   ],
+   "call_id": "38b2b63d-e2a0-4c4f-ba71-6f0c4b44b5c5",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 6
+  },
+  {
+   "id": "PUB-02",
+   "style": "pieces",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('not_reached', 'callback')",
+    "callbacks [], expected [{'date': '2026-10-15', 'time': '11:00'}]",
+    "the call was not closed with close_call",
+    "conversation: A callback was not scheduled for the next business day, 2026-10-15, at 11:00.",
+    "harness: POST /api/v2/chat/message -> 500: {\"success\":false,\"data\":{\"message\":\"Internal server error\",\"result\":{\"requestId\":\"dfa20ae7-3c9f-4a23-b3f6-3381e3ce2589\"}}}"
+   ],
+   "call_id": null,
+   "tools": [],
+   "turns": 0
+  },
+  {
+   "id": "PUB-03",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "conversation: The customer was never told to use the app or a branch, and the agent requested the date of birth again after the third wrong answer was first supplied."
+   ],
+   "call_id": "158fc48d-b536-4d61-8ae2-39f272d93c00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "close_call"
+   ],
+   "turns": 6
+  },
+  {
+   "id": "PUB-04",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "outcome ('no_promise', 'refused'), expected ('promise', None)",
+    "promises [], expected [('p1', 1250.0, '2026-10-23')]",
+    "conversation: The promise-date check is not clearly satisfied: October 23 was proposed, but the customer did not agree and no promise was recorded."
+   ],
+   "call_id": "4b1fbe30-a9ab-4ec2-b1c7-ed546d0b6b4a",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 7
+  },
+  {
+   "id": "PUB-05",
+   "style": null,
+   "pass": true,
+   "failed": [],
+   "call_id": "c528972f-12c4-4bbf-ab29-d230f4dc0456",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 6
+  },
+  {
+   "id": "PUB-06",
+   "style": "in_words",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 637.5, '2026-10-16')]",
+    "the call was not closed with close_call",
+    "conversation: The agent never offered the minimum payment with the note that the rest stays overdue, and no promise for 637.50 on Friday 16 October was established.",
+    "harness: GET /api/v2/call/4e67a551-ab39-4586-930e-6afd2831ce95 -> 503: {\"success\":false,\"data\":{\"message\":\"API key validation is temporarily unavailable. Retry shortly.\",\"result\":null}}"
+   ],
+   "call_id": "4e67a551-ab39-4586-930e-6afd2831ce95",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity"
+   ],
+   "turns": 17
+  },
+  {
+   "id": "PUB-07",
+   "style": "in_words",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 540.0, '2026-10-27')]",
+    "the call was not closed with close_call",
+    "conversation: The agent never asks for the exact day, rejects 26 October and offers the next business day, or records a promise for Tuesday 27 October within the early-band deadline.",
+    "harness: POST /api/v2/chat/message -> 500: {\"success\":false,\"data\":{\"message\":\"Internal server error\",\"result\":{\"requestId\":\"12202520-6136-4ff4-a740-2dc0fc8aae62\"}}}"
+   ],
+   "call_id": null,
+   "tools": [],
+   "turns": 0
+  },
+  {
+   "id": "PUB-08",
+   "style": "talkative",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('paid', None)",
+    "the call was not closed with close_call",
+    "conversation: The agent did not say payments can take one business day to appear.",
+    "harness: POST /api/v2/chat/message -> 500: {\"success\":false,\"data\":{\"message\":\"Internal server error\",\"result\":{\"requestId\":\"73a85dc0-1e9b-4281-9089-bfd135a24e34\"}}}"
+   ],
+   "call_id": null,
+   "tools": [],
+   "turns": 0
+  },
+  {
+   "id": "PUB-09",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('transferred', 'restructuring')",
+    "transfers [], expected [{'queue': 'restructuring'}]",
+    "the call was not closed with close_call",
+    "conversation: The required transfer_to_agent call with queue restructuring was never made.",
+    "harness: GET /api/v2/call/3108c718-0c14-4a5a-bc31-da9cc0712b82 -> 503: {\"success\":false,\"data\":{\"message\":\"API key validation is temporarily unavailable. Retry shortly.\",\"result\":null}}"
+   ],
+   "call_id": "3108c718-0c14-4a5a-bc31-da9cc0712b82",
+   "tools": [],
+   "turns": 18
+  },
+  {
+   "id": "PUB-10",
+   "style": "talkative",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 365.0, '2026-10-16')]",
+    "the call was not closed with close_call",
+    "conversation: The check requiring exactly one promise in the ledger after the retry fails because no tool call, retry, or ledger entry is shown.",
+    "harness: GET /api/v2/call/2e522854-dffd-4861-bf6e-cd6e3e37bcf2 -> 503: {\"success\":false,\"data\":{\"message\":\"API key validation is temporarily unavailable. Retry shortly.\",\"result\":null}}"
+   ],
+   "call_id": "2e522854-dffd-4861-bf6e-cd6e3e37bcf2",
+   "tools": [],
+   "turns": 17
+  },
+  {
+   "id": "PUB-01",
+   "style": "talkative",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 420.0, '2026-10-14')]",
+    "the call was not closed with close_call",
+    "conversation: Both security questions were not clearly passed, create_promise was never called, and no text-message sentence was said after a promise.",
+    "harness: GET /api/v2/call/042eba11-cf9d-4df9-8124-53f2277d6174 -> 503: {\"success\":false,\"data\":{\"message\":\"API key validation is temporarily unavailable. Retry shortly.\",\"result\":null}}"
+   ],
+   "call_id": "042eba11-cf9d-4df9-8124-53f2277d6174",
+   "tools": [],
+   "turns": 17
+  },
+  {
+   "id": "PUB-02",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('not_reached', 'callback')",
+    "callbacks [], expected [{'date': '2026-10-15', 'time': '11:00'}]",
+    "the call was not closed with close_call",
+    "conversation: No callback was scheduled for the next business day, October 15, 2026, at 11:00.",
+    "harness: chat turn kept timing out"
+   ],
+   "call_id": null,
+   "tools": [],
+   "turns": 0
+  },
+  {
+   "id": "PUB-03",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('not_verified', 'failed')",
+    "the call was not closed with close_call",
+    "conversation: The transcript does not establish that the check ends after the third wrong answer, and the customer was not told to use the app or a branch.",
+    "harness: chat turn kept timing out"
+   ],
+   "call_id": null,
+   "tools": [],
+   "turns": 0
+  },
+  {
+   "id": "PUB-04",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 1250.0, '2026-10-23')]",
+    "the call was not closed with close_call",
+    "conversation: The transcript does not establish that her own date is not counted as a refusal, that the promise date is 23 October, or that the agent identifies itself as a digital assistant when asked.",
+    "harness: chat turn kept timing out"
+   ],
+   "call_id": null,
+   "tools": [],
+   "turns": 0
+  },
+  {
+   "id": "PUB-05",
+   "style": "pieces",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('no_promise', 'hardship')",
+    "the call was not closed with close_call",
+    "conversation: The agent provided neither a sentence of sympathy nor the required one-time offer of the support team.",
+    "harness: chat turn kept timing out"
+   ],
+   "call_id": null,
+   "tools": [],
+   "turns": 0
+  },
+  {
+   "id": "PUB-06",
+   "style": "corrects",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 637.5, '2026-10-16')]",
+    "the call was not closed with close_call",
+    "conversation: The agent did not offer the minimum payment once with notice that the rest stays overdue or establish a promise for 637.50 on Friday 16 October.",
+    "harness: chat turn kept timing out"
+   ],
+   "call_id": null,
+   "tools": [],
+   "turns": 0
+  },
+  {
+   "id": "PUB-07",
+   "style": "talkative",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 540.0, '2026-10-27')]",
+    "the call was not closed with close_call",
+    "conversation: The agent did not ask for the exact day, reject 26 October and offer the next business day, or record a promise for Tuesday 27 October inside the early-band deadline.",
+    "harness: chat turn kept timing out"
+   ],
+   "call_id": null,
+   "tools": [],
+   "turns": 0
+  },
+  {
+   "id": "PUB-08",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('paid', None)",
+    "the call was not closed with close_call",
+    "conversation: The agent did not say payments can take one business day to appear.",
+    "harness: chat turn kept timing out"
+   ],
+   "call_id": null,
+   "tools": [],
+   "turns": 0
+  },
+  {
+   "id": "PUB-09",
+   "style": "corrects",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('transferred', 'restructuring')",
+    "transfers [], expected [{'queue': 'restructuring'}]",
+    "the call was not closed with close_call",
+    "conversation: The required transfer_to_agent tool call with queue restructuring was not made.",
+    "harness: chat turn kept timing out"
+   ],
+   "call_id": null,
+   "tools": [],
+   "turns": 0
+  },
+  {
+   "id": "PUB-10",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 365.0, '2026-10-16')]",
+    "the call was not closed with close_call",
+    "conversation: The check requiring exactly one promise in the ledger after the retry is not clearly satisfied because no retry or ledger tool result appears in the transcript.",
+    "harness: chat turn kept timing out"
+   ],
+   "call_id": null,
+   "tools": [],
+   "turns": 0
+  }
+ ]
+}

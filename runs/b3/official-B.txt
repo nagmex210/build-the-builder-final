@@ -1,0 +1,24 @@
+workspace 2: main-B -> agent ec9fbf58-6328-4272-9aa2-0ebec3797db2
+PASS PUB-11 medium Multi-product  | verify > verify > get_account > promise > promise > promise > close_call
+FAIL PUB-12 hard   Multi-product  | verify > verify > verify > get_account > promise > close_call > add_note > add_note
+       - notes [], expected [('p2', 'refused'), ('p3', 'refused')]
+       - the call was not closed with close_call
+       - conversation: The agent failed on two counts: 1. The 'refused' notes for the personal loan and car loan were never successfully recorded because the agent called 'close_call' before 'add_note', resulting in tool failures ('the call is already closed'). 2. The 
+PASS PUB-13 hard   Multi-product  | verify > verify > get_account > promise > promise > close_call
+
+slowest agent turn per call: median 9 s, worst 16 s. Failed calls where the customer hung up: 0.
+-- run 1 of 2: 2 / 3 passed, 215 s
+
+PASS PUB-11 medium Multi-product  | verify > verify > get_account > promise > promise > promise > close_call
+FAIL PUB-12 hard   Multi-product  | verify > verify > verify > get_account > add_note > promise > add_note > close_call
+       - conversation: The call failed because the assistant did not perform the required number of persuasion attempts for the personal loan. According to the success criteria and the account data, the personal loan (p2) is in the 'late' band, which requires two persu
+PASS PUB-13 hard   Multi-product  | verify > verify > get_account > promise > promise > close_call
+
+slowest agent turn per call: median 4 s, worst 5 s. Failed calls where the customer hung up: 0.
+-- run 2 of 2: 2 / 3 passed, 133 s
+
+PASS PUB-11 2/2
+FAIL PUB-12 0/2
+PASS PUB-13 2/2
+
+2 / 3 passed (bank records and conversation checks), a customer counts with 2 of 2 runs. Last simulation 6039b12a-cc7b-4e9f-927b-eb6011ee0ec9, status completed, 349 s.

@@ -1,0 +1,42 @@
+  [Skill] {'skill': 'build-phone-agent', 'args': 'Slot: main-rB. Tool API file: tools/openapi.json. Brief files: btb/briefs_raw/br
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; ls btb/briefs_raw 2>/dev/null || ls ../briefs_raw; wc -c btb/briefs_raw/* tools/o
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat btb/briefs_raw/brief-a-raw.md btb/briefs_raw/brief-b-raw.md'}
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat tools/openapi.json; cat .claude/skills/build-phone-agent/routing.md'}
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat examples/base-agent.json; python3 -c "\nimport json;d=json.load(open(\'out/ma
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; grep -n -i -A30 \'"node_type": "api_request"\' docs/workflow-format.md | head -60
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; sed -n 760,800p docs/workflow-format.md; grep -n "extraction_schema" -A12 docs/wo
+I'm writing the workflow now via a generator script; checking the account hook's output keys first.
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; python3 -c "\nimport json;d=json.load(open(\'out/main-rB.calc.json\'));c=d[\'acco
+  [Bash] {'command': 'mkdir -p /home/ubuntu/btb/gen; cat > /home/ubuntu/btb/gen/gen.py <<\'EOF\'\nimport json\nR=\'/home/ubuntu/b
+Lint and wording gate are clean; saving.
+  [Bash] {'command': 'python3 builder/save.py main-rB out/main-rB.workflow.json 2>&1 | tail -5'}
+  [Bash] {'command': 'grep -n \'"end_call"\' -B3 -A8 docs/workflow-format.md | head -30'}
+  [Bash] {'command': 'sed -n 618,640p docs/workflow-format.md'}
+  [Bash] {'command': 'python3 - <<\'EOF\'\np=\'/home/ubuntu/btb/gen/gen.py\'\ns=open(p).read()\ns=s.replace("\'terminal\':True,",
+  [Bash] {'command': 'sed -n 588,606p docs/workflow-format.md; grep -n \'"always"\' docs/workflow-format.md | head -3'}
+  [Bash] {'command': 'sed -i "s/\'enum\':\\[\'customer\',\'other_person\',\'unknown\'\\],\'default\':\'unknown\',/\'enum_values\'
+Saved. Running one quick chat turn to confirm it starts.
+  [Bash] {'command': 'timeout 90 python3 -c "import freya,json; print(str(freya.api(\'POST\',\'/api/v2/chat/message\',{\'workflow
+The workflow is built, saved to slot main-rB and starts correctly. I sent one test message and it replied with the right opening: "Hello, this is the digital assistant calling from Freya Bank; this call is recorded. Am I speaking with Ms Lee?" I did not run any practice cases, and that one message is the only live test.
+
+**How the call flows:** the date code you supplied runs first, then opening, identity check, account lookup, the main collection conversation, and the end of the call.
+- **Opening:** handles who answers, including a relative, callback, wrong number, deceased and unclear cases.
+- **Identity check:** asks the two security questions in turn.
+- **Account lookup:** runs on its own and uses your account hook code exactly as given.
+- **Main conversation:** handles Brief B's rules: every product is stated first, then one "pay all today?" question, then each product in turn with its own attempt count. All promises are read back once with one "Do you confirm?", then recorded one per product. Products without a promise get a note, and there are no notes when a transfer happens.
+- **Close codes:** the close step follows the outcome rules from both briefs.
+
+**Rule choices:**
+- **Failed recordings:** a failed `create_promise` is tried once more. A second failure marks that product `service_error`, and the call carries on with the others, as the Brief B memo says.
+- **Deadlines:** the memos' 12 and 7 business days match the date facts, so nothing differs from the brief.
+
+The structure check and the wording gate both show 0 errors. I did not get to the final rule-by-rule re-read against the brief before time ran short.
+
+The first two save attempts failed with a server error. The fixes were the end-of-call node's format and the opening's "who answered" field, which needed `enum_values`.
+
+workflow_id: e99b473c-2df6-4d05-927d-5b0085543563, agent_id: 33aaaf4a-3519-46f4-8ef1-2aa95ec80014
+
+done: 18 turns, 153 s
+wording gate: 0 errors, 0 warnings
+final save: {'workflow_id': 'e99b473c-2df6-4d05-927d-5b0085543563', 'agent_id': '33aaaf4a-3519-46f4-8ef1-2aa95ec80014', 'version': 12}; lint: 0 errors, 0 warnings
+{"workflow_id": "e99b473c-2df6-4d05-927d-5b0085543563", "agent_id": "33aaaf4a-3519-46f4-8ef1-2aa95ec80014"}

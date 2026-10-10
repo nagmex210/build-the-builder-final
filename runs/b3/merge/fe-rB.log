@@ -1,0 +1,35 @@
+FAIL PUB-11 0/2 | verify_identity > verify_identity > verify_identity > get_account
+       - [plain] outcome (None, None), expected ('promise', None)
+       - [plain] promises [], expected [('p1', 220.0, '2026-10-16'), ('p2', 640.0, '2026-10-16'), ('p3', 75.0, '2026-10-16')]
+       - [plain] the call was not closed with close_call
+       - [plain] conversation: The call fails the single read-back and confirmation check because these are repeated many times, and the one create_promise per product check because no create_promise tool calls were made.
+       - [plain] harness: GET /api/v2/call/07c0572c-17c6-409a-a6ee-5f084953ced6 -> 503: {"success":false,"data":{"message":"API key validation is temporarily unavailable. Retry shortly.","result":null}}
+       - [talkative] outcome (None, None), expected ('promise', None)
+       - [talkative] promises [], expected [('p1', 220.0, '2026-10-16'), ('p2', 640.0, '2026-10-16'), ('p3', 75.0, '2026-10-16')]
+       - [talkative] the call was not closed with close_call
+       - [talkative] conversation: All three checks fail: no products were stated before any ask, no combined read-back and confirmation occurred for all three products, and no create_promise calls were made.
+       - [talkative] harness: GET /api/v2/call/d9d24a91-8e4b-4c2a-958d-44a00fb42c62 -> 503: {"success":false,"data":{"message":"API key validation is temporarily unavailable. Retry shortly.","result":null}}
+FAIL PUB-12 0/2 | verify_identity > verify_identity > verify_identity > verify_identity > close_call
+       - [plain] outcome ('not_verified', 'declined'), expected ('promise', None)
+       - [plain] promises [], expected [('p1', 510.0, '2026-10-15')]
+       - [plain] notes [], expected [('p2', 'refused'), ('p3', 'refused')]
+       - [plain] conversation: No credit-card promise was recorded by a tool, neither other product received a 'refused' note, and the required two personal-loan attempts and one car-loan attempt were not made.
+       - [talkative] outcome (None, None), expected ('promise', None)
+       - [talkative] promises [], expected [('p1', 510.0, '2026-10-15')]
+       - [talkative] notes [], expected [('p2', 'refused'), ('p3', 'refused')]
+       - [talkative] the call was not closed with close_call
+       - [talkative] conversation: The agent did not ask the phone question again once, make exactly one credit-card promise, record one refused note for each other product, or make two late-band personal-loan attempts and one early-band car-loan attempt.
+       - [talkative] harness: chat turn kept timing out
+FAIL PUB-13 0/2 | verify_identity > verify_identity > verify_identity > get_account > verify_identity > verify_identity > verify_identity > verify_identity
+       - [talkative] outcome (None, None), expected ('promise', None)
+       - [talkative] promises [], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]
+       - [talkative] the call was not closed with close_call
+       - [talkative] conversation: No tool call recorded the credit card for 30 October 2026 or the loan for its deadline of 23 October 2026, and no read-back named both dates.
+       - [talkative] harness: chat turn timed out and no reply appeared
+       - [in_words] outcome (None, None), expected ('promise', None)
+       - [in_words] promises [], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]
+       - [in_words] the call was not closed with close_call
+       - [in_words] conversation: The credit card was not recorded for 30 October, the loan was not recorded for its 23 October deadline, and no read-back named both dates.
+       - [in_words] harness: chat turn kept timing out
+
+fast_eval: 0 / 3 passed (2 rep(s), all reps must pass), 1655 s

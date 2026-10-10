@@ -57,3 +57,30 @@ Hypotheses for next batch:
 - (H) The official A drop is mostly run-to-run variance: four cases at 1/2, and the A build was a different Claude run (356 s, with live tests). A repeat of official A on a fresh merge/b2 build would tell. The accept rule now asks for a gain that repeats.
 - (H) The guards' blocked call is visible in the transcript as an extra create_promise and may cost official checks ("create_promise exactly once"). Measure it before relying on guards.
 - (H) PUB-12 (per-item attempts and notes) and PUB-13 (per-item dates) remain the multi-product failures.
+
+## b3 merge (2026-10-10, merger)
+
+Platform: the workers' eval window (18:10-19:20 UTC) had the Freya chat endpoint saturated or down (503/504, about 25 fast_evals at once). Part of the time the Claude subscription also hit its session limit. **No worker measured anything.** All five reports say NOT MEASURED. During the merge window, workspace 1 chat was still very slow (one first turn took over 120 s) and the API returned "API key validation is temporarily unavailable" (503) for about 10 minutes. The official simulator in workspace 2 ran normally (median agent turn 4-9 s).
+
+Cheating check: diffs reviewed, and no worker hard-coded anything from brief A/B. guards/items/statemachine/SAY NEXT read everything from the brief-derived spec or the workflow's own tools. Nothing was rejected.
+
+Workers:
+- w1 (tool robustness, from merge/b2): live probes showed **the b2 guard block path was harmful**. A request sent to `.invalid` is a platform `function_call_error`, the NOT RECORDED post-hook never reaches the model, the model retries, and the second failure trips the service-error close. All three probed blocks were correct decisions that still lost the case. Fix: the block goes to a 2xx no-op path on the tool's own host (found by probing /health etc. at build time). The post-hook then says NOT RECORDED + reason and undoes the success count. **Merged.** This is (c), a mechanistic reason: it removes a failure path that fires whenever a guard blocks, and it is a likely cause of merge/b2's official A drop.
+- w2 (multi-product part 2): `items.py`, a per-item ledger in code (own deadline, own attempt count, status), plus `build.py` running the final pass after any agent error. The build fix is **merged** (w3 made the same fix independently). items.py is **not merged**: it is unmeasured, its A/rA/rB builds were drafts cut off by the quota, and it is large. It stays on idea/b3-2.
+- w3 (A2 state machine): decide code node + work_item/wrap_up. All four builds followed the shape. **Not merged**: unmeasured, and it is untested whether a post-hook variable fires a transition in the same turn.
+- w4 (A7 best-of-N): works end to end, 600-1139 s builds. The pick is unstable: one workflow scored 1/1 with 5 mistakes and 2/2 with 6 in two runs. Every valid scripted chat was judged failed, and the candidates share the same defects. **Not merged.**
+- w5 (wild card, numbered RULES + SAY NEXT per tool outcome, enforced by lint): all builds comply, the agent says the lines verbatim, and the build time is unchanged. **Merged** (cheap, format-only, independent of the others).
+
+Merge candidate `merge/b3` = merge/b2 code + w1 no-op block + build agent-error fix + w5 format. Builds took 121-219 s, with lint 0 and the wording gate at 0 errors on A/B/rA/rB/C. (The first build attempt ran without the Claude login and saved stale workflow files through the new agent-error path. That was harmless here because all slots were rebuilt, but (H) build.py should refuse to save when the agent wrote nothing in this build.)
+- fast_eval (--reps 2 --style random): A 0/10, B 0/3, raw-B 0/3; raw-A was killed to reduce load. **Not a measurement**: 26 of 32 runs carry harness errors. Transcripts show Freya resuming the chat from an old message (`conversation_resumed isBranch=true`), so the agent re-asked the first security question and called verify_identity up to 8 times. That is platform state loss, not the workflow.
+- Brief C (held-out): 1/12, with 9/12 runs carrying harness errors (not a measurement). Adversarial C was killed (load).
+- **Official B 2/3** (PUB-11 2/2, PUB-13 2/2, PUB-12 0/2), the same as the champion. PUB-12 failed on close_call before the last add_note in one run and on too few persuasion attempts on a late-band item in the other: the tool-order and per-item kinds (items.py targets the second).
+- **Official A: not finished** by the 100-minute limit (workspace 1 was saturated; started at about 20:05, no run printed by 20:45). It was left running and writes `runs/b3/official-A.txt`.
+- Decision: **discard (not kept on main)**. The rule needs official A+B not to drop, and A is unknown. Candidate pushed as branch `merge/b3`. If official-A.txt shows >= 8/10, the next merger should start from merge/b3: it has a mechanistic fix for merge/b2's drop, and B held at 2/3.
+
+Hypotheses for next batch (H):
+- (H) merge/b3 >= champion: the w1 fix removes the guard-block -> service-error path, which turned correct blocks into lost cases.
+- (H) Measurement is the bottleneck: two batches were lost to unmeasurable evals. Run self-tests/evals in workspace 2, cap concurrent fast_evals (<= 6 processes), and mark branch-resumed reps invalid.
+- (H) A code-side close_call guard (blocked while an item lacks its promise/note) fixes the tool-order kind seen on official B and on brief C.
+
+Next families: runs/next_families.txt (close_call ordering + per-item ledger; A17 deterministic self-simulation in workspace 2; A3 canned reply paths; datecalc unknown rule kinds; wild card replay-proof measurement/agent).

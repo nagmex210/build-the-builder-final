@@ -1,0 +1,29 @@
+The b2 guards pick the right values to block, but the way a block is carried out was broken and lost every case where a guard fired. I fixed that in `builder/guards.py`. I couldn't score the fix: Freya's chat endpoint went down for the whole workspace during my evaluation window.
+
+**What I saw live** (merge/b2 build, PUB-04/06/07 with a customer pushing a value the brief doesn't allow):
+- **Blocks were correct each time:** 300 is below the 637.50 minimum (PUB-06), 100 is below the 180 instalment (PUB-07), and 2 Nov is after the 23 Oct deadline (PUB-04). In PUB-04 the agent itself had wrongly offered 2 Nov as "the latest date".
+- **The block failed at the platform level:** sending the blocked request to the `.invalid` URL gives a DNS error that Freya reports as a failed tool call (`function_call_error`). Freya then adds to `create_promise_failure_count` itself, and our post-hook can't undo that.
+- **The model never got the reason:** our "NOT RECORDED: <reason>" reply never reached it. It retried with the same values, the second failure sent the call to the service-error close ("I could not record your promise. Goodbye"), and the outcome became `service_error` instead of `promise`.
+- **Judge:** it described these as "both create_promise calls failed", so it counted them as real failed attempts. This probably contributed to merge/b2's official A drop (6/10 against 8).
+
+**The fix** (commit `0fab732`):
+- A blocked call now goes to a do-nothing address on the bank's own host. At build time the builder tries `/health`, `/healthz`, `/status` and `/ping`; the mock bank answers `/health` with 200 and records nothing.
+- Freya sees a normal answer, so the failure count stays at 0. Our post-hook now runs and gives the model the "NOT RECORDED: <reason>" reply with instructions to explain and offer an allowed value.
+- The post-hook also removes the "success" that `harden`'s hook adds for that 200, so the blocked call isn't counted as recorded.
+- If no do-nothing address answers, it falls back to the old `.invalid` behaviour, which is no worse than merge/b2.
+- I checked offline by running the installed hooks on PUB-06 data: the blocked promise goes to `/health` and comes back `ok=false` with the reason, the allowed 637.50 goes to the bank and succeeds, and a blocked callback also goes to `/health`. All four rebuilt slots (w1-A/B/rA/rB) include it.
+
+**Score: not measured.**
+- From about 18:28 UTC every chat request hit gateway 504s or timeouts, for my workflows and for w3's. Reading calls still answered in 0.3 s.
+- My B and raw-B evals came back 0/3 with only timeout errors. The A and raw-A evals were killed when my 10-minute command timed out. w4 and w5 got 0/10 at the same time.
+- The re-probes of the fixed build never got a first turn.
+- For comparison: merge/b2 scored 9/26 and the b1 champion 4/26.
+
+**Brief-agnostic:** yes. The do-nothing address is found by checking common health paths on whatever host the tool API file names, and the limits still come from the brief.
+
+**For the merger:**
+- Keep the guards only with this fix.
+- Re-run `btb/probe_guard.py` on PUB-06 once Freya is back. Expect one NOT RECORDED call, then 637.50 on 16 Oct recorded.
+- Still untested: whether the official judge counts a visible NOT RECORDED call as an extra attempt.
+
+The report is `runs/b3/w1.md`, committed on `idea/b3-1` (latest commit `dc54670`). On restart I found a half-finished merge of main in the worktree and aborted it before resetting to merge/b2.

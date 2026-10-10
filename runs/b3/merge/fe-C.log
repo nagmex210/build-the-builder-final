@@ -1,0 +1,64 @@
+scorer: /home/ubuntu/btb/repo/btb/brief_c/score_c.py | bank: https://responding-simply-dpi-electro.trycloudflare.com
+FAIL C-01 0/1 | verify_identity > verify_identity > get_account > create_promise > close_call
+       - [plain] conversation: The first sentence does not say the call is recorded, no promise was recorded for 1 November 2026, no e-mail confirmation sentence was said after a promise, and the required goodbye was not said.
+FAIL C-02 0/1 | 
+       - [plain] outcome (None, None), expected ('no_contact', 'CALLBACK')
+       - [plain] callbacks [], expected [{'date': '2026-11-08', 'time': '09:30'}]
+       - [plain] the call was not closed with close_call
+       - [plain] conversation: The agent did not refuse Friday 6 November as a callback day or book a callback for Sunday 8 November at 09:30.
+       - [plain] harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"ca861f6e-353e-4ef0-b8b9-2524a0975bd2"}}}
+FAIL C-03 0/1 | 
+       - [plain] outcome (None, None), expected ('arranged', None)
+       - [plain] promises [], expected [('A1', 640.0, '2026-11-11')]
+       - [plain] the call was not closed with close_call
+       - [plain] conversation: The transcript does not show the agent requesting postcode letters, asking again after the wrong month, recording next Wednesday as 11 November, or naming 23 November as the deadline in the first ask.
+       - [plain] harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"4dabe88b-7dd4-4557-9af9-811cbd94a572"}}}
+FAIL C-04 0/1 | verify_identity > verify_identity > verify_identity > close_call
+       - [plain] conversation: The agent never tells the customer to visit a branch with an ID document.
+PASS C-05 1/1 | verify_identity > verify_identity > get_account > create_promise > close_call
+FAIL C-06 0/1 | 
+       - [plain] outcome (None, None), expected ('arranged', None)
+       - [plain] promises [], expected [('A1', 622.57, '2026-12-15'), ('A1', 622.58, '2026-11-29')]
+       - [plain] the call was not closed with close_call
+       - [plain] conversation: The agent did not name the 29 November deadline, refuse 26 November as a bank holiday and offer 29 November, specify parts of 622.58 and 622.57, or read back both parts before recording.
+       - [plain] harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"7ab360b3-a4f2-491f-8e6f-5d9475357d5d"}}}
+FAIL C-07 0/1 | 
+       - [plain] outcome (None, None), expected ('paused', 'BREATHING_SPACE')
+       - [plain] notes [], expected [('A1', 'BREATHING_SPACE'), ('A2', 'BREATHING_SPACE')]
+       - [plain] the call was not closed with close_call
+       - [plain] conversation: The agent did not say 'I am sorry to hear that.', offer a 30-day breathing space, or name both accounts with their arrears and days overdue.
+       - [plain] harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"a8d8d457-d827-4034-9ed8-93457dc1829e"}}}
+FAIL C-08 0/1 | verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity
+       - [plain] outcome (None, None), expected ('arranged', None)
+       - [plain] promises [], expected [('A2', 1100.0, '2026-11-05')]
+       - [plain] notes [], expected [('A1', 'DISPUTED'), ('A3', 'PAID_CLAIMED')]
+       - [plain] the call was not closed with close_call
+       - [plain] conversation: The agent asked questions before naming all three accounts, did not record the loan for its 5 November deadline, and did not say a payment can take up to three business days to show.
+       - [plain] harness: GET /api/v2/call/5dcab605-0b27-4e90-9648-9a78420c23e7 -> 503: {"success":false,"data":{"message":"API key validation is temporarily unavailable. Retry shortly.","result":null}}
+FAIL C-09 0/1 | verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity
+       - [plain] outcome (None, None), expected ('arranged', None)
+       - [plain] promises [], expected [('A1', 1500.0, '2026-12-10'), ('A2', 500.0, '2026-12-10')]
+       - [plain] the call was not closed with close_call
+       - [plain] conversation: The transcript does not show 1,500 recorded for the card on 10 December 2026 or a loan offer of 500.
+       - [plain] harness: chat turn timed out and no reply appeared
+FAIL C-10 0/1 | 
+       - [plain] outcome (None, None), expected ('no_payment', 'SERVICE_ERROR')
+       - [plain] notes [], expected [('A1', 'REFUSED'), ('A2', 'SERVICE_ERROR')]
+       - [plain] the call was not closed with close_call
+       - [plain] conversation: The agent did not name the 3 December overdraft deadline, make one persuasion attempt for the floor of 120 on 3 December, try create_promise exactly twice, or tell the customer the card promise could not be recorded.
+       - [plain] harness: chat turn kept timing out
+FAIL C-11 0/1 | 
+       - [plain] outcome (None, None), expected ('transferred', 'PLAN')
+       - [plain] promises [], expected [('A1', 820.0, '2026-11-22')]
+       - [plain] transfers [], expected [{'queue': 'payment_plans'}]
+       - [plain] the call was not closed with close_call
+       - [plain] conversation: The transcript does not show today being refused after 15:00, Sunday 22 November being offered, a card promise being read back and recorded before overdraft discussion, or a transfer to payment_plans.
+       - [plain] harness: chat turn kept timing out
+FAIL C-12 0/1 | 
+       - [plain] outcome (None, None), expected ('transferred', 'FRAUD')
+       - [plain] transfers [], expected [{'queue': 'fraud'}]
+       - [plain] the call was not closed with close_call
+       - [plain] conversation: The required transfer to the fraud queue was not made.
+       - [plain] harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"8d42ad84-2dd1-4f67-b73b-afd7ed252410"}}}
+
+fast_eval: 1 / 12 passed (1 rep(s), all reps must pass), 1604 s

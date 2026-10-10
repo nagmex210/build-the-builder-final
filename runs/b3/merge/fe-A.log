@@ -1,0 +1,93 @@
+FAIL PUB-01 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [corrects] conversation: The text-message sentence was not said after the promise.
+       - [talkative] outcome (None, None), expected ('promise', None)
+       - [talkative] promises [], expected [('p1', 420.0, '2026-10-14')]
+       - [talkative] the call was not closed with close_call
+       - [talkative] conversation: Both security questions were not clearly passed, create_promise was never called, and no text-message sentence was said after a promise.
+       - [talkative] harness: GET /api/v2/call/042eba11-cf9d-4df9-8124-53f2277d6174 -> 503: {"success":false,"data":{"message":"API key validation is temporarily unavailable. Retry shortly.","result":null}}
+FAIL PUB-02 0/2 | 
+       - [pieces] outcome (None, None), expected ('not_reached', 'callback')
+       - [pieces] callbacks [], expected [{'date': '2026-10-15', 'time': '11:00'}]
+       - [pieces] the call was not closed with close_call
+       - [pieces] conversation: A callback was not scheduled for the next business day, 2026-10-15, at 11:00.
+       - [pieces] harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"dfa20ae7-3c9f-4a23-b3f6-3381e3ce2589"}}}
+       - [asks_back] outcome (None, None), expected ('not_reached', 'callback')
+       - [asks_back] callbacks [], expected [{'date': '2026-10-15', 'time': '11:00'}]
+       - [asks_back] the call was not closed with close_call
+       - [asks_back] conversation: No callback was scheduled for the next business day, October 15, 2026, at 11:00.
+       - [asks_back] harness: chat turn kept timing out
+FAIL PUB-03 0/2 | verify_identity > verify_identity > verify_identity > close_call
+       - [asks_back] conversation: The customer was never told to use the app or a branch, and the agent requested the date of birth again after the third wrong answer was first supplied.
+       - [asks_back] outcome (None, None), expected ('not_verified', 'failed')
+       - [asks_back] the call was not closed with close_call
+       - [asks_back] conversation: The transcript does not establish that the check ends after the third wrong answer, and the customer was not told to use the app or a branch.
+       - [asks_back] harness: chat turn kept timing out
+FAIL PUB-04 0/2 | verify_identity > verify_identity > get_account > close_call
+       - [plain] outcome ('no_promise', 'refused'), expected ('promise', None)
+       - [plain] promises [], expected [('p1', 1250.0, '2026-10-23')]
+       - [plain] conversation: The promise-date check is not clearly satisfied: October 23 was proposed, but the customer did not agree and no promise was recorded.
+       - [plain] outcome (None, None), expected ('promise', None)
+       - [plain] promises [], expected [('p1', 1250.0, '2026-10-23')]
+       - [plain] the call was not closed with close_call
+       - [plain] conversation: The transcript does not establish that her own date is not counted as a refusal, that the promise date is 23 October, or that the agent identifies itself as a digital assistant when asked.
+       - [plain] harness: chat turn kept timing out
+FAIL PUB-05 1/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+       - [pieces] outcome (None, None), expected ('no_promise', 'hardship')
+       - [pieces] the call was not closed with close_call
+       - [pieces] conversation: The agent provided neither a sentence of sympathy nor the required one-time offer of the support team.
+       - [pieces] harness: chat turn kept timing out
+FAIL PUB-06 0/2 | verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity
+       - [in_words] outcome (None, None), expected ('promise', None)
+       - [in_words] promises [], expected [('p1', 637.5, '2026-10-16')]
+       - [in_words] the call was not closed with close_call
+       - [in_words] conversation: The agent never offered the minimum payment with the note that the rest stays overdue, and no promise for 637.50 on Friday 16 October was established.
+       - [in_words] harness: GET /api/v2/call/4e67a551-ab39-4586-930e-6afd2831ce95 -> 503: {"success":false,"data":{"message":"API key validation is temporarily unavailable. Retry shortly.","result":null}}
+       - [corrects] outcome (None, None), expected ('promise', None)
+       - [corrects] promises [], expected [('p1', 637.5, '2026-10-16')]
+       - [corrects] the call was not closed with close_call
+       - [corrects] conversation: The agent did not offer the minimum payment once with notice that the rest stays overdue or establish a promise for 637.50 on Friday 16 October.
+       - [corrects] harness: chat turn kept timing out
+FAIL PUB-07 0/2 | 
+       - [in_words] outcome (None, None), expected ('promise', None)
+       - [in_words] promises [], expected [('p1', 540.0, '2026-10-27')]
+       - [in_words] the call was not closed with close_call
+       - [in_words] conversation: The agent never asks for the exact day, rejects 26 October and offers the next business day, or records a promise for Tuesday 27 October within the early-band deadline.
+       - [in_words] harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"12202520-6136-4ff4-a740-2dc0fc8aae62"}}}
+       - [talkative] outcome (None, None), expected ('promise', None)
+       - [talkative] promises [], expected [('p1', 540.0, '2026-10-27')]
+       - [talkative] the call was not closed with close_call
+       - [talkative] conversation: The agent did not ask for the exact day, reject 26 October and offer the next business day, or record a promise for Tuesday 27 October inside the early-band deadline.
+       - [talkative] harness: chat turn kept timing out
+FAIL PUB-08 0/2 | 
+       - [talkative] outcome (None, None), expected ('paid', None)
+       - [talkative] the call was not closed with close_call
+       - [talkative] conversation: The agent did not say payments can take one business day to appear.
+       - [talkative] harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"73a85dc0-1e9b-4281-9089-bfd135a24e34"}}}
+       - [plain] outcome (None, None), expected ('paid', None)
+       - [plain] the call was not closed with close_call
+       - [plain] conversation: The agent did not say payments can take one business day to appear.
+       - [plain] harness: chat turn kept timing out
+FAIL PUB-09 0/2 | 
+       - [asks_back] outcome (None, None), expected ('transferred', 'restructuring')
+       - [asks_back] transfers [], expected [{'queue': 'restructuring'}]
+       - [asks_back] the call was not closed with close_call
+       - [asks_back] conversation: The required transfer_to_agent call with queue restructuring was never made.
+       - [asks_back] harness: GET /api/v2/call/3108c718-0c14-4a5a-bc31-da9cc0712b82 -> 503: {"success":false,"data":{"message":"API key validation is temporarily unavailable. Retry shortly.","result":null}}
+       - [corrects] outcome (None, None), expected ('transferred', 'restructuring')
+       - [corrects] transfers [], expected [{'queue': 'restructuring'}]
+       - [corrects] the call was not closed with close_call
+       - [corrects] conversation: The required transfer_to_agent tool call with queue restructuring was not made.
+       - [corrects] harness: chat turn kept timing out
+FAIL PUB-10 0/2 | 
+       - [talkative] outcome (None, None), expected ('promise', None)
+       - [talkative] promises [], expected [('p1', 365.0, '2026-10-16')]
+       - [talkative] the call was not closed with close_call
+       - [talkative] conversation: The check requiring exactly one promise in the ledger after the retry fails because no tool call, retry, or ledger entry is shown.
+       - [talkative] harness: GET /api/v2/call/2e522854-dffd-4861-bf6e-cd6e3e37bcf2 -> 503: {"success":false,"data":{"message":"API key validation is temporarily unavailable. Retry shortly.","result":null}}
+       - [plain] outcome (None, None), expected ('promise', None)
+       - [plain] promises [], expected [('p1', 365.0, '2026-10-16')]
+       - [plain] the call was not closed with close_call
+       - [plain] conversation: The check requiring exactly one promise in the ledger after the retry is not clearly satisfied because no retry or ledger tool result appears in the transcript.
+       - [plain] harness: chat turn kept timing out
+
+fast_eval: 0 / 10 passed (2 rep(s), all reps must pass), 1983 s

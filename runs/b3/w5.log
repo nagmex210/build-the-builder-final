@@ -1,0 +1,26 @@
+I built the change on all four slots, but I couldn't get a usable score: the shared platform was overloaded for the whole eval window, so every fast_eval result is 0 and says nothing about the idea.
+
+**What changed** (committed on `idea/b3-5`):
+- **Prompt format:** `routing.md` and `SKILL.md` now say every conversation node's prompt is short numbered RULES plus a SAY NEXT block. That block has one SUCCESS and one FAILED line for every tool in the node: the exact words to say, then the one next action.
+- **Lint check:** `builder/lint_workflow.py` reports an ERROR if a node with tools lacks the numbered rules or the SAY NEXT block, or is missing a SUCCESS or FAILED line for one of its tools. The builder's Claude fixes lint errors before saving, so the format is enforced.
+
+**Builds:** all four slots (A, B, rA, rB) followed the format on the first try with 0 lint errors. They took 135–154 s each, against 146 s for the current best builder, so the change adds no build time.
+
+**Score:** from about 18:12 UTC there were 22–30 fast_eval processes on the machine across all workers. Each platform step took 10–30 s, a single opening turn took 48 s, and chat returned 503s.
+- **A:** the first run was 0/10 with 18 timeouts. The second run on the same build was still going after 57 min and I stopped it.
+- **B and rB:** 0/3 in both runs, with every rep timing out at the same point, the turn after the second identity answer.
+- **rA:** I stopped both runs to reduce load.
+
+So the same-build-twice variance measurement you asked for still hasn't been taken, and whether this lowers the 1/2 rate is unknown.
+
+**What the transcripts do show:** in the reps that finished, the agent repeated the SAY NEXT lines word for word, so the model does follow them.
+- **PUB-02:** the callback was booked on the next business day at the requested time and the call closed correctly.
+- **PUB-03:** after three wrong answers the agent said the brief's exact sentence and closed as not verified.
+
+Both had a correct ledger, but our own judge failed them for things the transcript shows happened. I think it may read the transcript before the last turns arrive; that's a guess and worth checking in the harness.
+
+**Two notes for the merger:**
+- `program.md` says worker 5 should take an architecture exploration, but my prompt assigned this wild-card family, so I followed the prompt.
+- To measure this properly on a quiet platform: build once, run fast_eval twice on the same workflow id for this branch and for main, using `--workers 3` or fewer, and count the cases that flip between runs.
+
+The change only sets a prompt format and checks it against the node's own tool names, with no values from either brief, so it should carry over to unseen briefs. The negotiate prompts are still long (about 31 rules), so if results stay noisy the next step is splitting that node rather than adding rules. The full report is in `runs/b3/w5.md`.

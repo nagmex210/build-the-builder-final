@@ -1,0 +1,37 @@
+  [Skill] {'skill': 'build-phone-agent', 'args': 'Slot: main-rA. Tool API file: tools/openapi.json. Brief: btb/briefs_raw/brief-a-
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat btb/briefs_raw/brief-a-raw.md; echo ====; cat tools/openapi.json; echo ====; 
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat btb/briefs_raw/brief-a-raw.md'}
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat .claude/skills/build-phone-agent/routing.md; cat tools/openapi.json'}
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat docs/workflow-format.md docs/tools-and-code.md; cat examples/base-agent.json'
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat out/main-rA.calc.json; echo; cat out/main-rA.wording.json'}
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; python3 -c "\nimport json;d=json.load(open(\'out/main-rA.calc.json\'))\nprint(d.k
+Read the brief, the tool API file, the calc file and the wording file. Next: the example agent, then writing the workflow.
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat examples/base-agent.json | head -c 9000; ls builder'}
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; python3 -c "\nimport json;d=json.load(open(\'examples/base-agent.json\'))\nprint(
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; sed -n 525,560p docs/workflow-format.md; sed -n 690,830p docs/workflow-format.md'
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; grep -n -i "alwaysRunsAt\\|top-level .tools\\|global tool" docs/*.md | head; grep
+  [Bash] {'command': 'mkdir -p /home/ubuntu/btb/gen_rA && cat > /home/ubuntu/btb/gen_rA/gen.py <<\'EOF\'\nimport json\nR=\'/home/
+  [Bash] {'command': "sed -i 's#if it fails again thank, goodbye and close_call no_promise / refused is NOT allowed here: use not
+First version saved. Now running one chat turn to confirm it starts.
+  [Bash] {'command': 'timeout 90 python3 -c "import freya,json; print(json.dumps(freya.api(\'POST\',\'/api/v2/chat/message\',{\'w
+  [Bash] {'command': 'grep -rn -i "500" docs/*.md builder/robustness.md | grep -i -v "\\"500\\"\\|HTTP 500 from the bank" | head 
+  [Bash] {'command': 'timeout 90 python3 -c "import freya,json; print(json.dumps(freya.api(\'POST\',\'/api/v2/chat/message\',{\'w
+The first 500 was temporary; the retry worked. Running a few more turns.
+  [Bash] {'command': 'timeout 150 python3 -c "\nimport freya,json\ncid=\'9aad3d96-2406-438c-8632-238206739f21\'\nfor m in [\'Yes,
+I built the phone agent for brief A and saved it under slot main-rA. It starts calls correctly, but I only tested the opening and the first security question, not a full call through to a promise.
+
+- **Checks:** the lint step and the wording gate both show 0 errors and 0 warnings. Every exact sentence and content item from the wording file is in the node for its stage. Before identity is checked, the agent never says "collections", "debt", "payment", the product or an amount, including to a relative.
+- **Live test:** the first chat turn returned a 500 error, and the same message sent again worked. The agent gave the required opening sentence and asked "Am I speaking with Ms Lee?". "Yes, speaking" moved it to the security questions. "Why are you calling?" got the one-time explanation that the questions protect the account. All of this was with a test customer id.
+- **Not tested:** the account lookup, the deadline and floor-amount values, recording a promise, callbacks, transfers and closing the call. The test customer would not get past the security questions, and I had no real customer ids.
+- **Structure:** your date code runs first, then the opening (including the branch for when someone else answers), then identity, then the payment talk, then an end node. A call moves on only on a clear "yes/speaking/own name" or when both security answers pass. Each stage that can end the call goes to the end node once the close succeeds.
+- **One change from the plan:** the account lookup is a tool the agent calls first in the payment stage, not a silent step after identity. That puts your `account_post_process_code` hook, unchanged, on the `get_account` tool, so each product carries its own `deadline` and `floor_amount`. The agent is told to use those and never compute dates.
+- **Brief vs DATE FACTS:** they agree. The memo of 2026-10-09 moves the deadlines to the 12th business day after today (1–7 days late, 1 attempt) and the 7th (8–45 days late, 2 attempts), and the date code already uses those values.
+
+The workflow is in `out/main-rA.workflow.json`; the script that generates it is `/home/ubuntu/btb/gen_rA/gen.py`.
+
+workflow_id: 63f0e252-1681-4981-95d9-7bd18b847389, agent_id: b304e838-1091-40b6-aa62-a0cd00da1dc1
+
+done: 19 turns, 219 s
+wording gate: 0 errors, 0 warnings
+final save: {'workflow_id': '63f0e252-1681-4981-95d9-7bd18b847389', 'agent_id': 'b304e838-1091-40b6-aa62-a0cd00da1dc1', 'version': 9}; lint: 0 errors, 0 warnings
+{"workflow_id": "63f0e252-1681-4981-95d9-7bd18b847389", "agent_id": "b304e838-1091-40b6-aa62-a0cd00da1dc1"}

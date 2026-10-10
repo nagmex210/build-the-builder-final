@@ -1,0 +1,117 @@
+{
+ "workflow_id": "e99b473c-2df6-4d05-927d-5b0085543563",
+ "passed": 0,
+ "total": 3,
+ "rows": [
+  {
+   "id": "PUB-11",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 220.0, '2026-10-16'), ('p2', 640.0, '2026-10-16'), ('p3', 75.0, '2026-10-16')]",
+    "the call was not closed with close_call",
+    "conversation: The call fails the single read-back and confirmation check because these are repeated many times, and the one create_promise per product check because no create_promise tool calls were made.",
+    "harness: GET /api/v2/call/07c0572c-17c6-409a-a6ee-5f084953ced6 -> 503: {\"success\":false,\"data\":{\"message\":\"API key validation is temporarily unavailable. Retry shortly.\",\"result\":null}}"
+   ],
+   "call_id": "07c0572c-17c6-409a-a6ee-5f084953ced6",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account"
+   ],
+   "turns": 25
+  },
+  {
+   "id": "PUB-12",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "outcome ('not_verified', 'declined'), expected ('promise', None)",
+    "promises [], expected [('p1', 510.0, '2026-10-15')]",
+    "notes [], expected [('p2', 'refused'), ('p3', 'refused')]",
+    "conversation: No credit-card promise was recorded by a tool, neither other product received a 'refused' note, and the required two personal-loan attempts and one car-loan attempt were not made."
+   ],
+   "call_id": "aa26cb71-4f39-40be-866f-d699076a860c",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "close_call"
+   ],
+   "turns": 7
+  },
+  {
+   "id": "PUB-13",
+   "style": "talkative",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]",
+    "the call was not closed with close_call",
+    "conversation: No tool call recorded the credit card for 30 October 2026 or the loan for its deadline of 23 October 2026, and no read-back named both dates.",
+    "harness: chat turn timed out and no reply appeared"
+   ],
+   "call_id": "32bac543-fc58-4b82-8e23-15273406cff8",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity"
+   ],
+   "turns": 9
+  },
+  {
+   "id": "PUB-11",
+   "style": "talkative",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 220.0, '2026-10-16'), ('p2', 640.0, '2026-10-16'), ('p3', 75.0, '2026-10-16')]",
+    "the call was not closed with close_call",
+    "conversation: All three checks fail: no products were stated before any ask, no combined read-back and confirmation occurred for all three products, and no create_promise calls were made.",
+    "harness: GET /api/v2/call/d9d24a91-8e4b-4c2a-958d-44a00fb42c62 -> 503: {\"success\":false,\"data\":{\"message\":\"API key validation is temporarily unavailable. Retry shortly.\",\"result\":null}}"
+   ],
+   "call_id": "d9d24a91-8e4b-4c2a-958d-44a00fb42c62",
+   "tools": [],
+   "turns": 18
+  },
+  {
+   "id": "PUB-12",
+   "style": "talkative",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 510.0, '2026-10-15')]",
+    "notes [], expected [('p2', 'refused'), ('p3', 'refused')]",
+    "the call was not closed with close_call",
+    "conversation: The agent did not ask the phone question again once, make exactly one credit-card promise, record one refused note for each other product, or make two late-band personal-loan attempts and one early-band car-loan attempt.",
+    "harness: chat turn kept timing out"
+   ],
+   "call_id": null,
+   "tools": [],
+   "turns": 0
+  },
+  {
+   "id": "PUB-13",
+   "style": "in_words",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]",
+    "the call was not closed with close_call",
+    "conversation: The credit card was not recorded for 30 October, the loan was not recorded for its 23 October deadline, and no read-back named both dates.",
+    "harness: chat turn kept timing out"
+   ],
+   "call_id": null,
+   "tools": [],
+   "turns": 0
+  }
+ ]
+}
