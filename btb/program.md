@@ -75,7 +75,10 @@ will score zero on Sunday. The merger rejects such changes.
 3. Combine the winners: start from the best-scoring branch, merge others whose ideas are independent and also
    improved. Resolve conflicts by hand. Re-run the builder + fast_eval on the merged result.
 4. If the merged fast score beats the champion by ≥ 1 case (or ties with clearly shorter build time): run the
-   official scorer once per brief (`tools/run_cases.py <agent_id> --brief A --reps 2`, then `--brief B --reps 2`).
+   official scorer on both briefs AT THE SAME TIME, one per Freya workspace (one simulation at a time per workspace):
+   `python3 tools/run_cases.py <main-A agent_id> --brief A --reps 2 > runs/<batch>/official-A.txt &`
+   `python3 btb/official_ws2.py main-B --brief B --reps 2 > runs/<batch>/official-B.txt &` then `wait`.
+   (`official_ws2.py` copies the slot's workflow into our second workspace and scores it there.)
    Keep (commit to `main`, push) only if official A+B passes do not drop vs the champion.
 5. Append a row to `results.tsv`: `batch	commit	fast_A	fast_B	fast_rawA	fast_rawB	official_A	official_B	build_s	status	description`.
 6. Journal entry: what each worker tried, measured numbers, what was kept and why, hypotheses (marked) for next batch.
