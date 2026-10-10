@@ -88,7 +88,7 @@ will score zero on Sunday. The merger rejects such changes.
    Keep (commit to `main`, push) only if official A+B passes do not drop vs the champion.
    ACCEPT RULE (results vary a lot run to run): never keep a change because it wins by one case. Keep it only with
    (a) an improvement that repeats, (b) fixes across more than one failure kind, or (c) a mechanistic reason it
-   generalises (say which). Also read runs/case_analysis.md on branch fix/cases when it exists (case matrix, carry-overs from non-champion variants, bug list) and merge its fixes that hold up. Merge harness/* branches (e.g. harness/dspy) only if their report shows a held-out gain.
+   generalises (say which). Read runs/mechanisms.md on branch fix/cases when it exists (failure kinds, general mechanisms, carry-overs) and merge fixes that hold up on the raw briefs and brief C too. Merge harness/* branches (e.g. harness/dspy) only if their report shows a held-out gain.
 4b. HELD-OUT CHECK (merger only, every batch): build the merged builder on brief C
    (`python3 builder/build.py --slot main-C --tools btb/brief_c/openapi-c.json btb/brief_c/brief-c.md`) and score it:
    `python3 btb/fast_eval.py <wf> --cases btb/brief_c/cases-c.json --bank $(cat btb/brief_c/BANK_URL) --reps 1`
