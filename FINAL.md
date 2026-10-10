@@ -76,6 +76,7 @@ Post-17:00 change log (time UTC, commit, what crashed, fix):
 
 - [ ] Rotate every key that was on the box: Freya workspace API key(s) (`FREYA_API_KEY`, `FREYA_API_KEY_2`), the
       Azure key, the bank team key, the Claude OAuth token (log out / revoke), and update Parameter Store.
+      Also the GitHub token embedded in the repo's `origin` URL (`git remote -v`).
 - [ ] Stop the brief C mock bank and tunnel (`tmux kill-session -t bankc; tmux kill-session -t tunnelc`).
 
 ## Open question for the organisers
