@@ -13,7 +13,8 @@ scored ONLY by deterministic checks on the bank's ledger (no LLM judge: judge mi
    compete with live load in workspace 1. The workflow is copied there under slot `st-<slot>`. Without a second key
    they run in workspace 1.
 3. Checks, all deterministic, on the bank ledger:
-   - generic (every persona): no tool returned an error; close_call called exactly once and last; no tool other than
+   - generic (every persona): no tool returned an error; close_call called exactly once and last; a call the platform
+     hung up (end_call / goodbye auto-trigger) has a close_call; no tool other than
      identity before a successful identity check; no identical write repeated;
    - brief-derived code (datecalc spec of this build, out/<slot>.calc.json): every promise date is a business day,
      not before today and not after the product's deadline; amount >= the product's floor; callback date is a
@@ -330,6 +331,7 @@ def _run_one(workflow_id, sc, lib):
             hist += [{"role": "assistant", "content": msg}]
     except Exception as e:  # noqa: BLE001
         err = str(e)[:200]
+    hung = hang_up_events(call_id) if call_id else []      # read before our own chat/end adds its event
     if call_id:
         try:
             freya.api("POST", "/api/v2/chat/end", {"callId": call_id})
@@ -341,7 +343,29 @@ def _run_one(workflow_id, sc, lib):
            "transcript": "\n".join(f"{w}: {t}" for w, t in turns)[-4000:]}
     if err and not (calls and calls[-1]["tool"] == "close_call"):
         return {**row, "harness_error": err, "failed": []}
-    return {**row, "failed": check_ledger(calls, sess.get("now") or cu["now"], sc.get("checks") or [], lib)}
+    failed = check_ledger(calls, sess.get("now") or cu["now"], sc.get("checks") or [], lib)
+    if hung and "close_call" not in row["tools"]:
+        failed.append("the call was hung up (" + "; ".join(hung)[:160] + ") without close_call: no outcome was recorded")
+    return {**row, "hang_up": hung, "failed": failed}
+
+
+def hang_up_events(call_id):
+    """Every platform hang-up in the call (end_call function, goodbye auto-trigger, call_ended): a call that ends
+    without the close tool records no outcome, whoever said goodbye."""
+    try:
+        msgs = freya.get_call(call_id).get("messages") or []
+    except Exception:  # noqa: BLE001
+        return []
+    out = []
+    for m in msgs:
+        t = str(m.get("message") or "")
+        if m.get("role") == "system" and ("auto_trigger" in t or '"end_call"' in t or "call_ended" in t):
+            try:
+                ev = json.loads(t)
+                out.append(" ".join(f"{k}={ev[k]}" for k in ("event", "function", "reason", "triggered_pattern", "source") if k in ev))
+            except Exception:  # noqa: BLE001
+                out.append(t[:80])
+    return out
 
 
 def run_tests(slot, wf, scenarios, calc_file, timeout=CHAT_S + 120, reps=2):

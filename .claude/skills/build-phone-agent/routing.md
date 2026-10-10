@@ -36,7 +36,8 @@ negotiate (conversation)        state the debt, all the promise logic, objection
    │  post-hook on the promise tool adds what_to_do_next ("say it is recorded and the confirmation sentence" /
    │  "it failed: try once more" / "failed twice: say it could not be recorded, then close with <reason>")
    │  → hang_up             when close tool succeeded
-hang_up (end_call)              message_mode "none", on_enter silent. The goodbye is said by the previous node.
+hang_up (end_call)              message_mode "custom", spoken_message = the goodbye, on_enter silent. The PLATFORM says
+                                the goodbye after the close tool succeeded; the model never says goodbye itself.
 ```
 
 Multi-product briefs: keep ONE negotiate node and let the code node build an ordered product list with a summary
@@ -48,14 +49,10 @@ Close tool → end node (put this FIRST in the transitions of every conversation
 ```json
 { "target_node": "hang_up", "description": "The call was closed",
   "condition": { "logic": "or", "conditions": [
-    { "variable": "close_call_success_count", "operator": "greater_than", "operand": 0 } ] } }
+    { "variable": "close_call_response.data.ok", "operator": "equals", "operand": "true" },
+    { "variable": "close_call_response.data.ok", "operator": "equals", "operand": "True" } ] } }
 ```
-Only use it if the close tool's post-hook makes failures count as failures; safer: test the response too:
-```json
-{ "logic": "or", "conditions": [
-  { "variable": "close_call_response.data.ok", "operator": "equals", "operand": "true" },
-  { "variable": "close_call_response.data.ok", "operator": "equals", "operand": "True" } ] }
-```
+Never use `close_call_success_count` here: it counts every 2xx, including a guard's blocked close.
 
 Identity passed (boolean from the API, test both spellings):
 ```json
@@ -86,7 +83,7 @@ clear confirmation as the brief defines it; let the opening node handle everythi
 - `customer_id` and other ids that the model must not invent: `default: "{{customer_id}}"`; product ids: list them
   in the code node's summary so the model copies them exactly.
 - The task_message of each node starts with: "After every tool result, speak to the customer or call the next
-  tool. Never end a turn with nothing. Call one tool per message. Before calling the close tool say the goodbye."
+  tool. Never end a turn with nothing. Call one tool per message. Never say goodbye yourself: when the call is done, call the close tool; the system says the goodbye."
 - Set `max_node_turns` high (40-60) on conversation nodes; a whole negotiation can take many turns.
 
 ## Global nodes
