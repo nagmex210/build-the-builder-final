@@ -81,6 +81,22 @@ except Exception:
 
 PRE = r'''
 try:
+    _o2, _c2 = chr(123) * 2, chr(125) * 2
+    _b0 = config.get('body') if isinstance(config, dict) else None
+    if isinstance(_b0, dict):
+        for _k0 in list(_b0.keys()):
+            _x0 = _b0.get(_k0)
+            if isinstance(_x0, str) and _o2 in _x0:
+                _nm = _x0.replace(_o2, '').replace(_c2, '').strip()
+                _cand = [vars.get(__TOOL__ + '_args.' + _k0), vars.get(__TOOL__ + '_args.' + _nm), vars.get(_nm), vars.get(_k0)]
+                _cand = [c for c in _cand if c not in (None, '') and _o2 not in str(c)]
+                if _cand:
+                    _b0[_k0] = _cand[0]
+                else:
+                    _b0[_k0] = ''
+except Exception:
+    pass
+try:
     import json as _json
     _kn = vars.get('known_ids')
     if isinstance(_kn, str) and _kn:
@@ -135,7 +151,7 @@ def harden(wf):
             t["post_process_code"] = (old_post + "\n" if old_post else "") + post.lstrip("\n")
         old_pre = (t.get("pre_process_code") or "").strip()
         if write and "known_ids" not in old_pre:
-            t["pre_process_code"] = PRE.lstrip("\n") + ("\n" + old_pre if old_pre else "")
+            t["pre_process_code"] = PRE.replace("__TOOL__", repr(name)).lstrip("\n") + ("\n" + old_pre if old_pre else "")
         done.append(name)
     return done
 
