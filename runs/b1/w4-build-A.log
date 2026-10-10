@@ -1,0 +1,44 @@
+  [Skill] {'skill': 'build-phone-agent', 'args': 'Slot: w4-A. Tool API file: tools/openapi.json. Brief files: briefs/brief-a.md. W
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; cat briefs/brief-a.md; cat tools/openapi.json; ls; ls out docs examples builder'}
+Let me read the brief fully.
+  [Read] {'file_path': '/home/ubuntu/btb/wt4/briefs/brief-a.md'}
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; python3 -c "\nimport json;d=json.load(open(\'tools/openapi.json\'))\nprint(json.du
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; cat docs/workflow-format.md docs/tools-and-code.md; cat examples/base-agent.json'}
+  [Read] {'file_path': '/home/ubuntu/btb/wt4/docs/workflow-format.md'}
+  [Read] {'file_path': '/home/ubuntu/btb/wt4/docs/tools-and-code.md'}
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; cat examples/base-agent.json; cat builder/save.py; cat builder/harden.py; ls runs 
+Now I'll write a generator script that produces the workflow JSON.
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; python3 -c "import json;d=json.load(open(\'public-test-set.json\'));print(json.dum
+  [Write] {'file_path': '/tmp/w4a_gen/gen.py', 'content': '"""Generate out/w4-A.workflow.json from Brief A (written by hand from t
+  [Bash] {'command': "cd /home/ubuntu/btb/wt4; mkdir -p out && python3 /tmp/w4a_gen/gen.py out/w4-A.workflow.json && python3 - <<
+Code checks out. Saving.
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; source env.sh 2>/dev/null; python3 builder/save.py w4-A out/w4-A.workflow.json'}
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; source env.sh 2>/dev/null; python3 -c "import freya,json; print(freya.api(\'POST\'
+I built the Brief A agent, saved it as slot w4-A, and it starts a call: one test chat turn returned the opening line. I have not run it against the practice customers, so how well it handles real conversations is still untested.
+
+**Call flow, one step per stage:**
+1. **Setup:** works out the dates from `now` before the agent speaks: business days, holidays, what "this/next <weekday>" means, and the allowed callback times.
+2. **Opening:** says the fixed first sentence and asks "Am I speaking with {title} {last_name}?". It moves on only when the person clearly confirms. If someone else answers, it goes to a separate step that never says why the bank is calling and only books a callback.
+3. **Identity:** asks the date of birth, then the last four phone digits. Passing both, or a third wrong answer, moves the call on automatically based on the identity tool's result.
+4. **Account:** the account is fetched automatically, then a code step works out the product name, amounts, minimum acceptable payment, lateness band, deadline and the exact persuasion offers.
+5. **Payment talk:** the main step. It has the brief's rules on amounts, dates, persuasion, hardship, "already paid", disputes and transfers, filled in with the computed numbers.
+6. **Closing:** separate steps for a recorded promise, a promise that failed twice, a failed identity check, a failed account fetch, a booked callback and running out of turns. Most of them have the close outcome and reason fixed in advance, so the model doesn't pick them.
+
+**Honesty and tool failures:**
+- Each step only offers the close outcomes, reasons and transfer queues that make sense there.
+- Every step with tools tells the agent to read `tool_outcome` first.
+- A recorded promise or callback, or two failed promise attempts, moves the call on automatically.
+- The product id is copied into the promise tool from the account result, so the model never fills it in.
+
+**Risks to watch when you test it:**
+- **Goodbye and closing:** the agent is told to say goodbye in the same message as `close_call`. If it calls the tool without any text, the call ends with no goodbye.
+- **Missed close:** if the customer hangs up before the agent calls `close_call`, the call goes unrecorded. I left out a backup close at the end of the call, because if it misfired it would close every call twice.
+- **Unconfirmed routing:** some of the automatic moves rely on how the platform names tool results internally, which the docs say isn't fully confirmed. If a recorded promise or the identity result doesn't move the call on, that is the first place to look.
+- **Unreadable date of birth:** the tool-failure text added at save says to retry with the same values. The identity step tells the agent to ask the customer again instead, but the two instructions conflict.
+
+The workflow is in `out/w4-A.workflow.json`, made by `/tmp/w4a_gen/gen.py`. That script is outside the repo, so it will be lost unless you copy it in.
+
+workflow_id: f117c80b-d6ea-4e2b-bc00-80b941a00474 · agent_id: d9b758b1-ee09-4221-9a2e-0c1cdef2d095
+
+done: 15 turns, 277 s
+{"workflow_id": "f117c80b-d6ea-4e2b-bc00-80b941a00474", "agent_id": "d9b758b1-ee09-4221-9a2e-0c1cdef2d095"}

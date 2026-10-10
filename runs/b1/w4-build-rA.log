@@ -1,0 +1,54 @@
+  [Skill] {'skill': 'build-phone-agent', 'args': 'Slot: w4-rA. Tool API file: tools/openapi.json. Brief files: btb/briefs_raw/brie
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; ls; ls btb/briefs_raw out 2>&1; cat btb/briefs_raw/brief-a-raw.md; wc -c tools/ope
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; cat tools/openapi.json; cat docs/workflow-format.md'}
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; python3 -c "\nimport json;d=json.load(open(\'tools/openapi.json\'))\nfor p,v in d[
+  [Read] {'file_path': '/home/ubuntu/btb/wt4/docs/workflow-format.md'}
+I've read the brief, the tool API and the workflow format doc. Next I'm reading the tools/code doc and the example agent, then I'll write the workflow.
+  [Read] {'file_path': '/home/ubuntu/btb/wt4/docs/tools-and-code.md'}
+  [Read] {'file_path': '/home/ubuntu/btb/wt4/examples/base-agent.json'}
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; ls builder runs briefs; head -c 3000 journal.md; echo; tail -5 results.tsv; git lo
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; cat builder/save.py; cat builder/harden.py'}
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; python3 -c "\nimport json;d=json.load(open(\'public-test-set.json\'));print(type(d
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; grep -n -i "mock\\|customer_id\\|ledger\\|persona" docs/api.md | head -40; grep -n
+  [Bash] {'command': 'cd /tmp; for p in verify_identity get_account; do curl -s -X POST https://freya-bank-mock.freyavoice.worker
+Still designing: I've read the docs, the save/harden script and the mock API. Next I'm checking past run traces for real `verify_identity` responses, then I'll write the workflow generator.
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; ls runs/traces | head; ls runs/b1 | head; grep -rhoE \'"(hint|wrong_answers_left|a
+I have the whole design now. I'm writing a small Python generator that builds the workflow JSON, so the many similar nodes stay consistent.
+  [Bash] {'command': 'mkdir -p /home/ubuntu/btb/wt4/out /tmp/w4rA && ls /home/ubuntu/btb/wt4/out'}
+  [Write] {'file_path': '/tmp/w4rA/setup_code.py', 'content': 'import datetime\ntry:\n    HOL = set([\'2026-10-26\', \'2026-11-11\
+  [Write] {'file_path': '/tmp/w4rA/account_code.py', 'content': "import json\ntry:\n    prods = vars.get('products')\n    if isins
+  [Bash] {'command': 'cd /tmp/w4rA && python3 -c "\nv={\'now\':\'2026-10-14T11:00\'}\nexec(open(\'setup_code.py\').read(),{\'vars
+  [Bash] {'command': 'cd /tmp/w4rA && python3 - <<\'EOF\'\ns=open(\'setup_code.py\').read()\ns=s.replace("""        start = \'10:
+  [Write] {'file_path': '/tmp/w4rA/verify_post.py', 'content': "try:\n    _v = vars if isinstance(globals().get('vars'), dict) els
+  [Write] {'file_path': '/tmp/w4rA/gen.py', 'content': 'import json, sys\n\nBASE = "https://freya-bank-mock.freyavoice.workers.dev
+Generator is written. Now building the JSON, saving it with the slot, and running the start check.
+  [Bash] {'command': 'python3 /tmp/w4rA/gen.py out/w4-rA.workflow.json && python3 builder/save.py w4-rA out/w4-rA.workflow.json'}
+  [Bash] {'command': 'python3 -c "\nimport freya,json\nr=freya.api(\'POST\',\'/api/v2/chat/message\',{\'workflowId\':\'a7d94d1c-3
+Workflow starts correctly. I'll send a second chat turn to confirm the routing into the identity step works.
+  [Bash] {'command': 'sed -n 236,275p docs/api.md'}
+  [Bash] {'command': 'python3 -c "\nimport freya,json\nW=\'a7d94d1c-3971-4aa9-bf35-b704738fa462\'\ncv={\'customer_id\':\'c_test\'
+  [Bash] {'command': 'cd /tmp/w4rA && python3 - <<\'EOF\'\ns=open(\'gen.py\').read()\ns=s.replace(\'OPEN_ENUM = ["confirmed", "ot
+I built the brief A phone agent, saved it as slot `w4-rA`, and checked that it starts. I haven't run it against the practice customers yet. So far I've only tried a few chat turns with a fake customer id. The opening line, routing to the security questions and the robot-question answer behaved correctly; the identity check itself couldn't pass with that id.
+
+The workflow is in `out/w4-rA.workflow.json` (42 steps). Most rules are enforced by routing and code rather than by the prompt:
+
+- **Dates:** computed from `now` when the call starts, using the memo's deadlines: 12th business day for 1–7 days late, 7th for 8–45. This includes the bank holidays, the "this/next weekday" labels, the first fallback date and the callback window.
+- **Account details:** product wording, amounts, floor, band and deadline come from code. `product_id` comes straight from the account lookup, so the agent never guesses it.
+- **Opening:** the first line is fixed and says the call is recorded. The question "Am I speaking with…" is asked at most twice, then the call closes as `not_reached` / `unclear`. A relative is only asked when the customer can be reached, then a callback is booked inside the allowed window.
+- **Security check:**
+  - Three wrong answers close the call as `not_verified` / `failed`.
+  - A swapped day and month gets a "say the month as a word" retry that doesn't count as wrong.
+  - A refusal gets one explanation; a second refusal closes the call as `not_verified` / `declined`.
+- **Debt and offers:** the debt statement and "Can you make this payment today?" are fixed text. The persuasion attempts are separate steps, so the agent can't make more than 1 (early band) or 2 (late band).
+- **Promise:** "recorded" and the text-message sentence are only said after `create_promise` succeeds. Two failures close the call as `no_promise` / `service_error`.
+- **Transfers:** run automatically with the right queue, and are tried twice before giving up.
+- **Closing:** `close_call` always runs last with the outcome and reason set in code, after a fixed thank-you and goodbye. `add_note` is never used.
+
+Re-reading the brief rule by rule found one gap, which I fixed: refusing twice to talk at the opening closed as `unclear`, and now closes as `not_verified` / `declined` as rule 45 requires.
+
+The brief gives no rule for a transfer that fails twice. I close it as `no_promise` / `service_error`, or `no_promise` / `hardship` when it was the customer-support transfer.
+
+workflow_id: a7d94d1c-3971-4aa9-bf35-b704738fa462, agent_id: c2d23260-5d20-4e5d-8994-b6d6ada8e05b
+
+done: 27 turns, 470 s
+{"workflow_id": "a7d94d1c-3971-4aa9-bf35-b704738fa462", "agent_id": "c2d23260-5d20-4e5d-8994-b6d6ada8e05b"}

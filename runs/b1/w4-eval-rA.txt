@@ -1,0 +1,102 @@
+FAIL PUB-01 0/2 | 
+       - [pieces] outcome (None, None), expected ('promise', None)
+       - [pieces] promises [], expected [('p1', 420.0, '2026-10-14')]
+       - [pieces] the call was not closed with close_call
+       - [pieces] conversation: The required security verification before get_account is not established, create_promise was never called, and the text-message sentence was not said after a promise.
+       - [pieces] harness: POST /api/v2/chat/message -> 503: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"63cf28f6-6239-462f-8062-f36521bd018a"}}}
+       - [plain] outcome (None, None), expected ('promise', None)
+       - [plain] promises [], expected [('p1', 420.0, '2026-10-14')]
+       - [plain] the call was not closed with close_call
+       - [plain] conversation: Neither security question is shown as passed, create_promise was never called, and no text-message sentence was said after a promise.
+       - [plain] harness: POST /api/v2/chat/message -> 503: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"6728ccff-0d44-4045-ac97-9bc7b1cc7756"}}}
+FAIL PUB-02 0/2 | 
+       - [pieces] outcome (None, None), expected ('not_reached', 'callback')
+       - [pieces] callbacks [], expected [{'date': '2026-10-15', 'time': '11:00'}]
+       - [pieces] the call was not closed with close_call
+       - [pieces] conversation: No callback was scheduled for the next business day at 11:00.
+       - [pieces] harness: POST /api/v2/chat/message -> 503: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"b310b146-4d83-4ffb-9732-6bfe50065f83"}}}
+       - [corrects] outcome (None, None), expected ('not_reached', 'callback')
+       - [corrects] callbacks [], expected [{'date': '2026-10-15', 'time': '11:00'}]
+       - [corrects] the call was not closed with close_call
+       - [corrects] conversation: No callback was scheduled for the next business day at 11:00.
+       - [corrects] harness: POST /api/v2/chat/message -> 503: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"484a2b68-9eef-4708-b125-339862abe455"}}}
+FAIL PUB-03 0/2 | 
+       - [in_words] outcome (None, None), expected ('not_verified', 'failed')
+       - [in_words] the call was not closed with close_call
+       - [in_words] conversation: The transcript does not show the check ending after the third wrong answer or the customer being told to use the app or a branch.
+       - [in_words] harness: POST /api/v2/chat/message -> 503: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"33de00a1-3d86-4b22-a335-d60c66635722"}}}
+       - [asks_back] outcome (None, None), expected ('not_verified', 'failed')
+       - [asks_back] the call was not closed with close_call
+       - [asks_back] conversation: The transcript does not establish that the check ends after the third wrong answer, and the customer is not told to use the app or a branch.
+       - [asks_back] harness: POST /api/v2/chat/message -> 503: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"cb96b479-bb23-412a-91ae-99c71da9e3b7"}}}
+FAIL PUB-04 0/2 | 
+       - [pieces] outcome (None, None), expected ('promise', None)
+       - [pieces] promises [], expected [('p1', 1250.0, '2026-10-23')]
+       - [pieces] the call was not closed with close_call
+       - [pieces] conversation: The transcript does not clearly establish that her own date is not counted as a refusal or that the promise date is the late-band deadline, 23 October.
+       - [pieces] harness: POST /api/v2/chat/message -> 503: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"6f682884-0c63-4bcc-8092-c47f8f46bb4f"}}}
+       - [asks_back] outcome (None, None), expected ('promise', None)
+       - [asks_back] promises [], expected [('p1', 1250.0, '2026-10-23')]
+       - [asks_back] the call was not closed with close_call
+       - [asks_back] conversation: The transcript does not establish that her own date is not counted as a refusal, that the promise date is 23 October, or that the agent identifies itself as a digital assistant when asked.
+       - [asks_back] harness: POST /api/v2/chat/message -> 503: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"b72a8d75-b557-4002-a9b5-8de6ba891a5e"}}}
+FAIL PUB-05 0/2 | 
+       - [pieces] outcome (None, None), expected ('no_promise', 'hardship')
+       - [pieces] the call was not closed with close_call
+       - [pieces] conversation: The required sentence of sympathy and one-time support team offer are both missing.
+       - [pieces] harness: POST /api/v2/chat/message -> 503: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"300f23a7-35ca-4d06-801c-8cd590032e6a"}}}
+       - [corrects] outcome (None, None), expected ('no_promise', 'hardship')
+       - [corrects] the call was not closed with close_call
+       - [corrects] conversation: The required sentence of sympathy and one offer of the support team are both missing.
+       - [corrects] harness: POST /api/v2/chat/message -> 503: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"30726045-8503-4d3c-a5e1-d924a0b2d734"}}}
+FAIL PUB-06 0/2 | 
+       - [talkative] outcome (None, None), expected ('promise', None)
+       - [talkative] promises [], expected [('p1', 637.5, '2026-10-16')]
+       - [talkative] the call was not closed with close_call
+       - [talkative] conversation: The agent neither offered the minimum payment with a note that the rest stays overdue nor recorded a promise for 637.50 on Friday 16 October.
+       - [talkative] harness: POST /api/v2/chat/message -> 503: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"2bc8c8ff-683b-43b9-a983-c519a39d611d"}}}
+       - [asks_back] outcome (None, None), expected ('promise', None)
+       - [asks_back] promises [], expected [('p1', 637.5, '2026-10-16')]
+       - [asks_back] the call was not closed with close_call
+       - [asks_back] conversation: The agent did not offer the minimum payment with notice that the rest stays overdue or establish a promise for 637.50 on Friday 16 October.
+       - [asks_back] harness: POST /api/v2/chat/message -> 503: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"da9cf563-5b62-4c6c-ba9e-1841d5fab4ef"}}}
+FAIL PUB-07 0/2 | 
+       - [talkative] outcome (None, None), expected ('promise', None)
+       - [talkative] promises [], expected [('p1', 540.0, '2026-10-27')]
+       - [talkative] the call was not closed with close_call
+       - [talkative] conversation: The agent did not ask for the exact day, reject 26 October and offer the next business day, or record a promise for Tuesday 27 October within the early-band deadline.
+       - [talkative] harness: POST /api/v2/chat/message -> 503: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"1789f073-3b52-4023-89aa-887432e3333f"}}}
+       - [in_words] outcome (None, None), expected ('promise', None)
+       - [in_words] promises [], expected [('p1', 540.0, '2026-10-27')]
+       - [in_words] the call was not closed with close_call
+       - [in_words] conversation: The agent did not ask for the exact day, reject 26 October and offer the next business day, or record a promise for Tuesday 27 October inside the early-band deadline.
+       - [in_words] harness: POST /api/v2/chat/message -> 503: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"0fe21df4-0054-4a3c-965d-1b2f67867c84"}}}
+FAIL PUB-08 1/2 | 
+       - [asks_back] outcome (None, None), expected ('paid', None)
+       - [asks_back] the call was not closed with close_call
+       - [asks_back] conversation: The agent does not say that payments can take one business day to appear.
+       - [asks_back] harness: POST /api/v2/chat/message -> 503: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"ccc09391-e09b-4a00-a17b-8b58d113e35c"}}}
+FAIL PUB-09 0/2 | 
+       - [plain] outcome (None, None), expected ('transferred', 'restructuring')
+       - [plain] transfers [], expected [{'queue': 'restructuring'}]
+       - [plain] the call was not closed with close_call
+       - [plain] conversation: The required transfer_to_agent call with queue restructuring was not made.
+       - [plain] harness: POST /api/v2/chat/message -> 503: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"da336e1d-474d-44a7-9440-a2603bee4c87"}}}
+       - [pieces] outcome (None, None), expected ('transferred', 'restructuring')
+       - [pieces] transfers [], expected [{'queue': 'restructuring'}]
+       - [pieces] the call was not closed with close_call
+       - [pieces] conversation: The required transfer_to_agent call with queue restructuring was not made.
+       - [pieces] harness: POST /api/v2/chat/message -> 503: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"75dcad28-7e8f-4b7e-a7a7-1f649c7396a6"}}}
+FAIL PUB-10 0/2 | 
+       - [pieces] outcome (None, None), expected ('promise', None)
+       - [pieces] promises [], expected [('p1', 365.0, '2026-10-16')]
+       - [pieces] the call was not closed with close_call
+       - [pieces] conversation: The check requiring exactly one promise in the ledger after the retry is not clearly satisfied because no retry or ledger result appears in the transcript.
+       - [pieces] harness: POST /api/v2/chat/message -> 503: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"d3e82dc3-30b7-427e-9a8e-394b491ec5e5"}}}
+       - [plain] outcome (None, None), expected ('promise', None)
+       - [plain] promises [], expected [('p1', 365.0, '2026-10-16')]
+       - [plain] the call was not closed with close_call
+       - [plain] conversation: The check requiring exactly one promise in the ledger after the retry is not clearly satisfied because no retry or ledger result appears in the transcript.
+       - [plain] harness: POST /api/v2/chat/message -> 503: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"48dd81c9-6955-42fd-a0be-f3c1c83c469a"}}}
+
+fast_eval: 0 / 10 passed (2 rep(s), all reps must pass), 68 s
