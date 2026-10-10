@@ -1,0 +1,123 @@
+{
+ "workflow_id": "45b479a7-6323-4580-b0f5-fca4e82e0125",
+ "passed": 0,
+ "total": 3,
+ "rows": [
+  {
+   "id": "PUB-11",
+   "style": "corrects",
+   "pass": false,
+   "failed": [
+    "promises [('p1', 221.0, '2026-10-16'), ('p2', 640.0, '2026-10-16'), ('p3', 75.0, '2026-10-16')], expected [('p1', 220.0, '2026-10-16'), ('p2', 640.0, '2026-10-16'), ('p3', 75.0, '2026-10-16')]"
+   ],
+   "call_id": "ee785de7-b2a0-4fa9-a4da-c1d0eb9f1006",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 9
+  },
+  {
+   "id": "PUB-12",
+   "style": null,
+   "pass": true,
+   "failed": [],
+   "call_id": "35425eb0-cd2c-4e71-befb-b774895d10a5",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "add_note",
+    "create_promise",
+    "add_note",
+    "close_call"
+   ],
+   "turns": 13
+  },
+  {
+   "id": "PUB-13",
+   "style": "pieces",
+   "pass": false,
+   "failed": [
+    "promises [('p1', 300.0, '2026-11-02'), ('p2', 900.0, '2026-10-30')], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]",
+    "conversation: The credit card was submitted for November 2 rather than October 30, the loan was submitted for October 30 rather than its October 23 deadline, neither tool call shows confirmed success, and the read-back does not name the required dates."
+   ],
+   "call_id": "43d093cd-fc02-42e0-9178-d2961b77ad4a",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 8
+  },
+  {
+   "id": "PUB-11",
+   "style": "corrects",
+   "pass": true,
+   "failed": [],
+   "call_id": "c0a07bf3-80a3-4909-97c8-51425367e414",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 9
+  },
+  {
+   "id": "PUB-12",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "conversation: The car loan received two persuasion attempts instead of one, and the agent said 'I have noted that' before any recording tool call was made."
+   ],
+   "call_id": "1131ff17-67f6-4770-8dd9-165d32024c2b",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "add_note",
+    "add_note",
+    "close_call"
+   ],
+   "turns": 14
+  },
+  {
+   "id": "PUB-13",
+   "style": "pieces",
+   "pass": true,
+   "failed": [],
+   "call_id": "d610c86a-0a77-45eb-9850-0c537cdf6b81",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 11
+  }
+ ]
+}
