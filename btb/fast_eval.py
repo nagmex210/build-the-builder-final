@@ -39,11 +39,19 @@ def chat_turn(workflow_id, message, variables, call_id=None):
     body = {"workflowId": workflow_id, "message": message, "customerVariables": variables}
     if call_id:
         body["callId"] = call_id
-    for attempt in range(3):
+    for attempt in range(6):
         try:
             return freya.api("POST", "/api/v2/chat/message", body)
         except RuntimeError as e:
-            if not ("504" in str(e) or "502" in str(e)):
+            if "-> 503" in str(e):                # overloaded: resend only if the platform did not record the message
+                time.sleep(4 + 4 * attempt)
+                if not call_id:
+                    continue
+                msgs = freya.get_call(call_id).get("messages", [])
+                users = [m for m in msgs if m.get("role") == "user"]
+                if not users or users[-1].get("message") != message:
+                    continue
+            elif not ("504" in str(e) or "502" in str(e)):
                 raise
             if not call_id:                       # no call yet: nothing was recorded, safe to resend
                 time.sleep(3); continue

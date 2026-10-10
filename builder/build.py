@@ -7,13 +7,16 @@ call with its purpose, what it created on Freya, tests it ran) to runs/traces/<s
 Baseline = the kit's example builder (Claude Agent SDK + the build-phone-agent skill), with the test step
 changed: no practice-case runs (hidden briefs come without cases).
 """
-import argparse, asyncio, dataclasses, json, os, pathlib, sys, time
+import argparse, asyncio, dataclasses, json, os, pathlib, re, sys, time
 
 from claude_agent_sdk import AssistantMessage, ClaudeAgentOptions, ResultMessage, TextBlock, ToolUseBlock, query
 
 KIT = pathlib.Path(__file__).resolve().parent.parent
 
 
+INTENT_GUARD = ("Only an explicit statement in the customer's own words counts. A question back (for example whether a "
+                "date or amount could be different, why, or what happens if), small talk, hesitation or thinking aloud is "
+                "NOT one of the action categories: then use the neutral or none value, or keep the previous value.")
 ROBUST = (pathlib.Path(__file__).resolve().parent / "robustness.md").read_text().strip()
 
 
@@ -30,6 +33,12 @@ def add_robustness(slot, trace):
     if ROBUST.splitlines()[0] in sp:
         return None
     wf["system_prompt"] = (sp.rstrip() + "\n\n" + ROBUST).strip()
+    for node in (wf.get("nodes") or {}).values():
+        for e in node.get("extraction_schema") or []:
+            d = e.get("description") or ""
+            # a classification field (enum, or several quoted labels): a question back or small talk is no decision
+            if e.get("type", "string") == "string" and (e.get("enum_values") or len(re.findall(r"'[a-z_]+'\s*[:=]", d)) >= 3):
+                e["description"] = d.rstrip() + " " + INTENT_GUARD
     f.write_text(json.dumps(wf, indent=1))
     cwd = os.getcwd(); os.chdir(KIT)
     try:
