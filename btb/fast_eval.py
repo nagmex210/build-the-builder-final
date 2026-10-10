@@ -94,8 +94,19 @@ def transcript_text(call_id, fallback):
     return "\n".join(lines)
 
 
+def bank(path, body=None):
+    """The mock bank's http() with retries: a Cloudflare 1101 page (non-JSON) must not kill the whole eval run."""
+    for k in range(8):
+        try:
+            return http(path, body)
+        except Exception:  # noqa: BLE001
+            if k == 7:
+                raise
+            time.sleep(5 + 5 * k)
+
+
 def run_case(workflow_id, case, style=None):
-    sess = http("/v1/practice/sessions", {"case": case["id"]})["variables"]
+    sess = bank("/v1/practice/sessions", {"case": case["id"]})["variables"]
     persona = persona_for(case, {"identity": case["identity"]}, style)["prompt"]
     hist, convo, call_id, err = [], [], None, None
     msg = "Hello?"
@@ -106,7 +117,7 @@ def run_case(workflow_id, case, style=None):
             call_id = r.get("callId") or call_id
             agent = (r.get("response") or "").strip()
             convo.append(("agent", agent))
-            led = http("/v1/practice/ledger/" + sess["customer_id"])
+            led = bank("/v1/practice/ledger/" + sess["customer_id"])
             if led.get("calls") and led["calls"][-1]["tool"] == "close_call":
                 break
             if msg.strip().lower().startswith("thank you, goodbye"):
@@ -117,7 +128,7 @@ def run_case(workflow_id, case, style=None):
             hist += [{"role": "assistant", "content": msg}]
     except Exception as e:  # noqa: BLE001
         err = str(e)[:300]
-        led = http("/v1/practice/ledger/" + sess["customer_id"])
+        led = bank("/v1/practice/ledger/" + sess["customer_id"])
         if led.get("calls") and led["calls"][-1]["tool"] == "close_call":
             err = None                            # the agent hung up during that turn: a normal end, no reply comes
     if call_id:
@@ -125,7 +136,7 @@ def run_case(workflow_id, case, style=None):
             freya.api("POST", "/api/v2/chat/end", {"callId": call_id})
         except Exception:  # noqa: BLE001
             pass
-    led = http("/v1/practice/ledger/" + sess["customer_id"])
+    led = bank("/v1/practice/ledger/" + sess["customer_id"])
     res = SCORER(case, led)
     tx = transcript_text(call_id, convo) if call_id else "\n".join(f"{r}: {t}" for r, t in convo)
     try:
