@@ -67,6 +67,8 @@ Extract ONLY what is needed to compute dates and amounts in code. Return JSON on
    "promise_date_not_before_today": <true if the brief says a promise date must be today or later>,
    "promise_date_not_after_deadline": <true if the brief says a promise date must not be after the deadline>,
    "promise_amount_at_least_floor": <true if the brief says an amount below the floor cannot be recorded>,
+   "promise_non_business_day_offer": "next" | "previous" | "none",  // what the brief says to offer when the customer names a
+                     // weekend/holiday: the next business day, the previous one, or no rule ("none")
    "callback_tool": "<tool that books a callback, or empty>",
    "callback_date_field": "<its body field holding the date>",
    "callback_time_field": "<its body field holding the time HH:MM, or empty>"

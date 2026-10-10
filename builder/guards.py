@@ -127,8 +127,11 @@ try:
                 _o = _t
             if (SPEC.get('promise_cutoff_time') or SPEC.get('promise_min_days_ahead')):
                 _o = max(_o, earliest_promise(vars.get(SPEC.get('now_variable') or 'now')))
+            _nb = str(_G.get('promise_non_business_day_offer') or 'next').lower()
             if _G.get('promise_date_business_day') and not is_bd(_o):
-                _o = next_bd(_o)
+                _o = prev_bd(_o) if (_nb == 'previous' and prev_bd(_o) >= _t) else (next_bd(_o) if _nb != 'none' else _o)
+            if not is_bd(_o) and _G.get('promise_date_business_day'):
+                _o = _d                                    # no stated rule: code does not pick a date
             if _dl is not None and _o > _dl:
                 _o = _dl if (is_bd(_dl) or not _G.get('promise_date_business_day')) else prev_bd(_dl)
             if _o != _d:
