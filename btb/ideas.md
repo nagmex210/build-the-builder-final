@@ -37,3 +37,18 @@ mechanisms that made it reliable. Each is brief-agnostic. Pick from here when it
 11. **Jury on the few values that decide cases.** Sample 3 extractions of deadlines, floors, overrides and
     the outcome table; take the majority; disagreement → re-read that clause.
 12. **Log every model call and every gate result** in the trace (already required by the event rules).
+
+## Failure kinds seen on a held-out brief (generic; no brief content)
+
+The b1 champion built for an unseen brief passed 2/12. The failure KINDS, each fixable without knowing that brief:
+- A guard hook that blocks a tool call by deleting required fields hides the real reason: the bank answers
+  "amount must be a number" and the model never learns that the date was outside the window. Return the brief's
+  reason in `what_to_do_next` instead (or block before the call with a clear message).
+- Tool order: `close_call` was called before `transfer_to_agent` or before the last `add_note`. Closing must be last.
+- Duplicate `add_note` calls for the same product.
+- datecalc only knows deadline bands, floors and callback windows. Rule kinds it does not know (a deadline that
+  moves BACK to the previous business day, rounding a floor UP to a whole amount, a same-day cut-off time) were
+  silently dropped from DATE FACTS, and the agent read the wrong value. Unknown rule kinds must be extracted as
+  generic computed facts or flagged in the trace, never dropped.
+- A mandatory sentence that must come first (e.g. the recording notice) came second.
+- A relative date ("next Wednesday") recorded instead of the computed date; a wrong year in a read-back.
