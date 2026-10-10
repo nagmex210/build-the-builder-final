@@ -1,0 +1,43 @@
+  [Skill] {'skill': 'build-phone-agent', 'args': 'Slot: w2-rB. Tool API file: tools/openapi.json. Brief files: btb/briefs_raw/brie
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; ls; ls btb/briefs_raw 2>&1; ls ../briefs_raw 2>&1; ls tools docs examples builder 
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; cat btb/briefs_raw/brief-a-raw.md; echo ======; cat btb/briefs_raw/brief-b-raw.md;
+  [Read] {'file_path': '/home/ubuntu/.claude/projects/-home-ubuntu-btb-wt2/75642176-f0d4-4490-8171-803ec74220ed/tool-results/bsyr
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; cat docs/workflow-format.md docs/tools-and-code.md .claude/skills/build-phone-agen
+I've read both briefs and the tool API. Now reading the format docs and routing guide before writing the workflow.
+  [Read] {'file_path': '/home/ubuntu/.claude/projects/-home-ubuntu-btb-wt2/75642176-f0d4-4490-8171-803ec74220ed/tool-results/bztp
+  [Read] {'file_path': '/home/ubuntu/.claude/projects/-home-ubuntu-btb-wt2/75642176-f0d4-4490-8171-803ec74220ed/tool-results/bztp
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; sed -n 1,200p builder/lint_workflow.py; wc -l builder/build.py examples/agent_buil
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; head -c 3000 public-test-set.json; echo; python3 -c "\nimport json;d=json.load(ope
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; python3 -c "\nimport json;d=json.load(open(\'public-test-set.json\'))\nfor c in d:
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; cat builder/build.py | head -70; cat docs/api.md | grep -n -i -A3 "chat/message" |
+  [Write] {'file_path': '/tmp/w2rB/gen.py', 'content': '"""Generate out/w2-rB.workflow.json (Brief B on top of Brief A)."""\nimpor
+  [Bash] {'command': 'mkdir -p out && python3 /tmp/w2rB/gen.py out/w2-rB.workflow.json && python3 builder/lint_workflow.py out/w2
+Lint is clean and the date and hook logic check out locally. Saving to the platform and running one chat turn to confirm the call starts.
+  [Bash] {'command': 'source env.sh 2>/dev/null; python3 -c "import freya,json,sys; print(json.dumps(freya.save_workflow(sys.argv
+  [Bash] {'command': 'source env.sh 2>/dev/null; python3 -c "import freya,json; print(json.dumps(freya.api(\'POST\',\'/api/v2/cha
+The call starts correctly. Checking that the platform kept the hooks and code, then doing the rule-by-rule review.
+  [Bash] {'command': 'source env.sh 2>/dev/null; python3 -c "\nimport freya,json\nfreya.export_workflow(\'03b79369-d491-4d69-a150
+I built and saved the workflow for slot w2-rB. It lints with no errors and warnings, and a test chat turn starts the call with the right opening line. I haven't run the practice customers against it.
+
+**How the call flows:**
+1. **Setup** works out today's date and the allowed callback times from the supplied `now`, using the brief's bank holidays.
+2. **Opening** introduces the agent and asks "Am I speaking with {title} {last_name}?". The call moves on only when the customer clearly confirms. If someone else answers, this step books a callback or closes as wrong number, deceased, unclear or no callback, without saying why the bank is calling.
+3. **Identity** asks for date of birth, then the last four digits of the phone. It moves on only when the account service reports both answers verified. Before the date goes to the service, it is converted to `YYYY-MM-DD`, reading a numbers-only date as day, then month, then year. After each answer the agent is told what to do next: ask again, ask for the month as a word, or tell the customer to use the app or a branch and close as failed.
+4. **Account lookup** fetches the products. A calculation step then builds, for each product, its band and deadline (12 or 7 business days, per the amendment memos), its minimum amount, its persuasion offers, and a calendar.
+5. **Negotiation** opens with a fixed sentence per product, then "Can you make this payment today?" (or the all-products version when there are several).
+6. Every stage that can end the call routes to hang-up only after `close_call` succeeds.
+
+**Rules enforced in code rather than left to the agent's judgement:**
+- **Promise date:** if the date asked for is past that product's deadline, it is moved to the deadline before recording.
+- **Recording failures:** a failed `create_promise` is retried once per product. The agent is told explicitly whether it succeeded, so it can't claim a promise is recorded when it isn't.
+- **Closing outcome:** worked out from what actually happened. A transfer gives `transferred` with its reason; otherwise a recorded promise gives `promise`, all products paid gives `paid`, and anything else gives `no_promise` with the first non-paid product's reason.
+
+**Decision for you:** I treated this as a Brief B agent, so it adds a note for every product without a promise, including single-product customers. Brief A forbids notes, so practice cases graded under Brief A that end without a promise (for example the "already paid" customer) would likely fail on the notes check. Notes are held back until the end of the call so that a transfer, which forbids all notes, never leaves one behind.
+
+The workflow file is `out/w2-rB.workflow.json`; the script that generates it is outside the repo at `/tmp/w2rB/gen.py`.
+
+workflow_id: 03b79369-d491-4d69-a150-2b2cc248d0ab, agent_id: 201db53e-e511-47f0-8597-fd17f8abee51
+
+done: 18 turns, 295 s
+lint: 0 errors, 0 warnings
+{"workflow_id": "03b79369-d491-4d69-a150-2b2cc248d0ab", "agent_id": "201db53e-e511-47f0-8597-fd17f8abee51"}

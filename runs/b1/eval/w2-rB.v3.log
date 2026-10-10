@@ -1,0 +1,27 @@
+FAIL PUB-11 0/2 | 
+       - [talkative] outcome (None, None), expected ('promise', None)
+       - [talkative] promises [], expected [('p1', 220.0, '2026-10-16'), ('p2', 640.0, '2026-10-16'), ('p3', 75.0, '2026-10-16')]
+       - [talkative] the call was not closed with close_call
+       - [talkative] conversation: The agent asked a question before stating all three products, provided no read-back or confirmation for all three, and made no create_promise call for any product.
+       - [talkative] harness: POST /api/v2/chat/message -> 503: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"7ec2e0f4-ead5-4b5a-849c-32484e1f4fe6"}}}
+       - [talkative] outcome (None, None), expected ('promise', None)
+       - [talkative] promises [], expected [('p1', 220.0, '2026-10-16'), ('p2', 640.0, '2026-10-16'), ('p3', 75.0, '2026-10-16')]
+       - [talkative] the call was not closed with close_call
+       - [talkative] conversation: The transcript does not satisfy any check: all three products were not stated, no read-back or confirmation for all three occurred, and no create_promise call was made per product.
+       - [talkative] harness: POST /api/v2/chat/message -> 503: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"adb92280-1210-49ac-acfc-c0361966ed69"}}}
+FAIL PUB-12 0/2 | verify_identity > verify_identity > verify_identity > get_account
+       - [in_words] outcome (None, None), expected ('promise', None)
+       - [in_words] promises [], expected [('p1', 510.0, '2026-10-15')]
+       - [in_words] notes [], expected [('p2', 'refused'), ('p3', 'refused')]
+       - [in_words] the call was not closed with close_call
+       - [in_words] conversation: The exactly-one-credit-card-promise check and the refused-note check fail because both create_promise attempts and both refused-note calls failed, leaving no recorded promise or refused notes.
+       - [corrects] conversation: The phone question was not asked again, and the agent claimed to have noted the credit card payment before any recording tool call was made.
+FAIL PUB-13 0/2 | 
+       - [talkative] outcome (None, None), expected ('promise', None)
+       - [talkative] promises [], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]
+       - [talkative] the call was not closed with close_call
+       - [talkative] conversation: The transcript does not show the credit card recorded on 30 October, the loan recorded on its 23 October deadline, or a read-back naming both dates.
+       - [talkative] harness: POST /api/v2/chat/message -> 503: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"cf0e913a-af94-476b-a9ff-2498217dc410"}}}
+       - [pieces] conversation: Neither the credit card payment for 30 October nor the loan payment for 23 October was recorded through a successful tool call, although the read-back names both dates.
+
+fast_eval: 0 / 3 passed (2 rep(s), all reps must pass), 465 s

@@ -1,0 +1,48 @@
+  [Skill] {'skill': 'build-phone-agent', 'args': 'Slot: w2-rA. Tool API file: tools/openapi.json. Brief files: btb/briefs_raw/brie
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; ls; ls btb/briefs_raw tools docs examples out builder 2>&1; cat btb/briefs_raw/bri
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; cat tools/openapi.json; cat docs/workflow-format.md docs/tools-and-code.md', 'desc
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; python3 -I -c "\nimport json;d=json.load(open(\'tools/openapi.json\'))\nprint(json
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; python3 -I -c "\nimport json;d=json.load(open(\'tools/openapi.json\'))\nprint(d.ke
+I've read the brief and the tool API. Next I'm reading the workflow docs, the routing guide and the example before I write the workflow.
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; cat docs/workflow-format.md docs/tools-and-code.md .claude/skills/build-phone-agen
+  [Read] {'file_path': '/home/ubuntu/.claude/projects/-home-ubuntu-btb-wt2/ad28c216-75db-4cbd-b78a-6d807b846e88/tool-results/bt1p
+  [Read] {'file_path': '/home/ubuntu/.claude/projects/-home-ubuntu-btb-wt2/ad28c216-75db-4cbd-b78a-6d807b846e88/tool-results/bt1p
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; cat examples/base-agent.json; sed -n 1,80p builder/lint_workflow.py | head -100; g
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; sed -n 80,160p builder/lint_workflow.py; ls examples; head -50 builder/build.py; g
+Now I'll write a generator script that builds the workflow JSON.
+  [Bash] {'command': 'mkdir -p /tmp/w2rA /home/ubuntu/btb/wt2/out; cd /home/ubuntu/btb/wt2; cat docs/api.md | grep -n -i "chat/me
+  [Write] {'file_path': '/tmp/w2rA/gen.py', 'content': '"""Generate the Brief A workflow (slot w2-rA)."""\nimport json, sys\n\nBAS
+  [Bash] {'command': "python3 /tmp/w2rA/gen.py out/w2-rA.workflow.json && python3 builder/lint_workflow.py out/w2-rA.workflow.jso
+Lint is clean and the date and guard logic checks out locally. Saving the workflow and running a startup check:
+  [Bash] {'command': 'python3 -c "import freya,json,sys; print(json.dumps(freya.save_workflow(sys.argv[1], json.load(open(sys.arg
+  [Bash] {'command': 'python3 -c "import freya,json; print(freya.api(\'POST\',\'/api/v2/chat/message\',{\'workflowId\':\'d25011bb
+  [Bash] {'command': 'python3 - <<\'EOF\'\np=\'/tmp/w2rA/gen.py\'; s=open(p).read()\na=\'"Hello, this is the digital assistant of
+I built the Brief A phone agent and saved it as slot w2-rA. The lint check shows 0 errors and 0 warnings, and a one-turn chat check starts the call correctly with "Hello, this is a digital assistant calling from Freya Bank, and this call is recorded. Am I speaking with Ms Lee?". That first turn is the only thing I ran on the platform: no full test calls, so how it handles a real conversation is untested.
+
+**How the call is structured** (file: `out/w2-rA.workflow.json`):
+- **Start:** computes today, the current time and the allowed callback times from the supplied `now`.
+- **Opening:** asks for the customer by title and last name and moves on only when they clearly confirm. If someone else answers, the agent says nothing about why it is calling and handles callbacks, wrong numbers, deaths and unclear answers.
+- **Identity:** asks date of birth, then the last four digits of the phone number. It handles the swapped day/month hint, three wrong answers, refusals and requests for a human. It moves on only when the service reports both answers passed.
+- **Account and figures:** fetches the account, then works out the product wording, the minimum amount it can accept, the band, and the deadline (12th or 7th business day, from the amendment memo). It also prepares both persuasion offers and a day-by-day calendar marking weekends, holidays and dates past the deadline. The agent never does date maths itself.
+- **Negotiation:** opens with a fixed line giving the product, past-due amount and days late, then "Can you make this payment today?". It covers the promise rules, refusals and persuasion, read-back and "Do you confirm?", and the paid, dispute, hardship, new-plan and human-request cases.
+- **Ending:** every step that can end the call has the close tool. The call hangs up only after `close_call` succeeds, and the agent says thank you and goodbye in the same message. `add_note` is not used.
+
+**Rules enforced in code rather than prompts:**
+- A promise with a date outside the allowed business days, an amount below the minimum or above the past-due amount, or a second promise is never sent to the bank's system.
+- The agent says a promise is recorded only after `create_promise` returns ok. On failure it retries once, then closes as `no_promise` / `service_error`.
+- A callback outside the allowed times is not booked; a second such time closes as `not_reached` / `no_callback`.
+- Dates of birth given only in numbers are converted day-month-year.
+
+**Risk:** the promise and callback blocks work by sending the blocked call to an invalid address. The docs say this hook can rewrite the request, but I couldn't confirm the platform does. If it doesn't, a bad promise or callback would go to the bank's system, so it's worth checking in the first test runs.
+
+After the rule-by-rule review I fixed two things and saved again (version 2):
+- The opening sentence now says "calling from Freya Bank" (clause 1).
+- When a customer mentions hardship and also asks for a new plan, the agent offers the support team, not restructuring (clause 32 takes priority over clause 41).
+
+The generator script is at `/tmp/w2rA/gen.py`.
+
+workflow_id: d25011bb-adca-4e99-be82-6278c7280f99, agent_id: 53e6966f-0232-41ee-89f9-550493263e94
+
+done: 18 turns, 300 s
+lint: 0 errors, 0 warnings
+{"workflow_id": "d25011bb-adca-4e99-be82-6278c7280f99", "agent_id": "53e6966f-0232-41ee-89f9-550493263e94"}

@@ -1,0 +1,51 @@
+  [Skill] {'skill': 'build-phone-agent', 'args': 'Slot: w2-rB. Tool API file: tools/openapi.json. Brief files: btb/briefs_raw/brie
+  [Bash] {'command': 'ls; ls btb/briefs_raw 2>&1; ls ../briefs_raw 2>&1; ls docs examples builder tools out .claude/skills/build-
+  [Bash] {'command': 'cat btb/briefs_raw/brief-a-raw.md; echo ======; cat btb/briefs_raw/brief-b-raw.md; echo =====; cat tools/op
+  [Read] {'file_path': '/home/ubuntu/btb/wt2/btb/briefs_raw/brief-a-raw.md'}
+  [Read] {'file_path': '/home/ubuntu/btb/wt2/btb/briefs_raw/brief-b-raw.md'}
+  [Read] {'file_path': '/home/ubuntu/btb/wt2/tools/openapi.json'}
+  [Bash] {'command': 'cat docs/workflow-format.md docs/tools-and-code.md .claude/skills/build-phone-agent/routing.md', 'descripti
+I've read both briefs and the tool API; now going through the platform docs and the routing guide.
+  [Read] {'file_path': '/home/ubuntu/.claude/projects/-home-ubuntu-btb-wt2/fe79c74e-24bf-4ff7-8f45-3d17d3707122/tool-results/bcf0
+  [Read] {'file_path': '/home/ubuntu/.claude/projects/-home-ubuntu-btb-wt2/fe79c74e-24bf-4ff7-8f45-3d17d3707122/tool-results/bcf0
+  [Bash] {'command': 'cat examples/base-agent.json; echo; ls -la out; git log --oneline | head; git status --short | head; wc -c 
+  [Bash] {'command': 'cat builder/lint_workflow.py; python3 builder/lint_workflow.py out/w2-rB.workflow.json; python3 -c "\nimpor
+  [Bash] {'command': 'git log --oneline -- out/w2-rB.workflow.json; cat .freya-agents.json 2>/dev/null | head -30; ls runs | head
+  [Bash] {'command': 'python3 - <<\'EOF\'\nimport json\nw=json.load(open(\'out/w2-rB.workflow.json\'))\nprint("SYSTEM:\\n",w[\'sy
+There's already a draft workflow for this slot from an earlier run. I'm reviewing it against both briefs so I can fix it rather than start over.
+  [Read] {'file_path': '/home/ubuntu/.claude/projects/-home-ubuntu-btb-wt2/fe79c74e-24bf-4ff7-8f45-3d17d3707122/tool-results/ba8p
+  [Bash] {'command': 'mkdir -p /home/ubuntu/btb/wt2/runs/b1 && cat > /home/ubuntu/btb/wt2/runs/b1/patch_rB.py <<\'PYEOF\'\nimport
+Now tightening the prompts: the callback window, the product-by-product flow, and hardship taking priority over restructuring.
+  [Bash] {'command': 'cat > /home/ubuntu/btb/wt2/runs/b1/patch_rB_prompts.py <<\'PYEOF\'\nimport json, sys\nP = sys.argv[1]\nw = 
+Running the code snippets and hooks locally on sample data before saving.
+  [Bash] {'command': "python3 - <<'EOF'\nimport json\nw=json.load(open('out/w2-rB.workflow.json'));N=w['nodes']\nV={'now':'2026-1
+Hooks behave as intended and the deadline math checks out (12th business day skips the 26 Oct holiday). Saving and checking that it starts.
+  [Bash] {'command': 'python3 -c "import freya,json,sys; print(json.dumps(freya.save_workflow(sys.argv[1], json.load(open(sys.arg
+  [Bash] {'command': 'python3 -c "import freya,json; print(json.dumps(freya.api(\'POST\',\'/api/v2/chat/message\',{\'workflowId\'
+The check returned a 503 (not the 500 the skill warns about). Retrying, and trying another workflow alongside to tell a platform problem from a problem in mine.
+  [Bash] {'command': 'for wf in 03b79369-d491-4d69-a150-2b2cc248d0ab 217d660d-d50d-4364-9eee-ee4dd622ecbe; do sleep 5; python3 -c
+  [Bash] {'command': 'python3 -c "import freya,json,sys; print(json.dumps(freya.api(\'POST\',\'/api/v2/chat/message\',{\'workflow
+The known-good base workflow gets the same 503, so the chat endpoint itself is down, not my workflow. Waiting a minute and retrying.
+  [Bash] {'command': 'for i in 1 2 3 4; do sleep 45; if python3 -c "import freya,json,sys; r=freya.api(\'POST\',\'/api/v2/chat/me
+  [Bash] {'command': 'python3 -c "import freya; print(freya.api(\'POST\',\'/api/v2/chat/end\',{\'callId\':\'c6d80dfd-372c-457f-ad
+The w2-rB agent is saved and starts a call. Its first line was: "Hello, this is a digital assistant calling from Freya Bank, and this call is recorded. Am I speaking with Ms Lee?" That one turn is the only live test. I have not run it against the practice customers, so the promise, transfer and notes paths are untested on the platform.
+
+A draft for this slot from an earlier run was already in `out/w2-rB.workflow.json`. I reviewed it against both briefs and the tool API file, kept its structure, and moved several rules out of the prompts into code. The linter reports 0 errors and 0 warnings. I also ran every code step and hook locally on a two-product sample: the deadlines came out right (the early band skips the 26 Oct holiday), and bad inputs were refused.
+
+**How I read the two briefs:** Brief B extends Brief A, so the agent follows Brief B wherever they conflict. It writes a note (`add_note`) for each product without a promise, even on single-product calls, although Brief A says never to use notes. It also retries a failed promise once, then notes that product as a service error instead of ending the call. All other Brief A rules are kept, with the 9 Oct memo's deadlines: 12 business days for 1–7 days late, 7 for 8–45.
+
+**What the code now enforces:**
+- **Callbacks:** a time outside the window is refused (today later than `now`, or the next business day, 10:00–19:00). After the second one outside it, the agent is told to close as not reached / no callback.
+- **Promises:** refused if the date is past, a weekend or a bank holiday, or the amount is outside floor to full amount. Also refused for a second promise on the same product or after any transfer. A date after a product's deadline is moved to that deadline. Only `ok: true` lets the agent say a promise is recorded.
+- **Notes:** refused after any transfer, for a product that already has a promise, and for duplicates. After each promise or note, the agent is told which products still need one.
+- **Closing outcome:** worked out from what actually happened: transfer, failed or declined identity check, callback, or promises and notes.
+
+**Risks to check in testing:**
+- A refused attempt (callback, promise or note) still reaches the bank's service as a failed call. If the scorer counts failed calls in the ledger, these could cost points.
+- I let a callback be "today" even on a weekend or holiday, reading the policy literally. If the bank means business days only, that needs changing.
+
+workflow_id `03b79369-d491-4d69-a150-2b2cc248d0ab`, agent_id `201db53e-e511-47f0-8597-fd17f8abee51`
+
+done: 25 turns, 431 s
+lint: 0 errors, 0 warnings
+{"workflow_id": "03b79369-d491-4d69-a150-2b2cc248d0ab", "agent_id": "201db53e-e511-47f0-8597-fd17f8abee51"}

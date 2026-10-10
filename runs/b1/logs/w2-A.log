@@ -1,0 +1,47 @@
+  [Skill] {'skill': 'build-phone-agent', 'args': 'Slot: w2-A. Tool API file: tools/openapi.json. Brief files: briefs/brief-a.md. W
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; cat briefs/brief-a.md; echo ----; cat tools/openapi.json; echo ----; cat docs/work
+Output truncated; read files individually.
+  [Read] {'file_path': '/home/ubuntu/btb/wt2/briefs/brief-a.md'}
+  [Read] {'file_path': '/home/ubuntu/btb/wt2/tools/openapi.json'}
+  [Read] {'file_path': '/home/ubuntu/btb/wt2/.claude/skills/build-phone-agent/routing.md'}
+  [Read] {'file_path': '/home/ubuntu/btb/wt2/examples/base-agent.json'}
+  [Read] {'file_path': '/home/ubuntu/btb/wt2/docs/workflow-format.md'}
+  [Read] {'file_path': '/home/ubuntu/btb/wt2/docs/tools-and-code.md'}
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; ls out builder; git log --oneline | head -5; sed -n 1,200p builder/lint_workflow.p
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; wc -l builder/build.py; head -60 builder/build.py; ls; ls examples docs'}
+Now I'll write a generator script that produces the workflow JSON.
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; sed -n 1,80p freya.py | head -80; grep -n "def " freya.py'}
+  [Write] {'file_path': '/tmp/w2a/gen.py', 'content': '"""Generator for out/w2-A.workflow.json (brief A). Run: python3 /tmp/w2a/ge
+  [Bash] {'command': 'sed -i \'s/clearly confirmed being {{title}} {{last_name}}: said "\\n/X/\' /tmp/w2a/gen.py && python3 - <<\
+Lint is clean and the hooks behave as intended locally. Saving.
+  [Bash] {'command': 'python3 -c "import freya,json,sys; print(json.dumps(freya.save_workflow(sys.argv[1], json.load(open(sys.arg
+  [Bash] {'command': 'python3 -c "import freya,json; print(freya.api(\'POST\',\'/api/v2/chat/message\',{\'workflowId\':\'4b5eb075
+I built the brief A phone agent and saved it with slot w2-A. The workflow is in `out/w2-A.workflow.json`, it passes the lint with no errors or warnings, and a one-turn chat starts correctly. The agent opened with the right line: digital assistant from Freya Bank, call recorded, "Am I speaking with Ms Lee?".
+
+That chat turn is the only test on the platform. I didn't run any practice customers, so nothing past the opening line has been seen working live. The date, amount and close-outcome code was checked by running it locally with sample data.
+
+**How the call flows:**
+1. **Opening:** works out who is on the line, and handles callbacks, wrong numbers, deceased customers and unclear answers. It only moves on when the person clearly confirms they are the customer.
+2. **Identity:** asks the two security questions one at a time and moves on only when the bank's check says both passed.
+3. **Account lookup:** loads the product, then code works out the amounts, the days late band, the deadline, the dates for each persuasion attempt and a calendar of valid promise dates.
+4. **Negotiation:** states the debt, asks "Can you make this payment today?", and covers the persuasion attempts, hardship, disputes, "already paid", transfers and the read-back before recording.
+5. **End:** every stage that can close the call hangs up only after `close_call` succeeds.
+
+**Rules enforced in code rather than just in the prompt:**
+- **Promises:** a promise is blocked if its date isn't a valid business day on or before the deadline, if the amount is outside the floor-to-full range, or if one is already recorded.
+- **Callbacks:** a callback outside the window is not booked.
+- **Dates of birth:** they are converted to YYYY-MM-DD, reading numbers as day, month, year.
+- **Close outcome:** it is corrected to match what actually happened. After a transfer it becomes `transferred` with the matching reason. After a recorded promise it becomes `promise`, and after three wrong answers it becomes `not_verified` / `failed`. A `promise` outcome with nothing recorded becomes `no_promise`. No reason is sent for `promise` or `paid`.
+- **Failed calls:** each tool result tells the agent what to say next. It can't say a promise is recorded unless the bank confirmed it, and a second failure closes as `no_promise` / `service_error`.
+
+**Risks to check:**
+- **Blocked calls:** a blocked promise or callback is sent to a dead local address so it never reaches the bank's records. I haven't confirmed that the platform still runs the code that tells the agent why it was blocked when the call fails like this. If it doesn't, the agent gets a bare error and may handle it badly.
+- **Backup close at the end of the call:** this copies the example agent. It is guarded so it shouldn't send a second close after the agent has already closed, but that guard is also untested on the platform. If it fails, a call could get two closes, against the rule of exactly one.
+- **Persuasion attempts:** the count is followed through the prompt only, not tracked in code.
+- **Currency:** amounts are spoken without one (e.g. "245.50") because the brief doesn't give it.
+
+workflow_id: 4b5eb075-a0af-4c9a-bf1d-9f0ba94dd086, agent_id: 8bb3f92a-09f3-4a92-ab39-7cab30b89a56
+
+done: 17 turns, 301 s
+lint: 0 errors, 0 warnings
+{"workflow_id": "4b5eb075-a0af-4c9a-bf1d-9f0ba94dd086", "agent_id": "8bb3f92a-09f3-4a92-ab39-7cab30b89a56"}

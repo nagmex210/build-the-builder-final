@@ -1,0 +1,26 @@
+FAIL PUB-11 1/2 | verify_identity > verify_identity > get_account > create_promise > create_promise > create_promise > close_call
+       - [talkative] outcome ('no_promise', 'service_error'), expected ('promise', None)
+       - [talkative] promises [('p1', 220.0, '2026-10-16')], expected [('p1', 220.0, '2026-10-16'), ('p2', 640.0, '2026-10-16'), ('p3', 75.0, '2026-10-16')]
+       - [talkative] conversation: The one create_promise per product check failed because the agent made repeated calls for the credit card and car loan, and every create_promise attempt failed.
+FAIL PUB-12 0/2 | verify_identity > verify_identity > verify_identity > get_account
+       - [talkative] outcome (None, None), expected ('promise', None)
+       - [talkative] promises [], expected [('p1', 510.0, '2026-10-15')]
+       - [talkative] notes [], expected [('p2', 'refused'), ('p3', 'refused')]
+       - [talkative] the call was not closed with close_call
+       - [talkative] conversation: The identity-question repetition is not established by the truncated transcript, no credit-card promise or refused notes were successfully recorded, the agent made three personal-loan attempts and two car-loan attempts instead of two and one, and
+       - [corrects] outcome (None, None), expected ('promise', None)
+       - [corrects] promises [], expected [('p1', 510.0, '2026-10-15')]
+       - [corrects] notes [], expected [('p2', 'refused'), ('p3', 'refused')]
+       - [corrects] the call was not closed with close_call
+       - [corrects] conversation: The phone question was not asked or repeated, no credit-card promise or refused notes were recorded, and neither the two late-band personal-loan attempts nor the one early-band car-loan attempt occurred.
+       - [corrects] harness: POST /api/v2/chat/message -> 503: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"8bc0ba73-8d82-47b2-86ae-dd98d72b7b26"}}}
+FAIL PUB-13 0/2 | verify_identity
+       - [in_words] outcome (None, None), expected ('promise', None)
+       - [in_words] promises [], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]
+       - [in_words] the call was not closed with close_call
+       - [in_words] conversation: The credit card was not recorded for 30 October, the loan was not recorded for 23 October, and no read-back named both dates.
+       - [in_words] harness: POST /api/v2/chat/message -> 503: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"38e8917a-86fe-4efe-95a0-e970dc6b3f6c"}}}
+       - [asks_back] promises [('p1', 300.0, '2026-11-02'), ('p2', 900.0, '2026-10-30')], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]
+       - [asks_back] conversation: Neither payment was recorded by a tool call, and the read-back named November 2 for the credit card and October 30 for the loan instead of the required October 30 and October 23, respectively.
+
+fast_eval: 0 / 3 passed (2 rep(s), all reps must pass), 401 s
