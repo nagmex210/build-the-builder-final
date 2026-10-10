@@ -18,6 +18,11 @@ while [ "$(date +%s)" -lt "$FREEZE" ]; do
   echo "[$(date -Is)] analyst b$nb start" >> $LOG
   P="You are the STANDING ANALYST for batch b$nb. Read btb/program.md (section ANALYST) and follow it exactly. Workers of batch b$nb are on branches idea/b$nb-1..5 (reports: git show idea/b$nb-<N>:runs/b$nb/w<N>.md). The merger is working in the same repo right now: touch ONLY btb/mechanisms.md and runs/analyst/b$nb.md, commit only those paths (git commit -- <paths>; retry if index.lock exists), push. Hard limit 55 minutes. Never ask questions."
   ( cd "$R" && timeout 55m claude -p --model claude-opus-5-5 --dangerously-skip-permissions "$P" > "$BASE/analyst_b$nb.log" 2>&1 )
+  if grep -q "hit your session limit" "$BASE/analyst_b$nb.log"; then
+    t=$(grep -o "resets [0-9:apm]* (UTC)" "$BASE/analyst_b$nb.log" | tail -1 | sed 's/resets //; s/ (UTC)//')
+    s=$(date -u -d "$t" +%s 2>/dev/null) || s=$(( $(date +%s) + 1800 )); [ "$s" -lt "$(date +%s)" ] && s=$(( s + 86400 ))
+    echo "[$(date -Is)] analyst b$nb: session limit, retry after reset" >> $LOG; sleep $(( s + 180 - $(date +%s) )); continue
+  fi
   echo "[$(date -Is)] analyst b$nb done" >> $LOG
   done_b=$nb; echo $done_b > $BASE/analyst_done
 done
