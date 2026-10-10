@@ -1,0 +1,148 @@
+"""Tool-call hardening applied to every workflow before it is saved. Brief-agnostic: it reads only the workflow's
+own tools (names, body fields) and the shape of the bank's responses, never a rule from a brief.
+
+    python3 builder/harden.py <workflow.json>          # rewrites the file in place, prints a summary
+
+What it adds to every `api_call` tool (in node `tools`, node `pre_actions` and workflow-level `tools`):
+- a post-hook that turns every failed call (HTTP error, envelope status not success, `ok: false`) into an explicit
+  `tool_outcome` line: FAILED, nothing was recorded, failure number N of this tool in the call, do not claim it;
+  and, for pure acknowledgement writes (`{ok, <x>_id}` responses), a SUCCESS line so the model speaks after it.
+  Read tools (`get_*`) also store every `*_id` they return as the call's known ids.
+- a pre-hook that repairs an id field the model filled with something that is not a known id (case, or the only
+  id there is), so ids always come from the account lookup.
+- `maxRetries: 0` on every tool that is not a `get_*` read: retries of a failed write follow the brief's own rule,
+  made by the model, so the ledger and the transcript show them (a silent platform retry would hide them).
+Existing builder hooks are kept: ours run after (post) or before (pre) them in the same snippet.
+"""
+import json, sys
+
+POST = r'''
+try:
+    import json as _json
+    _t = __TOOL__
+    _v = vars if isinstance(globals().get('vars'), dict) else None
+    if isinstance(result, dict):
+        result.pop('header', None)
+        _d = result.get('data')
+        if not isinstance(_d, dict):
+            _d = {'raw': _d}
+            result['data'] = _d
+        try:
+            _sc = int(result.get('status_code') or 0)
+        except Exception:
+            _sc = 0
+        _st = str(result.get('status') or 'success').lower()
+        _failed = _st not in ('success', 'ok') or _sc >= 400 or _d.get('ok') in (False, 'false', 'False')
+        if _failed:
+            _n = 1
+            if _v is not None:
+                try:
+                    _n = int(_v.get('tool_failures_' + _t) or 0) + 1
+                except Exception:
+                    _n = 1
+                _v['tool_failures_' + _t] = _n
+                _v['last_tool_failed'] = _t
+            _err = _d.get('error') or result.get('message') or 'service error'
+            _msg = ('FAILED: ' + _t + ' was NOT carried out and NOTHING was recorded (error: ' + str(_err) + '). '
+                    'This is failure number ' + str(_n) + ' of ' + _t + ' in this call. Never tell the customer it was '
+                    'recorded, booked, sent or done. Apply the brief rule for a failed tool call: if it allows another '
+                    'attempt, call ' + _t + ' again now with the same values; otherwise tell the customer plainly that '
+                    'it could not be done and continue as the brief says.')
+            if 'id' in str(_err).lower() and _v is not None and _v.get('known_ids'):
+                _msg += ' Use only these ids, exactly as written: ' + str(_v.get('known_ids')) + '.'
+            _d['tool_outcome'] = _msg
+        else:
+            if _v is not None and _v.get('last_tool_failed') == _t:
+                _v['last_tool_failed'] = ''
+            _keys = [k for k in _d.keys() if k not in ('ok', 'error', 'tool_outcome', 'what_to_do_next')]
+            if __WRITE__ and all(str(k).endswith('_id') for k in _keys):
+                _d['tool_outcome'] = ('SUCCESS: ' + _t + ' was carried out and recorded. Only now may you tell the '
+                                      'customer it is recorded. Speak to the customer now.')
+            if _t.startswith('get_') and _v is not None:
+                _known = {}
+                _stack = [_d]
+                while _stack:
+                    _o = _stack.pop()
+                    if isinstance(_o, dict):
+                        for _k2, _x in _o.items():
+                            if str(_k2).endswith('_id') and _k2 != 'customer_id' and isinstance(_x, (str, int)):
+                                _known.setdefault(str(_k2), [])
+                                if str(_x) not in _known[str(_k2)]:
+                                    _known[str(_k2)].append(str(_x))
+                            else:
+                                _stack.append(_x)
+                    elif isinstance(_o, list):
+                        _stack.extend(reversed(_o))
+                if _known:
+                    _v['known_ids'] = _json.dumps(_known)
+except Exception:
+    pass
+'''
+
+PRE = r'''
+try:
+    import json as _json
+    _kn = vars.get('known_ids')
+    if isinstance(_kn, str) and _kn:
+        _kn = _json.loads(_kn)
+    _b = config.get('body') if isinstance(config, dict) else None
+    if isinstance(_b, str):
+        _b = None
+    if isinstance(_kn, dict) and isinstance(_b, dict):
+        for _k, _ids in _kn.items():
+            if _k in _b and _ids:
+                _val = str(_b.get(_k) or '').strip()
+                if _val in _ids:
+                    continue
+                _low = dict((str(i).lower(), i) for i in _ids)
+                if _val.lower() in _low:
+                    _b[_k] = _low[_val.lower()]
+                elif len(_ids) == 1:
+                    _b[_k] = _ids[0]
+except Exception:
+    pass
+'''
+
+
+def _api_tools(wf):
+    for node in (wf.get("nodes") or {}).values():
+        for key in ("tools", "pre_actions"):
+            for t in node.get(key) or []:
+                yield t
+    for node in (wf.get("global_nodes") or {}).values() if isinstance(wf.get("global_nodes"), dict) else []:
+        for key in ("tools", "pre_actions"):
+            for t in node.get(key) or []:
+                yield t
+    for t in wf.get("tools") or []:
+        yield t
+
+
+def harden(wf):
+    done = []
+    for t in _api_tools(wf):
+        fn = t.get("function") or {}
+        if fn.get("handler") != "__function__:api_call":
+            continue
+        name = fn.get("name") or "tool"
+        write = not name.startswith("get_")
+        cfg = t.setdefault("config", {})
+        if write:
+            cfg["maxRetries"] = 0
+        cfg.setdefault("timeoutMs", 12000)
+        post = POST.replace("__TOOL__", repr(name)).replace("__WRITE__", "True" if write else "False")
+        old_post = (t.get("post_process_code") or "").strip()
+        if "tool_outcome" not in old_post:
+            t["post_process_code"] = (old_post + "\n" if old_post else "") + post.lstrip("\n")
+        old_pre = (t.get("pre_process_code") or "").strip()
+        if write and "known_ids" not in old_pre:
+            t["pre_process_code"] = PRE.lstrip("\n") + ("\n" + old_pre if old_pre else "")
+        done.append(name)
+    return done
+
+
+if __name__ == "__main__":
+    p = sys.argv[1]
+    wf = json.load(open(p))
+    names = harden(wf)
+    json.dump(wf, open(p, "w"), indent=1)
+    print(json.dumps({"hardened_tools": names}))
