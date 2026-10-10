@@ -1,0 +1,139 @@
+{
+ "workflow_id": "95563f1d-fbd7-487a-9388-c490cb5e27bd",
+ "passed": 0,
+ "total": 3,
+ "rows": [
+  {
+   "id": "PUB-11",
+   "style": "pieces",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 220.0, '2026-10-16'), ('p2', 640.0, '2026-10-16'), ('p3', 75.0, '2026-10-16')]",
+    "the call was not closed with close_call",
+    "conversation: The one create_promise per product check failed because no create_promise calls were made, and the agent falsely claimed that the promises for all three accounts had been recorded."
+   ],
+   "call_id": "4dfc025d-3f1d-438a-a9d5-08c64d3a74a8",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity"
+   ],
+   "turns": 12
+  },
+  {
+   "id": "PUB-12",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "notes [('p2', 'refused'), ('p2', 'refused'), ('p2', 'refused'), ('p3', 'refused'), ('p3', 'refused')], expected [('p2', 'refused'), ('p3', 'refused')]",
+    "conversation: The phone-question repeat and absence of a date-of-birth repeat are not clearly demonstrated, and duplicate refused notes were saved for the personal loan and car loan rather than one per product."
+   ],
+   "call_id": "b4f389f7-94d7-4f1a-901c-dc039b1f974e",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "add_note",
+    "add_note",
+    "add_note",
+    "add_note",
+    "add_note",
+    "close_call"
+   ],
+   "turns": 12
+  },
+  {
+   "id": "PUB-13",
+   "style": "corrects",
+   "pass": false,
+   "failed": [
+    "outcome ('not_verified', 'declined'), expected ('promise', None)",
+    "promises [], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]",
+    "conversation: Neither the credit card payment for 30 October nor the loan payment for its 23 October deadline was recorded, and no read-back named both dates."
+   ],
+   "call_id": "c8f0a39b-996f-4bd4-8d50-c342120f04e7",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "verify_identity",
+    "verify_identity",
+    "close_call"
+   ],
+   "turns": 7
+  },
+  {
+   "id": "PUB-11",
+   "style": "in_words",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "the call was not closed with close_call",
+    "conversation: The one-confirmation check fails because the transcript includes a second confirmation request for all three products in the resumed branch."
+   ],
+   "call_id": "b7b61082-89bc-44b0-9d8b-f8c311f8efba",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise"
+   ],
+   "turns": 7
+  },
+  {
+   "id": "PUB-12",
+   "style": "in_words",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "notes [], expected [('p2', 'refused'), ('p3', 'refused')]",
+    "the call was not closed with close_call",
+    "conversation: The refused-note check fails: add_note was attempted twice for each loan, but every attempt failed, so neither product received a recorded refused note.",
+    "harness: chat turn timed out and no reply appeared"
+   ],
+   "call_id": "0928f559-009c-4568-8d37-a899700ef01d",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise"
+   ],
+   "turns": 10
+  },
+  {
+   "id": "PUB-13",
+   "style": "in_words",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]",
+    "the call was not closed with close_call",
+    "conversation: Neither the credit card payment on 30 October nor the loan payment on 23 October was recorded, no read-back named both dates, and the agent claimed to be connecting the customer without making a transfer tool call."
+   ],
+   "call_id": "0e77c7cc-81e0-4700-bf2c-0176855d5599",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity"
+   ],
+   "turns": 20
+  }
+ ]
+}
