@@ -109,7 +109,7 @@ async def self_simulate(slot, tools, briefs, trace, wf_file, final_pass, options
               f"eval or chat. You have {int(fix_s // 60)} minutes. End with one line per failure: fixed how / ignored why.")
     t = time.time()
     try:
-        await asyncio.wait_for(claude_stream(prompt, options, trace), timeout=fix_s)
+        await asyncio.wait_for(claude_stream(prompt, options, trace, "self-test fix"), timeout=fix_s)
     except asyncio.TimeoutError:
         log(trace, event="budget", what="fix round stopped at its time budget")
     log(trace, event="fix", what="self-simulation fix round: Claude EDITs the workflow with the failed checks", seconds=round(time.time() - t))
