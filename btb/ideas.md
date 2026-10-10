@@ -87,3 +87,18 @@ Our builds are all the same 6-node shape, so explore other shapes:
   tool error, arithmetic, honesty, wording) and fix only the matching component.
 - A13 Probe the tool API file before wiring: read every field, enum and error shape; build calls that read back
   status after an ambiguous write (quiet API defects were the failures tau^tau builders missed).
+- A14 Separate tester: the build's self-tests are written by a separate model call (another context, ideally
+  another model family) told to find cases that break the brief's rules; the builder only sees the failures, never
+  writes or edits the tests.
+- A15 Agent genome: the builder writes a small structured design (architecture family, stage list, tool policy,
+  guards, verifier, retries, prompts per node) and a compiler turns it into the workflow; repairs mutate the genome,
+  not 500 lines of workflow JSON (ADAS / AgentSquare style; same as idea 1 above).
+
+## Loop lessons (Meta-Agent Challenge, arXiv 2606.04455; ADAS, arXiv 2408.08435)
+- The best meta-agents evaluated SPARINGLY and thought longer between evaluations: the mean interval between eval
+  calls predicted success, the number of eval calls did not. Read failing transcripts fully and reason about the
+  cause before the next eval; do not run eval after every small edit.
+- Meta-agent results vary a lot between runs (a third of configurations had std > 0.1). One fast_eval run is weak
+  evidence; a 1-case difference is noise.
+- ADAS keeps an ARCHIVE of all designs with scores and builds new ones from the best of them, not only from the
+  last champion. Ours: every worker branch `idea/b<N>-<n>` stays in git with its report and scores (archive.tsv).

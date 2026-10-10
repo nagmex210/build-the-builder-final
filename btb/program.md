@@ -61,6 +61,9 @@ will score zero on Sunday. The merger rejects such changes.
    that no earlier batch tried (check journal.md); WORKER 4 does the same in even batches. Architecture workers may
    change the 6-node shape completely; they are judged on the same score.
    Your idea family is given in your prompt. Pick ONE concrete idea in it, the one you believe moves the score most.
+   ARCHIVE: you may start from any archived branch instead of main when your idea builds on it
+   (`archive.tsv` lists every worker branch with its scores; `git reset --hard idea/b<N>-<n>` in your worktree,
+   then say so in your report). Evaluate sparingly: read failing transcripts fully and reason before each re-run.
 3. Implement it in `builder/`. Commit.
 4. Build with your own slot (never another worker's): `python3 builder/build.py --slot w<N>-A --tools tools/openapi.json briefs/brief-a.md`,
    `--slot w<N>-B ... briefs/brief-a.md briefs/brief-b.md`, and the raw variants (`w<N>-rA`, `w<N>-rB`).
@@ -89,6 +92,9 @@ will score zero on Sunday. The merger rejects such changes.
    (if the tunnel is down: `bash btb/brief_c/start.sh`, then rebuild). Brief C is a hidden-like brief with rules A/B do
    not have. Write the C score in the description column and the journal. A change that helps A/B but drops C is
    suspect (it is fitting A/B). Never show brief C content to workers and never write it into builder/.
+4c. ARCHIVE: append one row per worker branch to `archive.tsv`
+   (`branch	parent	fast_A	fast_B	fast_rawA	fast_rawB	fast_C	build_s	idea	main_failures`), also for discarded
+   branches, so later workers can build on any design, not only the champion (ADAS-style archive).
 5. Append a row to `results.tsv`: `batch	commit	fast_A	fast_B	fast_rawA	fast_rawB	official_A	official_B	build_s	status	description`.
 6. Journal entry: what each worker tried, measured numbers, what was kept and why, hypotheses (marked) for next batch.
 7. Assign the next batch's five idea families in `runs/next_families.txt` (one per line), covering different parts:
