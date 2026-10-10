@@ -56,6 +56,19 @@ The organisers said the builder itself should simulate personas ("your system sh
 in itself ... this is what we want"). Until the champion's builder runs its own persona simulations inside the 30
 minutes (A17 in btb/ideas.md) and shows them in the trace, the merger assigns one self-simulation family every batch.
 
+Second priority, from the held-out brief (general mechanisms, no brief content; the merger assigns families that
+fix these before anything else, and checks them on brief C):
+1. A code check that rejects a tool call must answer with its OWN reason ("not recorded: date is after the
+   deadline"), never by blanking fields so the bank returns a confusing validation error the model then misreports.
+2. Tool order enforced in code: transfer and every note before close_call, no tool call after close_call.
+3. At most one note per product, enforced in code (duplicates are a common failure).
+4. Date/amount code must express roll direction (forward/back to a business day) and rounding (up/down/nearest);
+   a rule kind it cannot express is flagged in the trace and DATE FACTS, never dropped silently.
+5. Mandatory sentences inserted verbatim and checked (lint), not paraphrased by the model.
+6. Every node that can mention a date (opening included) gets the DATE FACTS block.
+7. Multi-product (up to 3 products): product ids only from the lookup; per-product promises/notes; no invented ids.
+Consistency: a case passes only if all 3 hidden runs pass, so a code-enforced fix beats a prompt-wording fix.
+
 ## Score of a builder version (the number we optimise)
 
 `score = fast_eval passes on A (10 cases) + B (3 cases) + raw-A + raw-B, --reps 2 --style random`
@@ -99,7 +112,11 @@ use run_in_background. Only stop after your report is committed.
    `python3 tools/run_cases.py <main-A agent_id> --brief A --reps 2 > runs/<batch>/official-A.txt &`
    `python3 btb/official_ws2.py main-B --brief B --reps 2 > runs/<batch>/official-B.txt &` then `wait`.
    (`official_ws2.py` copies the slot's workflow into our second workspace and scores it there.)
-   Keep (commit to `main`, push) only if official A+B passes do not drop vs the champion.
+   Then the RAW briefs the same way (half of Sunday's score is a raw-material brief; nobody has scored them officially):
+   `python3 tools/run_cases.py <main-rA agent_id> --brief A --reps 1 > runs/<batch>/official-rA.txt &`
+   `python3 btb/official_ws2.py main-rB --brief B --reps 1 > runs/<batch>/official-rB.txt &` then `wait`.
+   Keep (commit to `main`, push) only if official A+B passes do not drop vs the champion and rA+rB do not drop either
+   (the champion's rA/rB: see the latest official-r*.txt; if none exists yet, record them as the baseline).
    ACCEPT RULE (results vary a lot run to run): never keep a change because it wins by one case. Keep it only with
    (a) an improvement that repeats, (b) fixes across more than one failure kind, or (c) a mechanistic reason it
    generalises (say which). Read runs/mechanisms.md on branch fix/cases when it exists (failure kinds, general mechanisms, carry-overs) and merge fixes that hold up on the raw briefs and brief C too. Merge harness/* branches (e.g. harness/dspy) only if their report shows a held-out gain.
