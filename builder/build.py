@@ -50,9 +50,9 @@ async def self_simulate(slot, tools, briefs, trace, wf_file, final_pass, options
         failed=r1["n_failed"], checks_failed=r1["n_checks_failed"], seconds=round(time.time() - t_start), rows=r1["rows"])
     print(f"self-test 1 ({r1['where']}): {r1['n_failed']}/{r1['n']} personas failed a check ({r1['n_checks_failed']} checks)", flush=True)
     (KIT / "out" / f"{slot}.selftest1.json").write_text(json.dumps({"personas": personas, **r1}, indent=1, default=str))
-    if not r1["n_failed"] or r1["n"] < max(2, len(personas) // 2) or left() < ROUND_S + 180:
+    if not r1["n_failed"] or r1["n"] < len(personas) or left() < ROUND_S + 180:
         log(trace, event="ship", what="no fix round", why="no failed check" if not r1["n_failed"] else
-            ("too few valid chats" if r1["n"] < max(2, len(personas) // 2) else "no time left"))
+            ("too few valid chats" if r1["n"] < len(personas) else "no time left"))
         return
     best = wf_file.read_text()
     fails = selftest.failure_text(r1)
@@ -60,7 +60,9 @@ async def self_simulate(slot, tools, briefs, trace, wf_file, final_pass, options
     options = dataclasses.replace(options_base, skills=None, allowed_tools=["Read", "Edit", "Grep", "Bash"], max_turns=60)
     prompt = (f"You fix a Freya phone-agent workflow after a self-simulation. The workflow file is out/{slot}.workflow.json. "
               f"Brief files: {' '.join(briefs)}. Tool API file: {tools}. Docs: docs/. Test personas written from the brief talked to it; "
-              f"the record (scripts, transcripts) is out/{slot}.selftest1.json. These DETERMINISTIC checks on the bank's ledger failed:\n{fails}\n\n"
+              f"the record (scripts, transcripts) is out/{slot}.selftest1.json. These DETERMINISTIC checks on the bank's ledger failed (each persona was played twice):\n{fails}\n\n"
+              "A tool result with ok=false is the bank refusing the call: fix what made the agent send it (for example an id that "
+              "is not in the account tool's result, a call after the call was closed, a missing required field). "
               "First decide for each failure whether the BRIEF really requires the check for that customer's behaviour (a persona check "
               "can be wrong; then ignore it). EDIT the existing workflow file in place with the Edit tool: change ONLY the prompts, "
               "transitions or hook lines needed for real failures; keep everything else exactly (do not restructure, do not drop any "
@@ -93,7 +95,7 @@ async def self_simulate(slot, tools, briefs, trace, wf_file, final_pass, options
             failed=r2["n_failed"], checks_failed=r2["n_checks_failed"], seconds=round(time.time() - t), rows=r2["rows"])
         print(f"self-test 2: {r2['n_failed']}/{r2['n']} personas failed a check ({r2['n_checks_failed']} checks)", flush=True)
     rate = lambda r: (r["n_failed"] / r["n"], r["n_checks_failed"] / r["n"])
-    if r2 is None or r2["n"] < max(2, len(personas) // 2) or rate(r2) > rate(r1):
+    if r2 is None or r2["n"] < len(personas) or rate(r2) > rate(r1):
         (KIT / "out" / f"{slot}.workflow.rejected-fix.json").write_text(wf_file.read_text())
         wf_file.write_text(best); final_pass("restore build")
         log(trace, event="ship", what="fix tested worse or could not be tested: restored the build's workflow")

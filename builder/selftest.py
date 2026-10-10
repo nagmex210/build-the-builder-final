@@ -341,9 +341,11 @@ def _run_one(workflow_id, sc, lib):
     return {**row, "failed": check_ledger(calls, sess.get("now") or cu["now"], sc.get("checks") or [], lib)}
 
 
-def run_tests(slot, wf, scenarios, calc_file, timeout=CHAT_S + 120):
-    """Copy the workflow into workspace 2, play every persona there in parallel, check the ledgers."""
+def run_tests(slot, wf, scenarios, calc_file, timeout=CHAT_S + 120, reps=2):
+    """Copy the workflow into workspace 2, play every persona `reps` times there in parallel, check the ledgers.
+    The agent is stochastic: one play per persona made the keep/revert decision after the fix a coin flip."""
     lib = calc_lib(calc_file)
+    scenarios = [s for s in scenarios for _ in range(reps)]
     with Workspace2(slot, wf) as (wid, where):
         if wid is None:
             wid = json.loads((KIT / ".freya-agents.json").read_text())[slot]["workflow_id"]
@@ -362,9 +364,10 @@ def run_tests(slot, wf, scenarios, calc_file, timeout=CHAT_S + 120):
 
 
 def failure_text(result):
-    out = []
+    out, seen = [], set()
     for r in result["rows"]:
-        if r.get("failed"):
+        if r.get("failed") and (r["title"], tuple(r["failed"])) not in seen:
+            seen.add((r["title"], tuple(r["failed"])))
             out.append(f"- Persona '{r['title']}' (customer: {r['script'][:300]}) call_id {r.get('call_id')}; tools: {' > '.join(r['tools'])}\n" +
                        "\n".join("    * " + m for m in r["failed"]))
     return "\n".join(out)
