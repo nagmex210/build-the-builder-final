@@ -48,6 +48,12 @@ will score zero on Sunday. The merger rejects such changes.
   six agents.
 - `results.tsv` (merger only), `journal.md`, `runs/<batch>/w<N>.md` (worker reports).
 
+## PRIORITY (Freya team hint at the briefing)
+
+The organisers said the builder itself should simulate personas ("your system should also simulate some personas
+in itself ... this is what we want"). Until the champion's builder runs its own persona simulations inside the 30
+minutes (A17 in btb/ideas.md) and shows them in the trace, the merger assigns one self-simulation family every batch.
+
 ## Score of a builder version (the number we optimise)
 
 `score = fast_eval passes on A (10 cases) + B (3 cases) + raw-A + raw-B, --reps 2 --style random`
@@ -98,6 +104,7 @@ use run_in_background. Only stop after your report is committed.
 4b. HELD-OUT CHECK (merger only, every batch): build the merged builder on brief C
    (`python3 builder/build.py --slot main-C --tools btb/brief_c/openapi-c.json btb/brief_c/brief-c.md`) and score it:
    `python3 btb/fast_eval.py <wf> --cases btb/brief_c/cases-c.json --bank $(cat btb/brief_c/BANK_URL) --reps 1`
+   and once more with `--style adversarial` (manipulative callers; see A16)
    (if the tunnel is down: `bash btb/brief_c/start.sh`, then rebuild). Brief C is a hidden-like brief with rules A/B do
    not have. Write the C score in the description column and the journal. A change that helps A/B but drops C is
    suspect (it is fitting A/B). Never show brief C content to workers and never write it into builder/.

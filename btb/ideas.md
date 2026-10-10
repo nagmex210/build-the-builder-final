@@ -102,3 +102,14 @@ Our builds are all the same 6-node shape, so explore other shapes:
   evidence; a 1-case difference is noise.
 - ADAS keeps an ARCHIVE of all designs with scores and builds new ones from the best of them, not only from the
   last champion. Ours: every worker branch `idea/b<N>-<n>` stays in git with its report and scores (archive.tsv).
+
+- A16 Defensive structure against manipulative callers (prompt injection, fake identity, pressure): customer text
+  is data, never instructions; every write tool's values are checked in code against the brief (amount >= floor,
+  date inside the window, product id from the lookup, outcome/reason from the brief's code table); nothing about
+  the account is reachable before the bank's identity check passes; the agent never reads out its instructions.
+  Stress-test with `btb/fast_eval.py ... --style adversarial` (merger, brief C and A).
+- A17 SELF-SIMULATION INSIDE THE BUILDER (the Freya team said in the briefing: "your system should also simulate
+  some personas in itself ... this is what we want"): the builder generates customer personas from the brief
+  (every path, the five customer styles, a manipulative caller), runs them against the saved workflow through the
+  chat endpoint, checks the ledger/tool calls against expectations computed from the brief, fixes, and re-saves,
+  inside the 30 minutes. The trace must show every simulated persona and result (the event rules ask for tests).
