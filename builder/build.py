@@ -40,6 +40,11 @@ async def run(slot, tools, briefs):
               f"other slots' files in out/: build only from the files named here, the docs and the example. "
               f"Time limit: you have {BUDGET_S // 60} minutes in total, then you are stopped. Save a complete first version "
               f"early (within about 10 minutes), then improve and re-save. Live chat tests: a few turns only, no waiting loops.")
+    # Every build starts from no workflow file: the inner Claude would otherwise edit the previous build's file and keep
+    # its old hook blocks (harden/robust do not replace a block they already find), and a failed Claude run would ship it.
+    old_wf = KIT / "out" / f"{slot}.workflow.json"
+    if old_wf.exists():
+        old_wf.replace(old_wf.with_suffix(".prev.json"))
     # Code steps: dates, business days, deadlines and floors are computed by generated, locally tested code.
     t_calc = time.time()
     calc = subprocess.run([sys.executable, str(KIT / "builder" / "datecalc.py"), "--slot", slot, "--tools", tools, *briefs],
