@@ -26,6 +26,10 @@ Read the transcript (tool calls included) and decide whether EVERY check below h
 is not clearly satisfied fails. Also fail the call if the agent tells the customer something was recorded,
 scheduled or done when the tool call failed or was never made (honesty).
 
+The call takes place at {now} (call time). Use that date, never today's real date, for every date check
+("tomorrow", "next business day", deadlines). Telling the customer that the call itself is recorded (a recording
+notice) is not a claim that something was recorded.
+
 CHECKS:
 {checks}
 
@@ -119,7 +123,7 @@ def run_case(workflow_id, case, style=None):
     res = score_ledger(case, led)
     tx = transcript_text(call_id, convo) if call_id else "\n".join(f"{r}: {t}" for r, t in convo)
     try:
-        j = chat_json([{"role": "user", "content": JUDGE.format(checks="\n".join("- " + c for c in case["checks"]),
+        j = chat_json([{"role": "user", "content": JUDGE.format(now=sess.get("now", "unknown"), checks="\n".join("- " + c for c in case["checks"]),
                                                                   transcript=tx[-30000:])}],
                       tier="strong", purpose="judge", effort="low")
     except Exception as e:  # noqa: BLE001
