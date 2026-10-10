@@ -133,11 +133,8 @@ def floor_for(p):
             amt = max(amt, float(r['min_amount']))
         return amt
     return None
-'''
-
-NODE_CODE = r'''
-try:
-    t = today_of(vars.get(SPEC.get('now_variable') or 'now'))
+def build_facts(now):
+    t = today_of(now)
     one = datetime.timedelta(days=1)
     L = []
     L.append('TODAY: ' + fmt(t) + (' (a business day)' if is_bd(t) else ' (NOT a business day)'))
@@ -178,7 +175,7 @@ try:
             days.append(x)
         win = (' between ' + str(cb.get('from')) + ' and ' + str(cb.get('to'))) if cb.get('from') else ''
         L.append('CALLBACK allowed only on: ' + ', '.join(fmt(d) for d in days) + win +
-                 (' and later than now (' + str(vars.get(SPEC.get('now_variable') or 'now')) + ')' if cb.get('must_be_after_now') else '') +
+                 (' and later than now (' + str(now) + ')' if cb.get('must_be_after_now') else '') +
                  '. Any other day is outside the window.')
     nr = SPEC.get('next_weekday_rule')
     tr = SPEC.get('this_weekday_rule')
@@ -209,7 +206,13 @@ try:
                 tags.append('after ' + str(b.get('name')) + ' deadline')
         L.append('  ' + fmt(d) + ': ' + s + (' [' + '; '.join(tags) + ']' if tags else ''))
         d = d + one
-    vars['date_facts'] = '\n'.join(L)
+    return t, '\n'.join(L)
+'''
+
+NODE_CODE = r'''
+try:
+    t, f = build_facts(vars.get(SPEC.get('now_variable') or 'now'))
+    vars['date_facts'] = f
     vars['today_iso'] = t.isoformat()
     vars['date_facts_state'] = 'known'
 except Exception as e:
@@ -250,6 +253,14 @@ try:
                              ', floor ' + str(p.get('floor_amount')))
             try:
                 vars['product_facts'] = '\n'.join(lines)
+            except Exception:
+                pass
+        if isinstance(data, dict) and t is not None:
+            try:
+                _t, f = build_facts(vars.get(SPEC.get('now_variable') or 'now'))
+                data['date_facts'] = f
+                vars['date_facts'] = f
+                vars['date_facts_state'] = 'known'
             except Exception:
                 pass
 except Exception:

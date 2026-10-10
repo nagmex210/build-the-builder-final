@@ -51,7 +51,9 @@ async def run(slot, tools, briefs):
                    "day and the next business day via CALENDAR, deadlines and attempt dates via the anchor lines.' "
                    "(2) Set `account_post_process_code` verbatim as the `post_process_code` of the tool named in `account_tool` "
                    "(if you need more hook logic, append it after this code, do not change it). It adds to every product: `band`, `deadline`, "
-                   "`deadline_weekday`, `persuasion_attempts`, `floor_amount`. Tell the model to use each product's own `deadline` and `floor_amount` "
+                   "`deadline_weekday`, `persuasion_attempts`, `floor_amount`, and puts the same DATE FACTS block into the result as `date_facts` "
+                   "(and into the variable date_facts): this is the reliable copy after identity, because the platform may skip the code of the "
+                   "start node. Tell the model to use each product's own `deadline` and `floor_amount` "
                    "from the tool result and never to compute them. Read `example_date_facts` in that file to see the output. "
                    "If the brief's rule differs from these facts, follow the brief and mention it in your final line.")
     t0 = time.time()
