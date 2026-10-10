@@ -4,7 +4,7 @@
 
 In code: `scrub(text)`, `scrub_file(path)`, and `Redacting(stream)` (build.py wraps sys.stdout/sys.stderr with it).
 Replaces the values of the key variables below (as found in the environment) and anything that looks like a JWT,
-an sk-... key or a Freya fak_... key with [REDACTED].
+an sk-... key, a Freya fak_... key or a GitHub ghp_... token with [REDACTED].
 """
 import os, pathlib, re, sys
 
@@ -12,7 +12,8 @@ SECRET_VARS = ["FREYA_API_KEY", "FREYA_API_KEY_2", "AZURE_KEY", "FREYA_BANK_TEAM
                "ANTHROPIC_API_KEY"]
 PATTERNS = re.compile(r"eyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}"   # JWT
                       r"|sk-[A-Za-z0-9_-]{16,}"                                       # sk-..., sk-ant-...
-                      r"|fak_[A-Za-z0-9_-]{16,}")                                     # Freya API key
+                      r"|fak_[A-Za-z0-9_-]{16,}"                                      # Freya API key
+                      r"|gh[pousr]_[A-Za-z0-9]{20,}")                                 # GitHub token (git remote URL)
 MARK = "[REDACTED]"
 
 
