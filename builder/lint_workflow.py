@@ -82,6 +82,8 @@ def lint(w):
                 code = tool.get(code_key) or ""
                 if "{{" in code or "}}" in code:
                     errs.append(f"{k}/{name}: {code_key} contains {{{{ or }}}}")
+                if re.search(r"localhost|127\.0\.0\.1|0\.0\.0\.0", code):
+                    errs.append(f"{k}/{name}: {code_key} points a request at localhost (the platform refuses it)")
                 if code.strip():
                     try:
                         compile(code, f"{k}/{name}/{code_key}", "exec")

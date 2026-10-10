@@ -75,6 +75,11 @@ clear confirmation as the brief defines it; let the opening node handle everythi
 - Each `api_call` tool: `post_process_code` that pops `header`, and adds `data.what_to_do_next`: one plain sentence
   saying what the result means and what to say or call next, derived from the brief's rule for that tool
   (success, `ok: false`, specific hints/errors). Wrap in `try/except Exception: pass`.
+- A pre-hook must never point `config['url']` at localhost / 127.0.0.1 / any other host: the platform refuses
+  it ("Localhost URLs are not allowed") and the turn breaks. To stop a call that would break a brief rule (date
+  outside the window, amount below the floor, a second close), the pre-hook removes a required body field (so the
+  bank answers `ok: false` and records nothing) and stores the reason in a `vars` flag; the post-hook then puts
+  that reason into `data.what_to_do_next` ("not recorded because ...; offer ... instead").
 - Close tool: `outcome` and `reason` are model-filled leaves with the enums of the API file; descriptions list
   the brief's outcome table (which reason belongs to which outcome). Pre-hook drops `reason` for outcomes that the
   brief says take none.
