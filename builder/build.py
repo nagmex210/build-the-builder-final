@@ -11,11 +11,44 @@ Steps: datecalc (generated, locally tested date/amount code) -> Claude Agent SDK
 (routing recipe + lint) under a hard time budget -> final deterministic pass on the saved file (harden tool hooks,
 customer-speech block, lint) and one last save. No practice-case runs (hidden briefs come without cases).
 """
-import argparse, asyncio, dataclasses, json, os, pathlib, subprocess, sys, time
+import argparse, asyncio, dataclasses, json, os, pathlib, subprocess, sys, threading, time
 
-from claude_agent_sdk import AssistantMessage, ClaudeAgentOptions, ResultMessage, TextBlock, ToolUseBlock, query
+from claude_agent_sdk import (AssistantMessage, ClaudeAgentOptions, ResultMessage, TextBlock, ToolResultBlock, ToolUseBlock,
+                              UserMessage, query)
 
 KIT = pathlib.Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(KIT / "btb"))
+from scrub import Redacting, scrub_file  # noqa: E402
+
+
+def now():
+    return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+
+
+def tail_model_calls(trace, stop):
+    """Print every model call that btb/llm.py logs to the trace (datecalc, extract, anything the build agent runs),
+    as it happens: the printed log is the submitted trace."""
+    pos = 0
+    while True:
+        done = stop.is_set()
+        try:
+            with open(trace) as f:
+                f.seek(pos)
+                for line in f:
+                    if not line.endswith("\n"):
+                        break
+                    pos += len(line.encode())
+                    try:
+                        e = json.loads(line)
+                    except ValueError:
+                        continue
+                    if "type" not in e and "model" in e and "purpose" in e:
+                        print(f"[model call {e.get('at', '')}] {e['model']} (Azure, btb/llm.py): {e['purpose'] or '-'}", flush=True)
+        except FileNotFoundError:
+            pass
+        if done:
+            return
+        stop.wait(1)
 
 
 BUDGET_S = int(os.environ.get("BUILD_AGENT_BUDGET_S", "1260"))   # Claude part; the whole run must stay < 30 min
@@ -27,6 +60,10 @@ async def run(slot, tools, briefs):
     trace.parent.mkdir(parents=True, exist_ok=True)
     os.environ["BTB_TRACE"] = str(trace)          # btb/llm.py appends its model calls here too
     print(f"trace: {trace}", flush=True)
+    print(f"BUILD START {now()} slot={slot}", flush=True)
+    stop_tail = threading.Event()
+    tailer = threading.Thread(target=tail_model_calls, args=(str(trace), stop_tail), daemon=True)
+    tailer.start()
     options = ClaudeAgentOptions(
         cwd=KIT,
         model=os.environ.get("BUILDER_MODEL", "claude-opus-5-5"),
@@ -55,6 +92,8 @@ async def run(slot, tools, briefs):
                           cwd=KIT, capture_output=True, text=True, env={**os.environ, "BTB_TRACE": str(trace)})
     calc_file = KIT / "out" / f"{slot}.calc.json"
     calc_ok = calc_file.exists() and json.loads(calc_file.read_text()).get("ok")
+    print(f"[test] datecalc: generated date/amount code run locally on 5 dates and fake products -> "
+          f"{'ok' if calc_ok else 'FAILED (build continues without code steps)'} ({time.time() - t_calc:.0f} s)", flush=True)
     with trace.open("a") as out:
         out.write(json.dumps({"event": "test", "what": "datecalc: extract calendar/amount spec, generate code node + account hook, "
                               "run both locally on 5 dates and fake products", "ok": bool(calc_ok),
@@ -78,17 +117,31 @@ async def run(slot, tools, briefs):
         out.write(json.dumps({"event": "start", "at": time.strftime("%Y-%m-%dT%H:%M:%S%z"), "slot": slot, "tools": tools,
                               "briefs": briefs, "model": options.model}) + "\n")
 
+    print(f"[model] build agent: Claude Agent SDK, {options.model}, skill build-phone-agent, budget {BUDGET_S // 60} min", flush=True)
+
     async def agent():
+        turn, bash_ids = 0, set()
         with trace.open("a") as out:
             async for message in query(prompt=prompt, options=options):
                 out.write(json.dumps({"type": type(message).__name__, **dataclasses.asdict(message)}, default=str) + "\n")
                 out.flush()
                 if isinstance(message, AssistantMessage):
+                    turn += 1
+                    uses = [b.name for b in message.content if isinstance(b, ToolUseBlock)]
+                    print(f"[model call {now()}] {message.model} (Claude Agent SDK) build agent turn {turn}: "
+                          f"{'tools ' + ', '.join(uses) if uses else 'text'}", flush=True)
+                    bash_ids |= {b.id for b in message.content if isinstance(b, ToolUseBlock) and b.name == "Bash"}
                     for block in message.content:
                         if isinstance(block, TextBlock):
                             print(block.text, flush=True)
                         elif isinstance(block, ToolUseBlock):
                             print(f"  [{block.name}] {str(block.input)[:120]}", flush=True)
+                elif isinstance(message, UserMessage) and isinstance(message.content, list):
+                    for block in message.content:     # results of the agent's commands: saves, chat tests, lint
+                        if isinstance(block, ToolResultBlock) and block.tool_use_id in bash_ids:
+                            res = block.content if isinstance(block.content, str) else json.dumps(block.content, default=str)
+                            res = " ".join((res or "").split())
+                            print(f"    -> {'ERROR ' if block.is_error else ''}{res[:400]}{' ...' if len(res) > 400 else ''}", flush=True)
                 elif isinstance(message, ResultMessage):
                     print(f"\ndone: {message.num_turns} turns, {message.duration_ms / 1000:.0f} s", flush=True)
     try:
@@ -120,6 +173,23 @@ async def run(slot, tools, briefs):
     with trace.open("a") as out:
         out.write(json.dumps({"event": "end", "at": time.strftime("%Y-%m-%dT%H:%M:%S%z"), "seconds": round(time.time() - t0),
                               "created": state}) + "\n")
+    stop_tail.set(); tailer.join(5)
+    if state:
+        print(f"[freya] slot {slot}: workflow_id={state['workflow_id']} agent_id={state['agent_id']} "
+              f"version={state.get('version', 1)} (published)", flush=True)
+        # Export what the platform holds: this file is what gets submitted and scored.
+        export = KIT / "submission" / f"{slot}.workflow.json"
+        export.parent.mkdir(exist_ok=True)
+        try:
+            sys.path.insert(0, str(KIT))
+            import freya
+            freya.export_workflow(state["workflow_id"], str(export))
+            json.loads(export.read_text())
+            print(f"[freya] exported: {export}", flush=True)
+        except Exception as e:  # noqa: BLE001
+            print(f"[freya] EXPORT FAILED: {e}", flush=True)
+    n = scrub_file(trace)
+    print(f"BUILD END {now()} ({time.time() - t0:.0f} s); trace scrubbed ({n} secret(s) replaced): {trace}", flush=True)
     if not state:
         sys.exit("builder finished without saving a workflow for slot " + slot)
     print(json.dumps({"workflow_id": state["workflow_id"], "agent_id": state["agent_id"]}))
@@ -148,6 +218,7 @@ def parse_args(argv=None):
 
 
 if __name__ == "__main__":
+    sys.stdout, sys.stderr = Redacting(sys.stdout), Redacting(sys.stderr)   # never print a key into the submitted trace
     slot, tools, briefs = parse_args()
     print(f"builder: slot={slot} tools={tools} briefs={' '.join(briefs)}", flush=True)
     asyncio.run(run(slot, tools, briefs))
