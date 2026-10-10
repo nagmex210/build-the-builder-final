@@ -235,6 +235,13 @@ async def run(slot, tools, briefs):
                    "(and into the variable date_facts): this is the reliable copy after identity, because the platform may skip the code of the "
                    "start node. Tell the model to use each product's own `deadline` and `floor_amount` "
                    "from the tool result and never to compute them. Read `example_date_facts` in that file to see the output. "
+                   "DATE FACTS also carries, when the brief has such rules, EARLIEST PROMISE DATE (cut-off time / minimum days), GAP "
+                   "and deadlines already moved back/forward; floors are already rounded the brief's way. "
+                   "`unhandled_rules` in that file lists the brief's date/amount rules no code step computes: write each one, in the brief's "
+                   "words, into the task_message of the node that applies it (DATE FACTS repeats them under RULES NOT COMPUTED IN CODE). "
+                   "Code guards are added to the promise tool after you finish: a date or amount the brief forbids is not sent, and the "
+                   "result says NOT RECORDED with `offer_instead` (the one date/amount code computed). Tell the promise node: when a "
+                   "result has offer_instead, offer exactly that value. "
                    "If the brief's rule differs from these facts, follow the brief and mention it in your final line.")
     with trace.open("a") as out:
         out.write(json.dumps({"event": "start", "at": time.strftime("%Y-%m-%dT%H:%M:%S%z"), "slot": slot, "tools": tools,

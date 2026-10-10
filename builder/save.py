@@ -11,10 +11,16 @@ import freya                      # noqa: E402
 from harden import harden         # noqa: E402
 from robust import robustify      # noqa: E402
 from canned import apply as apply_canned  # noqa: E402
+from guards import install as install_guards  # noqa: E402
 
 
 def finish_and_save(slot, wf, canned=None):
     names = harden(wf)
+    calc = KIT / "out" / f"{slot}.calc.json"
+    if calc.exists():
+        c = json.loads(calc.read_text())
+        if c.get("ok"):
+            names += ["guard:" + n for n in install_guards(wf, c.get("spec"))]
     robustify(wf)
     if canned is None:
         f = KIT / "out" / f"{slot}.canned.json"
