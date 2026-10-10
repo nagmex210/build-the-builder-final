@@ -52,3 +52,27 @@ The b1 champion built for an unseen brief passed 2/12. The failure KINDS, each f
   generic computed facts or flagged in the trace, never dropped.
 - A mandatory sentence that must come first (e.g. the recording notice) came second.
 - A relative date ("next Wednesday") recorded instead of the computed date; a wrong year in a read-back.
+
+## Architecture explorations (variance; from tau^tau-bench, arXiv 2609.04611, and a Dialogflow banking agent, arXiv 2606.28779)
+
+tau^tau-bench found that agent builders converge on one design (92% single LLM loop) while the best expert
+agents use many; a one-line hint "route by intent, review tool calls" doubled a score (31% -> 67%). The best
+builds wrapped the model in deterministic scaffolding (policy guards, canned replies, structured state).
+Our builds are all the same 6-node shape, so explore other shapes:
+
+- A1 Router + specialists: after identity, a router node sends each situation (promise, hardship, dispute,
+  transfer request, third party, callback) to its own small node with only its tools ("one task per playbook").
+- A2 Code-driven state machine: after every tool result a code node decides the next stage from structured state
+  (product index, attempts, failures); the model only talks inside the stage it is given.
+- A3 Canned reply paths: every sentence the brief makes mandatory (opening, recording notice, confirmation,
+  closing) is fixed text the model cannot reword or reorder (static message / on_enter text), not a prompt line.
+- A4 Per-turn tool gating: a write tool is present only in the node where its preconditions hold (identity
+  verified, values computed and inside limits), so a premature or out-of-order call is impossible.
+- A5 Per-product loop: one negotiate pass per product driven by a code-node index, instead of all products in one node.
+- A6 Atomic-fact coverage: decompose the brief into atomic facts (one checkable statement each); a checker maps
+  every fact to a workflow element; uncovered facts go back to the builder. Builders that grep instead of reading
+  miss rules.
+- A7 Best-of-N builds: a build takes ~2.5 min, so build 2-3 candidates with different architectures in parallel,
+  run each through a few brief-derived scripted chats, ship the best, all inside 30 min.
+- A8 Honest self-tests: tests come from the brief only. When agent and test disagree, fix the agent; never weaken
+  an assertion or invent a rule to make a test pass (the paper saw builders cheat themselves this way).

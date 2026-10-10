@@ -57,7 +57,10 @@ will score zero on Sunday. The merger rejects such changes.
 
 1. Read: this file, `btb/ideas.md` (idea bank), `journal.md` (what was tried; do not repeat a discard unless the mechanism changes),
    the last batch's reports, `builder/`.
-2. Your idea family is given in your prompt. Pick ONE concrete idea in it, the one you believe moves the score most.
+2. VARIANCE RULE: WORKER 5 ignores its family and takes one ARCHITECTURE EXPLORATION (A1-A8 in btb/ideas.md)
+   that no earlier batch tried (check journal.md); WORKER 4 does the same in even batches. Architecture workers may
+   change the 6-node shape completely; they are judged on the same score.
+   Your idea family is given in your prompt. Pick ONE concrete idea in it, the one you believe moves the score most.
 3. Implement it in `builder/`. Commit.
 4. Build with your own slot (never another worker's): `python3 builder/build.py --slot w<N>-A --tools tools/openapi.json briefs/brief-a.md`,
    `--slot w<N>-B ... briefs/brief-a.md briefs/brief-b.md`, and the raw variants (`w<N>-rA`, `w<N>-rB`).
@@ -92,7 +95,8 @@ will score zero on Sunday. The merger rejects such changes.
    brief extraction/normalisation, workflow structure/routing, code steps for dates/amounts/business days,
    prompt wording per node, tool-call robustness/honesty, multi-product handling, conversation robustness to the
    customer styles, the builder's own self-test within 30 min, speed of the build. At most 2 families in a row on
-   the same part.
+   the same part. At least 2 of the 5 families must be architecture-level (A1-A8 in btb/ideas.md or new
+   shapes), and 1 a wild card not in any list. Never assign a family that was discarded twice.
 
 ## Freeze
 
