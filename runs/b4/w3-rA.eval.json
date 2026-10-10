@@ -1,0 +1,351 @@
+{
+ "workflow_id": "593c5d40-2694-48d4-845b-94cf2204f21c",
+ "passed": 0,
+ "total": 10,
+ "rows": [
+  {
+   "id": "PUB-01",
+   "style": "talkative",
+   "pass": true,
+   "failed": [],
+   "call_id": "0810ea1e-f1ee-4ff5-90c2-398d1245fe2b",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 6
+  },
+  {
+   "id": "PUB-02",
+   "style": "asks_back",
+   "pass": true,
+   "failed": [],
+   "call_id": "3afe62a1-b407-485e-954d-1642d775b2ec",
+   "tools": [
+    "schedule_callback",
+    "close_call"
+   ],
+   "turns": 4
+  },
+  {
+   "id": "PUB-03",
+   "style": "in_words",
+   "pass": true,
+   "failed": [],
+   "call_id": "bb38ff03-6a3e-4bbc-9d79-ede0daffd6a7",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "close_call"
+   ],
+   "turns": 5
+  },
+  {
+   "id": "PUB-04",
+   "style": "corrects",
+   "pass": false,
+   "failed": [
+    "outcome ('no_promise', 'refused'), expected ('promise', None)",
+    "promises [], expected [('p1', 1250.0, '2026-10-23')]",
+    "conversation: The promise-date check fails because no promise for 23 October was agreed or recorded."
+   ],
+   "call_id": "64b8bd3b-378a-4f13-aa04-46342f569c2a",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 7
+  },
+  {
+   "id": "PUB-05",
+   "style": "pieces",
+   "pass": true,
+   "failed": [],
+   "call_id": "dda4a1be-d55d-4a0c-9099-46703a5beacf",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 6
+  },
+  {
+   "id": "PUB-06",
+   "style": "in_words",
+   "pass": false,
+   "failed": [
+    "promises [('p1', 637.5, '2026-10-23')], expected [('p1', 637.5, '2026-10-16')]",
+    "conversation: The minimum payment was offered twice rather than once, and the recorded promise for 637.50 was for Friday 23 October instead of Friday 16 October."
+   ],
+   "call_id": "74e22554-b9d9-4934-be3b-3761f1ceac19",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 8
+  },
+  {
+   "id": "PUB-07",
+   "style": "talkative",
+   "pass": false,
+   "failed": [
+    "promises [('p1', 540.0, '2026-11-02')], expected [('p1', 540.0, '2026-10-27')]",
+    "conversation: The agent did not offer Tuesday 27 October as the next business day after 26 October, and no promise was recorded for Tuesday 27 October within the early-band deadline."
+   ],
+   "call_id": "17ec2201-42b9-48b8-a4d5-b3285040c0fa",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 9
+  },
+  {
+   "id": "PUB-08",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "conversation: The agent never says that payments can take one business day to appear."
+   ],
+   "call_id": "4b677e5c-46b7-4715-aaad-9d22d4041994",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 5
+  },
+  {
+   "id": "PUB-09",
+   "style": "in_words",
+   "pass": false,
+   "failed": [
+    "conversation: The required transfer_to_agent call with queue restructuring was never made."
+   ],
+   "call_id": "619844db-d5a7-4882-8382-277d07d821ab",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "transfer_to_agent",
+    "close_call"
+   ],
+   "turns": 6
+  },
+  {
+   "id": "PUB-10",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "conversation: The check requiring exactly one promise in the ledger after the retry fails because no create_promise call, retry, or successful ledger entry is shown."
+   ],
+   "call_id": "7e9c3366-6450-4933-a12b-4d476e284451",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 7
+  },
+  {
+   "id": "PUB-01",
+   "style": "pieces",
+   "pass": false,
+   "failed": [
+    "conversation: create_promise was never called, and no text-message sentence was said after the promise."
+   ],
+   "call_id": "1cdfa5d4-6e72-41f7-a015-602a479f3c72",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 6
+  },
+  {
+   "id": "PUB-02",
+   "style": "talkative",
+   "pass": false,
+   "failed": [
+    "conversation: No tool call scheduled the callback for the next business day, October 15, 2026, at 11:00."
+   ],
+   "call_id": "7d007897-59f8-4828-a3c5-2b64894bb92d",
+   "tools": [
+    "schedule_callback",
+    "close_call"
+   ],
+   "turns": 3
+  },
+  {
+   "id": "PUB-03",
+   "style": "in_words",
+   "pass": false,
+   "failed": [
+    "outcome ('no_promise', 'refused'), expected ('not_verified', 'failed')",
+    "conversation: The identity check did not end after the third wrong answer (1990-07-21 was skipped), the agent disclosed the credit card and amounts owed, and the customer was not directed to the app or a branch."
+   ],
+   "call_id": "7cd780e3-75df-4dba-8170-54b43d63a8d8",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 15
+  },
+  {
+   "id": "PUB-04",
+   "style": "asks_back",
+   "pass": true,
+   "failed": [],
+   "call_id": "3c7ec702-2540-4811-818c-39f24e156baf",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 9
+  },
+  {
+   "id": "PUB-05",
+   "style": "talkative",
+   "pass": false,
+   "failed": [
+    "conversation: The one-sentence-of-sympathy check fails because the agent gave two sympathy sentences, one about the hectic day and another about the job loss."
+   ],
+   "call_id": "77cccc91-d8ca-4204-b669-419642cab354",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 6
+  },
+  {
+   "id": "PUB-06",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "conversation: The minimum payment was offered twice rather than once, and no tool call created the confirmed promise for 637.50 on Friday 16 October."
+   ],
+   "call_id": "3eb2b2ae-4dc3-486f-893d-718602ef11a6",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 9
+  },
+  {
+   "id": "PUB-07",
+   "style": "corrects",
+   "pass": false,
+   "failed": [
+    "promises [('p1', 540.0, '2026-11-02')], expected [('p1', 540.0, '2026-10-27')]",
+    "conversation: The agent did not ask once to clarify the exact payment day, did not offer Tuesday 27 October as the next business day after the 26 October holiday, and never recorded a promise for Tuesday 27 October."
+   ],
+   "call_id": "c08ffd02-3a39-4f3a-9e81-2423f2d11bb0",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 10
+  },
+  {
+   "id": "PUB-08",
+   "style": "pieces",
+   "pass": false,
+   "failed": [
+    "conversation: The agent did not say that payments can take one business day to appear."
+   ],
+   "call_id": "6709b276-5d8c-4119-a5d1-9040a7fec48e",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 5
+  },
+  {
+   "id": "PUB-09",
+   "style": "in_words",
+   "pass": false,
+   "failed": [
+    "outcome ('promise', None), expected ('transferred', 'restructuring')",
+    "promises [('p1', 700.0, '2026-10-16')], expected []",
+    "transfers [], expected [{'queue': 'restructuring'}]",
+    "conversation: The agent never called transfer_to_agent with queue restructuring, proposed its own payment plan of 700 on 2026-10-16, and successfully recorded a promise using create_promise."
+   ],
+   "call_id": "4069a7a1-f62b-4cb3-8f68-8bc7595d61d7",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 8
+  },
+  {
+   "id": "PUB-10",
+   "style": "corrects",
+   "pass": false,
+   "failed": [
+    "conversation: The exactly-one-promise-after-retry check fails because the only create_promise call failed with nothing recorded, and no retry or successful ledger entry is shown."
+   ],
+   "call_id": "2774a834-fa93-4a4b-9f0b-4d940524580a",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 7
+  }
+ ]
+}

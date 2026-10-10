@@ -1,0 +1,30 @@
+FAIL PUB-01 1/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [plain] conversation: create_promise was never called, and no text-message sentence was said after the promise.
+FAIL PUB-02 1/2 | schedule_callback > close_call
+       - [corrects] callbacks [], expected [{'date': '2026-10-15', 'time': '11:00'}]
+       - [corrects] conversation: No callback was scheduled for the next business day, October 15, 2026, at 11:00.
+FAIL PUB-03 1/2 | verify_identity > verify_identity > verify_identity > close_call
+       - [in_words] conversation: The transcript does not establish that the check ends after the third wrong answer, and the customer was not told to use the app or a branch.
+PASS PUB-04 2/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+PASS PUB-05 2/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+FAIL PUB-06 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [plain] conversation: The minimum payment was offered twice, first for today and then for Friday 16 October, so the check that it be offered once fails.
+       - [in_words] conversation: The minimum payment was offered twice, first for today and then for Friday 16 October, rather than once.
+FAIL PUB-07 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [plain] promises [('p1', 540.0, '2026-11-02')], expected [('p1', 540.0, '2026-10-27')]
+       - [plain] conversation: The agent did not offer Tuesday 27 October as the next business day after 26 October, and no promise was recorded for Tuesday 27 October.
+       - [in_words] promises [('p1', 540.0, '2026-11-02')], expected [('p1', 540.0, '2026-10-27')]
+       - [in_words] conversation: The agent did not offer Tuesday 27 October as the next business day after the 26 October holiday, and no promise was recorded for Tuesday 27 October.
+FAIL PUB-08 0/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+       - [plain] conversation: The agent never says payments can take one business day to appear.
+       - [talkative] conversation: The agent never says that payments can take one business day to appear.
+FAIL PUB-09 0/2 | verify_identity > verify_identity > verify_identity > get_account > transfer_to_agent > close_call
+       - [talkative] conversation: The required transfer_to_agent call with queue restructuring was never made.
+       - [corrects] outcome ('no_promise', 'refused'), expected ('transferred', 'restructuring')
+       - [corrects] transfers [], expected [{'queue': 'restructuring'}]
+       - [corrects] conversation: The required transfer_to_agent call with queue restructuring was never made.
+FAIL PUB-10 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > close_call
+       - [asks_back] conversation: The check requiring exactly one promise in the ledger after the retry is not satisfied because no create_promise call or retry occurred.
+       - [in_words] conversation: The check requiring exactly one promise in the ledger after the retry fails because no create_promise call, retry, or successful ledger entry is shown.
+
+fast_eval: 2 / 10 passed (2 rep(s), all reps must pass), 483 s

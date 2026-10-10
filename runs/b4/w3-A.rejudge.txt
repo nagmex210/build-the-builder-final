@@ -1,0 +1,10 @@
+PUB-06 None REJUDGE fail: The minimum payment was offered twice—first for today and then for Friday, October 16—so the check that it be offered once fails.
+PUB-08 None REJUDGE pass
+PUB-09 talkative REJUDGE pass
+PUB-10 asks_back REJUDGE pass
+PUB-01 None REJUDGE pass
+PUB-03 in_words REJUDGE pass
+PUB-06 in_words REJUDGE fail: The minimum payment was offered twice—first for today and then for Friday 16 October—so the check that it be offered once fails.
+PUB-08 talkative REJUDGE pass
+PUB-10 in_words REJUDGE pass
+rejudged: 6 / 10 {'PUB-01': [True, True], 'PUB-02': [True, False], 'PUB-03': [True, True], 'PUB-04': [True, True], 'PUB-05': [True, True], 'PUB-06': [False, False], 'PUB-07': [False, False], 'PUB-08': [True, True], 'PUB-09': [True, False], 'PUB-10': [True, True]}

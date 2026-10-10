@@ -1,0 +1,27 @@
+  [Skill] {'skill': 'build-phone-agent', 'args': 'Slot: w3-A. Tool API file: tools/openapi.json. Brief: briefs/brief-a.md'}
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt3; cat briefs/brief-a.md; cat tools/openapi.json; cat .claude/skills/build-phone-agen
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt3; cat out/w3-A.calc.json | head -c 9000; echo; cat docs/workflow-format.md docs/tool
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt3; python3 -c "\nimport json;d=json.load(open(\'out/w3-A.calc.json\'))\nprint(d.keys(
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt3; python3 -c "\nimport json;d=json.load(open(\'out/w3-A.calc.json\'))\nprint(d[\'exa
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt3; cat examples/base-agent.json; grep -n "^#" docs/workflow-format.md docs/tools-and-
+I've read the brief, the API and the pre-built date code. Next I'll skim the key doc sections, then write the workflow.
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt3; sed -n 38,116p docs/workflow-format.md; sed -n 462,485p docs/workflow-format.md; s
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt3; python3 -c "\nimport json;d=json.load(open(\'out/w3-A.calc.json\'))\nprint(d[\'acc
+  [Bash] {'command': 'mkdir -p /home/ubuntu/btb/wt3/out/gen_w3A && cat > /home/ubuntu/btb/wt3/out/gen_w3A/gen.py <<\'EOF\'\nimpor
+  [Bash] {'command': 'python3 builder/save.py w3-A out/w3-A.workflow.json 2>&1 | tail -5'}
+  [Bash] {'command': 'timeout 90 python3 -c "import freya,json; print(json.dumps(freya.api(\'POST\',\'/api/v2/chat/message\',{\'w
+  [Bash] {'command': 'timeout 90 python3 -c "import freya,json; print(json.dumps(freya.api(\'POST\',\'/api/v2/chat/message\',{\'w
+The w3-A workflow is saved, and in a short live chat it opened correctly and moved on to the security questions. I didn't run the practice cases (as instructed) or the later stages, so the debt statement, promise logic and closing paths are untested.
+
+- **File:** `out/w3-A.workflow.json`. The lint check found no errors or warnings. The JSON is produced by a small script, `out/gen_w3A/gen.py`, so changes go there and the file is regenerated.
+- **Live chat (2 turns):** after "Hello?" it gave the recorded-call opening and asked "Am I speaking with Ms Lee?" without mentioning the debt. After "Yes, speaking." it asked for the date of birth.
+- **Structure:** the call starts at your date code node, then goes through opening (callbacks and the other third-party cases), identity, a silent account lookup, negotiation, and a node that closes as `no_promise` / `service_error` after two failed promise attempts. Every stage that can close the call has `close_call`, and a successful close leads to the hang-up node.
+- **Your code steps:** the date code node and the account hook are used verbatim; the hook is set on `get_account`. DATE FACTS and your exact "never compute a date yourself" sentence are in the opening and negotiation prompts. Negotiation tells the model to use each product's own `deadline` and `floor_amount` from the tool result.
+- **Brief vs. date facts:** the brief's deadlines and callback rule match the pre-computed date facts, so I didn't override them.
+- **Rules held only by the prompt:** a promise date past the deadline or an amount below the floor isn't blocked in code. The bank's service accepts both without complaint, so these depend on the model following the negotiation prompt.
+
+workflow_id: 928d91fb-c293-40e1-8d02-a1d00032b051, agent_id: c26a6d38-2cd5-49f5-bc0a-8d337edba948
+
+done: 14 turns, 110 s
+final save: {'workflow_id': '928d91fb-c293-40e1-8d02-a1d00032b051', 'agent_id': 'c26a6d38-2cd5-49f5-bc0a-8d337edba948', 'version': 9}; lint: 0 errors, 0 warnings
+{"workflow_id": "928d91fb-c293-40e1-8d02-a1d00032b051", "agent_id": "c26a6d38-2cd5-49f5-bc0a-8d337edba948"}
