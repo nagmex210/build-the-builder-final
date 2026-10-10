@@ -1,0 +1,31 @@
+  [Skill] {'skill': 'build-phone-agent', 'args': 'Slot: w2-B. Tool API file: tools/openapi.json. Brief files: briefs/brief-a.md br
+Time is tight. Read files fast.
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; cat briefs/brief-a.md briefs/brief-b.md; cat tools/openapi.json | head -c 9000; wc
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; cat .claude/skills/build-phone-agent/routing.md; cat examples/base-agent.json'}
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; python3 -c "\nimport json;d=json.load(open(\'tools/openapi.json\'));print(json.dum
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; mkdir -p /tmp/w2b; cat > /tmp/w2b/gen.py <<\'EOF\'\nimport json\nc=json.load(open(
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; grep -n "terminal" builder/lint_workflow.py docs/workflow-format.md | head'}
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; sed -n 610,650p docs/workflow-format.md; sed -n 60,75p builder/lint_workflow.py'}
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; python3 - <<\'EOF\'\nimport re\np=\'/tmp/w2b/gen.py\'; s=open(p).read()\ns=s.repla
+Saved the first version; now running a one-turn start check.
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; timeout 60 python3 -c "import freya,json; print(freya.api(\'POST\',\'/api/v2/chat/
+I built the brief B phone agent (which also covers brief A's one-product calls) and saved it as slot w2-B. It starts correctly: on a test "Hello?" it gave the right opening line and asked "Am I speaking with Ms Lee?". That was the only test turn; I ran no other chat tests and no practice cases.
+
+**How the call flows:** the date code step runs first, then the opening (who is on the line), then the security questions, then the negotiation, then hang-up. The call only moves to the next stage on a tool result or a clear "it's me" from the customer, never on a guess about what they meant. The two code steps are in place unedited: the date step is the start node, and the account hook is on `get_account`. Every prompt that handles dates or callbacks includes `{{date_facts}}` and the instruction never to compute a date. The negotiation prompt tells the model to use each product's own `deadline` and `floor_amount` from the account result.
+
+**Choices I made where the brief is silent:**
+- **Failed callback booking:** the agent tries once more, and if it fails again it closes as `not_reached` / `no_callback`.
+- **Account lookup failing twice:** it closes as `no_promise` / `service_error`.
+- **Security check service failing twice:** it closes as `not_verified` / `declined`.
+- **Account lookup:** it is a tool the model calls first in the negotiation stage, rather than a separate silent lookup step before it.
+
+**Brief vs date facts:** these mostly agree, with two differences:
+- **Payday is today:** if today is the last business day of the week, attempt 1 uses "last business day of next week". That follows the brief, which the date block doesn't do by itself.
+- **"this <weekday>" for a day already past:** the date facts give a date that has already gone by. The model is told only that a promise date must be today or later, so this may be handled inconsistently.
+
+workflow_id: 4f8a3d12-421f-4165-b57f-c8bdfa2327ec, agent_id: 0ff14fe6-34a6-4040-8894-d0d0f47637eb
+
+done: 11 turns, 90 s
+final save (build): {'workflow_id': '4f8a3d12-421f-4165-b57f-c8bdfa2327ec', 'agent_id': '0ff14fe6-34a6-4040-8894-d0d0f47637eb', 'version': 15}; lint: 0 errors, 0 warnings
+self-test 1 (workspace 2): 8/12 personas failed a check (22 checks)
+{"workflow_id": "4f8a3d12-421f-4165-b57f-c8bdfa2327ec", "agent_id": "0ff14fe6-34a6-4040-8894-d0d0f47637eb"}

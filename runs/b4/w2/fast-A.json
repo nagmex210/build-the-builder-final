@@ -1,0 +1,337 @@
+{
+ "workflow_id": "f6965b97-5ba0-49f2-b19e-5595194b0169",
+ "passed": 5,
+ "total": 10,
+ "rows": [
+  {
+   "id": "PUB-01",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "conversation: The truncated transcript does not clearly establish that both security questions passed before get_account or that 'collections' was not said before identity verification."
+   ],
+   "call_id": "99047c4f-db03-4f35-bb7e-3edd428f3ad8",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 6
+  },
+  {
+   "id": "PUB-02",
+   "style": null,
+   "pass": true,
+   "failed": [],
+   "call_id": "9d63221a-858d-4239-94a4-84874c77fcc3",
+   "tools": [
+    "schedule_callback",
+    "close_call"
+   ],
+   "turns": 4
+  },
+  {
+   "id": "PUB-03",
+   "style": "talkative",
+   "pass": true,
+   "failed": [],
+   "call_id": "10b1a4bf-2f18-46a5-bd73-9a97068e0e04",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "close_call"
+   ],
+   "turns": 5
+  },
+  {
+   "id": "PUB-04",
+   "style": "corrects",
+   "pass": false,
+   "failed": [
+    "promises [('p1', 200.0, '2026-10-23')], expected [('p1', 1250.0, '2026-10-23')]",
+    "conversation: The digital-assistant disclosure check is not clearly satisfied: the provided transcript contains no statement identifying the agent as a digital assistant when asked."
+   ],
+   "call_id": "27503e50-db8c-4eb5-8c49-ca90b56ef661",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 8
+  },
+  {
+   "id": "PUB-05",
+   "style": null,
+   "pass": true,
+   "failed": [],
+   "call_id": "30849c92-366b-4ad9-bdf3-eca62d198b3b",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 6
+  },
+  {
+   "id": "PUB-06",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "promises [('p1', 150.0, '2026-10-16')], expected [('p1', 637.5, '2026-10-16')]",
+    "conversation: The minimum payment of 637.50 was not offered with notice that the rest stays overdue, and the recorded promise for Friday 16 October was for 150.00 rather than 637.50."
+   ],
+   "call_id": "6c6058d5-ace4-463c-bd2f-d01f60aceefd",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 8
+  },
+  {
+   "id": "PUB-07",
+   "style": "in_words",
+   "pass": false,
+   "failed": [
+    "promises [('p1', 540.0, '2026-11-02')], expected [('p1', 540.0, '2026-10-27')]",
+    "conversation: The transcript does not clearly show the agent asking once for the exact day or rejecting 26 October and offering the next business day, and the promise was recorded for 2 November rather than Tuesday 27 October."
+   ],
+   "call_id": "d2f1bba3-e5b7-49c1-8baa-c95c9718b6c5",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 11
+  },
+  {
+   "id": "PUB-08",
+   "style": "corrects",
+   "pass": true,
+   "failed": [],
+   "call_id": "0ad98da6-1042-4209-8a7c-f694b4c86b3e",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 5
+  },
+  {
+   "id": "PUB-09",
+   "style": "talkative",
+   "pass": true,
+   "failed": [],
+   "call_id": "ad63273f-a679-40ef-9847-7eb6b34882ea",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "transfer_to_agent",
+    "close_call"
+   ],
+   "turns": 5
+  },
+  {
+   "id": "PUB-10",
+   "style": "talkative",
+   "pass": true,
+   "failed": [],
+   "call_id": "58a0636b-cabb-4b23-84e5-3b3898db1bab",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 7
+  },
+  {
+   "id": "PUB-01",
+   "style": "talkative",
+   "pass": false,
+   "failed": [
+    "conversation: The truncated transcript does not clearly establish that both security questions passed before get_account or that 'collections' was not said before identity verification."
+   ],
+   "call_id": "6ef3145d-21a0-4214-b495-8e80b65e87df",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 7
+  },
+  {
+   "id": "PUB-02",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "conversation: The callback was not scheduled for the next business day, October 15, 2026, at 11:00; the agent only proposed that time and made no scheduling tool call."
+   ],
+   "call_id": "3d057fce-9589-4f94-814b-f5241be4459d",
+   "tools": [
+    "schedule_callback",
+    "close_call"
+   ],
+   "turns": 3
+  },
+  {
+   "id": "PUB-03",
+   "style": "in_words",
+   "pass": true,
+   "failed": [],
+   "call_id": "0ebdc376-7c20-481c-9270-ae93287e1515",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "close_call"
+   ],
+   "turns": 5
+  },
+  {
+   "id": "PUB-04",
+   "style": "pieces",
+   "pass": false,
+   "failed": [
+    "promises [('p1', 400.0, '2026-10-23')], expected [('p1', 1250.0, '2026-10-23')]",
+    "conversation: The truncated transcript does not clearly establish that her own date was not counted as a refusal or that the agent identified itself as a digital assistant when asked."
+   ],
+   "call_id": "a7abbf5f-b9c1-4d6c-8674-27627060098e",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 9
+  },
+  {
+   "id": "PUB-05",
+   "style": null,
+   "pass": true,
+   "failed": [],
+   "call_id": "292f31fc-6432-429c-8c53-f14671715bd8",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 6
+  },
+  {
+   "id": "PUB-06",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "promises [('p1', 200.0, '2026-10-14')], expected [('p1', 637.5, '2026-10-16')]",
+    "conversation: The minimum payment was not clearly offered once with notice that the rest stays overdue, and the recorded promise was for 200 on 14 October 2026 rather than 637.50 on Friday 16 October 2026."
+   ],
+   "call_id": "7ef748b0-9df0-4f20-8b19-43f772cd6860",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 8
+  },
+  {
+   "id": "PUB-07",
+   "style": "talkative",
+   "pass": false,
+   "failed": [
+    "promises [('p1', 540.0, '2026-11-02')], expected [('p1', 540.0, '2026-10-27')]",
+    "conversation: The transcript does not show the agent asking once for the exact day or rejecting 26 October and offering the next business day, and the promise was recorded for 2 November rather than Tuesday 27 October."
+   ],
+   "call_id": "2709b262-e085-4f41-b38a-7c812e76528a",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 9
+  },
+  {
+   "id": "PUB-08",
+   "style": null,
+   "pass": true,
+   "failed": [],
+   "call_id": "feb991b2-dfb2-4260-aa45-bc48ab8be72c",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 5
+  },
+  {
+   "id": "PUB-09",
+   "style": "talkative",
+   "pass": true,
+   "failed": [],
+   "call_id": "b6017207-f51c-4ec0-a99a-17c1d9d3f702",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "transfer_to_agent",
+    "close_call"
+   ],
+   "turns": 6
+  },
+  {
+   "id": "PUB-10",
+   "style": "pieces",
+   "pass": true,
+   "failed": [],
+   "call_id": "9004d718-3f73-47c2-8bb2-9b6677238887",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 7
+  }
+ ]
+}
