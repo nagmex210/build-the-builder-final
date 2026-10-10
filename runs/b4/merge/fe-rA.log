@@ -1,0 +1,29 @@
+FAIL PUB-01 1/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [talkative] outcome ('no_promise', 'service_error'), expected ('promise', None)
+       - [talkative] promises [], expected [('p1', 420.0, '2026-10-14')]
+       - [talkative] conversation: Both security questions did not pass and identity was falsely declared verified, create_promise was never called, and no text-message sentence was said after a promise.
+PASS PUB-02 2/2 | schedule_callback > close_call
+FAIL PUB-03 0/2 | verify_identity > verify_identity > verify_identity > verify_identity > verify_identity
+       - [plain] outcome (None, None), expected ('not_verified', 'failed')
+       - [plain] the call was not closed with close_call
+       - [plain] conversation: Identity checks continued after the third wrong answer, the customer was not directed to the app or a branch, and the agent falsely claimed identity verification despite unsuccessful verification results.
+       - [corrects] outcome ('promise', None), expected ('not_verified', 'failed')
+       - [corrects] promises [('p1', 95.0, '2026-10-16')], expected []
+       - [corrects] conversation: The agent disclosed the amount and credit-card product and never directed the customer to use the app or a branch; ending verification after a third wrong answer was not demonstrated.
+PASS PUB-04 2/2 | verify_identity > verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+FAIL PUB-05 1/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+       - [asks_back] conversation: The no-persuasion check fails because the agent proposed a promise to pay at a later date after the customer said they could not pay anything.
+FAIL PUB-06 1/2 | verify_identity > verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > close_call
+       - [corrects] promises [('p1', 637.5, '2026-10-23')], expected [('p1', 637.5, '2026-10-16')]
+       - [corrects] conversation: The minimum payment was offered twice rather than once, and the recorded promise was for 637.50 on Friday 23 October instead of Friday 16 October.
+FAIL PUB-07 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [plain] promises [('p1', 540.0, '2026-11-02')], expected [('p1', 540.0, '2026-10-27')]
+       - [plain] conversation: The agent did not offer the next business day, Tuesday 27 October, after the proposed 26 October date, and recorded the promise for 2 November instead of 27 October.
+       - [in_words] promises [('p1', 540.0, '2026-11-02')], expected [('p1', 540.0, '2026-10-27')]
+       - [in_words] conversation: The agent did not offer the next business day, Tuesday 27 October, after 26 October and recorded the promise for 2 November instead of 27 October.
+PASS PUB-08 2/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+PASS PUB-09 2/2 | verify_identity > verify_identity > verify_identity > get_account > transfer_to_agent > close_call
+PASS PUB-10 2/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > create_promise > close_call
+
+fast_eval: 5 / 10 passed (2 rep(s), all reps must pass), 613 s
+harness: 0 case(s) still INVALID after 2 re-run(s) (not a measurement), 0 rep(s) re-run

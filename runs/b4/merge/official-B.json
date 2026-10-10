@@ -1,0 +1,224 @@
+{
+ "agent_id": "ec9fbf58-6328-4272-9aa2-0ebec3797db2",
+ "simulation_id": "6fcbe371-6498-4169-ae47-4ca10e971347",
+ "iteration_id": "059ec262-36b2-49da-93eb-0961865b068a",
+ "seconds": 194,
+ "passed": 2,
+ "total": 3,
+ "runs": 2,
+ "final": [
+  {
+   "id": "PUB-11",
+   "family": "Multi-product",
+   "passes": 2,
+   "runs": 2,
+   "pass": true
+  },
+  {
+   "id": "PUB-12",
+   "family": "Multi-product",
+   "passes": 1,
+   "runs": 2,
+   "pass": false
+  },
+  {
+   "id": "PUB-13",
+   "family": "Multi-product",
+   "passes": 2,
+   "runs": 2,
+   "pass": true
+  }
+ ],
+ "rows": [
+  {
+   "id": "PUB-11",
+   "level": "medium",
+   "family": "Multi-product",
+   "pass": true,
+   "failed": [],
+   "call_id": "01df0585-0da5-4bbc-bc4e-81017f6bd3cf",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "customer_id": "c_f4a15e83-e76",
+   "slowest_turn_s": 6.2,
+   "ended": "assistant-ended-call"
+  },
+  {
+   "id": "PUB-12",
+   "level": "hard",
+   "family": "Multi-product",
+   "pass": false,
+   "failed": [
+    "conversation: The assistant failed to satisfy the persuasion attempt criteria for the personal loan. As a 'late' band product (16 days late), the personal loan required two persuasion attempts. The assistant made one attempt for all products in Message 8, but after the user refused to pay the personal loan in Message 9, the assistant immediately accepted the refusal in Message 12 instead of making a second atte"
+   ],
+   "call_id": "e2455db0-d830-438b-b349-fddbd25a7e85",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "add_note",
+    "add_note",
+    "close_call"
+   ],
+   "customer_id": "c_ac24c7cd-5ff",
+   "slowest_turn_s": 2.6,
+   "ended": "assistant-ended-call"
+  },
+  {
+   "id": "PUB-13",
+   "level": "hard",
+   "family": "Multi-product",
+   "pass": true,
+   "failed": [],
+   "call_id": "76386908-541a-4d04-b00b-6cd9559c61a3",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "customer_id": "c_c22695bd-6e6",
+   "slowest_turn_s": 4.9,
+   "ended": "assistant-ended-call"
+  }
+ ],
+ "all_rows": [
+  [
+   {
+    "id": "PUB-11",
+    "level": "medium",
+    "family": "Multi-product",
+    "pass": true,
+    "failed": [],
+    "call_id": "28a34d40-ee1a-480f-8e28-f87affdc5f32",
+    "tools": [
+     "verify_identity",
+     "verify_identity",
+     "get_account",
+     "create_promise",
+     "create_promise",
+     "create_promise",
+     "close_call"
+    ],
+    "customer_id": "c_9a3a52ae-9dd",
+    "slowest_turn_s": 2.7,
+    "ended": "assistant-ended-call"
+   },
+   {
+    "id": "PUB-12",
+    "level": "hard",
+    "family": "Multi-product",
+    "pass": true,
+    "failed": [],
+    "call_id": "a4d9f609-6bb9-49b2-b41e-f1e7b6e8e1b1",
+    "tools": [
+     "verify_identity",
+     "verify_identity",
+     "verify_identity",
+     "get_account",
+     "create_promise",
+     "add_note",
+     "add_note",
+     "close_call"
+    ],
+    "customer_id": "c_513c8b27-a92",
+    "slowest_turn_s": 2.1,
+    "ended": "assistant-ended-call"
+   },
+   {
+    "id": "PUB-13",
+    "level": "hard",
+    "family": "Multi-product",
+    "pass": true,
+    "failed": [],
+    "call_id": "26e97206-5a5d-401a-970f-0b1b40028d7e",
+    "tools": [
+     "verify_identity",
+     "verify_identity",
+     "get_account",
+     "create_promise",
+     "create_promise",
+     "close_call"
+    ],
+    "customer_id": "c_cd5be300-0d8",
+    "slowest_turn_s": 1.6,
+    "ended": "assistant-ended-call"
+   }
+  ],
+  [
+   {
+    "id": "PUB-11",
+    "level": "medium",
+    "family": "Multi-product",
+    "pass": true,
+    "failed": [],
+    "call_id": "01df0585-0da5-4bbc-bc4e-81017f6bd3cf",
+    "tools": [
+     "verify_identity",
+     "verify_identity",
+     "get_account",
+     "create_promise",
+     "create_promise",
+     "create_promise",
+     "close_call"
+    ],
+    "customer_id": "c_f4a15e83-e76",
+    "slowest_turn_s": 6.2,
+    "ended": "assistant-ended-call"
+   },
+   {
+    "id": "PUB-12",
+    "level": "hard",
+    "family": "Multi-product",
+    "pass": false,
+    "failed": [
+     "conversation: The assistant failed to satisfy the persuasion attempt criteria for the personal loan. As a 'late' band product (16 days late), the personal loan required two persuasion attempts. The assistant made one attempt for all products in Message 8, but after the user refused to pay the personal loan in Message 9, the assistant immediately accepted the refusal in Message 12 instead of making a second atte"
+    ],
+    "call_id": "e2455db0-d830-438b-b349-fddbd25a7e85",
+    "tools": [
+     "verify_identity",
+     "verify_identity",
+     "verify_identity",
+     "get_account",
+     "create_promise",
+     "add_note",
+     "add_note",
+     "close_call"
+    ],
+    "customer_id": "c_ac24c7cd-5ff",
+    "slowest_turn_s": 2.6,
+    "ended": "assistant-ended-call"
+   },
+   {
+    "id": "PUB-13",
+    "level": "hard",
+    "family": "Multi-product",
+    "pass": true,
+    "failed": [],
+    "call_id": "76386908-541a-4d04-b00b-6cd9559c61a3",
+    "tools": [
+     "verify_identity",
+     "verify_identity",
+     "get_account",
+     "create_promise",
+     "create_promise",
+     "close_call"
+    ],
+    "customer_id": "c_c22695bd-6e6",
+    "slowest_turn_s": 4.9,
+    "ended": "assistant-ended-call"
+   }
+  ]
+ ]
+}

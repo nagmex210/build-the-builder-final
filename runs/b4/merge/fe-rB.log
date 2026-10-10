@@ -1,0 +1,18 @@
+FAIL PUB-11 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > create_promise > create_promise > create_promise > create_promise > close_call
+       - [corrects] promises [('p1', 220.0, '2026-10-17'), ('p2', 640.0, '2026-10-17'), ('p3', 75.0, '2026-10-17')], expected [('p1', 220.0, '2026-10-16'), ('p2', 640.0, '2026-10-16'), ('p3', 75.0, '2026-10-16')]
+       - [corrects] conversation: The agent requested two combined confirmations instead of one, made six create_promise calls rather than one per product, and incorrectly dated the coming Friday as October 17 instead of October 16, 2026.
+       - [in_words] promises [('p1', 220.0, '2026-10-17'), ('p2', 640.0, '2026-10-17'), ('p3', 75.0, '2026-10-17')], expected [('p1', 220.0, '2026-10-16'), ('p2', 640.0, '2026-10-16'), ('p3', 75.0, '2026-10-16')]
+       - [in_words] conversation: The 'one create_promise per product' check fails because the agent made six create_promise calls, with a failed attempt and a retry for each product.
+FAIL PUB-12 0/2 | verify_identity > verify_identity > verify_identity > verify_identity > get_account > add_note > create_promise > add_note > create_promise > close_call
+       - [plain] notes [('CL_5678', 'refused'), ('PL_1234', 'refused')], expected [('p2', 'refused'), ('p3', 'refused')]
+       - [plain] conversation: The attempt-count check failed: the agent made three product-specific payment attempts on the personal loan and three on the car loan, rather than two and one respectively.
+       - [talkative] notes [('CL_5678', 'refused'), ('PL_1234', 'refused')], expected [('p2', 'refused'), ('p3', 'refused')]
+       - [talkative] conversation: The attempt-limit check fails because the agent made three product-specific payment attempts on the car loan instead of one, and the refused notes used unrecognized product IDs rather than p2 and p3.
+FAIL PUB-13 0/2 | verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > create_promise > create_promise > close_call
+       - [plain] promises [('p1', 300.0, '2026-10-23'), ('p2', 900.0, '2026-11-02')], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]
+       - [plain] conversation: The credit card was recorded for 23 October instead of 30 October, the loan was recorded for 2 November instead of its 23 October deadline, and the read-back did not name both required dates.
+       - [talkative] promises [('p1', 300.0, '2026-10-23'), ('p2', 900.0, '2026-10-27')], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]
+       - [talkative] conversation: The credit card was recorded for 23 October instead of 30 October, the loan was recorded for 27 October instead of its 23 October deadline, and the read-back did not name both required dates.
+
+fast_eval: 0 / 3 passed (2 rep(s), all reps must pass), 621 s
+harness: 0 case(s) still INVALID after 2 re-run(s) (not a measurement), 0 rep(s) re-run

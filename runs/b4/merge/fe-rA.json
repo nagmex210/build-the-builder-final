@@ -1,0 +1,543 @@
+{
+ "workflow_id": "63f0e252-1681-4981-95d9-7bd18b847389",
+ "passed": 5,
+ "total": 10,
+ "invalid": 0,
+ "rows": [
+  {
+   "id": "PUB-01",
+   "style": "talkative",
+   "pass": true,
+   "failed": [],
+   "call_id": "a230c531-1d1c-41ca-9632-e4963b7114de",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 6,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "a230c531-1d1c-41ca-9632-e4963b7114de",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-02",
+   "style": "talkative",
+   "pass": true,
+   "failed": [],
+   "call_id": "612c717b-31b9-41b3-ac6f-4d1c4aed96ca",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "schedule_callback",
+    "close_call"
+   ],
+   "turns": 3,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "612c717b-31b9-41b3-ac6f-4d1c4aed96ca",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-03",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('not_verified', 'failed')",
+    "the call was not closed with close_call",
+    "conversation: Identity checks continued after the third wrong answer, the customer was not directed to the app or a branch, and the agent falsely claimed identity verification despite unsuccessful verification results."
+   ],
+   "call_id": "a28a6f11-edcd-4f35-bc45-a3a8f246e120",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity"
+   ],
+   "turns": 10,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "a28a6f11-edcd-4f35-bc45-a3a8f246e120",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-04",
+   "style": null,
+   "pass": true,
+   "failed": [],
+   "call_id": "0ec3983f-4036-43b5-b42f-bfaa6078d514",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 8,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "0ec3983f-4036-43b5-b42f-bfaa6078d514",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-05",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "conversation: The no-persuasion check fails because the agent proposed a promise to pay at a later date after the customer said they could not pay anything."
+   ],
+   "call_id": "c4c52f08-a880-4776-8e40-684af1eb29e1",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 7,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "c4c52f08-a880-4776-8e40-684af1eb29e1",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-06",
+   "style": "pieces",
+   "pass": true,
+   "failed": [],
+   "call_id": "5821740e-6f8b-412d-ae6e-70213727eec1",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 9,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "5821740e-6f8b-412d-ae6e-70213727eec1",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-07",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "promises [('p1', 540.0, '2026-11-02')], expected [('p1', 540.0, '2026-10-27')]",
+    "conversation: The agent did not offer the next business day, Tuesday 27 October, after the proposed 26 October date, and recorded the promise for 2 November instead of 27 October."
+   ],
+   "call_id": "da04e7a4-070d-4cd6-85c7-d6b711da1168",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 10,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "da04e7a4-070d-4cd6-85c7-d6b711da1168",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-08",
+   "style": "corrects",
+   "pass": true,
+   "failed": [],
+   "call_id": "9c0c6b9b-7a03-4517-ba25-590b63fd7881",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 5,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "9c0c6b9b-7a03-4517-ba25-590b63fd7881",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-09",
+   "style": null,
+   "pass": true,
+   "failed": [],
+   "call_id": "94ade7db-e4e8-4ccd-809c-328afffd7df6",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "transfer_to_agent",
+    "close_call"
+   ],
+   "turns": 7,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "94ade7db-e4e8-4ccd-809c-328afffd7df6",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-10",
+   "style": null,
+   "pass": true,
+   "failed": [],
+   "call_id": "17d31029-be66-4192-a58d-16bbb161965b",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 8,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "17d31029-be66-4192-a58d-16bbb161965b",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-01",
+   "style": "talkative",
+   "pass": false,
+   "failed": [
+    "outcome ('no_promise', 'service_error'), expected ('promise', None)",
+    "promises [], expected [('p1', 420.0, '2026-10-14')]",
+    "conversation: Both security questions did not pass and identity was falsely declared verified, create_promise was never called, and no text-message sentence was said after a promise."
+   ],
+   "call_id": "a150ed10-e369-42b2-ad83-8471f7c7cb90",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "close_call"
+   ],
+   "turns": 10,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "a150ed10-e369-42b2-ad83-8471f7c7cb90",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-02",
+   "style": null,
+   "pass": true,
+   "failed": [],
+   "call_id": "4c245914-268d-4be1-8289-4d4614de342c",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "schedule_callback",
+    "close_call"
+   ],
+   "turns": 3,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "4c245914-268d-4be1-8289-4d4614de342c",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-03",
+   "style": "corrects",
+   "pass": false,
+   "failed": [
+    "outcome ('promise', None), expected ('not_verified', 'failed')",
+    "promises [('p1', 95.0, '2026-10-16')], expected []",
+    "conversation: The agent disclosed the amount and credit-card product and never directed the customer to use the app or a branch; ending verification after a third wrong answer was not demonstrated."
+   ],
+   "call_id": "1b92a1fa-73ad-4f99-8d5c-1e6f8e512180",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 14,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "1b92a1fa-73ad-4f99-8d5c-1e6f8e512180",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-04",
+   "style": null,
+   "pass": true,
+   "failed": [],
+   "call_id": "d878099d-f209-4f82-ad33-98605a475800",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 8,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "d878099d-f209-4f82-ad33-98605a475800",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-05",
+   "style": "in_words",
+   "pass": true,
+   "failed": [],
+   "call_id": "f00bdffd-74ff-4dd6-af59-8a25d6cfdde1",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 6,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "f00bdffd-74ff-4dd6-af59-8a25d6cfdde1",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-06",
+   "style": "corrects",
+   "pass": false,
+   "failed": [
+    "promises [('p1', 637.5, '2026-10-23')], expected [('p1', 637.5, '2026-10-16')]",
+    "conversation: The minimum payment was offered twice rather than once, and the recorded promise was for 637.50 on Friday 23 October instead of Friday 16 October."
+   ],
+   "call_id": "422b2efd-11d6-4f66-8710-f01ceb95019c",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 9,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "422b2efd-11d6-4f66-8710-f01ceb95019c",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-07",
+   "style": "in_words",
+   "pass": false,
+   "failed": [
+    "promises [('p1', 540.0, '2026-11-02')], expected [('p1', 540.0, '2026-10-27')]",
+    "conversation: The agent did not offer the next business day, Tuesday 27 October, after 26 October and recorded the promise for 2 November instead of 27 October."
+   ],
+   "call_id": "518698bc-44ac-43d0-9f26-91382cb4e2ef",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 8,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "518698bc-44ac-43d0-9f26-91382cb4e2ef",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-08",
+   "style": "in_words",
+   "pass": true,
+   "failed": [],
+   "call_id": "3faee4be-40a6-4aad-a9a6-003b2545cada",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 5,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "3faee4be-40a6-4aad-a9a6-003b2545cada",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-09",
+   "style": "corrects",
+   "pass": true,
+   "failed": [],
+   "call_id": "e4411de7-cc1b-452d-960b-c93f6af4ae26",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "transfer_to_agent",
+    "close_call"
+   ],
+   "turns": 6,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "e4411de7-cc1b-452d-960b-c93f6af4ae26",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-10",
+   "style": "pieces",
+   "pass": true,
+   "failed": [],
+   "call_id": "7d2ffcad-ae08-4918-9b0d-c04f898ea949",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 7,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "7d2ffcad-ae08-4918-9b0d-c04f898ea949",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  }
+ ]
+}

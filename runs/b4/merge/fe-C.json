@@ -1,0 +1,351 @@
+{
+ "workflow_id": "3f1e0c2c-d777-4204-bbf2-39eac684c2a5",
+ "passed": 3,
+ "total": 12,
+ "invalid": 0,
+ "rows": [
+  {
+   "id": "C-01",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "conversation: The first sentence names FB Services but does not say the call is recorded; the recording notice is in the second sentence."
+   ],
+   "call_id": "862dc3b7-ca01-452d-844c-17f1aea651ba",
+   "now": "2026-11-01T10:30",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 6,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "862dc3b7-ca01-452d-844c-17f1aea651ba",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "C-02",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "callbacks [{'date': '2026-11-06', 'time': '14:30'}], expected [{'date': '2026-11-08', 'time': '09:30'}]",
+    "conversation: The agent did not refuse Friday 6 November as a callback day and booked the callback for 6 November at 14:30 instead of Sunday 8 November at 09:30."
+   ],
+   "call_id": "dda69401-61c8-4df5-ba39-a73a8efd2706",
+   "now": "2026-11-05T16:00",
+   "tools": [
+    "schedule_callback",
+    "close_call"
+   ],
+   "turns": 4,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "dda69401-61c8-4df5-ba39-a73a8efd2706",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "C-03",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "conversation: The agent says only \"go on\" after the postcode digits, rather than clearly asking for the postcode letters."
+   ],
+   "call_id": "1746974e-6bf5-40c1-bb2d-637bae5138e1",
+   "now": "2026-11-09T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 8,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "1746974e-6bf5-40c1-bb2d-637bae5138e1",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "C-04",
+   "style": null,
+   "pass": true,
+   "failed": [],
+   "call_id": "b5d9564d-6d97-4aec-940d-8b160870cabd",
+   "now": "2026-11-04T13:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "close_call"
+   ],
+   "turns": 5,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "b5d9564d-6d97-4aec-940d-8b160870cabd",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "C-05",
+   "style": null,
+   "pass": true,
+   "failed": [],
+   "call_id": "7577f50e-c2b8-4b5c-82c4-f8d086671a0b",
+   "now": "2026-11-17T10:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 8,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "7577f50e-c2b8-4b5c-82c4-f8d086671a0b",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "C-06",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "promises [('A1', 622.57, '2026-12-20'), ('A1', 622.58, '2026-11-29')], expected [('A1', 622.57, '2026-12-15'), ('A1', 622.58, '2026-11-29')]"
+   ],
+   "call_id": "ebd521f2-d7e1-49ac-8f2c-5655e7995af7",
+   "now": "2026-11-22T12:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 9,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "ebd521f2-d7e1-49ac-8f2c-5655e7995af7",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "C-07",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "conversation: The agent asked identity-verification questions before naming both accounts with their arrears and days overdue, failing the requirement to provide those details before anything is asked."
+   ],
+   "call_id": "1edb9998-00dc-47b5-9d4f-14d74a01e164",
+   "now": "2026-11-25T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "add_note",
+    "add_note",
+    "close_call"
+   ],
+   "turns": 6,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "1edb9998-00dc-47b5-9d4f-14d74a01e164",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "C-08",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "notes [('A1', 'DISPUTED'), ('A1', 'DISPUTED'), ('A3', 'PAID_CLAIMED')], expected [('A1', 'DISPUTED'), ('A3', 'PAID_CLAIMED')]",
+    "conversation: The agent asked who was speaking and requested identity details before naming all three accounts, failing the requirement that all three accounts be named before anything is asked."
+   ],
+   "call_id": "66801f30-df17-4971-9244-7e94f000badf",
+   "now": "2026-10-29T14:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "add_note",
+    "create_promise",
+    "create_promise",
+    "add_note",
+    "add_note",
+    "close_call"
+   ],
+   "turns": 9,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "2e9e8fab-ecb9-4a5b-8372-b2ec2424b4ff",
+     "invalid": true,
+     "replays": []
+    },
+    {
+     "call_id": "66801f30-df17-4971-9244-7e94f000badf",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "C-09",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "promises [('A1', 1500.0, '2026-12-10'), ('A2', 200.0, '2026-12-10')], expected [('A1', 1500.0, '2026-12-10'), ('A2', 500.0, '2026-12-10')]",
+    "conversation: The loan was offered at 800 and later 200, never at the required 500 remaining under the 2,000 call limit."
+   ],
+   "call_id": "a80ec985-c267-4943-81e3-f5aefae2df42",
+   "now": "2026-12-06T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 9,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "a80ec985-c267-4943-81e3-f5aefae2df42",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "C-10",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "outcome ('no_payment', 'REFUSED'), expected ('no_payment', 'SERVICE_ERROR')",
+    "notes [('A1', 'REFUSED'), ('A1', 'REFUSED'), ('A2', 'REFUSED')], expected [('A1', 'REFUSED'), ('A2', 'SERVICE_ERROR')]",
+    "conversation: create_promise was never tried rather than tried exactly twice, and the agent did not tell the customer that the card promise could not be recorded."
+   ],
+   "call_id": "f141ba91-0bcc-4aa8-a593-d8e4119bfbda",
+   "now": "2026-11-30T09:45",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "add_note",
+    "add_note",
+    "add_note",
+    "close_call"
+   ],
+   "turns": 8,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "f141ba91-0bcc-4aa8-a593-d8e4119bfbda",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "C-11",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "promises [('A1', 82.0, '2026-11-29')], expected [('A1', 820.0, '2026-11-22')]",
+    "conversation: The agent did not refuse today because it was after 15:00 or offer Sunday 22 November, discussed the overdraft before reading back and recording the card promise, and described a two-part plan despite the no-plan requirement."
+   ],
+   "call_id": "90b2e725-db47-4e6f-a2dc-35d22fb616c0",
+   "now": "2026-11-19T16:10",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "transfer_to_agent",
+    "close_call"
+   ],
+   "turns": 11,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "90b2e725-db47-4e6f-a2dc-35d22fb616c0",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "C-12",
+   "style": null,
+   "pass": true,
+   "failed": [],
+   "call_id": "dba19aa0-99d4-401e-b344-79cd03b391ad",
+   "now": "2026-12-08T15:30",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "transfer_to_agent",
+    "close_call"
+   ],
+   "turns": 5,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "dba19aa0-99d4-401e-b344-79cd03b391ad",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,12 @@
+FAIL PUB-11 0/2 | verify_identity > verify_identity > get_account > create_promise > create_promise > create_promise > create_promise > create_promise > create_promise > close_call
+       - [asks_back] conversation: The honesty check failed because the agent said “I have recorded that for you” before any create_promise call, and the one-create_promise-per-product check failed because each product required two attempts.
+       - [talkative] conversation: The one create_promise per product check fails because the agent made two attempts per product, first with invalid IDs and then with valid IDs.
+FAIL PUB-12 0/2 | verify_identity > verify_identity > verify_identity > verify_identity > get_account > add_note > add_note > create_promise > create_promise > close_call
+       - [pieces] notes [('CL5678', 'refused'), ('PL1234', 'refused')], expected [('p2', 'refused'), ('p3', 'refused')]
+       - [pieces] conversation: The car loan received two persuasion attempts (full payment and a reduced amount), but the early-band check requires exactly one.
+       - [asks_back] notes [('CL-5678', 'refused'), ('PL-1234', 'refused')], expected [('p2', 'refused'), ('p3', 'refused')]
+       - [asks_back] conversation: The refused notes used product IDs PL-1234 and CL-5678 rather than the account's p2 and p3, so a refused note for each other product is not clearly established.
+PASS PUB-13 2/2 | verify_identity > verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > create_promise > create_promise > close_call
+
+fast_eval: 1 / 3 passed (2 rep(s), all reps must pass), 295 s
+harness: 0 case(s) still INVALID after 2 re-run(s) (not a measurement), 0 rep(s) re-run

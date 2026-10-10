@@ -1,0 +1,198 @@
+{
+ "workflow_id": "0e92e0fa-2e50-4314-8434-33760d22f246",
+ "passed": 1,
+ "total": 3,
+ "invalid": 0,
+ "rows": [
+  {
+   "id": "PUB-11",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "conversation: The honesty check failed because the agent said \u201cI have recorded that for you\u201d before any create_promise call, and the one-create_promise-per-product check failed because each product required two attempts."
+   ],
+   "call_id": "1136b1f5-1879-4520-bc56-c444ee42db2b",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 6,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "1136b1f5-1879-4520-bc56-c444ee42db2b",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-12",
+   "style": "pieces",
+   "pass": false,
+   "failed": [
+    "notes [('CL5678', 'refused'), ('PL1234', 'refused')], expected [('p2', 'refused'), ('p3', 'refused')]",
+    "conversation: The car loan received two persuasion attempts (full payment and a reduced amount), but the early-band check requires exactly one."
+   ],
+   "call_id": "a3488deb-19cb-4e1d-93a4-16239fc96fb4",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "add_note",
+    "add_note",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 11,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "a3488deb-19cb-4e1d-93a4-16239fc96fb4",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-13",
+   "style": "talkative",
+   "pass": true,
+   "failed": [],
+   "call_id": "3fccae13-0445-443f-a1f8-58b490b92298",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 10,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "3fccae13-0445-443f-a1f8-58b490b92298",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-11",
+   "style": "talkative",
+   "pass": false,
+   "failed": [
+    "conversation: The one create_promise per product check fails because the agent made two attempts per product, first with invalid IDs and then with valid IDs."
+   ],
+   "call_id": "81f074f9-c9b8-4ea9-b097-90daae5cd9c8",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 10,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "81f074f9-c9b8-4ea9-b097-90daae5cd9c8",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-12",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "notes [('CL-5678', 'refused'), ('PL-1234', 'refused')], expected [('p2', 'refused'), ('p3', 'refused')]",
+    "conversation: The refused notes used product IDs PL-1234 and CL-5678 rather than the account's p2 and p3, so a refused note for each other product is not clearly established."
+   ],
+   "call_id": "20d1f81c-6a10-4449-b52b-c3bf2121857f",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "add_note",
+    "add_note",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 13,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "20d1f81c-6a10-4449-b52b-c3bf2121857f",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-13",
+   "style": "asks_back",
+   "pass": true,
+   "failed": [],
+   "call_id": "1c8b5629-9dd7-4f08-bae4-6dc5e015d8e0",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 7,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "1c8b5629-9dd7-4f08-bae4-6dc5e015d8e0",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,24 @@
+workspace 2: main-B -> agent ec9fbf58-6328-4272-9aa2-0ebec3797db2
+another simulation is running in this workspace, waiting 30 s
+another simulation is running in this workspace, waiting 30 s
+another simulation is running in this workspace, waiting 30 s
+PASS PUB-11 medium Multi-product  | verify > verify > get_account > promise > promise > promise > close_call
+PASS PUB-12 hard   Multi-product  | verify > verify > verify > get_account > promise > add_note > add_note > close_call
+PASS PUB-13 hard   Multi-product  | verify > verify > get_account > promise > promise > close_call
+
+slowest agent turn per call: median 2 s, worst 3 s. Failed calls where the customer hung up: 0.
+-- run 1 of 2: 3 / 3 passed, 142 s
+
+PASS PUB-11 medium Multi-product  | verify > verify > get_account > promise > promise > promise > close_call
+FAIL PUB-12 hard   Multi-product  | verify > verify > verify > get_account > promise > add_note > add_note > close_call
+       - conversation: The assistant failed to satisfy the persuasion attempt criteria for the personal loan. As a 'late' band product (16 days late), the personal loan required two persuasion attempts. The assistant made one attempt for all products in Message 8, but 
+PASS PUB-13 hard   Multi-product  | verify > verify > get_account > promise > promise > close_call
+
+slowest agent turn per call: median 5 s, worst 6 s. Failed calls where the customer hung up: 0.
+-- run 2 of 2: 2 / 3 passed, 52 s
+
+PASS PUB-11 2/2
+FAIL PUB-12 1/2
+PASS PUB-13 2/2
+
+2 / 3 passed (bank records and conversation checks), a customer counts with 2 of 2 runs. Last simulation 6fcbe371-6498-4169-ae47-4ca10e971347, status completed, 194 s.

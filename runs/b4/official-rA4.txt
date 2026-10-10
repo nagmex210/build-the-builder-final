@@ -1,0 +1,19 @@
+FAIL PUB-01 easy   Happy path     | verify > verify > get_account > promise
+       - outcome (None, None), expected ('promise', None)
+       - the call was not closed with close_call
+FAIL PUB-02 medium Third party    | schedule_callback > close_call
+       - conversation: The agent failed to satisfy the first criterion because it disclosed the reason for the call to a third party (the husband). In Message 4, the agent stated 'I cannot accept payment from anyone other than Ms Costa', which confirmed the call was ab
+PASS PUB-03 medium Identity       | verify > verify > verify > close_call
+PASS PUB-04 medium Dates          | verify > verify > get_account > promise > close_call
+FAIL PUB-05 medium Hardship       | verify > verify > get_account
+       - outcome (None, None), expected ('no_promise', 'hardship')
+       - the call was not closed with close_call
+PASS PUB-06 hard   Amounts        | verify > verify > get_account > promise > close_call
+PASS PUB-07 hard   Dates          | verify > verify > get_account > promise > close_call
+PASS PUB-08 medium Already paid   | verify > verify > get_account > close_call
+PASS PUB-09 medium Restructuring  | verify > verify > get_account > transfer_to_agent > close_call
+PASS PUB-10 hard   Tool failure   | verify > verify > get_account > promise > promise > close_call
+
+slowest agent turn per call: median 3 s, worst 18 s. Failed calls where the customer hung up: 0.
+
+7 / 10 passed (bank records and conversation checks). Last simulation c902df10-f084-496c-8990-72ea99198d64, status completed, 163 s.

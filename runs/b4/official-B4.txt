@@ -1,0 +1,24 @@
+workspace 2: main-B4 -> agent b1767d6a-aca2-4902-86d7-5a361014c66f
+PASS PUB-11 medium Multi-product  | verify > verify > get_account > promise > promise > promise > close_call
+PASS PUB-12 hard   Multi-product  | verify > verify > verify > get_account > promise > add_note > add_note > close_call
+PASS PUB-13 hard   Multi-product  | verify > verify > get_account > promise > promise > close_call
+
+slowest agent turn per call: median 11 s, worst 13 s. Failed calls where the customer hung up: 0.
+WARNING: the phone agent was slow in this run. If the same agent is fast in another run, the model was busy and this score is too low.
+-- run 1 of 2: 3 / 3 passed, 92 s
+
+PASS PUB-11 medium Multi-product  | verify > verify > get_account > promise > promise > promise > close_call
+FAIL PUB-12 hard   Multi-product  | verify > verify > verify > get_account > promise > close_call > add_note > add_note
+       - notes [], expected [('p2', 'refused'), ('p3', 'refused')]
+       - the call was not closed with close_call
+       - conversation: The assistant failed to meet the requirement regarding the 'refused' notes. Although the assistant attempted to add notes for the personal loan (p2) and car loan (p3) following the customer's refusals, it called the 'close_call' tool before the '
+PASS PUB-13 hard   Multi-product  | verify > verify > get_account > promise > promise > close_call
+
+slowest agent turn per call: median 5 s, worst 7 s. Failed calls where the customer hung up: 0.
+-- run 2 of 2: 2 / 3 passed, 83 s
+
+PASS PUB-11 2/2
+FAIL PUB-12 1/2
+PASS PUB-13 2/2
+
+2 / 3 passed (bank records and conversation checks), a customer counts with 2 of 2 runs. Last simulation 719af290-e952-415f-9899-5a38f0ccb5ef, status completed, 175 s.

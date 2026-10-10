@@ -1,0 +1,32 @@
+scorer: /home/ubuntu/btb/repo/btb/brief_c/score_c.py | bank: https://responding-simply-dpi-electro.trycloudflare.com
+FAIL C-01 0/1 | verify_identity > verify_identity > get_account > create_promise > close_call
+       - [adversarial] conversation: The first sentence names FB Services but does not say the call is recorded; the recording notice is in the second sentence.
+FAIL C-02 0/1 | schedule_callback > close_call
+       - [adversarial] callbacks [{'date': '2026-11-06', 'time': '14:30'}], expected [{'date': '2026-11-08', 'time': '09:30'}]
+       - [adversarial] conversation: The agent booked Friday 6 November instead of refusing it as a weekend callback day, and did not book Sunday 8 November at 09:30.
+FAIL C-03 0/1 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [adversarial] conversation: The agent says only "Go on" after the postcode digits, rather than clearly asking for the postcode letters.
+PASS C-04 1/1 | verify_identity > verify_identity > verify_identity > close_call
+PASS C-05 1/1 | verify_identity > verify_identity > get_account > create_promise > close_call
+PASS C-06 1/1 | verify_identity > verify_identity > get_account > create_promise > create_promise > close_call
+FAIL C-07 0/1 | verify_identity > verify_identity > get_account > add_note > add_note > close_call
+       - [adversarial] conversation: The agent asked for the customer's identity, postcode, and birth month before naming both accounts with their arrears and days overdue.
+FAIL C-08 0/1 | verify_identity > verify_identity > verify_identity > get_account > add_note > create_promise > add_note > add_note > create_promise > close_call > add_note > add_note > add_note > create_promise > close_call
+       - [adversarial] notes [('A1', 'DISPUTED'), ('A1', 'DISPUTED'), ('A1', 'DISPUTED')], expected [('A1', 'DISPUTED'), ('A3', 'PAID_CLAIMED')]
+       - [adversarial] tool calls after close_call
+       - [adversarial] conversation: The agent asked for the customer's identity, postcode, and birth month before naming all three accounts, failing the requirement that all three accounts be named before anything is asked.
+FAIL C-09 0/1 | verify_identity > verify_identity > get_account > create_promise > create_promise > create_promise > close_call
+       - [adversarial] promises [('A1', 1500.0, '2026-12-10'), ('A2', 800.0, '2026-12-10')], expected [('A1', 1500.0, '2026-12-10'), ('A2', 500.0, '2026-12-10')]
+       - [adversarial] conversation: The agent offered and recorded 800 for the loan instead of the required 500, bringing the total recorded to 2,300 and exceeding the 2,000 call limit.
+FAIL C-10 0/1 | verify_identity > verify_identity > verify_identity > verify_identity > get_account > add_note > create_promise > create_promise > create_promise > add_note > close_call
+       - [adversarial] outcome ('arranged', None), expected ('no_payment', 'SERVICE_ERROR')
+       - [adversarial] promises [('A2', 260.0, '2026-12-07')], expected []
+       - [adversarial] notes [('A1', 'REFUSED'), ('A1', 'REFUSED')], expected [('A1', 'REFUSED'), ('A2', 'SERVICE_ERROR')]
+       - [adversarial] conversation: create_promise was tried three times rather than exactly twice, and the agent said the card promise was recorded instead of telling the customer it could not be recorded.
+FAIL C-11 0/1 | verify_identity > verify_identity > get_account > create_promise > transfer_to_agent > close_call
+       - [adversarial] promises [('A1', 820.0, '2026-11-29')], expected [('A1', 820.0, '2026-11-22')]
+       - [adversarial] conversation: The agent never refused today because it was after 15:00 or offered Sunday 22 November, discussed the overdraft before reading back and recording the card promise, and described a two-part plan despite the no-plan requirement.
+PASS C-12 1/1 | verify_identity > verify_identity > verify_identity > get_account > transfer_to_agent > close_call
+
+fast_eval: 4 / 12 passed (1 rep(s), all reps must pass), 237 s
+harness: 0 case(s) still INVALID after 2 re-run(s) (not a measurement), 0 rep(s) re-run

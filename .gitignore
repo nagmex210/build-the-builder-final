@@ -11,3 +11,4 @@ runs/*/work/
 .freya-agents.json.lock
 submission/
 traces/
+.freya-agents-ws2.json

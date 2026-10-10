@@ -84,3 +84,83 @@ Hypotheses for next batch (H):
 - (H) A code-side close_call guard (blocked while an item lacks its promise/note) fixes the tool-order kind seen on official B and on brief C.
 
 Next families: runs/next_families.txt (close_call ordering + per-item ledger; A17 deterministic self-simulation in workspace 2; A3 canned reply paths; datecalc unknown rule kinds; wild card replay-proof measurement/agent).
+
+## b4 merge (2026-10-10, merger; the first merger session was cut by the Claude session limit at ~22:17 UTC and resumed)
+
+Cheating check: diffs reviewed. No worker hard-coded a rule, value, name, date or outcome code from brief A/B. Every
+canned sentence, rule kind, persona and check is read from the brief at build time. **Disclosure (w4):** while looking
+for brief C, w4 read part of brief C's README and a grep of its date lines, then stopped. Its callback-slot rule kind
+is C-informed, and it is not merged (only w4's own-band calendar tag fix is merged, and that one comes from A/B evidence).
+
+Workers (fast_eval --reps 2 --style random; champion b1 = A 3, B 0, rA 1, rB 0 = 4/26):
+- w1 (close_call last + per-item ledger, from merge/b3): A 0, B 0, rA 6, rB 1 = 7/26, mixed hook versions mid-eval.
+  Measured live: the model sends several tool calls in ONE turn, and sibling hooks do not see each other's variable
+  writes (M12/M20). So the close guard blocked correct closes and left calls unclosed. **Not merged** (the author
+  says not as is). Kept from it: a post-hook that rewrites `data.ok` does steer `<tool>_response` transitions.
+- w2 (A17 self-simulation in the builder, workspace 2, deterministic checks, one EDIT fix round): A 5, B 0, rA 3,
+  rB 0 = 8/26. **Merged.**
+- w3 (A3 canned reply paths: opening tts, success lines in post-hooks, goodbye in the close tool description):
+  A 2, B 0, rA 0, rB 0 as printed; 6/0/3/0 re-judged. It found the fast judge reading the transcript before the final
+  message is saved. **Merged.**
+- w4 (datecalc never drops a rule kind + guards/oracle on merge/b3): A 2, B 1, rA 3, rB 0 = 6/26. It found the PUB-07
+  cause: the calendar tagged a holiday with ANOTHER band's deadline. **Own-band tag fix ported (95fc23d)**; the rule
+  kinds are not merged (they sit on the merge/b3 lineage, are inert on A/B, and the callback slots are C-informed).
+- w5 (wild card replay-proof measurement): the fast_eval part was already on main. Its harden identity memory
+  (verified_items in call variables) is **merged** (ed7d8f8). No report (the session was cut).
+
+Merge candidate merge/b4 = w2 + w3 + w5 identity memory, plus three merger commits:
+- self-test: a chat cut by the time limit is harness-invalid, and the budget is bounded by the whole build's 30 min;
+- an inner-agent error (quota/SDK) falls through to the final pass (M9, carried over from merge/b3; this exact
+  failure hit build A2 tonight);
+- the w4 own-band calendar tags (M1).
+
+Measured:
+- fast_eval (on the ed7d8f8 build, before the last 3 commits): A 4, B 1, rA 5, rB 0 = **10/26** vs 4.
+- Brief C: 3/12 random, 4/12 adversarial.
+- Official on the ed7d8f8 build:
+  - A, 1 rep: 9/10;
+  - **A, 2 reps: 7/10** (runs 8, 9; PUB-03, 06, 10 at 1/2);
+  - B, 2 reps: 2/3 (runs 3, 2).
+  - Under the rule that alone is a one-case drop vs the champion's 8 (runs 9, 9).
+- Official on the merge/b4 HEAD build (95fc23d, the code now on main):
+  - **A 8/10 (runs 9, 9)**: PUB-07 1/2, PUB-10 1/2;
+  - **B 2/3 (runs 3, 2)**: PUB-12 1/2.
+  - Both equal the champion.
+- RAW briefs, first official baseline:
+  - rA 8/10 twice on the ed7d8f8 build (ws1 and ws2), 7/10 on the HEAD build;
+  - rB 1/3 on the ed7d8f8 build;
+  - rB on HEAD: see runs/b4/official-rB4.txt if present.
+- Build time 537-603 s (self-simulation included), well inside 30 min. The champion's is 146 s.
+
+Decision: **KEEP (main = merge/b4 at 2603373).** On the build that is now main, official A+B does not drop vs the
+champion (8+2 = 8+2). The win is NOT a repeated official win, so the keep rests on (c), mechanisms that generalise:
+- (1) M9: a quota/SDK error no longer kills the build. This is a Sunday risk, and it happened in this batch.
+- (2) A17 self-simulation, the organisers' stated priority, is now in the champion and printed in the trace. In
+  the A4 build, round 1 failed 3/11 personas (wrong hardship queue, identity check not ended after 3 wrong answers,
+  an inner hook using an unset name). The fix round fixed them, and round 2 failed 1/12.
+- (3) Verbatim mandatory lines (M10/M24) and identity memory (M5/M16).
+- (4) Own-band calendar tags (M1).
+Fast went 4 → 10/26 across A, rA and B (more than one failure kind). The pooled official per-run A rate is 35/40 on
+merge builds vs 18/20 on the champion: equal within noise.
+
+Failures left (official):
+- PUB-07, holiday: once again the deadline (2 Nov) was offered instead of the next business day, even with own-band
+  tags (1 of 2 on HEAD).
+- PUB-10: the official judge counts the brief's own mandatory "the call is recorded" in the opening as saying
+  "recorded" before success. The canned tts makes the opening identical on every call, so this may now be
+  systematic at ~50%.
+- PUB-12: per-item persuasion attempts.
+- **New mechanism seen (H):** on official rA4 PUB-01/05 and rB PUB-11, the model said the goodbye as plain text
+  without calling close_call. The customer said goodbye, the platform's built-in "goodbye" auto-trigger
+  (`trigger_timeout_started function end_call triggered_pattern goodbye source auto_trigger`) hung up, and the
+  outcome was never recorded. The same "not closed with close_call" appears in b1/b2 logs, so it is not new with A3,
+  but A3's "say the goodbye before calling" text may make it more frequent. Fix idea: the platform speaks the goodbye
+  only AFTER close_call ok (end_call node spoken_message / hang-up tts), and the model is told never to say goodbye
+  itself.
+
+Hypotheses for next batch (H):
+- (H) The goodbye-before-close kind is worth ~1 case per brief run and is fixable structurally (above).
+- (H) PUB-07 needs a code answer: when a customer names a non-business day, a promise pre-hook or DATE FACTS line
+  gives the next business day explicitly. Prompt tags alone get it right in only half the runs.
+- (H) The self-simulation's fix round can edit hooks. Make its checks cover "close_call present when the call
+  ended", so it catches the goodbye kind at build time.

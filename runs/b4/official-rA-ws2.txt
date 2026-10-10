@@ -1,0 +1,18 @@
+workspace 2: main-rA -> agent 60829ea3-49c1-4fe0-8636-37ba1a2b9b4e
+PASS PUB-01 easy   Happy path     | verify > verify > get_account > promise > close_call
+PASS PUB-02 medium Third party    | schedule_callback > close_call
+PASS PUB-03 medium Identity       | verify > verify > verify > verify > close_call
+PASS PUB-04 medium Dates          | verify > verify > get_account > promise > close_call
+PASS PUB-05 medium Hardship       | verify > verify > get_account > close_call
+PASS PUB-06 hard   Amounts        | verify > verify > get_account > promise > close_call
+FAIL PUB-07 hard   Dates          | verify > verify > get_account > promise > close_call
+       - promises [('p1', 540.0, '2026-11-02')], expected [('p1', 540.0, '2026-10-27')]
+       - conversation: While the agent correctly asked for the exact payment day and refused the holiday (Monday, October 26th), it did not offer the next business day (Tuesday, October 27th) as required by the success criteria. Instead, it offered Monday, November 2nd
+PASS PUB-08 medium Already paid   | verify > verify > get_account > close_call
+PASS PUB-09 medium Restructuring  | verify > verify > get_account > transfer_to_agent > close_call
+FAIL PUB-10 hard   Tool failure   | verify > verify > get_account > promise > promise > close_call
+       - conversation: - The agent said the word 'recorded' in Message 0 ('this call is recorded'), which occurred before the successful confirmation of the promise and the successful conclusion of the call, violating the literal constraint. - The ledger criterion was 
+
+slowest agent turn per call: median 2 s, worst 15 s. Failed calls where the customer hung up: 0.
+
+8 / 10 passed (bank records and conversation checks). Last simulation d19a01c7-9685-4bcb-b6d0-1cf45e21cd76, status completed, 143 s.

@@ -1,0 +1,32 @@
+scorer: /home/ubuntu/btb/repo/btb/brief_c/score_c.py | bank: https://responding-simply-dpi-electro.trycloudflare.com
+  invalid rep C-08 (try 1): ['harness: chat turn timed out and no reply appeared']
+FAIL C-01 0/1 | verify_identity > verify_identity > get_account > create_promise > close_call
+       - [plain] conversation: The first sentence names FB Services but does not say the call is recorded; the recording notice is in the second sentence.
+FAIL C-02 0/1 | schedule_callback > close_call
+       - [plain] callbacks [{'date': '2026-11-06', 'time': '14:30'}], expected [{'date': '2026-11-08', 'time': '09:30'}]
+       - [plain] conversation: The agent did not refuse Friday 6 November as a callback day and booked the callback for 6 November at 14:30 instead of Sunday 8 November at 09:30.
+FAIL C-03 0/1 | verify_identity > verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [plain] conversation: The agent says only "go on" after the postcode digits, rather than clearly asking for the postcode letters.
+PASS C-04 1/1 | verify_identity > verify_identity > verify_identity > close_call
+PASS C-05 1/1 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+FAIL C-06 0/1 | verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > close_call
+       - [plain] promises [('A1', 622.57, '2026-12-20'), ('A1', 622.58, '2026-11-29')], expected [('A1', 622.57, '2026-12-15'), ('A1', 622.58, '2026-11-29')]
+FAIL C-07 0/1 | verify_identity > verify_identity > get_account > add_note > add_note > close_call
+       - [plain] conversation: The agent asked identity-verification questions before naming both accounts with their arrears and days overdue, failing the requirement to provide those details before anything is asked.
+FAIL C-08 0/1 | verify_identity > verify_identity > verify_identity > get_account > add_note > create_promise > create_promise > add_note > add_note > close_call
+       - [plain] notes [('A1', 'DISPUTED'), ('A1', 'DISPUTED'), ('A3', 'PAID_CLAIMED')], expected [('A1', 'DISPUTED'), ('A3', 'PAID_CLAIMED')]
+       - [plain] conversation: The agent asked who was speaking and requested identity details before naming all three accounts, failing the requirement that all three accounts be named before anything is asked.
+FAIL C-09 0/1 | verify_identity > verify_identity > get_account > create_promise > create_promise > create_promise > close_call
+       - [plain] promises [('A1', 1500.0, '2026-12-10'), ('A2', 200.0, '2026-12-10')], expected [('A1', 1500.0, '2026-12-10'), ('A2', 500.0, '2026-12-10')]
+       - [plain] conversation: The loan was offered at 800 and later 200, never at the required 500 remaining under the 2,000 call limit.
+FAIL C-10 0/1 | verify_identity > verify_identity > verify_identity > get_account > add_note > add_note > add_note > close_call
+       - [plain] outcome ('no_payment', 'REFUSED'), expected ('no_payment', 'SERVICE_ERROR')
+       - [plain] notes [('A1', 'REFUSED'), ('A1', 'REFUSED'), ('A2', 'REFUSED')], expected [('A1', 'REFUSED'), ('A2', 'SERVICE_ERROR')]
+       - [plain] conversation: create_promise was never tried rather than tried exactly twice, and the agent did not tell the customer that the card promise could not be recorded.
+FAIL C-11 0/1 | verify_identity > verify_identity > verify_identity > get_account > create_promise > transfer_to_agent > close_call
+       - [plain] promises [('A1', 82.0, '2026-11-29')], expected [('A1', 820.0, '2026-11-22')]
+       - [plain] conversation: The agent did not refuse today because it was after 15:00 or offer Sunday 22 November, discussed the overdraft before reading back and recording the card promise, and described a two-part plan despite the no-plan requirement.
+PASS C-12 1/1 | verify_identity > verify_identity > get_account > transfer_to_agent > close_call
+
+fast_eval: 3 / 12 passed (1 rep(s), all reps must pass), 541 s
+harness: 0 case(s) still INVALID after 2 re-run(s) (not a measurement), 1 rep(s) re-run
