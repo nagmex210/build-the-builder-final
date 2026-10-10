@@ -129,7 +129,7 @@ Measured:
 - RAW briefs, first official baseline:
   - rA 8/10 twice on the ed7d8f8 build (ws1 and ws2), 7/10 on the HEAD build;
   - rB 1/3 on the ed7d8f8 build;
-  - rB on HEAD: see runs/b4/official-rB4.txt if present.
+  - **rB 3/3 on the HEAD build** (1 rep).
 - Build time 537-603 s (self-simulation included), well inside 30 min. The champion's is 146 s.
 
 Decision: **KEEP (main = merge/b4 at 2603373).** On the build that is now main, official A+B does not drop vs the
@@ -164,3 +164,6 @@ Hypotheses for next batch (H):
   gives the next business day explicitly. Prompt tags alone get it right in only half the runs.
 - (H) The self-simulation's fix round can edit hooks. Make its checks cover "close_call present when the call
   ended", so it catches the goodbye kind at build time.
+
+Slots: `main-A/B/rA/rB/C` hold the ed7d8f8 build; `main-A4/B4/rA4/rB4` hold the HEAD build (= main). The next merger
+rebuilds main-* anyway. Raw baselines for later batches, official, HEAD build: rA 7/10, rB 3/3, both 1 rep.
