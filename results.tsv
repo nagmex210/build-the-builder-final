@@ -1,1 +1,2 @@
 batch	commit	fast_A	fast_B	fast_rawA	fast_rawB	official_A	official_B	build_s	status	description
+b1	994d935	3	0	1	0	8	2	146	keep	merge w2 routing+lint, w3 datecalc, w4 harden, w5 speech block; merger: body-leaf default fix, time budget, final harden/robust/lint pass (w1 extract not wired)

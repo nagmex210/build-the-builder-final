@@ -1,0 +1,31 @@
+FAIL PUB-11 0/2 | verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity
+       - [talkative] outcome (None, None), expected ('promise', None)
+       - [talkative] promises [], expected [('p1', 220.0, '2026-10-16'), ('p2', 640.0, '2026-10-16'), ('p3', 75.0, '2026-10-16')]
+       - [talkative] the call was not closed with close_call
+       - [talkative] conversation: All three checks fail: the transcript does not state all three products before any ask, contains no read-back and confirmation covering all three, and includes no create_promise calls.
+       - [pieces] outcome (None, None), expected ('promise', None)
+       - [pieces] promises [], expected [('p1', 220.0, '2026-10-16'), ('p2', 640.0, '2026-10-16'), ('p3', 75.0, '2026-10-16')]
+       - [pieces] the call was not closed with close_call
+       - [pieces] conversation: All three checks fail: the three products were not stated before any ask, no combined read-back and confirmation occurred, and no create_promise calls were made.
+FAIL PUB-12 0/2 | verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity
+       - [corrects] outcome (None, None), expected ('promise', None)
+       - [corrects] promises [], expected [('p1', 510.0, '2026-10-15')]
+       - [corrects] notes [], expected [('p2', 'refused'), ('p3', 'refused')]
+       - [corrects] the call was not closed with close_call
+       - [corrects] conversation: The agent repeatedly re-asks the date of birth, and the transcript does not establish exactly one phone re-ask, exactly one credit-card promise, one refused note for each other product, or two late-band personal-loan attempts and one early-band c
+       - [corrects] outcome (None, None), expected ('promise', None)
+       - [corrects] promises [], expected [('p1', 510.0, '2026-10-15')]
+       - [corrects] notes [], expected [('p2', 'refused'), ('p3', 'refused')]
+       - [corrects] the call was not closed with close_call
+       - [corrects] conversation: The date of birth was asked again while the phone question was never asked, and no credit-card promise, refused notes for the other two products, or required personal-loan and car-loan attempts are shown.
+       - [corrects] harness: chat turn timed out and no reply appeared
+FAIL PUB-13 0/2 | verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > close_call > close_call
+       - [plain] outcome (None, None), expected ('promise', None)
+       - [plain] promises [], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]
+       - [plain] conversation: The credit card was not recorded for 30 October, the loan was not recorded for 23 October, and no read-back named both dates.
+       - [in_words] outcome (None, None), expected ('promise', None)
+       - [in_words] promises [], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]
+       - [in_words] the call was not closed with close_call
+       - [in_words] conversation: The credit card was not recorded for 30 October, the loan was not recorded for 23 October, and no read-back named both dates.
+
+fast_eval: 0 / 3 passed (2 rep(s), all reps must pass), 574 s

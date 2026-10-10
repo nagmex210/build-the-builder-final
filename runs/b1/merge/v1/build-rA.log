@@ -1,0 +1,40 @@
+  [Skill] {'skill': 'build-phone-agent', 'args': 'Slot: main-rA. Tool API file: tools/openapi.json. Brief files: btb/briefs_raw/br
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; ls btb/briefs_raw/ 2>/dev/null; ls; cat btb/briefs_raw/brief-a-raw.md 2>/dev/null
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat tools/openapi.json; cat docs/workflow-format.md docs/tools-and-code.md .claud
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat examples/base-agent.json; python3 -c "\nimport json;d=json.load(open(\'out/ma
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat .claude/skills/build-phone-agent/routing.md; python3 -c "\nimport json;d=json
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat docs/workflow-format.md | head -250; wc -l docs/*.md', 'description': 'Read w
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; python3 -c "\nimport json;d=json.load(open(\'out/main-rA.calc.json\'));print(list
+Spec matches the memo (12/7 business days). Now reading the example agent to copy the JSON pattern.
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; python3 -c "\nimport json;d=json.load(open(\'examples/base-agent.json\'))\nprint(
+Writing the workflow generator now.
+  [Bash] {'command': 'mkdir -p /home/ubuntu/scratch; cat > /home/ubuntu/scratch/gen.py <<\'EOF\'\nimport json\ncalc=json.load(ope
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; grep -n \'"terminal"\' -B3 -A15 docs/*.md | head -40', 'description': 'Check term
+Good. Saving and testing.
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; python3 builder/save.py main-rA out/main-rA.workflow.json 2>&1 | tail -5', 'descr
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; timeout 120 python3 -c "\nimport freya,json\nr=freya.api(\'POST\',\'/api/v2/chat/
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; grep -n "callId" docs/api.md | head -5; timeout 120 python3 -c "\nimport freya,js
+First version works (opening → identity transition confirmed). Applying a couple of rule fixes (clause 45/42 before verification in the opening node, get_account failure) and re-saving.
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; python3 - <<\'EOF\'\np=\'/home/ubuntu/scratch/gen.py\'; s=open(p).read()\ns=s.rep
+The Brief A phone agent is saved as slot main-rA (version 2), and the lint check passes with no errors. I tested only two chat turns: the opening line came out as the brief requires, and "Yes, speaking." moved on to the date-of-birth question. Nothing after the first security question has been run, and as instructed I ran no practice cases.
+
+The call goes through four stages, each with only the tools it needs:
+- **Date step (start node):** the ready code node, unedited. It works out the date facts from `now`.
+- **Opening:** checks who answered and says nothing about the account. It handles relatives, callbacks, wrong numbers, deceased customers and unclear answers. It only moves on when the person clearly confirms who they are.
+- **Identity:** the two security questions, one `verify_identity` call per answer. It moves on only when the bank's reply says both checks passed.
+- **Negotiation:** `get_account` carries your post-process hook word for word. The agent is told to use each product's own deadline and floor amount from the result and to look every date up in DATE FACTS. This node covers the payment promise, transfers, disputes, hardship and the "already paid" case.
+
+Every stage that can end the call has `close_call`, and a successful close leads to a silent hang-up. Failure handling follows clause 37: if recording a promise fails, the agent tries once more, then says it could not be recorded and closes as `no_promise` / `service_error`.
+
+Two choices where the brief left a gap:
+- **`get_account` failure:** the brief gives no rule. The agent tries once more, then closes as `no_promise` / `service_error`.
+- **Callback booking failure:** if `schedule_callback` fails twice, the agent closes as `not_reached` / `no_callback`.
+
+The brief's deadline rule doesn't differ from the date facts. The amendment memo sets 12 business days for the early band and 7 for the late band, which is what the code computes.
+
+workflow_id 63f0e252-1681-4981-95d9-7bd18b847389, agent_id b304e838-1091-40b6-aa62-a0cd00da1dc1
+
+done: 16 turns, 108 s
+final save: {'workflow_id': '63f0e252-1681-4981-95d9-7bd18b847389', 'agent_id': 'b304e838-1091-40b6-aa62-a0cd00da1dc1', 'version': 2}; lint: 0 errors, 0 warnings
+{"workflow_id": "63f0e252-1681-4981-95d9-7bd18b847389", "agent_id": "b304e838-1091-40b6-aa62-a0cd00da1dc1"}
+117.91 s

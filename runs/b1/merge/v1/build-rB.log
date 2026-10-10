@@ -1,0 +1,43 @@
+  [Skill] {'skill': 'build-phone-agent'}
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat btb/briefs_raw/brief-a-raw.md btb/briefs_raw/brief-b-raw.md; cat tools/openap
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat docs/workflow-format.md docs/tools-and-code.md .claude/skills/build-phone-age
+  [Read] {'file_path': '/home/ubuntu/.claude/projects/-home-ubuntu-btb-repo/1c3d8574-7ad1-45ff-ae9f-ca129000255e/tool-results/bw1
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat .claude/skills/build-phone-agent/routing.md examples/base-agent.json; python3
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; python3 -c "\nimport json;d=json.load(open(\'out/main-rB.calc.json\'));c=dict(d[\
+Read the briefs, the tool API file and the docs. Next I'm writing the workflow JSON.
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; sed -n 150,260p docs/tools-and-code.md'}
+  [Bash] {'command': 'mkdir -p /tmp/genrB && cat > /tmp/genrB/gen.py <<\'EOF\'\nimport json\nR=\'/home/ubuntu/btb/repo/\'\ncalc=j
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; grep -n -i "terminal" builder/lint_workflow.py docs/workflow-format.md | head'}
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; sed -n 610,650p docs/workflow-format.md; sed -n 60,75p builder/lint_workflow.py'}
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; python3 - <<\'EOF\'\np=\'/tmp/genrB/gen.py\';s=open(p).read()\ns=s.replace(\'\'\'
+Saved a first version. Quick start check.
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; timeout 120 python3 -c "import freya,json; print(freya.api(\'POST\',\'/api/v2/cha
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; python3 - <<\'EOF\'\np=\'/tmp/genrB/gen.py\';s=open(p).read()\ns=s.replace("Hello
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; timeout 150 python3 -c "\nimport freya\nr=freya.api(\'POST\',\'/api/v2/chat/messa
+I saved the workflow for slot main-rB (version 2), built as Brief B on top of Brief A. It passed the lint check with no errors, and a two-turn chat test worked: the opening line, then "Yes, speaking." moved it on to the date-of-birth question. As instructed, I did not run the practice cases, and I did not test the security questions, account step or payment promises live.
+
+**How the call flows:**
+1. The date code node from `main-rB.calc.json` runs first, unedited.
+2. **Opening:** the robot, scam and relative rules, callbacks, wrong number, deceased, unclear answers and asking for a human. It moves on only when the extracted `party` variable equals `customer`.
+3. **Identity:** the two security questions, the "day and month swapped" hint, three wrong answers, refusals, and asking for a human. It moves on only when `verify_identity` reports `all_verified`.
+4. **Account lookup:** a silent step calling `get_account`, with your hook pasted in unchanged. Each product's band, deadline, floor and the date facts are placed into the prompt.
+5. **Negotiation:** one node that handles all products in the order the bank returns them. It covers all the Brief B rules, including one confirmation for all promises, notes for products without a promise, no notes on a transfer, and the closing outcome table.
+6. **End:** every node can close the call, and it hangs up only after `close_call` succeeds.
+
+**Code checks in the tool hooks:**
+- **Promise failures:** if `create_promise` fails twice for a product (the per-product limit after the memo), the agent says so and adds a `service_error` note for that product.
+- **Notes after a transfer:** any `add_note` attempted after a transfer is blocked.
+- **Close reason:** the reason is removed when the outcome is `promise` or `paid`.
+
+**Gaps:**
+- Promise dates and amounts (business day, deadline, floor) are checked only by the prompt, not by code. The bank's service accepts a promise past the deadline without complaint.
+- The brief gives no rule for a failed security-check call. I made it try once more, then close as `not_verified` / `failed`.
+
+The date facts already match the brief, including both memos (12 business days for the early band, 7 for the late band), so I made no date-rule changes.
+
+workflow_id: e99b473c-2df6-4d05-927d-5b0085543563, agent_id: 33aaaf4a-3519-46f4-8ef1-2aa95ec80014
+
+done: 16 turns, 128 s
+final save: {'workflow_id': 'e99b473c-2df6-4d05-927d-5b0085543563', 'agent_id': '33aaaf4a-3519-46f4-8ef1-2aa95ec80014', 'version': 2}; lint: 0 errors, 0 warnings
+{"workflow_id": "e99b473c-2df6-4d05-927d-5b0085543563", "agent_id": "33aaaf4a-3519-46f4-8ef1-2aa95ec80014"}
+138.77 s

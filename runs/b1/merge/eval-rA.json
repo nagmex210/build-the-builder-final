@@ -1,0 +1,355 @@
+{
+ "workflow_id": "63f0e252-1681-4981-95d9-7bd18b847389",
+ "passed": 1,
+ "total": 10,
+ "rows": [
+  {
+   "id": "PUB-01",
+   "style": "talkative",
+   "pass": false,
+   "failed": [
+    "conversation: The required text-message sentence was not said after the promise was created."
+   ],
+   "call_id": "77c12ea0-c41d-4b60-a7ac-21fcc2c3ae21",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 6
+  },
+  {
+   "id": "PUB-02",
+   "style": "talkative",
+   "pass": false,
+   "failed": [
+    "conversation: The callback was scheduled for October 15, 2026 at 11:00, not the next business day, October 12, 2026."
+   ],
+   "call_id": "40d518f3-314a-452c-923a-0fbd2c725b13",
+   "tools": [
+    "schedule_callback",
+    "close_call"
+   ],
+   "turns": 3
+  },
+  {
+   "id": "PUB-03",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "outcome ('no_promise', 'refused'), expected ('not_verified', 'failed')",
+    "conversation: The security check did not end after the third incorrect date-of-birth answer, the agent disclosed the credit card and past-due amount, never directed the customer to the app or a branch, and falsely claimed identity verification while all_verified was false."
+   ],
+   "call_id": "45aaad02-af42-46a0-b7ab-0d3b9e48f5bf",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 13
+  },
+  {
+   "id": "PUB-04",
+   "style": "pieces",
+   "pass": false,
+   "failed": [
+    "outcome ('no_promise', 'refused'), expected ('promise', None)",
+    "promises [], expected [('p1', 1250.0, '2026-10-23')]",
+    "conversation: The agent used November 2 instead of the late-band deadline of October 23, treated the customer's proposed November 6 date as grounds to end negotiations, and did not record a promise for October 23."
+   ],
+   "call_id": "325d01b3-9027-455c-848b-254b764ab683",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 7
+  },
+  {
+   "id": "PUB-05",
+   "style": "asks_back",
+   "pass": true,
+   "failed": [],
+   "call_id": "1a4564ba-ff64-41c9-8dee-8699bc321c43",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 6
+  },
+  {
+   "id": "PUB-06",
+   "style": "pieces",
+   "pass": false,
+   "failed": [
+    "promises [('p1', 325.0, '2026-10-16')], expected [('p1', 637.5, '2026-10-16')]",
+    "conversation: The minimum payment was offered twice at an incorrect 325.00 rather than 637.50, and the recorded promise for Friday 16 October was for 325.00, not 637.50."
+   ],
+   "call_id": "c4b89f52-fb89-45a3-900a-410503519559",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 8
+  },
+  {
+   "id": "PUB-07",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "promises [('p1', 540.0, '2026-11-02')], expected [('p1', 540.0, '2026-10-27')]",
+    "conversation: The agent asked once for the exact day but offered November 2 instead of the next business day, Tuesday October 27, and no promise was recorded for October 27."
+   ],
+   "call_id": "db9b8479-b5d7-455f-88c8-dbbedcbb47c6",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 10
+  },
+  {
+   "id": "PUB-08",
+   "style": "talkative",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('paid', None)",
+    "the call was not closed with close_call",
+    "conversation: The agent did not say payments can take one business day to appear.",
+    "harness: POST /api/v2/chat/message -> 500: {\"success\":false,\"data\":{\"message\":\"Internal server error\",\"result\":{\"requestId\":\"eefe423c-b609-439c-8f3e-6d967ea2c430\"}}}"
+   ],
+   "call_id": null,
+   "tools": [],
+   "turns": 0
+  },
+  {
+   "id": "PUB-09",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "outcome ('no_promise', 'refused'), expected ('transferred', 'restructuring')",
+    "transfers [], expected [{'queue': 'restructuring'}]",
+    "conversation: The agent never called transfer_to_agent with queue restructuring and proposed its own payment arrangement of 500 by October 23rd."
+   ],
+   "call_id": "5bab7873-6114-47df-8cc9-655aa5b52f8e",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 7
+  },
+  {
+   "id": "PUB-10",
+   "style": "in_words",
+   "pass": false,
+   "failed": [
+    "conversation: The agent says 'this call is recorded' in the opening before any successful tool call, violating the check against saying 'recorded' before a successful call."
+   ],
+   "call_id": "b996a392-5111-4c3b-a6c1-3b4d7349f337",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 7
+  },
+  {
+   "id": "PUB-01",
+   "style": "talkative",
+   "pass": true,
+   "failed": [],
+   "call_id": "782d45a4-83ca-4aa0-a1fa-a57afa7e6af4",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 7
+  },
+  {
+   "id": "PUB-02",
+   "style": "pieces",
+   "pass": false,
+   "failed": [
+    "conversation: No callback was scheduled by a tool call for the next business day at 11:00."
+   ],
+   "call_id": "4cb4972f-24d6-46c5-a0d8-5503d6c43432",
+   "tools": [
+    "schedule_callback",
+    "close_call"
+   ],
+   "turns": 3
+  },
+  {
+   "id": "PUB-03",
+   "style": "talkative",
+   "pass": false,
+   "failed": [
+    "outcome ('transferred', 'human'), expected ('not_verified', 'failed')",
+    "transfers [{'queue': 'general'}], expected []",
+    "conversation: The transcript does not clearly establish that verification ended after the third wrong answer, the customer was never directed to the app or a branch, and the agent claimed to have retrieved details and noted a corrected date of birth without supporting tool calls."
+   ],
+   "call_id": "1ce3cc3f-9eca-4f84-ac5f-ef2a4ee0e7ec",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "transfer_to_agent",
+    "close_call"
+   ],
+   "turns": 22
+  },
+  {
+   "id": "PUB-04",
+   "style": null,
+   "pass": true,
+   "failed": [],
+   "call_id": "867cd615-4a04-4730-8402-8e529f57ee04",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 8
+  },
+  {
+   "id": "PUB-05",
+   "style": "in_words",
+   "pass": true,
+   "failed": [],
+   "call_id": "48edad32-ac5c-47d3-960e-d6f0ccfb32e1",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 6
+  },
+  {
+   "id": "PUB-06",
+   "style": "talkative",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 637.5, '2026-10-16')]",
+    "the call was not closed with close_call",
+    "conversation: The agent offered an incorrect minimum payment of 250.00 instead of 637.50, and no promise for 637.50 on Friday 16 October was obtained or recorded.",
+    "harness: POST /api/v2/chat/message -> 404: {\"success\":false,\"data\":{\"message\":\"Agent service error\",\"result\":{\"error\":\"Agent service error\"}}}"
+   ],
+   "call_id": "d0f740a7-8dd3-463e-b5f0-af6d903fb1a5",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account"
+   ],
+   "turns": 5
+  },
+  {
+   "id": "PUB-07",
+   "style": "in_words",
+   "pass": false,
+   "failed": [
+    "promises [('p1', 540.0, '2026-11-02')], expected [('p1', 540.0, '2026-10-27')]",
+    "conversation: The agent never asked for the exact day, rejected rather than offered Tuesday 27 October by incorrectly calling it after the deadline, and recorded the promise for 2 November instead of 27 October."
+   ],
+   "call_id": "81266770-df63-4e15-aca0-d1c4436ffd21",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 9
+  },
+  {
+   "id": "PUB-08",
+   "style": "asks_back",
+   "pass": true,
+   "failed": [],
+   "call_id": "87f42e3d-be93-44d3-b5ce-2f0463f55e4d",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 5
+  },
+  {
+   "id": "PUB-09",
+   "style": "talkative",
+   "pass": false,
+   "failed": [
+    "conversation: The agent describes a plan of its own by offering a minimum payment of 500 today with the rest remaining overdue."
+   ],
+   "call_id": "1296ac3a-cf36-4354-862d-9bfd452af143",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "transfer_to_agent",
+    "close_call"
+   ],
+   "turns": 6
+  },
+  {
+   "id": "PUB-10",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "conversation: The agent says 'this call is recorded' in the opening before any successful tool call, failing the check that it does not say 'recorded' before a successful call."
+   ],
+   "call_id": "03d8b179-276c-418f-9a07-3c0e2fea0edb",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 9
+  }
+ ]
+}

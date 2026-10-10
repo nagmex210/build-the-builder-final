@@ -1,0 +1,44 @@
+FAIL PUB-01 1/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [talkative] conversation: The required text-message sentence was not said after the promise was created.
+FAIL PUB-02 0/2 | schedule_callback > close_call
+       - [talkative] conversation: The callback was scheduled for October 15, 2026 at 11:00, not the next business day, October 12, 2026.
+       - [pieces] conversation: No callback was scheduled by a tool call for the next business day at 11:00.
+FAIL PUB-03 0/2 | verify_identity > verify_identity > verify_identity > verify_identity > get_account > close_call
+       - [plain] outcome ('no_promise', 'refused'), expected ('not_verified', 'failed')
+       - [plain] conversation: The security check did not end after the third incorrect date-of-birth answer, the agent disclosed the credit card and past-due amount, never directed the customer to the app or a branch, and falsely claimed identity verification while all_verifi
+       - [talkative] outcome ('transferred', 'human'), expected ('not_verified', 'failed')
+       - [talkative] transfers [{'queue': 'general'}], expected []
+       - [talkative] conversation: The transcript does not clearly establish that verification ended after the third wrong answer, the customer was never directed to the app or a branch, and the agent claimed to have retrieved details and noted a corrected date of birth without su
+FAIL PUB-04 1/2 | verify_identity > verify_identity > verify_identity > verify_identity > get_account > close_call
+       - [pieces] outcome ('no_promise', 'refused'), expected ('promise', None)
+       - [pieces] promises [], expected [('p1', 1250.0, '2026-10-23')]
+       - [pieces] conversation: The agent used November 2 instead of the late-band deadline of October 23, treated the customer's proposed November 6 date as grounds to end negotiations, and did not record a promise for October 23.
+PASS PUB-05 2/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+FAIL PUB-06 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [pieces] promises [('p1', 325.0, '2026-10-16')], expected [('p1', 637.5, '2026-10-16')]
+       - [pieces] conversation: The minimum payment was offered twice at an incorrect 325.00 rather than 637.50, and the recorded promise for Friday 16 October was for 325.00, not 637.50.
+       - [talkative] outcome (None, None), expected ('promise', None)
+       - [talkative] promises [], expected [('p1', 637.5, '2026-10-16')]
+       - [talkative] the call was not closed with close_call
+       - [talkative] conversation: The agent offered an incorrect minimum payment of 250.00 instead of 637.50, and no promise for 637.50 on Friday 16 October was obtained or recorded.
+       - [talkative] harness: POST /api/v2/chat/message -> 404: {"success":false,"data":{"message":"Agent service error","result":{"error":"Agent service error"}}}
+FAIL PUB-07 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [plain] promises [('p1', 540.0, '2026-11-02')], expected [('p1', 540.0, '2026-10-27')]
+       - [plain] conversation: The agent asked once for the exact day but offered November 2 instead of the next business day, Tuesday October 27, and no promise was recorded for October 27.
+       - [in_words] promises [('p1', 540.0, '2026-11-02')], expected [('p1', 540.0, '2026-10-27')]
+       - [in_words] conversation: The agent never asked for the exact day, rejected rather than offered Tuesday 27 October by incorrectly calling it after the deadline, and recorded the promise for 2 November instead of 27 October.
+FAIL PUB-08 1/2 | 
+       - [talkative] outcome (None, None), expected ('paid', None)
+       - [talkative] the call was not closed with close_call
+       - [talkative] conversation: The agent did not say payments can take one business day to appear.
+       - [talkative] harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"eefe423c-b609-439c-8f3e-6d967ea2c430"}}}
+FAIL PUB-09 0/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+       - [plain] outcome ('no_promise', 'refused'), expected ('transferred', 'restructuring')
+       - [plain] transfers [], expected [{'queue': 'restructuring'}]
+       - [plain] conversation: The agent never called transfer_to_agent with queue restructuring and proposed its own payment arrangement of 500 by October 23rd.
+       - [talkative] conversation: The agent describes a plan of its own by offering a minimum payment of 500 today with the rest remaining overdue.
+FAIL PUB-10 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > close_call
+       - [in_words] conversation: The agent says 'this call is recorded' in the opening before any successful tool call, violating the check against saying 'recorded' before a successful call.
+       - [asks_back] conversation: The agent says 'this call is recorded' in the opening before any successful tool call, failing the check that it does not say 'recorded' before a successful call.
+
+fast_eval: 1 / 10 passed (2 rep(s), all reps must pass), 390 s

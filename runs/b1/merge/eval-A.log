@@ -1,0 +1,33 @@
+FAIL PUB-01 1/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [plain] conversation: create_promise was never called, and the required text-message sentence was not said after the promise.
+FAIL PUB-02 0/2 | schedule_callback > close_call
+       - [talkative] conversation: No callback was scheduled for the next business day at 11:00.
+       - [corrects] conversation: The callback was not scheduled for the next business day at 11:00; no scheduling tool call was made.
+PASS PUB-03 2/2 | verify_identity > verify_identity > verify_identity > close_call
+FAIL PUB-04 1/2 | verify_identity > verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [asks_back] outcome ('no_promise', 'refused'), expected ('promise', None)
+       - [asks_back] promises [], expected [('p1', 1250.0, '2026-10-23')]
+       - [asks_back] conversation: The agent counted her proposed date as a refusal by closing with reason 'refused', and no promise was recorded for the late-band deadline of 23 October.
+PASS PUB-05 2/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+FAIL PUB-06 1/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [corrects] promises [('p1', 637.5, '2026-10-20')], expected [('p1', 637.5, '2026-10-16')]
+       - [corrects] conversation: The promise was for 637.50 on Tuesday 20 October, not the required Friday 16 October.
+FAIL PUB-07 0/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+       - [talkative] outcome ('no_promise', 'refused'), expected ('promise', None)
+       - [talkative] promises [], expected [('p1', 540.0, '2026-10-27')]
+       - [talkative] conversation: The promise was never recorded for Tuesday 27 October despite that date being inside the early-band deadline of Monday 2 November; no create_promise tool call was made.
+       - [pieces] outcome ('no_promise', 'refused'), expected ('promise', None)
+       - [pieces] promises [], expected [('p1', 540.0, '2026-10-27')]
+       - [pieces] conversation: The agent never asked for the exact payment day, never rejected 26 October and offered the next business day, and never recorded a promise for Tuesday 27 October within the early-band deadline.
+PASS PUB-08 2/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+FAIL PUB-09 1/2 | 
+       - [plain] outcome (None, None), expected ('transferred', 'restructuring')
+       - [plain] transfers [], expected [{'queue': 'restructuring'}]
+       - [plain] the call was not closed with close_call
+       - [plain] conversation: The required transfer_to_agent call with queue restructuring was not made.
+       - [plain] harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"4d48a9aa-b978-4d54-975e-a8ad38e7225b"}}}
+FAIL PUB-10 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > close_call
+       - [corrects] conversation: Exactly one promise in the ledger after the retry is not established: create_promise failed with nothing recorded, and no retry or successful creation appears.
+       - [asks_back] conversation: The agent says “this call is recorded” in the opening before any successful tool call, failing the check against saying “recorded” before a successful call.
+
+fast_eval: 3 / 10 passed (2 rep(s), all reps must pass), 364 s

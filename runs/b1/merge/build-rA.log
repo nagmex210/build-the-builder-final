@@ -1,0 +1,42 @@
+  [Skill] {'skill': 'build-phone-agent', 'args': 'Slot: main-rA. Tool API file: tools/openapi.json. Brief files: btb/briefs_raw/br
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; ls btb/briefs_raw/ 2>/dev/null; ls; cat btb/briefs_raw/brief-a-raw.md 2>/dev/null
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat tools/openapi.json; cat .claude/skills/build-phone-agent/routing.md'}
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat docs/workflow-format.md docs/tools-and-code.md; cat examples/base-agent.json'
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; python3 -c "\nimport json;d=json.load(open(\'out/main-rA.calc.json\'));print(d.ke
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat examples/base-agent.json; ls builder'}
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; grep -n -i -E "api_request|end_call\\"|node_type|response_mapping|alwaysRunsAt|po
+I've read the brief, the tool API, and the date-code file. Next I'm checking the docs for node shapes, then I'll write the workflow.
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; sed -n 605,650p docs/workflow-format.md; sed -n 380,410p docs/tools-and-code.md; 
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; sed -n 170,222p docs/tools-and-code.md; sed -n 60,200p builder/lint_workflow.py |
+  [Write] {'file_path': '/home/ubuntu/gen_mainrA/gen.py', 'content': 'import json, copy\nR = \'/home/ubuntu/btb/repo/\'\ncalc = js
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; python3 /home/ubuntu/gen_mainrA/gen.py && python3 builder/lint_workflow.py out/ma
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; python3 builder/save.py main-rA out/main-rA.workflow.json 2>&1 | tail -5'}
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; timeout 90 python3 -c "import freya,json; print(json.dumps(freya.api(\'POST\',\'/
+Version 1 is saved and the start check passed. Now I'm running one more chat turn to check the move into the security check.
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; timeout 90 python3 -c "import freya,json; print(json.dumps(freya.api(\'POST\',\'/
+The Brief A phone agent is saved as slot main-rA. A two-turn live chat worked: it opened correctly and, after "Yes, speaking", moved on and asked for the date of birth. I have not tested anything after that: no security check, account lookup, promise, transfer or closing. No practice cases were run, as instructed.
+
+**How it's built**
+- **Start:** the date code node runs first, then the call moves to the opening.
+- **Opening:** the greeting says it's Freya Bank's digital assistant and the call is recorded, then asks "Am I speaking with {title} {last_name}?". This step also handles relatives, callbacks, wrong numbers, a deceased customer, unclear answers and requests for a human.
+- **Identity:** two security questions, one check per answer. The check's result tells the agent what to do next: date given day and month the wrong way round, wrong answer with attempts left, failed after three, or declined.
+- **Negotiation:** it moves here only when the tool reports both answers passed. It looks up the account, then handles the promise, transfers and closing.
+- **End:** every step with the close tool moves to the hang-up step only when the close succeeds.
+
+**Date and amount handling**
+- The account-lookup hook is in verbatim as `post_process_code` of `get_account`, and the start code node is unedited.
+- Every step's instructions include DATE FACTS and the "never compute a date yourself" rule. The negotiation step tells the agent to use each product's own `deadline` and `floor_amount` from the lookup result.
+- I added a check before `create_promise` is sent. It blocks the request, so nothing is recorded, if the date is in the past, a weekend, a holiday or after the deadline. It also blocks amounts below the floor or above the past-due amount. The agent is then told why and what to offer instead.
+- `add_note` is never available to the agent.
+
+**Not done**
+- The skill suggests routing straight to a close when `create_promise` fails twice. I didn't build that. The "try once more, then close as `no_promise` / `service_error`" rule exists only in the instructions and in the message the agent gets after a failed call, so it relies on the model following it.
+
+The date facts already match the brief's 9 Oct memo: 12th business day after today for the early band, 7th for the late band. No brief rule differs from them.
+
+workflow_id 63f0e252-1681-4981-95d9-7bd18b847389, agent_id b304e838-1091-40b6-aa62-a0cd00da1dc1
+
+done: 16 turns, 126 s
+final save: {'workflow_id': '63f0e252-1681-4981-95d9-7bd18b847389', 'agent_id': 'b304e838-1091-40b6-aa62-a0cd00da1dc1', 'version': 3}; lint: 0 errors, 0 warnings
+{"workflow_id": "63f0e252-1681-4981-95d9-7bd18b847389", "agent_id": "b304e838-1091-40b6-aa62-a0cd00da1dc1"}
+135.66 s

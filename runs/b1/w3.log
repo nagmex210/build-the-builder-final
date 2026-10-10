@@ -1,0 +1,32 @@
+I built the date-and-amount code steps and committed them on `idea/b1-3` with the report at `runs/b1/w3.md`, but the fast score is 0/26, so there's no evidence yet that the change helps. Freya was failing for much of the batch, so the merger should re-score on a healthy platform before deciding.
+
+**The idea:** the builder now works out dates, business days, deadlines and minimum amounts ("floors") in code, instead of leaving them to the phone agent's model.
+- `builder/datecalc.py` (new) makes one Azure model call that reads the brief and tool file. It pulls out weekend days, holidays, deadline bands, floor rules, the callback window and what "this/next Friday" means.
+- From that it generates two snippets, with no brief values written into the builder:
+  - **A code step at the start of the call.** It writes the date facts: today, the next business day, the deadline per band, the callback days, a "this/next weekday" table and a day-by-day calendar.
+  - **A hook on the account tool.** It adds each product's band, deadline, number of persuasion attempts and floor, plus a copy of the date facts.
+- Both snippets are run locally on 5 dates and sample products before the build continues; this takes about 8 seconds and is logged in the build trace.
+- `builder/build.py` runs this step first, then tells Claude to wire both into the workflow.
+
+**Scores** (re-run from 14:09 UTC, once the platform was mostly back):
+
+| Slot | Cases passing both reps | Single runs passed | Runs cut by platform errors |
+|---|---|---|---|
+| A | 0/10 | 4/20 | 6/20 |
+| B | 0/3 | 0/6 | 3/6 |
+| raw-A | 0/10 | 0/20 | 8/20 |
+| raw-B | 0/3 | 1/6 | 3/6 |
+
+`results.tsv` has no champion row yet. Before 14:08 every agent got 503 errors, including the kit's example agent, so those earlier evals were thrown out.
+
+**What the transcripts show:**
+- **Where it works:** in a three-product call the hook's deadlines were right: 16 days late gave Fri 23 Oct, and 7 days late gave Mon 2 Nov, skipping the 26 Oct holiday. The agent then said "tomorrow, Thursday 15 October" correctly.
+- **Start step probably skipped:** in an earlier call, before the hook carried the date facts, the agent invented "today, 2025-10-31" and recorded it. The start code step probably doesn't run when it is the first node, so the hook now carries the date facts too. Callbacks before identity still lack them; I suggest moving that step after the first node.
+- **One date failure left:** in PUB-07 the customer named the 26 Oct holiday. The agent recorded 2 Nov instead of the next business day, 27 Oct, even though the calendar line gave 27 Oct. A check on the date before `create_promise` records it would catch this; I haven't built it.
+- **Other failures are outside this idea:** in B the agent made up product ids and claimed a promise was recorded before calling the tool. Two failures were the judge's mistakes: it called 12 Oct the "next business day" after 14 Oct, and it objected to the required "this call is recorded".
+
+**Generality:** no brief value is written into the builder's code or prompts. The rules extracted from the four briefs (including the raw versions) matched in substance.
+
+**Two things to know when re-scoring:**
+- The second-round A and B builds started from my first-round workflow files rather than from scratch, so they aren't a clean measure of a fresh build.
+- To check whether the outage was platform-wide, I briefly saved the kit's example agent into my own raw-A slot. The raw-A build saved over it when it finished, so that slot's workflow is current.

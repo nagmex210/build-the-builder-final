@@ -1,0 +1,14 @@
+FAIL PUB-11 1/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > create_promise > close_call
+       - [pieces] conversation: The one create_promise per product check failed because no create_promise tool calls were made for any of the three products.
+FAIL PUB-12 0/2 | verify_identity > verify_identity > verify_identity > verify_identity > get_account > create_promise > add_note > add_note > close_call
+       - [pieces] conversation: No refused notes were recorded for the personal loan or car loan, and the car loan received two attempts after the initial refusal rather than one.
+       - [in_words] outcome (None, None), expected ('promise', None)
+       - [in_words] promises [], expected [('p1', 510.0, '2026-10-15')]
+       - [in_words] notes [], expected [('p2', 'refused'), ('p3', 'refused')]
+       - [in_words] the call was not closed with close_call
+       - [in_words] conversation: The transcript does not show the phone question asked again once, exactly one credit-card promise, one refused note for each other product, or two late-band personal-loan attempts and one early-band car-loan attempt.
+       - [in_words] harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"624d6aca-3a12-48ce-a124-eef28b9b724c"}}}
+FAIL PUB-13 1/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > close_call
+       - [asks_back] conversation: Neither the credit card promise for 30 October nor the loan promise for 23 October is confirmed recorded, because both create_promise calls lack completion results.
+
+fast_eval: 0 / 3 passed (2 rep(s), all reps must pass), 209 s

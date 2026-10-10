@@ -1,0 +1,45 @@
+  [Skill] {'skill': 'build-phone-agent', 'args': 'Slot: main-B. Tool API file: tools/openapi.json. Brief files: briefs/brief-a.md 
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat briefs/brief-a.md briefs/brief-b.md; cat tools/openapi.json'}
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat docs/workflow-format.md docs/tools-and-code.md .claude/skills/build-phone-age
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat examples/base-agent.json; python3 -c "\nimport json;d=json.load(open(\'out/ma
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat .claude/skills/build-phone-agent/routing.md; wc -c docs/*.md'}
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; grep -n "^#" docs/workflow-format.md docs/tools-and-code.md | head -80'}
+Reading the docs on account-lookup nodes and hooks next; after that I'll write the workflow.
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; sed -n 143,340p docs/tools-and-code.md; sed -n 367,420p docs/tools-and-code.md; s
+  [Bash] {'command': 'mkdir -p /tmp/gen_mainB; cd /home/ubuntu/btb/repo; ls builder; sed -n 1,60p builder/lint_workflow.py | head
+Writing the generator now.
+  [Write] {'file_path': '/tmp/gen_mainB/gen.py', 'content': 'import json, copy, sys\nREPO = \'/home/ubuntu/btb/repo\'\ncalc = json
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; python3 - <<\'E\'\np=\'/tmp/gen_mainB/gen.py\'; s=open(p).read()\ns=s.replace(\' 
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; sed -i "s|negotiate\\[\'on_enter\'\\] = {\'type\': \'llm\'}|negotiate[\'on_enter\
+First version saved. Quick start check:
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; timeout 90 python3 -c "\nimport freya,json\nr=freya.api(\'POST\',\'/api/v2/chat/m
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; timeout 120 python3 -c "\nimport freya,json\nr=freya.api(\'POST\',\'/api/v2/chat/
+I built and saved the main-B workflow. It starts and handles the first turns correctly. I did not run any practice cases, as you asked.
+
+**Live check (two turns):** the agent opened with "Hello, I am a digital assistant calling from Freya Bank, and this call is recorded. Am I speaking with Ms Lee?". When I said I was her husband and asked what it was about, it gave no details and asked when Ms Lee could be reached. That is what the brief requires.
+
+**How it is built:**
+- **Calls move on tool results, not on what the customer says.** The only exception is the opening, which moves on when the customer clearly confirms who they are.
+- **Stages:**
+  1. The date code step runs first, as given.
+  2. **Opening:** who is on the line, callbacks, wrong number, deceased.
+  3. **Identity:** the two security questions, with a pass-or-fail step after each answer.
+  4. **Account lookup:** runs `get_account` with your hook added unchanged.
+  5. **Negotiation:** one stage covers all products in order.
+  6. **End:** every stage that can close the call goes to a silent hang-up after `close_call` succeeds.
+- **Dates and amounts:** every stage that deals with dates gets the DATE FACTS block and the instruction never to compute a date. The negotiation stage tells the model to use each product's own `deadline` and `floor_amount`.
+- **Brief B rules are in the negotiation prompt:** state every product first, count attempts per product, add notes only when there are two or more products and never on a transfer, and close with the reason of the first product whose note is not `paid`.
+
+**Gaps:**
+- When `create_promise` fails twice, the call is not moved to the close by routing. The prompt and the tool's result message tell the model to say it could not record the promise. With one product it then closes as `no_promise` / `service_error`; with several it adds a `service_error` note for that product. I left the routing out because with several products a second failure must not end the call.
+- The callback window in the opening relies on the DATE FACTS from the first code step. If the platform skips that step, the opening has no dates; the copy from the account hook only arrives after identity.
+- If `verify_identity` keeps failing as a service error, the prompts only say to retry once and tell the customer. The brief does not say how to close that call, so there is no closing rule for it.
+
+The brief's date rules match the DATE FACTS (12th or 7th business day after today, same holidays, same callback window), so I followed the facts as given.
+
+workflow_id: 0e92e0fa-2e50-4314-8434-33760d22f246, agent_id: bce0c1bc-a68b-436e-a37b-88db6b717c99
+
+done: 15 turns, 124 s
+final save: {'workflow_id': '0e92e0fa-2e50-4314-8434-33760d22f246', 'agent_id': 'bce0c1bc-a68b-436e-a37b-88db6b717c99', 'version': 2}; lint: 0 errors, 0 warnings
+{"workflow_id": "0e92e0fa-2e50-4314-8434-33760d22f246", "agent_id": "bce0c1bc-a68b-436e-a37b-88db6b717c99"}
+132.16 s

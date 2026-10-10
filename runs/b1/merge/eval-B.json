@@ -1,0 +1,139 @@
+{
+ "workflow_id": "0e92e0fa-2e50-4314-8434-33760d22f246",
+ "passed": 0,
+ "total": 3,
+ "rows": [
+  {
+   "id": "PUB-11",
+   "style": "corrects",
+   "pass": false,
+   "failed": [
+    "conversation: The one create_promise per product check fails because the calls used nonexistent product IDs instead of p1, p2, and p3, and the returned results explicitly state that nothing was recorded."
+   ],
+   "call_id": "76ceb2e9-fb57-488f-b45e-2d371eff0f31",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 9
+  },
+  {
+   "id": "PUB-12",
+   "style": "in_words",
+   "pass": false,
+   "failed": [
+    "conversation: No credit-card promise or refused notes for either loan were recorded through tool calls, and the car loan received two persuasion attempts instead of one."
+   ],
+   "call_id": "a0186c12-0dad-4ef9-b8f5-22eed3d706d3",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "add_note",
+    "add_note",
+    "close_call"
+   ],
+   "turns": 11
+  },
+  {
+   "id": "PUB-13",
+   "style": "corrects",
+   "pass": false,
+   "failed": [
+    "promises [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-30')], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]",
+    "conversation: Neither payment was recorded by a tool call, the loan was agreed for 30 October rather than its 23 October deadline, and the read-back omitted 23 October."
+   ],
+   "call_id": "c4529a18-6eb5-4fc7-9794-9daa81fd84c5",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 10
+  },
+  {
+   "id": "PUB-11",
+   "style": "corrects",
+   "pass": false,
+   "failed": [
+    "promises [('p1', 220.0, '2026-10-20'), ('p2', 640.0, '2026-10-20'), ('p3', 75.0, '2026-10-19')], expected [('p1', 220.0, '2026-10-16'), ('p2', 640.0, '2026-10-16'), ('p3', 75.0, '2026-10-16')]",
+    "conversation: The one create_promise per product check failed: the agent made two attempts per product, first with invalid product IDs and then with correct IDs."
+   ],
+   "call_id": "76c11d05-6527-4869-9411-d67fe0690c1d",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 11
+  },
+  {
+   "id": "PUB-12",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "conversation: The agent made three personal-loan attempts and two car-loan attempts after the initial refusal instead of two and one, and neither refused-note call has a successful result confirming it was recorded."
+   ],
+   "call_id": "105bb0d6-dab0-4da1-918e-dcca2a89d360",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "add_note",
+    "add_note",
+    "close_call"
+   ],
+   "turns": 12
+  },
+  {
+   "id": "PUB-13",
+   "style": "pieces",
+   "pass": false,
+   "failed": [
+    "promises [('p1', 50.0, '2026-11-02'), ('p2', 900.0, '2026-10-23')], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]",
+    "conversation: The credit card was recorded for 2 November rather than 30 October, and the read-back named 2 November and 23 October rather than both required dates."
+   ],
+   "call_id": "6b185edf-2364-4413-ba67-2c21ddec0d1b",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 13
+  }
+ ]
+}

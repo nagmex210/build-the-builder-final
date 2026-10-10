@@ -1,0 +1,26 @@
+FAIL PUB-11 0/2 | verify_identity > verify_identity > get_account > create_promise > create_promise > create_promise > create_promise
+       - [in_words] outcome (None, None), expected ('promise', None)
+       - [in_words] the call was not closed with close_call
+       - [in_words] conversation: The one read-back and one confirmation check fails because the agent asks for confirmation again after receiving it, and the one create_promise per product check fails because the credit card required two calls.
+       - [corrects] outcome (None, None), expected ('promise', None)
+       - [corrects] the call was not closed with close_call
+       - [corrects] conversation: The one create_promise per product check fails because the credit-card promise required two calls, including an initial failed call with an invalid product ID.
+FAIL PUB-12 0/2 | verify_identity > verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise
+       - [talkative] outcome (None, None), expected ('promise', None)
+       - [talkative] notes [], expected [('p2', 'refused'), ('p3', 'refused')]
+       - [talkative] the call was not closed with close_call
+       - [talkative] conversation: No credit-card promise or refused notes were successfully recorded because the tool calls failed, and the agent made two car-loan persuasion attempts instead of the required one.
+       - [pieces] outcome (None, None), expected ('promise', None)
+       - [pieces] promises [], expected [('p1', 510.0, '2026-10-15')]
+       - [pieces] notes [], expected [('p2', 'refused'), ('p3', 'refused')]
+       - [pieces] the call was not closed with close_call
+       - [pieces] conversation: The phone question was asked only once rather than repeated once, no credit-card promise or refused notes for the other two products were recorded, and there were no personal-loan or car-loan attempts.
+FAIL PUB-13 0/2 | verify_identity > verify_identity > verify_identity > verify_identity > get_account > create_promise
+       - [asks_back] outcome (None, None), expected ('promise', None)
+       - [asks_back] promises [], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]
+       - [asks_back] the call was not closed with close_call
+       - [asks_back] conversation: The credit card was not recorded for 30 October and the loan was not recorded for 23 October because all create_promise calls failed, although the read-back named both dates.
+       - [pieces] outcome (None, None), expected ('promise', None)
+       - [pieces] the call was not closed with close_call
+
+fast_eval: 0 / 3 passed (2 rep(s), all reps must pass), 380 s

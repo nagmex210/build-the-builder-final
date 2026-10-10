@@ -1,0 +1,38 @@
+  [Skill] {'skill': 'build-phone-agent', 'args': 'Slot: main-rB. Tool API file: tools/openapi.json. Brief files: btb/briefs_raw/br
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; ls btb/briefs_raw/ 2>/dev/null || ls ../briefs_raw; wc -c tools/openapi.json docs
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat btb/briefs_raw/brief-a-raw.md btb/briefs_raw/brief-b-raw.md 2>/dev/null || ca
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat .claude/skills/build-phone-agent/routing.md; cat tools/openapi.json; cat exam
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; python3 -c "\nimport json;d=json.load(open(\'out/main-rB.calc.json\'));print(d.ke
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; grep -n -A12 \'"response_mapping"\' docs/workflow-format.md | head -50; grep -n "
+Writing the workflow generator now; checking the api_request node format first.
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; grep -n "api_request" docs/workflow-format.md | head; sed -n 730,770p docs/workfl
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; python3 -c "\nimport json;d=json.load(open(\'out/main-rB.calc.json\'));c=d[\'acco
+  [Bash] {'command': 'mkdir -p /tmp/genrb; cat > /tmp/genrb/gen.py <<\'EOF\'\nimport json\nR=\'/home/ubuntu/btb/repo/\'\ncalc=jso
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; grep -n "terminal" docs/workflow-format.md builder/lint_workflow.py | head'}
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; sed -n 613,650p docs/workflow-format.md'}
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; python3 - <<\'EOF\'\np=\'/tmp/genrb/gen.py\';s=open(p).read()\ns=s.replace(\'\'\'
+Saved first version; running a quick start check.
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; timeout 90 python3 -c "import freya,json; print(json.dumps(freya.api(\'POST\',\'/
+I built the workflow for slot main-rB, saved it to `out/main-rB.workflow.json` and saved it to the platform. It passes the lint check, and one test chat turn opened correctly with the recorded-call greeting and "Am I speaking with Ms Lee?". I did not run any practice cases or longer chat tests.
+
+**How the call flows:**
+1. It starts with the date-facts code step from the calc file, unchanged.
+2. **Opening:** handles someone else answering (callback, wrong number, deceased, unclear). It moves on only when the person clearly confirms who they are.
+3. **Identity:** the two security questions. The identity tool's result now tells the model what to do next: wrong answer, swapped day and month, failed after three, or passed.
+4. **Account lookup:** runs silently. The account hook from the calc file is used as given, with extra code added after it. That code builds a numbered product summary (the words to say, the exact product id, amount owed, days late, minimum accepted amount, deadline, number of persuasion attempts).
+5. **Negotiation:** one stage for all the payment-promise rules. Ending the call from any stage goes to a hang-up step.
+
+**Checks in code, not just in the prompt:** before a promise is sent, a check stops it if the amount is outside the range from the minimum to the full amount owed. It also stops dates that are in the past, on a weekend or holiday, or after that product's deadline. Nothing is recorded, and the model is told why and what to offer instead. Every stage that uses tools tells the model to read the tool's success or failure first. It must never say something is recorded before the tool confirms it.
+
+**Choices you should know about:**
+- **Deadlines:** the calc file already uses the amended values (12 and 7 business days), so the brief and the date facts agree.
+- **Notes conflict between the briefs:** Brief A says never add a note; Brief B says add one for every product without a promise. I applied Brief A when the account has one product and Brief B when it has two or more.
+- **Failed promise recording:** applied per product as "try once more" (Brief A and the Brief B memo agree). With one product, a second failure ends the call as no promise / service error. With several, that product gets a service-error note and the call continues with the others.
+- **Not routed in code:** there is no automatic jump to the end on repeated recording failures, because a single failure counter cannot tell products apart. The model follows the prompt and the tool's guidance instead.
+
+workflow_id e99b473c-2df6-4d05-927d-5b0085543563, agent_id 33aaaf4a-3519-46f4-8ef1-2aa95ec80014 (deadlines follow the brief's amended 12/7 business days, same as the date facts; on add_note the briefs conflict, so I used Brief A for one product and Brief B for two or more).
+
+done: 15 turns, 136 s
+final save: {'workflow_id': 'e99b473c-2df6-4d05-927d-5b0085543563', 'agent_id': '33aaaf4a-3519-46f4-8ef1-2aa95ec80014', 'version': 3}; lint: 0 errors, 0 warnings
+{"workflow_id": "e99b473c-2df6-4d05-927d-5b0085543563", "agent_id": "33aaaf4a-3519-46f4-8ef1-2aa95ec80014"}
+146.48 s

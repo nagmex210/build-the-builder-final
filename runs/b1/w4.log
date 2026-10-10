@@ -1,0 +1,22 @@
+I made the builder's tool handling and honesty enforced in code, and committed everything on `idea/b1-4` with the report at `runs/b1/w4.md`. I could not get a valid fast_eval score: the Freya chat endpoint returned 503/504/500 errors for most of the slot, on another worker's workflow as well as mine. All four scores read 0, but most of the 52 runs were cut off by the platform.
+
+**The idea:** after the builder model writes a workflow, a fixed code step rewrites every API tool in it before saving. It doesn't depend on which brief is being built.
+- **Failed calls:** every failed result (HTTP error or `ok: false`) gets a line saying "FAILED, nothing was recorded, failure number N, never claim it was done". A successful write gets a "SUCCESS, only now say it is recorded" line.
+- **Ids:** ids returned by `get_account` are stored during the call. Before each write, a wrong id is fixed when there is only one candidate. Body values the platform left as literal `{{var}}` are filled from the model's arguments or call variables.
+- **Retries:** writes are never retried silently by the platform (`maxRetries: 0`). The model makes each retry itself, following the brief's own rule.
+- **Skill text:** a new section tells the builder model to read the failure line, to put the brief's failed-call rule into prompts and routing, and to take ids only from the account result.
+
+The new code is in `builder/harden.py` and `builder/save.py`, plus a final harden-and-save step in `builder/build.py`, which is also logged in the trace.
+
+**What the transcripts showed:**
+- **Honesty on failure works:** when a promise failed twice, the agent never claimed it was recorded.
+- **New failure found and fixed:** the platform sent `create_promise` with literal `{{product_id}}`/`{{deadline_date}}`, so promises never reached the bank. After the fix, every promise reached the ledger with a real id and date.
+- **PUB-10 (promise service fails once):** passed in one run (fail, retry, success, close). It failed in the other on a date the customer corrected, which is outside this idea.
+- **PUB-07 (holiday date):** still records the promise on the holiday. That is the date-rule area, not this one.
+- **Hook safety:** an earlier worry that the hooks break calls was cleared; a full call with the hooks ran normally.
+
+**Build times:** A 280 s, B 350 s, raw A 472 s, raw B 393 s.
+
+**For the merger:**
+- **Score the four workflows again:** the slots are `w4-*` in wt4's `.freya-agents.json`. B, raw A and raw B were built before the template fix, so they need rebuilding to include it.
+- **Builder login:** the builder's Claude process inside a worker isn't logged in by default. I fetched the token from SSM (Parameter Store) the same way `btb/batch.sh` does, which other workers will need to know.

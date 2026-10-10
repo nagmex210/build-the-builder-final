@@ -1,0 +1,163 @@
+{
+ "workflow_id": "0e92e0fa-2e50-4314-8434-33760d22f246",
+ "passed": 0,
+ "total": 3,
+ "rows": [
+  {
+   "id": "PUB-11",
+   "style": "talkative",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 220.0, '2026-10-16'), ('p2', 640.0, '2026-10-16'), ('p3', 75.0, '2026-10-16')]",
+    "the call was not closed with close_call",
+    "conversation: All three checks fail: the transcript does not state all three products before any ask, contains no read-back and confirmation covering all three, and includes no create_promise calls."
+   ],
+   "call_id": "2ebabee3-d433-413c-aa71-fe50fcdabe39",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity"
+   ],
+   "turns": 9
+  },
+  {
+   "id": "PUB-12",
+   "style": "corrects",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 510.0, '2026-10-15')]",
+    "notes [], expected [('p2', 'refused'), ('p3', 'refused')]",
+    "the call was not closed with close_call",
+    "conversation: The agent repeatedly re-asks the date of birth, and the transcript does not establish exactly one phone re-ask, exactly one credit-card promise, one refused note for each other product, or two late-band personal-loan attempts and one early-band car-loan attempt."
+   ],
+   "call_id": "c6ebba13-627a-48dc-ae68-3558424d418c",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity"
+   ],
+   "turns": 40
+  },
+  {
+   "id": "PUB-13",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]",
+    "conversation: The credit card was not recorded for 30 October, the loan was not recorded for 23 October, and no read-back named both dates."
+   ],
+   "call_id": "4139bdc0-5259-4636-b856-5472210c20f4",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "close_call",
+    "close_call"
+   ],
+   "turns": 11
+  },
+  {
+   "id": "PUB-11",
+   "style": "pieces",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 220.0, '2026-10-16'), ('p2', 640.0, '2026-10-16'), ('p3', 75.0, '2026-10-16')]",
+    "the call was not closed with close_call",
+    "conversation: All three checks fail: the three products were not stated before any ask, no combined read-back and confirmation occurred, and no create_promise calls were made."
+   ],
+   "call_id": "b1fc3c00-65a5-4029-9bf1-d4b1ce7ea6ac",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity"
+   ],
+   "turns": 9
+  },
+  {
+   "id": "PUB-12",
+   "style": "corrects",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 510.0, '2026-10-15')]",
+    "notes [], expected [('p2', 'refused'), ('p3', 'refused')]",
+    "the call was not closed with close_call",
+    "conversation: The date of birth was asked again while the phone question was never asked, and no credit-card promise, refused notes for the other two products, or required personal-loan and car-loan attempts are shown.",
+    "harness: chat turn timed out and no reply appeared"
+   ],
+   "call_id": "088b6057-6853-4623-b0fd-82b9e9c5bc7e",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity"
+   ],
+   "turns": 3
+  },
+  {
+   "id": "PUB-13",
+   "style": "in_words",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]",
+    "the call was not closed with close_call",
+    "conversation: The credit card was not recorded for 30 October, the loan was not recorded for 23 October, and no read-back named both dates."
+   ],
+   "call_id": "2484e590-1c26-485b-a43d-0262f6633248",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity"
+   ],
+   "turns": 12
+  }
+ ]
+}

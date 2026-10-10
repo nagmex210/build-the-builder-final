@@ -1,0 +1,24 @@
+I've finished worker 2's task for b1: the change is built and committed on `idea/b1-2`, and the report is in `runs/b1/w2.md`. The scores don't tell us whether the idea works, because the Freya platform was failing for the whole evaluation window.
+
+**The idea:** give the builder a fixed call structure that works for any brief, plus a checker for the workflow it produces.
+- **Structure:** opening → identity → account lookup → a code step that works out all the numbers and dates → negotiation → a hang-up node.
+- **Routing:** each stage hands over on a tool result or a value pulled from what the customer said, not on the model guessing intent. Any stage that can close the call has the close tool, and a successful close always leads to the hang-up node.
+- **Checker:** `builder/lint_workflow.py` catches the platform mistakes that otherwise fail silently. `builder/build.py` now runs it after every build and records the result in the trace.
+- **Fix from the second round:** the first A and B builds "blocked" rule-breaking tool calls by pointing them at localhost, which the platform refuses, so the turn broke. The recipe now says to drop a required field instead, and the checker flags localhost.
+
+All 8 builds followed the structure and passed the checker with no errors. The second-round builds took 374–531 s.
+
+**Scores (fast_eval, 2 reps, random style):** 2/26 in total — A 1/10, B 0/3, raw-A 1/10, raw-B 0/3. There is no champion row in `results.tsv` to compare against. Two platform problems drove these numbers:
+- The chat endpoint returned instant 503 errors. The kit's own example agent got 0 of 8 first turns, later 2–4 of 5.
+- The code sandbox that runs tool hooks was unreachable, so every tool call with a hook failed. The agent handled this honestly: it said it couldn't record and closed with `service_error`.
+
+For the final runs I used a local, uncommitted wrapper that retries the 503s, and the platform still wasn't healthy. Of the 27 calls with no platform error, 10 passed (in the first round, before the outage got worse, it was 9 of 11). **These four slots need re-scoring once the platform is healthy.** The workflow ids are under `w2-A`, `w2-B`, `w2-rA` and `w2-rB` in `.freya-agents.json`.
+
+**Failures that were not the platform:**
+- **Dates:** a callback date called "tomorrow", a promise date after the deadline accepted, a holiday not moved to the next business day.
+- **Missed steps:** no transfer to restructuring when the customer asked for a new plan, and the third wrong security answer not handled properly.
+- **Wording:** the floor amount offered twice, and the "payments can take one business day" sentence missing.
+
+**Brief-agnostic:** yes. The recipe and the checker mention only the seven fixed tool names and how the platform works. Every rule, value, outcome code and holiday is read from the brief when the builder runs.
+
+During the raw-B build, the builder left three untracked files in `runs/b1/`: `patch_rB.py`, `patch_rB_prompts.py` and `w2-rB.before.json`. I didn't commit them.

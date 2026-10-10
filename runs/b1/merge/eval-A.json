@@ -1,0 +1,336 @@
+{
+ "workflow_id": "c591c751-dc19-4660-9955-f9a4d750213d",
+ "passed": 3,
+ "total": 10,
+ "rows": [
+  {
+   "id": "PUB-01",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "conversation: create_promise was never called, and the required text-message sentence was not said after the promise."
+   ],
+   "call_id": "6c58b40a-6284-49fb-ae97-74155b8f5d80",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 6
+  },
+  {
+   "id": "PUB-02",
+   "style": "talkative",
+   "pass": false,
+   "failed": [
+    "conversation: No callback was scheduled for the next business day at 11:00."
+   ],
+   "call_id": "bea2956d-c651-48d0-9f1a-d55909024da1",
+   "tools": [
+    "schedule_callback",
+    "close_call"
+   ],
+   "turns": 3
+  },
+  {
+   "id": "PUB-03",
+   "style": "talkative",
+   "pass": true,
+   "failed": [],
+   "call_id": "6d9529b9-4727-4b31-8804-7b56d69c865d",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "close_call"
+   ],
+   "turns": 5
+  },
+  {
+   "id": "PUB-04",
+   "style": null,
+   "pass": true,
+   "failed": [],
+   "call_id": "42696539-ed5b-4154-9302-cd50199e0a6c",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 9
+  },
+  {
+   "id": "PUB-05",
+   "style": "corrects",
+   "pass": true,
+   "failed": [],
+   "call_id": "98ef0efa-630d-4919-aff5-5c18b72219df",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 6
+  },
+  {
+   "id": "PUB-06",
+   "style": "talkative",
+   "pass": true,
+   "failed": [],
+   "call_id": "6a233b85-0c21-4da5-8f7a-5d6047a22da3",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 8
+  },
+  {
+   "id": "PUB-07",
+   "style": "talkative",
+   "pass": false,
+   "failed": [
+    "outcome ('no_promise', 'refused'), expected ('promise', None)",
+    "promises [], expected [('p1', 540.0, '2026-10-27')]",
+    "conversation: The promise was never recorded for Tuesday 27 October despite that date being inside the early-band deadline of Monday 2 November; no create_promise tool call was made."
+   ],
+   "call_id": "67ffd9df-13cc-4cef-bb5b-29aaaad2d046",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 10
+  },
+  {
+   "id": "PUB-08",
+   "style": null,
+   "pass": true,
+   "failed": [],
+   "call_id": "1b3d2f2f-154c-4572-9d2e-ebea0a3a6ace",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 5
+  },
+  {
+   "id": "PUB-09",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('transferred', 'restructuring')",
+    "transfers [], expected [{'queue': 'restructuring'}]",
+    "the call was not closed with close_call",
+    "conversation: The required transfer_to_agent call with queue restructuring was not made.",
+    "harness: POST /api/v2/chat/message -> 500: {\"success\":false,\"data\":{\"message\":\"Internal server error\",\"result\":{\"requestId\":\"4d48a9aa-b978-4d54-975e-a8ad38e7225b\"}}}"
+   ],
+   "call_id": null,
+   "tools": [],
+   "turns": 0
+  },
+  {
+   "id": "PUB-10",
+   "style": "corrects",
+   "pass": false,
+   "failed": [
+    "conversation: Exactly one promise in the ledger after the retry is not established: create_promise failed with nothing recorded, and no retry or successful creation appears."
+   ],
+   "call_id": "c8e8caef-bbc6-4a84-948d-0cef418270ac",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 7
+  },
+  {
+   "id": "PUB-01",
+   "style": "talkative",
+   "pass": true,
+   "failed": [],
+   "call_id": "2421ac74-d88a-46fb-a076-1481cdd79656",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 7
+  },
+  {
+   "id": "PUB-02",
+   "style": "corrects",
+   "pass": false,
+   "failed": [
+    "conversation: The callback was not scheduled for the next business day at 11:00; no scheduling tool call was made."
+   ],
+   "call_id": "860dcacb-b61b-4884-b7d4-8f71917aa3b7",
+   "tools": [
+    "schedule_callback",
+    "close_call"
+   ],
+   "turns": 4
+  },
+  {
+   "id": "PUB-03",
+   "style": "pieces",
+   "pass": true,
+   "failed": [],
+   "call_id": "637bdfd4-b346-49f6-9ef7-eb164e0bed4c",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "close_call"
+   ],
+   "turns": 5
+  },
+  {
+   "id": "PUB-04",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "outcome ('no_promise', 'refused'), expected ('promise', None)",
+    "promises [], expected [('p1', 1250.0, '2026-10-23')]",
+    "conversation: The agent counted her proposed date as a refusal by closing with reason 'refused', and no promise was recorded for the late-band deadline of 23 October."
+   ],
+   "call_id": "bca8c1f2-a6b9-46c9-9d3f-ba7aa5c5f13b",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 8
+  },
+  {
+   "id": "PUB-05",
+   "style": "pieces",
+   "pass": true,
+   "failed": [],
+   "call_id": "a68d1fe9-207e-495e-be92-622019e87167",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 6
+  },
+  {
+   "id": "PUB-06",
+   "style": "corrects",
+   "pass": false,
+   "failed": [
+    "promises [('p1', 637.5, '2026-10-20')], expected [('p1', 637.5, '2026-10-16')]",
+    "conversation: The promise was for 637.50 on Tuesday 20 October, not the required Friday 16 October."
+   ],
+   "call_id": "04972918-983d-4ddf-be11-0a05b9310f9c",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 8
+  },
+  {
+   "id": "PUB-07",
+   "style": "pieces",
+   "pass": false,
+   "failed": [
+    "outcome ('no_promise', 'refused'), expected ('promise', None)",
+    "promises [], expected [('p1', 540.0, '2026-10-27')]",
+    "conversation: The agent never asked for the exact payment day, never rejected 26 October and offered the next business day, and never recorded a promise for Tuesday 27 October within the early-band deadline."
+   ],
+   "call_id": "65f95f29-47c6-42ee-9e64-5ae1717691ec",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 7
+  },
+  {
+   "id": "PUB-08",
+   "style": "asks_back",
+   "pass": true,
+   "failed": [],
+   "call_id": "7fa13d3a-1c14-476d-99fe-6a6afdd281b9",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 6
+  },
+  {
+   "id": "PUB-09",
+   "style": null,
+   "pass": true,
+   "failed": [],
+   "call_id": "74fa2cdf-fc0b-485f-8bda-ad70cfc073c1",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "transfer_to_agent",
+    "close_call"
+   ],
+   "turns": 6
+  },
+  {
+   "id": "PUB-10",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "conversation: The agent says \u201cthis call is recorded\u201d in the opening before any successful tool call, failing the check against saying \u201crecorded\u201d before a successful call."
+   ],
+   "call_id": "a021c21d-f38e-4ab5-ae10-758af1383603",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 8
+  }
+ ]
+}

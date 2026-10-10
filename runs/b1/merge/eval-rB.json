@@ -1,0 +1,118 @@
+{
+ "workflow_id": "e99b473c-2df6-4d05-927d-5b0085543563",
+ "passed": 0,
+ "total": 3,
+ "rows": [
+  {
+   "id": "PUB-11",
+   "style": "talkative",
+   "pass": true,
+   "failed": [],
+   "call_id": "3a105cad-9d12-4aec-bbf6-daeb9e78cab1",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 15
+  },
+  {
+   "id": "PUB-12",
+   "style": "pieces",
+   "pass": false,
+   "failed": [
+    "conversation: No refused notes were recorded for the personal loan or car loan, and the car loan received two attempts after the initial refusal rather than one."
+   ],
+   "call_id": "3acb1c0b-2bda-4345-b0ba-160f5285236d",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "add_note",
+    "add_note",
+    "close_call"
+   ],
+   "turns": 11
+  },
+  {
+   "id": "PUB-13",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "conversation: Neither the credit card promise for 30 October nor the loan promise for 23 October is confirmed recorded, because both create_promise calls lack completion results."
+   ],
+   "call_id": "b8b67f28-1163-4ef3-8b15-d01c69cb474c",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 8
+  },
+  {
+   "id": "PUB-11",
+   "style": "pieces",
+   "pass": false,
+   "failed": [
+    "conversation: The one create_promise per product check failed because no create_promise tool calls were made for any of the three products."
+   ],
+   "call_id": "61b86889-a905-442e-913a-8d6278a5f97d",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 11
+  },
+  {
+   "id": "PUB-12",
+   "style": "in_words",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 510.0, '2026-10-15')]",
+    "notes [], expected [('p2', 'refused'), ('p3', 'refused')]",
+    "the call was not closed with close_call",
+    "conversation: The transcript does not show the phone question asked again once, exactly one credit-card promise, one refused note for each other product, or two late-band personal-loan attempts and one early-band car-loan attempt.",
+    "harness: POST /api/v2/chat/message -> 500: {\"success\":false,\"data\":{\"message\":\"Internal server error\",\"result\":{\"requestId\":\"624d6aca-3a12-48ce-a124-eef28b9b724c\"}}}"
+   ],
+   "call_id": null,
+   "tools": [],
+   "turns": 0
+  },
+  {
+   "id": "PUB-13",
+   "style": "asks_back",
+   "pass": true,
+   "failed": [],
+   "call_id": "3460f388-d053-4f48-ba22-f165e2b53e39",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 7
+  }
+ ]
+}

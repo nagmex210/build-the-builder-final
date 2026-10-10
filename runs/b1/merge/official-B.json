@@ -1,0 +1,230 @@
+{
+ "agent_id": "bce0c1bc-a68b-436e-a37b-88db6b717c99",
+ "simulation_id": "627864ef-a920-4183-be6a-99a7d37d2408",
+ "iteration_id": "42772a7d-cfad-4e12-a3b1-246eb2f61982",
+ "seconds": 124,
+ "passed": 2,
+ "total": 3,
+ "runs": 2,
+ "final": [
+  {
+   "id": "PUB-11",
+   "family": "Multi-product",
+   "passes": 2,
+   "runs": 2,
+   "pass": true
+  },
+  {
+   "id": "PUB-12",
+   "family": "Multi-product",
+   "passes": 1,
+   "runs": 2,
+   "pass": false
+  },
+  {
+   "id": "PUB-13",
+   "family": "Multi-product",
+   "passes": 2,
+   "runs": 2,
+   "pass": true
+  }
+ ],
+ "rows": [
+  {
+   "id": "PUB-11",
+   "level": "medium",
+   "family": "Multi-product",
+   "pass": true,
+   "failed": [],
+   "call_id": "be6165ff-c111-4a35-bdd8-7f3a82c143b8",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "customer_id": "c_d82c61ea-8de",
+   "slowest_turn_s": 4.3,
+   "ended": "assistant-ended-call"
+  },
+  {
+   "id": "PUB-12",
+   "level": "hard",
+   "family": "Multi-product",
+   "pass": false,
+   "failed": [
+    "promises [('p1', 153.0, '2026-10-15')], expected [('p1', 510.0, '2026-10-15')]",
+    "notes [('p2', 'refused')], expected [('p2', 'refused'), ('p3', 'refused')]",
+    "the call was not closed with close_call",
+    "conversation: The conversation failed on two success criteria: 1. Persuasion attempts: The assistant made two attempts for the car loan (Messages 20 and 22), despite the success criteria requiring exactly one attempt for early band products. 2. Documentation: While the assistant called the `add_note` function for the car loan, the system event shows it failed because the call was already closed (`\"ok\": false, \""
+   ],
+   "call_id": "c30f4fb2-ccb7-4d1f-9a69-119158632354",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "add_note",
+    "close_call",
+    "add_note"
+   ],
+   "customer_id": "c_5e624dd6-d38",
+   "slowest_turn_s": 3.5,
+   "ended": "assistant-ended-call"
+  },
+  {
+   "id": "PUB-13",
+   "level": "hard",
+   "family": "Multi-product",
+   "pass": true,
+   "failed": [],
+   "call_id": "300e60fc-8795-489c-8c54-21ea6d09b97d",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "customer_id": "c_66a17ee5-3c2",
+   "slowest_turn_s": 2.7,
+   "ended": "assistant-ended-call"
+  }
+ ],
+ "all_rows": [
+  [
+   {
+    "id": "PUB-11",
+    "level": "medium",
+    "family": "Multi-product",
+    "pass": true,
+    "failed": [],
+    "call_id": "c910763d-2c1a-4b2a-a854-26d0d5089f19",
+    "tools": [
+     "verify_identity",
+     "verify_identity",
+     "get_account",
+     "create_promise",
+     "create_promise",
+     "create_promise",
+     "close_call"
+    ],
+    "customer_id": "c_d5d2142e-141",
+    "slowest_turn_s": 3.8,
+    "ended": "assistant-ended-call"
+   },
+   {
+    "id": "PUB-12",
+    "level": "hard",
+    "family": "Multi-product",
+    "pass": true,
+    "failed": [],
+    "call_id": "d9bcb078-5302-44b2-9c5d-b5675501c2ec",
+    "tools": [
+     "verify_identity",
+     "verify_identity",
+     "verify_identity",
+     "get_account",
+     "create_promise",
+     "add_note",
+     "add_note",
+     "close_call"
+    ],
+    "customer_id": "c_4e1d64dd-413",
+    "slowest_turn_s": 3.0,
+    "ended": "assistant-ended-call"
+   },
+   {
+    "id": "PUB-13",
+    "level": "hard",
+    "family": "Multi-product",
+    "pass": true,
+    "failed": [],
+    "call_id": "bf8427c2-c15d-4192-9d58-dcb0d8fcad64",
+    "tools": [
+     "verify_identity",
+     "verify_identity",
+     "get_account",
+     "create_promise",
+     "create_promise",
+     "close_call"
+    ],
+    "customer_id": "c_52e704da-0f4",
+    "slowest_turn_s": 2.8,
+    "ended": "assistant-ended-call"
+   }
+  ],
+  [
+   {
+    "id": "PUB-11",
+    "level": "medium",
+    "family": "Multi-product",
+    "pass": true,
+    "failed": [],
+    "call_id": "be6165ff-c111-4a35-bdd8-7f3a82c143b8",
+    "tools": [
+     "verify_identity",
+     "verify_identity",
+     "get_account",
+     "create_promise",
+     "create_promise",
+     "create_promise",
+     "close_call"
+    ],
+    "customer_id": "c_d82c61ea-8de",
+    "slowest_turn_s": 4.3,
+    "ended": "assistant-ended-call"
+   },
+   {
+    "id": "PUB-12",
+    "level": "hard",
+    "family": "Multi-product",
+    "pass": false,
+    "failed": [
+     "promises [('p1', 153.0, '2026-10-15')], expected [('p1', 510.0, '2026-10-15')]",
+     "notes [('p2', 'refused')], expected [('p2', 'refused'), ('p3', 'refused')]",
+     "the call was not closed with close_call",
+     "conversation: The conversation failed on two success criteria: 1. Persuasion attempts: The assistant made two attempts for the car loan (Messages 20 and 22), despite the success criteria requiring exactly one attempt for early band products. 2. Documentation: While the assistant called the `add_note` function for the car loan, the system event shows it failed because the call was already closed (`\"ok\": false, \""
+    ],
+    "call_id": "c30f4fb2-ccb7-4d1f-9a69-119158632354",
+    "tools": [
+     "verify_identity",
+     "verify_identity",
+     "verify_identity",
+     "get_account",
+     "create_promise",
+     "add_note",
+     "close_call",
+     "add_note"
+    ],
+    "customer_id": "c_5e624dd6-d38",
+    "slowest_turn_s": 3.5,
+    "ended": "assistant-ended-call"
+   },
+   {
+    "id": "PUB-13",
+    "level": "hard",
+    "family": "Multi-product",
+    "pass": true,
+    "failed": [],
+    "call_id": "300e60fc-8795-489c-8c54-21ea6d09b97d",
+    "tools": [
+     "verify_identity",
+     "verify_identity",
+     "get_account",
+     "create_promise",
+     "create_promise",
+     "close_call"
+    ],
+    "customer_id": "c_66a17ee5-3c2",
+    "slowest_turn_s": 2.7,
+    "ended": "assistant-ended-call"
+   }
+  ]
+ ]
+}
