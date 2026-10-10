@@ -1,0 +1,37 @@
+FAIL PUB-11 0/2 | 
+       - [asks_back] outcome (None, None), expected ('promise', None)
+       - [asks_back] promises [], expected [('p1', 220.0, '2026-10-16'), ('p2', 640.0, '2026-10-16'), ('p3', 75.0, '2026-10-16')]
+       - [asks_back] the call was not closed with close_call
+       - [asks_back] conversation: The agent asked for identity confirmation before stating all three products, and no read-back, confirmation for all three, or create_promise call per product occurred.
+       - [asks_back] harness: POST /api/v2/chat/message -> 503: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"4a37a22e-1630-42ca-92c7-76e8e695758a"}}}
+       - [asks_back] outcome (None, None), expected ('promise', None)
+       - [asks_back] promises [], expected [('p1', 220.0, '2026-10-16'), ('p2', 640.0, '2026-10-16'), ('p3', 75.0, '2026-10-16')]
+       - [asks_back] the call was not closed with close_call
+       - [asks_back] conversation: The checks fail because all three products were not stated, no read-back or confirmation for all three occurred, and no create_promise call was made for any product.
+       - [asks_back] harness: POST /api/v2/chat/message -> 503: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"65dbdba1-298d-4a42-8903-268ee2cb6ac1"}}}
+FAIL PUB-12 0/2 | 
+       - [in_words] outcome (None, None), expected ('promise', None)
+       - [in_words] promises [], expected [('p1', 510.0, '2026-10-15')]
+       - [in_words] notes [], expected [('p2', 'refused'), ('p3', 'refused')]
+       - [in_words] the call was not closed with close_call
+       - [in_words] conversation: The transcript does not establish a repeated phone question without a repeated date-of-birth question, exactly one credit-card promise, one refused note for each other product, or two late-band personal-loan attempts and one early-band car-loan a
+       - [in_words] harness: POST /api/v2/chat/message -> 503: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"0fff6cd6-d732-48b2-9e44-c8b82032b35c"}}}
+       - [corrects] outcome (None, None), expected ('promise', None)
+       - [corrects] promises [], expected [('p1', 510.0, '2026-10-15')]
+       - [corrects] notes [], expected [('p2', 'refused'), ('p3', 'refused')]
+       - [corrects] the call was not closed with close_call
+       - [corrects] conversation: The phone question was not asked and repeated once, no credit-card promise or refused notes for the other two products were recorded, and neither the two late-band personal-loan attempts nor the one early-band car-loan attempt occurred.
+       - [corrects] harness: POST /api/v2/chat/message -> 503: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"5e5384d8-6a10-4c7f-9e42-6aeeac896093"}}}
+FAIL PUB-13 0/2 | 
+       - [in_words] outcome (None, None), expected ('promise', None)
+       - [in_words] promises [], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]
+       - [in_words] the call was not closed with close_call
+       - [in_words] conversation: The transcript does not show the credit card recorded for 30 October, the loan recorded for its 23 October deadline, or a read-back naming both dates.
+       - [in_words] harness: POST /api/v2/chat/message -> 503: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"f20a99be-a68a-43bc-9362-9bcc1fc7c2e0"}}}
+       - [talkative] outcome (None, None), expected ('promise', None)
+       - [talkative] promises [], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]
+       - [talkative] the call was not closed with close_call
+       - [talkative] conversation: The credit card was not recorded for 30 October, the loan was not recorded for its 23 October deadline, and no read-back named both dates.
+       - [talkative] harness: POST /api/v2/chat/message -> 503: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"d704ed86-1b32-48b7-a328-1b3583321d41"}}}
+
+fast_eval: 0 / 3 passed (2 rep(s), all reps must pass), 40 s

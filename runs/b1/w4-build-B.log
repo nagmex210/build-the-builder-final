@@ -1,0 +1,40 @@
+  [Skill] {'skill': 'build-phone-agent', 'args': 'Slot: w4-B. Tool API file: tools/openapi.json. Brief files: briefs/brief-a.md br
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; ls -R briefs tools docs examples builder out 2>&1 | head -50; cat briefs/brief-a.m
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; cat tools/openapi.json; echo =====; cat docs/workflow-format.md; echo ====; cat do
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; cat examples/base-agent.json; echo ====; cat builder/save.py; echo ====; cat build
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; cat docs/workflow-format.md; echo ====; cat docs/tools-and-code.md', 'description'
+  [Read] {'file_path': '/home/ubuntu/.claude/projects/-home-ubuntu-btb-wt4/127d0b7d-70f4-4c75-920d-6cc2f37802b6/tool-results/be0z
+Reading the docs and the tool API now. Next I'll write the workflow.
+  [Read] {'file_path': '/home/ubuntu/.claude/projects/-home-ubuntu-btb-wt4/127d0b7d-70f4-4c75-920d-6cc2f37802b6/tool-results/be0z
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; python3 -c "\nimport json;d=json.load(open(\'tools/openapi.json\'))\nprint(d[\'inf
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; python3 -c "\nimport json;d=json.load(open(\'tools/openapi.json\'))\nfor p,v in d[
+Writing the workflow generator now. It will have a date-calculation code node, opening/third-party, identity, account load, a collection node, and fixed closing nodes.
+  [Write] {'file_path': '/home/ubuntu/btb/wt4/out/w4-B.gen.py', 'content': '"""Generates out/w4-B.workflow.json (Brief A + Brief B
+  [Edit] {'replace_all': False, 'file_path': '/home/ubuntu/btb/wt4/out/w4-B.gen.py', 'old_string': '    "- If verify_identity FAI
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; python3 out/w4-B.gen.py && python3 - <<\'EOF\'\n# test code snippets locally\nimpo
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; python3 - <<\'EOF\'\np=\'out/w4-B.gen.py\'; s=open(p).read()\nold="""        today
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; python3 -c "import freya,json; print(json.dumps(freya.api(\'POST\',\'/api/v2/chat/
+I built and saved the w4-B phone agent, and it starts: a test chat turn came back with the right opening line. I haven't run it against the practice customers yet, so it has passed no cases so far.
+
+**What it does.** It follows Brief B, which is Brief A extended to customers with up to three late products. The call goes:
+
+1. **Dates first.** Before the call starts, a code step works out the business days, holidays, each product's deadline, the attempt-1 date and the allowed callback window, all from `now`. The agent reads these from a calendar in its prompt instead of guessing weekdays.
+2. **Opening.** The first line is fixed: digital assistant from Freya Bank, call recorded, then "Am I speaking with {title} {last_name}?". This step also handles a relative answering (callback only, nothing about the account), wrong number, deceased, and an unclear answer after the second ask.
+3. **Identity.** Date of birth first, then the last four digits of the phone, each checked with `verify_identity`. Both passing moves the call on automatically. Three wrong answers go straight to a fixed "use the mobile app or a branch" goodbye that closes as `not_verified` / `failed`.
+4. **Account.** `get_account` runs automatically once identity passes. Code then builds a fact line per product: its id, the product in words, past-due amount, band, floor, deadline and the persuasion attempts allowed.
+5. **Collection.** One step covers stating the debt, the amount, date and persuasion rules per product, the special cases (hardship, already paid, dispute, restructuring, asking for a human), one joint read-back, `create_promise` per product, then notes and the goodbye.
+
+**Rules enforced in code or routing rather than left to the prompt:**
+- **Fixed closings.** A booked callback, a completed transfer and failed identity each go to a closing step with a fixed goodbye, and the correct outcome is sent in code.
+- **Closing outcome.** I added a check that runs before every `close_call`. It keeps a record of successful promises, notes and transfers, and corrects the outcome and reason from that record using Brief B's closing rules. For example, a transfer always closes as `transferred`, and the reason comes from the first product in order whose note is not `paid`.
+- **Notes.** `add_note` is only called at the end of the call, so no notes are added when a transfer happens.
+- **Failed tool calls.** The agent tries a failed write once more, then tells the customer it could not be done. A promise that fails twice is noted as `service_error` and the other promises stay recorded.
+
+**Conflict between the briefs:** Brief A says it never uses `add_note`, but Brief B says every product without a promise gets a note. I followed Brief B, so a single-product customer who refuses also gets a note. If this agent is also scored on Brief A cases, that will count against it there.
+
+The generator script is `out/w4-B.gen.py`. Edit that and run it to rebuild the workflow file, then save again with `builder/save.py`.
+
+workflow_id: 4eaa14d7-6d65-4fa7-9f82-ce9b3738e396, agent_id: 6d560fd2-537d-4350-b8be-93131e4bfb4b
+
+done: 16 turns, 348 s
+{"workflow_id": "4eaa14d7-6d65-4fa7-9f82-ce9b3738e396", "agent_id": "6d560fd2-537d-4350-b8be-93131e4bfb4b"}

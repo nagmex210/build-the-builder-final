@@ -1,0 +1,10 @@
+FAIL PUB-07 0/2 | verify_identity > verify_identity > get_account > create_promise > close_call
+       - [pieces] promises [('p1', 540.0, '2026-10-26')], expected [('p1', 540.0, '2026-10-27')]
+       - [pieces] conversation: The agent accepted 26 October without offering the next business day and recorded the promise for Monday 26 October instead of Tuesday 27 October.
+       - [plain] promises [('p1', 540.0, '2026-10-26')], expected [('p1', 540.0, '2026-10-27')]
+       - [plain] conversation: The agent did not ask once for the exact payment day after the vague response, accepted 26 October without offering the next business day, and recorded the promise for Monday 26 October rather than Tuesday 27 October.
+FAIL PUB-10 1/2 | verify_identity > verify_identity > get_account > create_promise > create_promise > close_call
+       - [corrects] promises [('p1', 365.0, '2026-10-20')], expected [('p1', 365.0, '2026-10-16')]
+       - [corrects] conversation: The check that the agent does not say 'recorded' before a successful call fails because the opening says 'this call is recorded' before any successful tool call.
+
+fast_eval: 0 / 2 passed (2 rep(s), all reps must pass), 121 s

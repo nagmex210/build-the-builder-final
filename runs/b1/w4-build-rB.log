@@ -1,0 +1,38 @@
+  [Skill] {'skill': 'build-phone-agent', 'args': 'Slot: w4-rB. Tool API file: tools/openapi.json. Brief files: btb/briefs_raw/brie
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; ls; ls btb/briefs_raw 2>&1; ls ../briefs_raw 2>&1; ls docs examples out builder to
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; cat btb/briefs_raw/brief-a-raw.md; echo ======; cat btb/briefs_raw/brief-b-raw.md'
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; cat tools/openapi.json; echo =====; cat docs/workflow-format.md', 'description': '
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; cat docs/tools-and-code.md; echo =====; cat examples/base-agent.json', 'descriptio
+  [Read] {'file_path': '/home/ubuntu/.claude/projects/-home-ubuntu-btb-wt4/9a3b3f7a-213a-483a-99e6-19841f86f55f/tool-results/bvzp
+I've read both briefs (B extends A with multi-product handling), the tool API, and the workflow format doc. Now reading the tools/code doc and the example agent.
+  [Read] {'file_path': '/home/ubuntu/.claude/projects/-home-ubuntu-btb-wt4/9a3b3f7a-213a-483a-99e6-19841f86f55f/tool-results/byt1
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; cat builder/save.py; cat builder/harden.py; head -c 3000 journal.md; echo; head -2
+  [Bash] {'command': 'mkdir -p /tmp/w4rB /home/ubuntu/btb/wt4/out; cd /home/ubuntu/btb/wt4; cat freya.py | head -60; grep -n "def
+  [Write] {'file_path': '/tmp/w4rB/gen.py', 'content': '"""Generate out/w4-rB.workflow.json from Brief A + Brief B (multi-product)
+  [Bash] {'command': "python3 /tmp/w4rB/gen.py out/w4-rB.workflow.json && python3 - <<'EOF'\nimport json\nwf=json.load(open('out/
+Code nodes compute correctly. Saving.
+  [Bash] {'command': 'source env.sh 2>/dev/null; python3 builder/save.py w4-rB out/w4-rB.workflow.json', 'description': 'Harden a
+  [Bash] {'command': 'source env.sh 2>/dev/null; python3 -c "import freya,json; print(freya.api(\'POST\',\'/api/v2/chat/message\'
+  [Bash] {'command': 'python3 - <<\'EOF\'\np=\'/tmp/w4rB/gen.py\'; s=open(p).read()\nold=\'\'\'is recorded, booked, scheduled, tr
+I built the phone agent from Brief B (which extends Brief A), saved it as slot `w4-rB`, and it starts a call correctly. The one test chat turn returned the right opening: "Hello, I am a digital assistant calling from Freya Bank, and this call is recorded. Am I speaking with Ms Lee?" I did not run the practice customers, so it is untested beyond that first turn.
+
+**How the call flows:**
+1. **Opening:** confirms who answered, asks a second time if the answer is unclear, then closes as `not_reached`/`unclear`.
+2. **Someone else answers:** handles callbacks inside the allowed window, wrong number and deceased. It never says why it is calling.
+3. **Security check:** date of birth, then the last four phone digits. The swapped day/month hint does not count as a wrong answer, and it moves on to the fail or decline paths based on the tool results.
+4. **Account and disclosure:** a code step reads the account and works out, for each product, the band, deadline, floor, allowed dates and persuasion offers. The disclosure is fixed text with one sentence per product, followed by the "pay all today?" question.
+5. **Negotiation:** the Brief A rules applied product by product, ending with one combined read-back and "Do you confirm?".
+6. **Recording:** a separate step records the promises (one more attempt after a failure, then a `service_error` note for that product), adds a note for each product without a promise, then says goodbye and closes the call. Transfers go straight to closing with no notes.
+
+**Choices to know about:**
+- **Memo values:** I used the memo values, not the older policy figures: deadlines of 12 and 7 business days, up to 3 products, and 2 failed `create_promise` calls per product.
+- **Closing outcome:** extra code in the tools tracks recorded promises, notes, transfers and callbacks, and overrides what the model sends to `close_call` with the outcome the brief requires. This depends on the tool code being able to save values between tool calls. The docs confirm this for code that runs after a tool call. They don't confirm it for code that runs before a call, which is where notes and the transfer queue are partly captured.
+- **Account load failure:** neither brief covers this. I close it as `no_promise`/`service_error`.
+- **Transfer failure:** no rule in either brief, so it follows the skill's default: try once more, then tell the customer it could not be done.
+
+The workflow file is `out/w4-rB.workflow.json`. The script that generates it is at `/tmp/w4rB/gen.py`, outside the repository, so it won't be kept with the project unless you copy it in.
+
+workflow_id: 494ff161-fbcf-48a3-956a-8d4b2854a768, agent_id: 8c943717-6bc1-4031-8912-0d0b732e0997
+
+done: 16 turns, 391 s
+{"workflow_id": "494ff161-fbcf-48a3-956a-8d4b2854a768", "agent_id": "8c943717-6bc1-4031-8912-0d0b732e0997"}

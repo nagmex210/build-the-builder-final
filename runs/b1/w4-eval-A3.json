@@ -1,0 +1,79 @@
+{
+ "workflow_id": "f117c80b-d6ea-4e2b-bc00-80b941a00474",
+ "passed": 0,
+ "total": 2,
+ "rows": [
+  {
+   "id": "PUB-07",
+   "style": "pieces",
+   "pass": false,
+   "failed": [
+    "promises [('p1', 540.0, '2026-10-26')], expected [('p1', 540.0, '2026-10-27')]",
+    "conversation: The agent accepted 26 October without offering the next business day and recorded the promise for Monday 26 October instead of Tuesday 27 October."
+   ],
+   "call_id": "6c7c9aa7-dad7-4aa9-a495-19e47814cb34",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 8
+  },
+  {
+   "id": "PUB-10",
+   "style": "corrects",
+   "pass": false,
+   "failed": [
+    "promises [('p1', 365.0, '2026-10-20')], expected [('p1', 365.0, '2026-10-16')]",
+    "conversation: The check that the agent does not say 'recorded' before a successful call fails because the opening says 'this call is recorded' before any successful tool call."
+   ],
+   "call_id": "87296180-828b-408e-9f9c-aeb6cc440357",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 8
+  },
+  {
+   "id": "PUB-07",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "promises [('p1', 540.0, '2026-10-26')], expected [('p1', 540.0, '2026-10-27')]",
+    "conversation: The agent did not ask once for the exact payment day after the vague response, accepted 26 October without offering the next business day, and recorded the promise for Monday 26 October rather than Tuesday 27 October."
+   ],
+   "call_id": "ea6cd0ad-c983-476f-a8dc-3e7694104633",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 8
+  },
+  {
+   "id": "PUB-10",
+   "style": null,
+   "pass": true,
+   "failed": [],
+   "call_id": "bfac5cb1-119f-42e8-97f6-f6dbb124a6d7",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 9
+  }
+ ]
+}

@@ -46,6 +46,22 @@ async def run(slot, tools, briefs):
                         print(f"  [{block.name}] {str(block.input)[:120]}", flush=True)
             elif isinstance(message, ResultMessage):
                 print(f"\ndone: {message.num_turns} turns, {message.duration_ms / 1000:.0f} s", flush=True)
+    # Guarantee: whatever the agent saved, the published workflow carries the tool-failure/honesty hooks.
+    wf_file = KIT / "out" / f"{slot}.workflow.json"
+    if wf_file.exists():
+        try:
+            sys.path.insert(0, str(KIT)); sys.path.insert(0, str(KIT / "builder"))
+            import freya
+            from harden import harden
+            wf = json.loads(wf_file.read_text())
+            names = harden(wf)
+            wf_file.write_text(json.dumps(wf, indent=1))
+            saved = freya.save_workflow(slot, wf, state_file=str(KIT / ".freya-agents.json"))
+            with trace.open("a") as out:
+                out.write(json.dumps({"event": "harden+save", "tools": names, "saved": saved}) + "\n")
+        except Exception as e:  # noqa: BLE001
+            with trace.open("a") as out:
+                out.write(json.dumps({"event": "harden failed", "error": str(e)[:300]}) + "\n")
     state = json.loads((KIT / ".freya-agents.json").read_text()).get(slot) if (KIT / ".freya-agents.json").exists() else None
     with trace.open("a") as out:
         out.write(json.dumps({"event": "end", "at": time.strftime("%Y-%m-%dT%H:%M:%S%z"), "seconds": round(time.time() - t0),

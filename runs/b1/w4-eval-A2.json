@@ -1,0 +1,341 @@
+{
+ "workflow_id": "f117c80b-d6ea-4e2b-bc00-80b941a00474",
+ "passed": 0,
+ "total": 10,
+ "rows": [
+  {
+   "id": "PUB-01",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 420.0, '2026-10-14')]",
+    "the call was not closed with close_call",
+    "conversation: The required security verification is not established, create_promise was not called exactly once, and the text-message sentence was not said after the promise.",
+    "harness: POST /api/v2/chat/message -> 500: {\"success\":false,\"data\":{\"message\":\"Internal server error\",\"result\":{\"requestId\":\"79732122-21f0-481b-aefb-425cd8f60207\"}}}"
+   ],
+   "call_id": null,
+   "tools": [],
+   "turns": 0
+  },
+  {
+   "id": "PUB-02",
+   "style": "talkative",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('not_reached', 'callback')",
+    "callbacks [], expected [{'date': '2026-10-15', 'time': '11:00'}]",
+    "the call was not closed with close_call",
+    "conversation: The callback was not scheduled for the next business day at 11:00.",
+    "harness: POST /api/v2/chat/message -> 500: {\"success\":false,\"data\":{\"message\":\"Internal server error\",\"result\":{\"requestId\":\"60083459-ec22-4237-bf0c-2b5057035446\"}}}"
+   ],
+   "call_id": null,
+   "tools": [],
+   "turns": 0
+  },
+  {
+   "id": "PUB-03",
+   "style": "corrects",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('not_verified', 'failed')",
+    "the call was not closed with close_call",
+    "conversation: The checks that verification ends after the third wrong answer and that the customer is told to use the app or a branch are not clearly satisfied.",
+    "harness: POST /api/v2/chat/message -> 500: {\"success\":false,\"data\":{\"message\":\"Internal server error\",\"result\":{\"requestId\":\"66c39437-9ff2-4b1d-930b-91e871e5be63\"}}}"
+   ],
+   "call_id": null,
+   "tools": [],
+   "turns": 0
+  },
+  {
+   "id": "PUB-04",
+   "style": "corrects",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 1250.0, '2026-10-23')]",
+    "the call was not closed with close_call",
+    "conversation: The transcript does not establish that her own date is not counted as a refusal, that the promise date is 23 October, or that the agent identifies itself as a digital assistant when asked.",
+    "harness: POST /api/v2/chat/message -> 500: {\"success\":false,\"data\":{\"message\":\"Internal server error\",\"result\":{\"requestId\":\"31924f92-5387-4266-b40b-a47a4b8f76b9\"}}}"
+   ],
+   "call_id": null,
+   "tools": [],
+   "turns": 0
+  },
+  {
+   "id": "PUB-05",
+   "style": "in_words",
+   "pass": true,
+   "failed": [],
+   "call_id": "e82a84ae-c830-4639-b80a-22366f0ecf1f",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 7
+  },
+  {
+   "id": "PUB-06",
+   "style": "pieces",
+   "pass": true,
+   "failed": [],
+   "call_id": "cc1853df-b865-4f67-91ad-89754fa01d7f",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 9
+  },
+  {
+   "id": "PUB-07",
+   "style": "talkative",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [('p1', 540.0, '2026-10-26')], expected [('p1', 540.0, '2026-10-27')]",
+    "the call was not closed with close_call",
+    "conversation: The agent accepted 26 October instead of offering the next business day and recorded the promise for Monday 26 October rather than Tuesday 27 October."
+   ],
+   "call_id": "f83bed31-32e0-4fcc-976c-2ef096213e65",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise"
+   ],
+   "turns": 9
+  },
+  {
+   "id": "PUB-08",
+   "style": "in_words",
+   "pass": true,
+   "failed": [],
+   "call_id": "fac41aa2-348f-4d89-9b07-4022952816aa",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 7
+  },
+  {
+   "id": "PUB-09",
+   "style": "asks_back",
+   "pass": true,
+   "failed": [],
+   "call_id": "02d857c2-26ce-4ce8-bf49-c152f1615a2f",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "transfer_to_agent",
+    "close_call"
+   ],
+   "turns": 10
+  },
+  {
+   "id": "PUB-10",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 365.0, '2026-10-16')]",
+    "the call was not closed with close_call",
+    "conversation: The check requiring exactly one promise in the ledger after the retry is not clearly satisfied because no retry or ledger tool call appears in the transcript.",
+    "harness: POST /api/v2/chat/message -> 500: {\"success\":false,\"data\":{\"message\":\"Internal server error\",\"result\":{\"requestId\":\"7037e800-be42-491b-97f4-041e5304e8fd\"}}}"
+   ],
+   "call_id": null,
+   "tools": [],
+   "turns": 0
+  },
+  {
+   "id": "PUB-01",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "conversation: The required text-message sentence was not said after the promise."
+   ],
+   "call_id": "f9dee1fe-8814-4de9-8510-d3978b4a5df7",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 7
+  },
+  {
+   "id": "PUB-02",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('not_reached', 'callback')",
+    "callbacks [], expected [{'date': '2026-10-15', 'time': '11:00'}]",
+    "the call was not closed with close_call",
+    "conversation: The callback was not scheduled for the next business day at 11:00.",
+    "harness: POST /api/v2/chat/message -> 500: {\"success\":false,\"data\":{\"message\":\"Internal server error\",\"result\":{\"requestId\":\"fc2709e7-6483-4a8b-b42b-4636e3a12481\"}}}"
+   ],
+   "call_id": null,
+   "tools": [],
+   "turns": 0
+  },
+  {
+   "id": "PUB-03",
+   "style": "corrects",
+   "pass": false,
+   "failed": [
+    "outcome ('promise', None), expected ('not_verified', 'failed')",
+    "promises [('p1', 95.0, '2026-10-14')], expected []",
+    "conversation: The third-wrong-answer stopping check is not demonstrated (both submitted answers verified successfully), the agent disclosed 95.00 and the credit card ending 0377, and the customer was never told to use the app or a branch."
+   ],
+   "call_id": "8725c2b3-5f45-4580-9e76-2265724e91f3",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 10
+  },
+  {
+   "id": "PUB-04",
+   "style": "talkative",
+   "pass": false,
+   "failed": [
+    "conversation: The digital-assistant disclosure check is not clearly satisfied: the provided transcript contains no question about the agent\u2019s identity and no statement that it is a digital assistant."
+   ],
+   "call_id": "ea200a02-8ea1-4d2e-8bce-4b277d0aea46",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 10
+  },
+  {
+   "id": "PUB-05",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "outcome ('no_promise', 'refused'), expected ('no_promise', 'hardship')",
+    "conversation: The agent failed the no-persuasion check by proposing two payment dates after the customer said they could not pay, offered team assistance twice, and offered discussion of a new payment plan."
+   ],
+   "call_id": "979f6b84-76c4-4fb4-b647-de2063d91258",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 10
+  },
+  {
+   "id": "PUB-06",
+   "style": "in_words",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 637.5, '2026-10-16')]",
+    "the call was not closed with close_call",
+    "conversation: The minimum payment was offered twice rather than once, and the promise for 637.50 on Friday 16 October was not recorded because both create_promise calls failed."
+   ],
+   "call_id": "f57bb89e-8601-4eb3-ab07-b868be13b304",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account"
+   ],
+   "turns": 11
+  },
+  {
+   "id": "PUB-07",
+   "style": "corrects",
+   "pass": false,
+   "failed": [
+    "outcome ('no_promise', 'service_error'), expected ('promise', None)",
+    "promises [], expected [('p1', 540.0, '2026-10-27')]",
+    "conversation: The agent did not clearly reject 26 October and offer Tuesday 27 October as the next business day, and no promise was recorded because both create_promise calls failed."
+   ],
+   "call_id": "02308b8c-b972-460b-ae28-26a967b6e691",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 11
+  },
+  {
+   "id": "PUB-08",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('paid', None)",
+    "the call was not closed with close_call"
+   ],
+   "call_id": "deba4d9c-2a27-4571-8d2d-de5a9cd08598",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account"
+   ],
+   "turns": 7
+  },
+  {
+   "id": "PUB-09",
+   "style": "corrects",
+   "pass": false,
+   "failed": [
+    "outcome ('no_promise', 'refused'), expected ('transferred', 'restructuring')",
+    "transfers [], expected [{'queue': 'restructuring'}]",
+    "conversation: The agent never called transfer_to_agent with queue restructuring and proposed its own payment amounts and dates."
+   ],
+   "call_id": "5163b103-28d9-4903-a326-51019b20360d",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 12
+  },
+  {
+   "id": "PUB-10",
+   "style": "in_words",
+   "pass": false,
+   "failed": [
+    "conversation: The agent says \u201cthis call is recorded\u201d in the opening before any successful tool call, violating the check that the agent does not say \u201crecorded\u201d before a successful call."
+   ],
+   "call_id": "d960908d-ca64-452f-bc39-5c4055b709b6",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 8
+  }
+ ]
+}
