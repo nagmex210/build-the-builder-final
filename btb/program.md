@@ -61,7 +61,7 @@ use run_in_background. Only stop after your report is committed.
 
 ## WORKER (you were started in a git worktree `wt<N>` on branch `idea/<batch>-<N>`)
 
-1. Read: this file, `btb/ideas.md` (idea bank), `journal.md` (what was tried; do not repeat a discard unless the mechanism changes),
+1. Read: this file, `btb/mechanisms.md` (what the analyst learned: failure kinds, general rules, carry-overs), `btb/ideas.md` (idea bank), `journal.md` (what was tried; do not repeat a discard unless the mechanism changes),
    the last batch's reports, `builder/`.
 2. VARIANCE RULE: WORKER 5 ignores its family and takes one ARCHITECTURE EXPLORATION (A1-A8 in btb/ideas.md)
    that no earlier batch tried (check journal.md); WORKER 4 does the same in even batches. Architecture workers may
@@ -106,12 +106,29 @@ use run_in_background. Only stop after your report is committed.
    branches, so later workers can build on any design, not only the champion (ADAS-style archive).
 5. Append a row to `results.tsv`: `batch	commit	fast_A	fast_B	fast_rawA	fast_rawB	official_A	official_B	build_s	status	description`.
 6. Journal entry: what each worker tried, measured numbers, what was kept and why, hypotheses (marked) for next batch.
-7. Assign the next batch's five idea families in `runs/next_families.txt` (one per line), covering different parts:
+7. Before assigning families, re-read `btb/mechanisms.md` (the analyst updates it while you work): target the most frequent builder-side failure kinds, and merge carry-overs that hold up.
+8. Assign the next batch's five idea families in `runs/next_families.txt` (one per line), covering different parts:
    brief extraction/normalisation, workflow structure/routing, code steps for dates/amounts/business days,
    prompt wording per node, tool-call robustness/honesty, multi-product handling, conversation robustness to the
    customer styles, the builder's own self-test within 30 min, speed of the build. At most 2 families in a row on
    the same part. At least 2 of the 5 families must be architecture-level (A1-A8 in btb/ideas.md or new
    shapes), and 1 a wild card not in any list. Never assign a family that was discarded twice.
+
+## ANALYST (standing; runs after each batch's workers finish, in parallel with the merger)
+
+The public cases are a sample; Sunday's 60 customers are unseen. Learn MECHANISMS, never answers for cases.
+1. Read every new result: the batch's worker reports and eval JSONs (`git show idea/<batch>-<N>:<path>`), and
+   transcripts of failing AND passing calls (`freya.get_call(call_id)["messages"]`).
+2. Update `btb/mechanisms.md` (keep it under ~150 lines, rewrite rather than append forever):
+   - failure kinds with running counts (misread rule, wrong route, tool order/duplication, date/amount math,
+     honesty, mandatory wording, harness/judge noise), builder vs harness;
+   - general mechanisms, each one line, stated for ANY collections brief (what makes calls fail or succeed);
+   - carry-overs: a mechanism some non-champion branch has that fixes a failure kind the champion still shows,
+     with the branch/commit that has it;
+   - variance sources (what differs between a passing and a failing run of the same call).
+   No case ids, customer names, brief values or scenario details in mechanisms.md: rules only.
+3. Write runs/analyst/<batch>.md with the evidence (case ids allowed there; workers do not read runs/analyst/).
+4. Commit only those two paths and push. Never edit builder/.
 
 ## Freeze
 
