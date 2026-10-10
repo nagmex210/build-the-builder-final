@@ -1,0 +1,34 @@
+  [Skill] {'skill': 'build-phone-agent', 'args': 'Slot: main-A. Tool API file: tools/openapi.json. Brief files: briefs/brief-a.md.
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat briefs/brief-a.md; cat tools/openapi.json; cat .claude/skills/build-phone-age
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat docs/workflow-format.md docs/tools-and-code.md | head -400; cat examples/base
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat out/main-A.wording.json; python3 -c "\nimport json;d=json.load(open(\'out/mai
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; python3 -c "\nimport json;d=json.load(open(\'out/main-A.calc.json\'));c=d[\'code_
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; grep -n "^#" docs/workflow-format.md docs/tools-and-code.md; sed -n \'/## Top-lev
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; sed -n 143,240p docs/tools-and-code.md; sed -n 528,660p docs/workflow-format.md; 
+Read the brief, the tool API file, the docs and the calc/wording files. Now writing the workflow.
+  [Bash] {'command': 'mkdir -p /tmp/bld && cat > /tmp/bld/build_a.py <<\'EOF\'\nimport json\nR=\'/home/ubuntu/btb/repo/\'\ncalc=j
+Lint and wording gate pass (the 2 warnings are just an example date). Saving.
+  [Bash] {'command': 'python3 builder/save.py main-A out/main-A.workflow.json 2>&1 | tail -5'}
+  [Bash] {'command': 'timeout 120 python3 -c "\nimport freya,json\nr=freya.api(\'POST\',\'/api/v2/chat/message\',{\'workflowId\':
+Chat test is blocked: the platform returned 402 "Insufficient credits". Save worked. Now a small rule-by-rule tightening, then re-save.
+  [Bash] {'command': 'cd /tmp/bld && python3 - <<\'EOF\'\np=\'/tmp/bld/build_a.py\'; s=open(p).read()\ns=s.replace(" - Weekend da
+I built the Brief A workflow and saved it to slot main-A (version 5). I couldn't confirm it starts a call: the one-turn chat test came back with a 402 "Insufficient credits" error, so it has had no live test at all.
+
+- **Checks:** the lint and the wording gate both pass with no errors before each save. The gate shows 2 warnings, both for the example birth date (1985-04-03) I used to show how a date given as numbers is read.
+- **Structure:** the call goes `date_facts_setup` → `opening` → `identity` → `load_account` → `negotiate` → `hang_up`.
+  - `date_facts_setup` is the ready code node from the calc file, unchanged.
+  - `opening` handles who is on the line, including callbacks, wrong number and deceased.
+  - `load_account` runs `get_account` silently. Its post-hook is the account code from the calc file, verbatim.
+  - `close_call` is available in all three conversation stages. A successful close sends the call to `hang_up`.
+- **Moving between stages:** the call moves to identity only when the extracted `party` is "customer". It moves to the account lookup only when `verify_identity` reports `all_verified` (both "true" and "True" are tested).
+- **Wording:** every exact sentence is in its stage's prompt, quoted with "say exactly", and the content items are in the brief's words. Only the brief's outcome and reason codes are used.
+- **Dates:** `{{date_facts}}` is in the opening and negotiate prompts, along with the "never compute a date yourself" instruction. The negotiate prompt tells the model to use each product's own `deadline` and `floor_amount` from the tool result.
+- **Brief vs date facts:** they match. The holidays, the two bands with 12 and 7 business days, the attempt counts and the callback window are the same in both.
+- **Failed writes:** the retry-once rule (rule 37 and the brief's default) is only in the prompts. I didn't add a transition that routes on the failure counters.
+
+workflow_id: c591c751-dc19-4660-9955-f9a4d750213d, agent_id: d7b2b782-a1c2-42ce-b004-ab865e0186de
+
+done: 13 turns, 111 s
+wording gate: 0 errors, 2 warnings
+final save: {'workflow_id': 'c591c751-dc19-4660-9955-f9a4d750213d', 'agent_id': 'd7b2b782-a1c2-42ce-b004-ab865e0186de', 'version': 6}; lint: 0 errors, 0 warnings
+{"workflow_id": "c591c751-dc19-4660-9955-f9a4d750213d", "agent_id": "d7b2b782-a1c2-42ce-b004-ab865e0186de"}

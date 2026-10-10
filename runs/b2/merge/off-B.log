@@ -1,0 +1,22 @@
+PASS PUB-11 medium Multi-product  | verify > verify > get_account > promise > promise > promise > close_call
+PASS PUB-12 hard   Multi-product  | verify > verify > verify > get_account > promise > add_note > add_note > close_call
+PASS PUB-13 hard   Multi-product  | verify > verify > get_account > promise > promise > close_call
+
+slowest agent turn per call: median 2 s, worst 3 s. Failed calls where the customer hung up: 0.
+-- run 1 of 2: 3 / 3 passed, 93 s
+
+PASS PUB-11 medium Multi-product  | verify > verify > get_account > promise > promise > promise > close_call
+FAIL PUB-12 hard   Multi-product  | verify > verify > verify > get_account > promise > add_note > close_call > add_note
+       - notes [('p3', 'refused')], expected [('p2', 'refused'), ('p3', 'refused')]
+       - the call was not closed with close_call
+       - conversation: The call failed to meet two of the success criteria: 1. The agent made two persuasion attempts on the car loan (Message 14 and Message 16) despite the requirement specifying exactly one attempt for early band products. 2. Although the agent attem
+PASS PUB-13 hard   Multi-product  | verify > verify > get_account > promise > promise > close_call
+
+slowest agent turn per call: median 3 s, worst 5 s. Failed calls where the customer hung up: 0.
+-- run 2 of 2: 2 / 3 passed, 63 s
+
+PASS PUB-11 2/2
+FAIL PUB-12 1/2
+PASS PUB-13 2/2
+
+2 / 3 passed (bank records and conversation checks), a customer counts with 2 of 2 runs. Last simulation 3fa1cb95-46f2-4d2d-af5d-84ac0c0cdc16, status completed, 156 s.

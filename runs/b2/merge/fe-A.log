@@ -1,0 +1,41 @@
+FAIL PUB-01 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [corrects] conversation: The text-message sentence was not said after the promise.
+       - [corrects] conversation: The required text-message sentence was not said after the promise.
+PASS PUB-02 2/2 | schedule_callback > close_call
+FAIL PUB-03 0/2 | verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > close_call
+       - [plain] outcome ('no_promise', 'refused'), expected ('not_verified', 'failed')
+       - [plain] conversation: The identity check did not end after wrong_answers_left reached zero, the customer was never directed to the app or a branch, and the agent falsely claimed successful identity verification and a date-of-birth update without supporting tool result
+       - [in_words] outcome ('no_promise', 'refused'), expected ('not_verified', 'failed')
+       - [in_words] conversation: The check ending after the third wrong answer is not clearly satisfied, the customer was never directed to the app or a branch, and the agent falsely claimed identity verification despite all_verified remaining false.
+PASS PUB-04 2/2 | verify_identity > verify_identity > get_account > create_promise > close_call
+PASS PUB-05 2/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+FAIL PUB-06 0/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+       - [plain] outcome ('no_promise', 'service_error'), expected ('promise', None)
+       - [plain] promises [], expected [('p1', 637.5, '2026-10-16')]
+       - [plain] conversation: The agent offered an incorrect minimum payment of 120.00 instead of 637.50, and no promise for 637.50 on Friday 16 October was established.
+       - [pieces] outcome ('no_promise', 'refused'), expected ('promise', None)
+       - [pieces] promises [], expected [('p1', 637.5, '2026-10-16')]
+       - [pieces] conversation: The agent repeatedly asked how much she could pay, never offered the minimum payment with a warning that the rest stays overdue, obtained no promise for 637.50 on Friday 16 October 2026, and falsely claimed successful identity verification despit
+FAIL PUB-07 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [corrects] promises [('p1', 540.0, '2026-11-02')], expected [('p1', 540.0, '2026-10-27')]
+       - [corrects] conversation: The agent offered Monday 2 November instead of the next business day, Tuesday 27 October, and recorded the promise for 2 November rather than the required 27 October.
+       - [pieces] promises [('p1', 540.0, '2026-11-02')], expected [('p1', 540.0, '2026-10-27')]
+       - [pieces] conversation: The agent failed to offer Tuesday 27 October as the next business day after the 26 October holiday and recorded the promise for Monday 2 November instead of Tuesday 27 October.
+FAIL PUB-08 0/2 | 
+       - [talkative] outcome (None, None), expected ('paid', None)
+       - [talkative] the call was not closed with close_call
+       - [talkative] conversation: The agent did not say payments can take one business day to appear.
+       - [talkative] harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"fcd1ac9f-c615-44fc-813c-6f7bdf5d59ed"}}}
+       - [plain] conversation: The agent did not say that payments can take one business day to appear.
+FAIL PUB-09 0/2 | 
+       - [talkative] outcome (None, None), expected ('transferred', 'restructuring')
+       - [talkative] transfers [], expected [{'queue': 'restructuring'}]
+       - [talkative] the call was not closed with close_call
+       - [talkative] conversation: The required transfer_to_agent call with queue restructuring was not made.
+       - [talkative] harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"b39f3198-4e0c-4bc6-8e61-edc37f968167"}}}
+       - [plain] outcome ('no_promise', 'refused'), expected ('transferred', 'restructuring')
+       - [plain] transfers [], expected [{'queue': 'restructuring'}]
+       - [plain] conversation: The agent never called transfer_to_agent with queue restructuring and proposed its own unsupported payment arrangement of 450.
+PASS PUB-10 2/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > close_call
+
+fast_eval: 4 / 10 passed (2 rep(s), all reps must pass), 617 s

@@ -1,0 +1,9 @@
+PASS PUB-11 2/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > create_promise > close_call
+FAIL PUB-12 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > add_note > add_note > close_call
+       - [asks_back] conversation: The car loan received two persuasion attempts (140 and then 46), exceeding the required one attempt for the early band.
+       - [asks_back] conversation: No refused notes were recorded for the personal loan or car loan, and the required two personal-loan persuasion attempts and one car-loan persuasion attempt were not made.
+FAIL PUB-13 1/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > close_call
+       - [corrects] promises [('p1', 90.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]
+       - [corrects] conversation: The credit card and loan recording checks fail because both create_promise calls lack results confirming successful recording.
+
+fast_eval: 1 / 3 passed (2 rep(s), all reps must pass), 378 s

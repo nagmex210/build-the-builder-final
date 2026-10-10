@@ -1,0 +1,30 @@
+I built the mandatory-wording checklist and retrievability gate, but I couldn't get a score: the platform broke during the eval window. Everything is committed on `idea/b2-3` and the report is in `runs/b2/w3.md`.
+
+**What I built** (`builder/wording.py`, wired into `builder/build.py`):
+- **Checklist:** one Azure call (about 20 s, run alongside datecalc, so no extra build time) lists two kinds of mandatory wording:
+  - every sentence the brief makes the agent say word for word;
+  - every clause that says what content must be said.
+  Each item has a stage, a condition and the clause it came from. The call also returns the brief's outcome/reason codes and its forbidden words. An item or code is kept only if it can be found in the brief text; anything else is dropped and logged in the trace. On raw B, the memo replaces the single-product "Can you make this payment today?" question, and the checklist correctly left it out.
+- **Gate (code only, no model):** it checks the workflow and reports an error when:
+  - a mandatory sentence is not present word for word;
+  - a `close_call` outcome/reason value is not in the brief's code list or the tool API file;
+  - a prompt names an outcome/reason code the brief doesn't have.
+
+  A number or date the brief never states is only a warning. Claude must run the gate and fix every error before saving. In a test where I deleted one sentence and invented a code, the gate caught both.
+- **Final pass:** the exact sentences are also added to `system_prompt` with their conditions, so they are there even if Claude misses one. The content items are left out of it on purpose: placed outside their stage, they could break a "say nothing before identity is checked" rule.
+
+**Builds:** A, B, raw-A and raw-B took 152-165 s each (the current best build takes 146 s). All four had 0 lint errors and 0 gate errors, and every mandatory sentence landed in the right node.
+
+**Score:** fast_eval gave 0/26 against the champion's 4/26, but that number is not evidence:
+- The bank mock returned Cloudflare error 1101 until 15:49.
+- During the eval, Freya chat started answering **402 "Insufficient credits"**, plus 500s and timeouts. 39 of 46 runs had a platform error, and the raw-B eval crashed.
+- The 7 clean runs failed for reasons outside this idea:
+  - a platform-degraded promise loop;
+  - a callback date failure that is the date noise b1 already blamed on our own grader;
+  - an identity-check failure;
+  - amounts swapped between two products.
+- Credits were still exhausted at 16:27, so I couldn't do the two fix rounds or a re-run.
+
+**Brief-agnostic:** yes. Every sentence, code and number is read from the brief at build time and kept only if it can be found there. Nothing from brief A or B is in the builder.
+
+**For the merger:** once Freya has credits again, rebuild w3-A/B/rA/rB first and then run fast_eval. The rebuild picks up a later fix that turns the brief's `{title}` into the platform's `{{title}}` in the system-prompt block. The `build_w3A/` and `gen/` folders are scratch files left by the inner Claude and are not committed.

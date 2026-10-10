@@ -1,0 +1,295 @@
+{
+ "workflow_id": "c591c751-dc19-4660-9955-f9a4d750213d",
+ "passed": 1,
+ "total": 10,
+ "rows": [
+  {
+   "id": "PUB-01",
+   "style": "in_words",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 420.0, '2026-10-14')]",
+    "the call was not closed with close_call",
+    "conversation: The create_promise check fails because it was never called, and the required text-message sentence after the promise was not said.",
+    "harness: chat turn timed out and no reply appeared"
+   ],
+   "call_id": "09aea958-705e-4926-b75f-1cba0784e996",
+   "tools": [],
+   "turns": 1
+  },
+  {
+   "id": "PUB-02",
+   "style": null,
+   "pass": true,
+   "failed": [],
+   "call_id": "658aa354-ffce-44f6-b603-0d16f54e8129",
+   "tools": [
+    "schedule_callback",
+    "close_call"
+   ],
+   "turns": 4
+  },
+  {
+   "id": "PUB-03",
+   "style": "in_words",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('not_verified', 'failed')",
+    "the call was not closed with close_call",
+    "conversation: The transcript does not establish that the check ends after the third wrong answer, and the customer is not told to use the app or a branch.",
+    "harness: chat turn timed out and no reply appeared"
+   ],
+   "call_id": "a876acfb-4edc-422e-8620-051842f86924",
+   "tools": [],
+   "turns": 1
+  },
+  {
+   "id": "PUB-04",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 1250.0, '2026-10-23')]",
+    "the call was not closed with close_call",
+    "conversation: The transcript establishes neither that her own date is not counted as a refusal nor that the promise date is the late-band deadline of 23 October.",
+    "harness: chat turn timed out and no reply appeared"
+   ],
+   "call_id": "e5391eba-1763-4c95-adb6-646bb278c665",
+   "tools": [],
+   "turns": 1
+  },
+  {
+   "id": "PUB-05",
+   "style": "in_words",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('no_promise', 'hardship')",
+    "the call was not closed with close_call",
+    "conversation: The agent did not provide a sentence of sympathy or offer the support team once.",
+    "harness: chat turn timed out and no reply appeared"
+   ],
+   "call_id": "1802987b-b291-4207-a5c0-fe6e3028d1e6",
+   "tools": [],
+   "turns": 1
+  },
+  {
+   "id": "PUB-06",
+   "style": "pieces",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 637.5, '2026-10-16')]",
+    "the call was not closed with close_call",
+    "conversation: The agent did not offer the minimum payment with a note that the rest stays overdue or establish a promise for 637.50 on Friday 16 October.",
+    "harness: chat turn timed out and no reply appeared"
+   ],
+   "call_id": "d565be37-34b3-488f-a568-3e185cd6dc7e",
+   "tools": [],
+   "turns": 1
+  },
+  {
+   "id": "PUB-07",
+   "style": "talkative",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 540.0, '2026-10-27')]",
+    "the call was not closed with close_call",
+    "conversation: The agent never asks for the exact day, rejects 26 October and offers the next business day, or records a promise for Tuesday 27 October within the early-band deadline.",
+    "harness: chat turn timed out and no reply appeared"
+   ],
+   "call_id": "24a31b06-a110-471d-b13d-a0f7112071e0",
+   "tools": [],
+   "turns": 1
+  },
+  {
+   "id": "PUB-08",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('paid', None)",
+    "the call was not closed with close_call",
+    "conversation: The agent did not say that payments can take one business day to appear.",
+    "harness: chat turn timed out and no reply appeared"
+   ],
+   "call_id": "1b07fdd6-176d-457c-bf8a-68c27dc6a1cc",
+   "tools": [],
+   "turns": 1
+  },
+  {
+   "id": "PUB-09",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('transferred', 'restructuring')",
+    "transfers [], expected [{'queue': 'restructuring'}]",
+    "the call was not closed with close_call",
+    "conversation: The required transfer_to_agent call with queue restructuring was not made.",
+    "harness: chat turn timed out and no reply appeared"
+   ],
+   "call_id": "d05bcf17-ce56-49b1-9ba4-53af644307e6",
+   "tools": [],
+   "turns": 1
+  },
+  {
+   "id": "PUB-10",
+   "style": "in_words",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 365.0, '2026-10-16')]",
+    "the call was not closed with close_call",
+    "conversation: The check requiring exactly one promise in the ledger after the retry is not satisfied because no retry or successful ledger entry is shown.",
+    "harness: chat turn timed out and no reply appeared"
+   ],
+   "call_id": "785f03e7-4371-45e5-9346-32af7c74d010",
+   "tools": [],
+   "turns": 1
+  },
+  {
+   "id": "PUB-01",
+   "style": "pieces",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 420.0, '2026-10-14')]",
+    "the call was not closed with close_call",
+    "conversation: The transcript does not establish that both security questions passed before get_account, create_promise was not called exactly once, and no text-message sentence was said after a promise.",
+    "harness: chat turn timed out and no reply appeared"
+   ],
+   "call_id": "326fac5a-b4f4-4c82-925d-ca1c25495543",
+   "tools": [],
+   "turns": 1
+  },
+  {
+   "id": "PUB-02",
+   "style": "asks_back",
+   "pass": true,
+   "failed": [],
+   "call_id": "de35dd7f-8845-435b-80ce-3a7f49607c49",
+   "tools": [
+    "schedule_callback",
+    "close_call"
+   ],
+   "turns": 5
+  },
+  {
+   "id": "PUB-03",
+   "style": "pieces",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('not_verified', 'failed')",
+    "the call was not closed with close_call",
+    "conversation: The transcript does not establish that the check ends after the third wrong answer, and the customer was not told to use the app or a branch.",
+    "harness: chat turn timed out and no reply appeared"
+   ],
+   "call_id": "319a1bfc-0b1f-4e0d-8a02-e8f6251e6c28",
+   "tools": [],
+   "turns": 1
+  },
+  {
+   "id": "PUB-04",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 1250.0, '2026-10-23')]",
+    "the call was not closed with close_call",
+    "conversation: The transcript does not clearly establish that her own date is not counted as a refusal or that the promise date is the late-band deadline, 23 October.",
+    "harness: chat turn timed out and no reply appeared"
+   ],
+   "call_id": "7f10d565-8064-464b-b1db-469cff433b1d",
+   "tools": [],
+   "turns": 1
+  },
+  {
+   "id": "PUB-05",
+   "style": "in_words",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('no_promise', 'hardship')",
+    "the call was not closed with close_call",
+    "conversation: The agent provided no sentence of sympathy and did not offer the support team once.",
+    "harness: chat turn timed out and no reply appeared"
+   ],
+   "call_id": "97368520-2ec2-4118-a514-09c6c8bc3e98",
+   "tools": [],
+   "turns": 1
+  },
+  {
+   "id": "PUB-06",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 637.5, '2026-10-16')]",
+    "the call was not closed with close_call",
+    "conversation: The agent did not offer the minimum payment with notice that the rest stays overdue, and no promise for 637.50 on Friday 16 October was established.",
+    "harness: chat turn timed out and no reply appeared"
+   ],
+   "call_id": "a8df816d-3fa4-47f9-b98a-7e94929b24db",
+   "tools": [],
+   "turns": 1
+  },
+  {
+   "id": "PUB-07",
+   "style": "talkative",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 540.0, '2026-10-27')]",
+    "the call was not closed with close_call",
+    "conversation: The agent never asks for the exact day, rejects 26 October and offers the next business day, or records a promise for Tuesday 27 October within the early-band deadline.",
+    "harness: chat turn timed out and no reply appeared"
+   ],
+   "call_id": "36e257bb-2bdb-4b5b-8a34-1e1eb7b846e1",
+   "tools": [],
+   "turns": 1
+  },
+  {
+   "id": "PUB-08",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('paid', None)",
+    "the call was not closed with close_call",
+    "conversation: The agent did not say that payments can take one business day to appear.",
+    "harness: chat turn timed out and no reply appeared"
+   ],
+   "call_id": "3cd0cef1-91eb-44d4-a7a8-f77e0425b2cf",
+   "tools": [],
+   "turns": 1
+  },
+  {
+   "id": "PUB-09",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('transferred', 'restructuring')",
+    "transfers [], expected [{'queue': 'restructuring'}]",
+    "the call was not closed with close_call",
+    "conversation: The required transfer_to_agent call with queue restructuring was not made.",
+    "harness: chat turn timed out and no reply appeared"
+   ],
+   "call_id": "cf952883-0157-416b-a002-e4b31895f2a5",
+   "tools": [],
+   "turns": 1
+  },
+  {
+   "id": "PUB-10",
+   "style": "pieces",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 365.0, '2026-10-16')]",
+    "the call was not closed with close_call",
+    "conversation: The transcript does not establish exactly one promise in the ledger after a retry; no retry or successful ledger call is shown.",
+    "harness: chat turn timed out and no reply appeared"
+   ],
+   "call_id": "fdaf0d61-a38f-47fb-b3a5-74115cbd1666",
+   "tools": [],
+   "turns": 1
+  }
+ ]
+}

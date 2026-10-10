@@ -1,0 +1,27 @@
+  [Skill] {'skill': 'build-phone-agent', 'args': 'Slot: main-rB. Tool API file: tools/openapi.json. Brief files: btb/briefs_raw/br
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; ls btb/briefs_raw/; wc -c btb/briefs_raw/brief-a-raw.md btb/briefs_raw/brief-b-ra
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; ls btb/briefs_raw; cat btb/briefs_raw/brief-a-raw.md btb/briefs_raw/brief-b-raw.m
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat tools/openapi.json | python3 -c "import json,sys;d=json.load(sys.stdin);print
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat examples/base-agent.json; python3 -c "\nimport json;d=json.load(open(\'out/ma
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; python3 -c "\nimport json;d=json.load(open(\'out/main-rB.wording.json\'))\nfor s 
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; sed -n 143,250p docs/tools-and-code.md; sed -n 611,660p docs/workflow-format.md'}
+I'm writing the workflow generator now (date-facts code node → opening → identity → account lookup → negotiate → hang-up).
+  [Bash] {'command': 'mkdir -p /home/ubuntu/btb/repo/out/gen_rB && cat > /home/ubuntu/btb/repo/out/gen_rB/gen.py <<\'EOF\'\nimpor
+  [Bash] {'command': 'python3 builder/save.py main-rB out/main-rB.workflow.json 2>&1 | tail -5'}
+  [Bash] {'command': 'timeout 90 python3 -c "import freya,json; print(json.dumps(freya.api(\'POST\',\'/api/v2/chat/message\',{\'w
+  [Bash] {'command': 'timeout 90 python3 -c "import freya,json; print(json.dumps(freya.api(\'POST\',\'/api/v2/chat/message\',{\'w
+I built the workflow and saved it to slot main-rB. It passed lint and the wording gate with 0 errors and 0 warnings. A one-turn chat test started the call correctly: "Hello, this is the digital assistant of Freya Bank calling, and this call is recorded. Am I speaking with Ms Lee?". The second test turn, where the customer confirms who they are, got a 504 from the platform. So I have not seen the call move from the opening into the security check, or anything after that. As instructed, I ran no practice cases.
+
+- **Call flow:** the date-facts code node runs first and goes to the opening, then the security check. From there a silent `get_account` lookup (with your post-process code unchanged) leads to the negotiation node and then the hang-up node. Every stage that can end the call has `close_call`, and its success sends the call to hang-up.
+- **Moving between stages:** the call goes to the security check only when the person is extracted as the customer, and to the account lookup only when `all_verified` comes back true.
+- **Wording:** every mandatory sentence and rule from the wording file is in the node for its stage. "Am I speaking with…", "I am sorry for your loss.", "Can you make this payment today?" (single product), "Do you confirm?" and the text-message sentence are marked "say exactly". Outcome and reason codes are limited to the brief's list.
+- **Multi-product rules (Brief B):** the agent states every product before asking for anything. It then asks once whether they can pay all of them today, and after that goes product by product, with each product's own deadline, floor and number of attempts taken from the tool result. All promises are read back together with one "Do you confirm?", then recorded one per product. A failed recording is tried once more; after a second failure that product gets a `service_error` note. Products without a promise get a note, except when there has been a transfer. The closing outcome follows the brief's order (transfer first, then promise, then paid, then the first product's reason).
+- **Dates:** the deadlines in the date facts (12 business days early band, 7 late band) already match the memos, so I found no conflict with the brief.
+- **Possible issue:** the negotiation prompt inserts the product list as `{{products}}`, which may appear as raw JSON. As a fallback the model can call `get_account` there if that list is empty.
+
+workflow_id: e99b473c-2df6-4d05-927d-5b0085543563 · agent_id: 33aaaf4a-3519-46f4-8ef1-2aa95ec80014
+
+done: 13 turns, 160 s
+wording gate: 0 errors, 0 warnings
+final save: {'workflow_id': 'e99b473c-2df6-4d05-927d-5b0085543563', 'agent_id': '33aaaf4a-3519-46f4-8ef1-2aa95ec80014', 'version': 8}; lint: 0 errors, 0 warnings
+{"workflow_id": "e99b473c-2df6-4d05-927d-5b0085543563", "agent_id": "33aaaf4a-3519-46f4-8ef1-2aa95ec80014"}

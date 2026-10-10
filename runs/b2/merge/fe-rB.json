@@ -1,0 +1,120 @@
+{
+ "workflow_id": "e99b473c-2df6-4d05-927d-5b0085543563",
+ "passed": 1,
+ "total": 3,
+ "rows": [
+  {
+   "id": "PUB-11",
+   "style": "asks_back",
+   "pass": true,
+   "failed": [],
+   "call_id": "ef88e524-e452-4d00-a354-049e93411563",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 9
+  },
+  {
+   "id": "PUB-12",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "conversation: The car loan received two persuasion attempts (140 and then 46), exceeding the required one attempt for the early band."
+   ],
+   "call_id": "f548c0fe-8635-41d9-a291-c5f6a7239bf5",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "add_note",
+    "add_note",
+    "close_call"
+   ],
+   "turns": 11
+  },
+  {
+   "id": "PUB-13",
+   "style": "asks_back",
+   "pass": true,
+   "failed": [],
+   "call_id": "cbe4f5bd-8e39-4ede-91e2-5f8765a2462e",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 7
+  },
+  {
+   "id": "PUB-11",
+   "style": "corrects",
+   "pass": true,
+   "failed": [],
+   "call_id": "a825bdcc-914b-4411-a35b-08d0aa60ecc0",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 9
+  },
+  {
+   "id": "PUB-12",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "conversation: No refused notes were recorded for the personal loan or car loan, and the required two personal-loan persuasion attempts and one car-loan persuasion attempt were not made."
+   ],
+   "call_id": "ddc1d5e0-80e2-4dba-8e85-5e82b270a909",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "add_note",
+    "add_note",
+    "close_call"
+   ],
+   "turns": 7
+  },
+  {
+   "id": "PUB-13",
+   "style": "corrects",
+   "pass": false,
+   "failed": [
+    "promises [('p1', 90.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]",
+    "conversation: The credit card and loan recording checks fail because both create_promise calls lack results confirming successful recording."
+   ],
+   "call_id": "d10fe1d7-9732-4f40-8c75-3c02ee6fd6ce",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 10
+  }
+ ]
+}

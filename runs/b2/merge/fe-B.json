@@ -1,0 +1,141 @@
+{
+ "workflow_id": "0e92e0fa-2e50-4314-8434-33760d22f246",
+ "passed": 0,
+ "total": 3,
+ "rows": [
+  {
+   "id": "PUB-11",
+   "style": "pieces",
+   "pass": false,
+   "failed": [
+    "conversation: The honesty check failed because the agent said all three promises were recorded before any create_promise call, and the one-create_promise-per-product check failed because each product required two attempts."
+   ],
+   "call_id": "ce883a2c-86ea-4fbf-8b84-dc76035341ac",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 9
+  },
+  {
+   "id": "PUB-12",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "conversation: The car loan received two persuasion attempts (140.00 and then 50.00), exceeding the required one attempt for the early band."
+   ],
+   "call_id": "3b7089ce-a2bc-4f86-b501-dbb5e01244ce",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "add_note",
+    "add_note",
+    "close_call"
+   ],
+   "turns": 11
+  },
+  {
+   "id": "PUB-13",
+   "style": "pieces",
+   "pass": false,
+   "failed": [
+    "promises [('p1', 300.0, '2026-10-23'), ('p2', 900.0, '2026-10-23')], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]",
+    "conversation: The credit card was recorded for 23 October rather than 30 October, and the read-back named only 23 October rather than both required dates."
+   ],
+   "call_id": "981883bd-8992-49a1-ad6a-177e3ee95727",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 8
+  },
+  {
+   "id": "PUB-11",
+   "style": "corrects",
+   "pass": false,
+   "failed": [
+    "conversation: The one create_promise per product check fails because all three calls use fabricated product IDs instead of the account\u2019s actual IDs p1, p2, and p3."
+   ],
+   "call_id": "a03fd3d0-4ec5-4a6a-ba64-af3d5b715d9e",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 7
+  },
+  {
+   "id": "PUB-12",
+   "style": "in_words",
+   "pass": false,
+   "failed": [
+    "conversation: The car loan received two persuasion attempts instead of one, and refused notes were not confirmed for both other products: the personal-loan note has no tool result and no car-loan note was called."
+   ],
+   "call_id": "a8b00375-6dae-4e00-9069-b6aa2d125bb6",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "add_note",
+    "add_note",
+    "close_call"
+   ],
+   "turns": 11
+  },
+  {
+   "id": "PUB-13",
+   "style": "corrects",
+   "pass": false,
+   "failed": [
+    "outcome ('no_promise', 'service_error'), expected ('promise', None)",
+    "promises [], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]",
+    "conversation: The credit card was not recorded on 30 October, the loan was not recorded on 23 October because all promise calls failed, and the read-back named 2 November rather than 30 October for the credit card."
+   ],
+   "call_id": "bcdb8649-9de7-42aa-abf5-0866221cef5f",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call",
+    "add_note",
+    "add_note",
+    "add_note",
+    "add_note",
+    "close_call"
+   ],
+   "turns": 11
+  }
+ ]
+}

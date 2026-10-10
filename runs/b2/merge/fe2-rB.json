@@ -1,0 +1,99 @@
+{
+ "workflow_id": "e99b473c-2df6-4d05-927d-5b0085543563",
+ "passed": 0,
+ "total": 3,
+ "rows": [
+  {
+   "id": "PUB-11",
+   "style": "corrects",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 220.0, '2026-10-16'), ('p2', 640.0, '2026-10-16'), ('p3', 75.0, '2026-10-16')]",
+    "the call was not closed with close_call",
+    "conversation: The agent did not state all three products before asking a question, obtain one read-back and one confirmation for all three, or make one create_promise call per product.",
+    "harness: chat turn timed out and no reply appeared"
+   ],
+   "call_id": "7992450c-e870-4705-afde-866ec65efc38",
+   "tools": [],
+   "turns": 1
+  },
+  {
+   "id": "PUB-12",
+   "style": "talkative",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 510.0, '2026-10-15')]",
+    "notes [], expected [('p2', 'refused'), ('p3', 'refused')]",
+    "the call was not closed with close_call",
+    "conversation: The phone question was not asked again, no credit-card promise or refused notes were made, and neither the two personal-loan attempts nor the one car-loan attempt occurred.",
+    "harness: chat turn timed out and no reply appeared"
+   ],
+   "call_id": "f70bb82a-c2c8-4766-8d77-70cfc280e4c4",
+   "tools": [],
+   "turns": 1
+  },
+  {
+   "id": "PUB-13",
+   "style": "corrects",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]",
+    "the call was not closed with close_call",
+    "conversation: Neither the credit card payment on 30 October nor the loan payment on its deadline of 23 October was recorded, and no read-back named both dates.",
+    "harness: chat turn timed out and no reply appeared"
+   ],
+   "call_id": "2a7b959d-f52c-4a1c-95c6-7728f7a9dd86",
+   "tools": [],
+   "turns": 1
+  },
+  {
+   "id": "PUB-11",
+   "style": "corrects",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 220.0, '2026-10-16'), ('p2', 640.0, '2026-10-16'), ('p3', 75.0, '2026-10-16')]",
+    "the call was not closed with close_call",
+    "conversation: The agent did not state all three products before asking a question, obtain one read-back and one confirmation covering all three, or make one create_promise call per product.",
+    "harness: chat turn timed out and no reply appeared"
+   ],
+   "call_id": "9fcad2a8-40b1-4e53-9360-820818b6d79e",
+   "tools": [],
+   "turns": 1
+  },
+  {
+   "id": "PUB-12",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 510.0, '2026-10-15')]",
+    "notes [], expected [('p2', 'refused'), ('p3', 'refused')]",
+    "the call was not closed with close_call",
+    "conversation: The transcript does not show the phone question asked again once, exactly one credit-card promise, refused notes for both other products, or two personal-loan attempts and one car-loan attempt.",
+    "harness: chat turn timed out and no reply appeared"
+   ],
+   "call_id": "9b73bb85-bd54-4e8b-a415-37aed9569bab",
+   "tools": [],
+   "turns": 1
+  },
+  {
+   "id": "PUB-13",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]",
+    "the call was not closed with close_call",
+    "conversation: Neither the credit card payment for 30 October nor the loan payment for its 23 October deadline was recorded, and no read-back named both dates.",
+    "harness: chat turn timed out and no reply appeared"
+   ],
+   "call_id": "decd251c-5cd5-43ee-8b99-4e3b80891507",
+   "tools": [],
+   "turns": 1
+  }
+ ]
+}

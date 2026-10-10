@@ -1,0 +1,12 @@
+FAIL PUB-11 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > create_promise > create_promise > create_promise > close_call
+       - [corrects] conversation: The one create_promise per product check fails because the personal-loan and car-loan calls used invalid product IDs pl_1234 and cl_5678 instead of p2 and p3.
+       - [asks_back] conversation: The one create_promise per product check fails: three initial calls used invalid product IDs, and only two of the three corrected calls have confirmed successful results.
+FAIL PUB-12 0/2 | verify_identity > verify_identity > verify_identity > verify_identity > get_account > create_promise > add_note > add_note > close_call
+       - [pieces] notes [('cl_5678', 'refused'), ('pl_1234', 'refused')], expected [('p2', 'refused'), ('p3', 'refused')]
+       - [pieces] conversation: The refused notes used incorrect product IDs pl_1234 and cl_5678 instead of p2 and p3, and the agent made three car-loan persuasion attempts instead of the required one.
+       - [corrects] notes [('cl_5678', 'refused'), ('pl_1234', 'refused')], expected [('p2', 'refused'), ('p3', 'refused')]
+       - [corrects] conversation: The refused notes used incorrect product IDs (pl_1234 and cl_5678 instead of p2 and p3), and the agent made two car-loan persuasion attempts rather than the required one.
+FAIL PUB-13 1/2 | verify_identity > verify_identity > get_account > create_promise > create_promise > create_promise > close_call
+       - [asks_back] conversation: The loan was not recorded for 23 October because its create_promise call used an unknown product_id and failed.
+
+fast_eval: 0 / 3 passed (2 rep(s), all reps must pass), 239 s

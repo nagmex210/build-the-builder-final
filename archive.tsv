@@ -1,1 +1,7 @@
 branch	parent	fast_A	fast_B	fast_rawA	fast_rawB	fast_C	build_s	idea	main_failures
+idea/b2-1	main@c74baa9	NA	NA	NA	NA	NA	123-200	code guards on create_promise/schedule_callback (.invalid block) + independent oracle for datecalc	unmeasured (Freya 402/outage); merged into merge/b2
+idea/b2-2	main@c74baa9	NA	NA	NA	NA	NA	123-156	multi-product: invented-id resolver, ids_to_use line, per-item success outcome, recipe bookkeeping	unmeasured; merged into merge/b2 (PUB-11 now passes officially)
+idea/b2-3	main@c74baa9	NA	NA	NA	NA	NA	152-165	mandatory wording checklist + retrievability gate (codes, numbers)	unmeasured; merged into merge/b2
+idea/b2-4	main@c74baa9	NA	NA	NA	NA	NA	115-151 (+15-18 min self-test)	builder self-test: scripted chats + one EDIT fix round, ship best	unmeasured; not merged (build.py rewrite, cost)
+idea/b2-5	main@c74baa9	NA	NA	NA	NA	NA	140-176	sectioned gated extraction (facts sheet) + oracle + spec retrievability	unmeasured; not merged (overlaps w1 oracle + w3 wording; expected ~0 on A/B)
+merge/b2	main@c74baa9	3	1	5	0	NA	149-356	b2 merge: w2+w1+w3 + fresh-start build + silent on_enter fix	official A 6/10 (PUB-02,03,07,10 1/2), B 2/3 (PUB-12 1/2); discarded

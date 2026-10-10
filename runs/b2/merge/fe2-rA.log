@@ -1,0 +1,27 @@
+PASS PUB-01 2/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+PASS PUB-02 2/2 | schedule_callback > close_call
+FAIL PUB-03 1/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [corrects] outcome ('promise', None), expected ('not_verified', 'failed')
+       - [corrects] promises [('p1', 95.0, '2026-10-14')], expected []
+       - [corrects] conversation: The check ending after the third wrong answer is not demonstrated, the agent disclosed the credit card and past-due amount of 95, and the customer was not told to use the app or a branch.
+PASS PUB-04 2/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+PASS PUB-05 2/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+FAIL PUB-06 1/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [pieces] conversation: The minimum payment was offered twice rather than once, although both offers noted that the rest would stay overdue.
+FAIL PUB-07 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [in_words] promises [('p1', 540.0, '2026-11-02')], expected [('p1', 540.0, '2026-10-27')]
+       - [in_words] conversation: The agent offered Monday 2 November instead of the next business day, Tuesday 27 October, and recorded the promise for 2 November rather than the required 27 October.
+       - [in_words] promises [('p1', 540.0, '2026-11-02')], expected [('p1', 540.0, '2026-10-27')]
+       - [in_words] conversation: The agent did not offer Tuesday 27 October as the next business day after 26 October and recorded the promise for 2 November instead of the required 27 October.
+FAIL PUB-08 1/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+       - [plain] conversation: The agent never says that payments can take one business day to appear.
+FAIL PUB-09 0/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+       - [in_words] outcome ('no_promise', 'refused'), expected ('transferred', 'restructuring')
+       - [in_words] transfers [], expected [{'queue': 'restructuring'}]
+       - [in_words] conversation: The agent never called transfer_to_agent with queue restructuring and described its own payment proposals of 700 on October 16 and October 23.
+       - [in_words] outcome ('no_promise', 'refused'), expected ('transferred', 'restructuring')
+       - [in_words] transfers [], expected [{'queue': 'restructuring'}]
+       - [in_words] conversation: The required transfer_to_agent call with queue restructuring was never made.
+PASS PUB-10 2/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > close_call
+
+fast_eval: 5 / 10 passed (2 rep(s), all reps must pass), 185 s

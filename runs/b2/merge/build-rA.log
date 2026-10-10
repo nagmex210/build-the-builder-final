@@ -1,0 +1,34 @@
+  [Skill] {'skill': 'build-phone-agent', 'args': 'Slot: main-rA. Tool API file: tools/openapi.json. Brief: btb/briefs_raw/brief-a-
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat btb/briefs_raw/brief-a-raw.md; echo ====; cat tools/openapi.json'}
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat docs/workflow-format.md docs/tools-and-code.md .claude/skills/build-phone-age
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat examples/base-agent.json; echo ====; cat out/main-rA.wording.json; echo ====;
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat .claude/skills/build-phone-agent/routing.md; python3 -c "\nimport json;d=json
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; grep -n -i -A40 "api_request" docs/workflow-format.md | head -120; grep -n -i "en
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; sed -n 600,850p docs/workflow-format.md; grep -n "response_mapping" -A12 docs/too
+I've read the brief, the tool API, the docs and the code/wording files. Now I'm writing a generator script for the workflow.
+  [Bash] {'command': 'mkdir -p /home/ubuntu/btb/repo/out/gen_rA && cat > /home/ubuntu/btb/repo/out/gen_rA/gen.py <<\'EOF\'\nimpor
+  [Bash] {'command': 'python3 - <<\'EOF\'\np=\'out/gen_rA/gen.py\'; s=open(p).read()\ni=s.index(\'nodes["negotiate"]["transitions
+Saved a first version. Running a quick live chat check.
+  [Bash] {'command': 'timeout 120 python3 -c "\nimport freya,json\nr=freya.api(\'POST\',\'/api/v2/chat/message\',{\'workflowId\':
+I built the workflow and saved it, but I couldn't test it live: the one chat call I tried was refused with "402 Insufficient credits". I also didn't run any practice cases, as you asked. The lint check and the wording gate both pass with 0 errors and 0 warnings.
+
+**How it is laid out:**
+- **Start:** the date code node runs first, unchanged, and then hands over to the opening.
+- **Opening:** the first sentence says this is Freya Bank's digital assistant and that the call is recorded, then asks exactly "Am I speaking with {{title}} {{last_name}}?". This step also handles a relative or other person answering: callbacks, wrong number, the customer having died ("I am sorry for your loss."), and an unclear answer after two asks. It moves on to the security check only when the customer clearly confirms who they are.
+- **Identity:** asks date of birth, then the last four phone digits, one `verify_identity` call per answer. It handles the swapped day/month hint, three wrong answers (closes as `not_verified` / `failed`) and refusals (closes as `not_verified` / `declined`).
+- **Account lookup:** after both answers pass, `get_account` runs automatically with your hook code unchanged. Each product then carries its own deadline and floor amount.
+- **Negotiation:** tells the customer about the debt, asks "Can you make this payment today?", then handles dates, amounts, persuasion attempts, the "Do you confirm?" read-back and `create_promise`. If recording fails it tries once more, then closes as `no_promise` / `service_error`. It also covers already paid, dispute, hardship, restructuring and human transfers.
+- **Hang up:** an end node is reached only after `close_call` succeeds.
+
+The amended deadlines in the memo (12 business days for 1–7 days late, 7 for 8–45 days late) match the date facts, so nothing differed from the brief. All outcome and reason codes come from the brief's code list, and `add_note` is never used.
+
+**Two choices of mine the brief doesn't cover:**
+- If `schedule_callback` fails twice, the agent says it couldn't be booked and closes as `not_reached` / `no_callback`.
+- If `verify_identity` hits a service error twice, it closes as `not_verified` / `declined`.
+
+workflow_id 63f0e252-1681-4981-95d9-7bd18b847389, agent_id b304e838-1091-40b6-aa62-a0cd00da1dc1
+
+done: 12 turns, 107 s
+wording gate: 0 errors, 0 warnings
+final save: {'workflow_id': '63f0e252-1681-4981-95d9-7bd18b847389', 'agent_id': 'b304e838-1091-40b6-aa62-a0cd00da1dc1', 'version': 5}; lint: 0 errors, 0 warnings
+{"workflow_id": "63f0e252-1681-4981-95d9-7bd18b847389", "agent_id": "b304e838-1091-40b6-aa62-a0cd00da1dc1"}

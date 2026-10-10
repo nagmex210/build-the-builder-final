@@ -1,0 +1,37 @@
+FAIL PUB-11 0/2 | 
+       - [corrects] outcome (None, None), expected ('promise', None)
+       - [corrects] promises [], expected [('p1', 220.0, '2026-10-16'), ('p2', 640.0, '2026-10-16'), ('p3', 75.0, '2026-10-16')]
+       - [corrects] the call was not closed with close_call
+       - [corrects] conversation: The agent did not state all three products before asking a question, obtain one read-back and one confirmation for all three, or make one create_promise call per product.
+       - [corrects] harness: chat turn timed out and no reply appeared
+       - [corrects] outcome (None, None), expected ('promise', None)
+       - [corrects] promises [], expected [('p1', 220.0, '2026-10-16'), ('p2', 640.0, '2026-10-16'), ('p3', 75.0, '2026-10-16')]
+       - [corrects] the call was not closed with close_call
+       - [corrects] conversation: The agent did not state all three products before asking a question, obtain one read-back and one confirmation covering all three, or make one create_promise call per product.
+       - [corrects] harness: chat turn timed out and no reply appeared
+FAIL PUB-12 0/2 | 
+       - [talkative] outcome (None, None), expected ('promise', None)
+       - [talkative] promises [], expected [('p1', 510.0, '2026-10-15')]
+       - [talkative] notes [], expected [('p2', 'refused'), ('p3', 'refused')]
+       - [talkative] the call was not closed with close_call
+       - [talkative] conversation: The phone question was not asked again, no credit-card promise or refused notes were made, and neither the two personal-loan attempts nor the one car-loan attempt occurred.
+       - [talkative] harness: chat turn timed out and no reply appeared
+       - [plain] outcome (None, None), expected ('promise', None)
+       - [plain] promises [], expected [('p1', 510.0, '2026-10-15')]
+       - [plain] notes [], expected [('p2', 'refused'), ('p3', 'refused')]
+       - [plain] the call was not closed with close_call
+       - [plain] conversation: The transcript does not show the phone question asked again once, exactly one credit-card promise, refused notes for both other products, or two personal-loan attempts and one car-loan attempt.
+       - [plain] harness: chat turn timed out and no reply appeared
+FAIL PUB-13 0/2 | 
+       - [corrects] outcome (None, None), expected ('promise', None)
+       - [corrects] promises [], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]
+       - [corrects] the call was not closed with close_call
+       - [corrects] conversation: Neither the credit card payment on 30 October nor the loan payment on its deadline of 23 October was recorded, and no read-back named both dates.
+       - [corrects] harness: chat turn timed out and no reply appeared
+       - [asks_back] outcome (None, None), expected ('promise', None)
+       - [asks_back] promises [], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]
+       - [asks_back] the call was not closed with close_call
+       - [asks_back] conversation: Neither the credit card payment for 30 October nor the loan payment for its 23 October deadline was recorded, and no read-back named both dates.
+       - [asks_back] harness: chat turn timed out and no reply appeared
+
+fast_eval: 0 / 3 passed (2 rep(s), all reps must pass), 259 s

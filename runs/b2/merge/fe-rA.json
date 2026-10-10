@@ -1,0 +1,337 @@
+{
+ "workflow_id": "63f0e252-1681-4981-95d9-7bd18b847389",
+ "passed": 1,
+ "total": 10,
+ "rows": [
+  {
+   "id": "PUB-01",
+   "style": "corrects",
+   "pass": true,
+   "failed": [],
+   "call_id": "b419d4ef-db73-4fd3-8744-999f5f410cfb",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 6
+  },
+  {
+   "id": "PUB-02",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "outcome ('not_reached', 'no_callback'), expected ('not_reached', 'callback')",
+    "callbacks [], expected [{'date': '2026-10-15', 'time': '11:00'}]",
+    "conversation: The callback was not scheduled for the next business day, 2026-10-15 at 11:00, because schedule_callback failed and no successful retry occurred."
+   ],
+   "call_id": "3ae2d6dd-0a78-4385-8888-13f9d1fe8678",
+   "tools": [
+    "close_call"
+   ],
+   "turns": 4
+  },
+  {
+   "id": "PUB-03",
+   "style": "asks_back",
+   "pass": true,
+   "failed": [],
+   "call_id": "a51bf916-84f9-4969-bdc7-1d79a6057c81",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "close_call"
+   ],
+   "turns": 5
+  },
+  {
+   "id": "PUB-04",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "promises [('p1', 400.0, '2026-10-23')], expected [('p1', 1250.0, '2026-10-23')]",
+    "conversation: The customer's own proposed date was effectively counted as a refusal: the agent moved to the 400 minimum payment after only one subsequent refusal, rather than completing two persuasion attempts."
+   ],
+   "call_id": "2a3ca677-a079-4d91-945a-83288baddfbd",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 8
+  },
+  {
+   "id": "PUB-05",
+   "style": "corrects",
+   "pass": true,
+   "failed": [],
+   "call_id": "6cd12179-03f1-43d1-bbcc-1970ba2ed420",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 6
+  },
+  {
+   "id": "PUB-06",
+   "style": "talkative",
+   "pass": true,
+   "failed": [],
+   "call_id": "3cdece9f-6a3b-4542-a4a6-5623e8ce0b5a",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 8
+  },
+  {
+   "id": "PUB-07",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "promises [('p1', 540.0, '2026-11-02')], expected [('p1', 540.0, '2026-10-27')]",
+    "conversation: The agent offered November 2 instead of the next business day, Tuesday October 27, after October 26, and recorded the promise for November 2 rather than October 27."
+   ],
+   "call_id": "cbb4096a-2277-4618-9cd6-7c8b1e017ef3",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 8
+  },
+  {
+   "id": "PUB-08",
+   "style": "corrects",
+   "pass": true,
+   "failed": [],
+   "call_id": "caf72c28-1ae3-4f53-8b58-89b8556549aa",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 5
+  },
+  {
+   "id": "PUB-09",
+   "style": "talkative",
+   "pass": true,
+   "failed": [],
+   "call_id": "ae0b1d48-7220-477b-acf9-9cd993c8d63a",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "transfer_to_agent",
+    "close_call"
+   ],
+   "turns": 6
+  },
+  {
+   "id": "PUB-10",
+   "style": "pieces",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 365.0, '2026-10-16')]",
+    "the call was not closed with close_call",
+    "conversation: The check requiring exactly one promise in the ledger after the retry is not satisfied because no retry or successful ledger entry is shown.",
+    "harness: POST /api/v2/chat/message -> 500: {\"success\":false,\"data\":{\"message\":\"Internal server error\",\"result\":{\"requestId\":\"d5350598-30e8-4db7-8899-fc36401a50e4\"}}}"
+   ],
+   "call_id": null,
+   "tools": [],
+   "turns": 0
+  },
+  {
+   "id": "PUB-01",
+   "style": "in_words",
+   "pass": false,
+   "failed": [
+    "conversation: The create_promise exactly-once check failed because create_promise was called twice."
+   ],
+   "call_id": "3deb1f03-713a-4f5e-b98f-f0f77e7ccd24",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 6
+  },
+  {
+   "id": "PUB-02",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "outcome ('not_reached', 'no_callback'), expected ('not_reached', 'callback')",
+    "callbacks [], expected [{'date': '2026-10-15', 'time': '11:00'}]",
+    "conversation: The callback was not successfully scheduled for the next business day, 2026-10-15 at 11:00, because both schedule_callback attempts failed."
+   ],
+   "call_id": "ef3471e2-8f4f-498c-a18e-abab6494c247",
+   "tools": [
+    "close_call"
+   ],
+   "turns": 4
+  },
+  {
+   "id": "PUB-03",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "conversation: The transcript does not show the identity check ending after the third wrong answer, and the customer was not told to use the app or a branch."
+   ],
+   "call_id": "55f4ca1d-d2f3-4d07-a578-7c5e70d730a9",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "close_call"
+   ],
+   "turns": 5
+  },
+  {
+   "id": "PUB-04",
+   "style": "pieces",
+   "pass": false,
+   "failed": [
+    "conversation: The check that the agent says it is a digital assistant when asked is not clearly satisfied because no such question and response occur in the transcript."
+   ],
+   "call_id": "a5cd51d8-b828-4a2a-86c7-b72820f5f81b",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 7
+  },
+  {
+   "id": "PUB-05",
+   "style": "pieces",
+   "pass": true,
+   "failed": [],
+   "call_id": "b2a8f9db-21b6-47da-ad06-93db3fd029f7",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 6
+  },
+  {
+   "id": "PUB-06",
+   "style": "pieces",
+   "pass": false,
+   "failed": [
+    "conversation: The minimum payment was offered twice, with a repeated request to pay 637.50 today, so the requirement to offer it only once fails."
+   ],
+   "call_id": "78c39b63-277a-47ab-bc19-31eba62ac706",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 8
+  },
+  {
+   "id": "PUB-07",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "promises [('p1', 540.0, '2026-11-02')], expected [('p1', 540.0, '2026-10-27')]",
+    "conversation: The agent did not offer Tuesday 27 October as the next business day after 26 October and instead recorded the promise for Monday 2 November, failing the required promise-date check."
+   ],
+   "call_id": "57b2f66f-ea07-4c32-bc34-47dc6dc3e6db",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 9
+  },
+  {
+   "id": "PUB-08",
+   "style": "in_words",
+   "pass": false,
+   "failed": [
+    "conversation: The agent did not say that payments can take one business day to appear."
+   ],
+   "call_id": "4a89814e-5a94-4d00-9c2c-b5bbd51d0c25",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 5
+  },
+  {
+   "id": "PUB-09",
+   "style": "in_words",
+   "pass": false,
+   "failed": [
+    "outcome ('no_promise', 'refused'), expected ('transferred', 'restructuring')",
+    "transfers [], expected [{'queue': 'restructuring'}]",
+    "conversation: The required transfer_to_agent call with queue restructuring was never made."
+   ],
+   "call_id": "756f8bcf-802e-47ec-a9b9-604e0dee753f",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 7
+  },
+  {
+   "id": "PUB-10",
+   "style": "asks_back",
+   "pass": true,
+   "failed": [],
+   "call_id": "e55042af-9f15-42cd-adb7-4d28d07dcf3b",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 6
+  }
+ ]
+}

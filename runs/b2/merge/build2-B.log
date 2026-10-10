@@ -1,0 +1,39 @@
+  [Skill] {'skill': 'build-phone-agent', 'args': 'Slot: main-B. Tool API file: tools/openapi.json. Brief files: briefs/brief-a.md 
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat briefs/brief-a.md briefs/brief-b.md; wc -c tools/openapi.json docs/*.md .clau
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat .claude/skills/build-phone-agent/routing.md; cat out/main-B.wording.json; pyt
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat tools/openapi.json | python3 -c "import json,sys;d=json.load(sys.stdin);print
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat examples/base-agent.json; python3 -c "\nimport json;d=json.load(open(\'out/ma
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; grep -n "api_request" -A40 docs/workflow-format.md | head -90; python3 -c "\nimpo
+I've read the briefs, the tool API file and the code steps. Next I'll check the docs for the account-lookup node format, then write the workflow.
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; grep -n "response_mapping" -B3 -A25 docs/tools-and-code.md | head -120'}
+  [Bash] {'command': 'mkdir -p /home/ubuntu/btb/repo/out/gen_mainB && cat > /home/ubuntu/btb/repo/out/gen_mainB/gen.py <<\'EOF\'\
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; grep -n -i "workflow-level\\|top-level \\`tools\\`\\|global tool\\|alwaysRunsAt" 
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; python3 - <<\'EOF\'\np=\'out/gen_mainB/gen.py\';s=open(p).read()\ns=s.replace("[c
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; python3 - <<\'EOF\'\np=\'out/gen_mainB/gen.py\';s=open(p).read()\ns=s.replace(" o
+Saved a first version. Now a quick start check.
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; timeout 90 python3 -c "import freya,json; print(json.dumps(freya.api(\'POST\',\'/
+I built the brief B phone agent and saved it to slot main-B. It starts correctly, but I have only tested one chat turn, so I haven't seen identity checks, promises or closes work in a real conversation.
+
+- **Checks:** the lint and the wording gate both pass with 0 errors. The wording gate gives 1 warning, for "120.50": it's just an example amount in the `create_promise` field description.
+- **Start test:** "Hello?" got the reply "I am a digital assistant calling from Freya Bank, and the call is recorded. Am I speaking with Ms Lee?"
+- **Structure:** the call goes through these steps:
+  1. The date-facts code node, unedited.
+  2. An opening step, which also handles callbacks, wrong number and deceased.
+  3. The identity check.
+  4. A silent account lookup with your `account_post_process_code` used verbatim.
+  5. One negotiation step for all products.
+  6. A hang-up step, reached only after `close_call` succeeds.
+- **Wording:** every exact sentence, content item and outcome/reason code from the wording file is in the step that handles it. Nothing forbidden is said before identity is verified.
+- **Brief vs date facts:** they agree on bands, deadlines, persuasion attempts and holidays, so nothing needed overriding.
+- **Not done:**
+  - A failed `create_promise` or transfer is retried once and then closed according to prompt instructions only, not by routing. With several products, the right close depends on which products are already recorded, and a single route can't tell that.
+  - The opening step relies on the start node's date facts for callback dates. If the platform skips that node, the agent has no calendar for callbacks before identity.
+
+I wrote the workflow with a small generator script, `out/gen_mainB/gen.py`, so changes go there and get re-run. The saved workflow is `out/main-B.workflow.json`.
+
+workflow_id: 0e92e0fa-2e50-4314-8434-33760d22f246, agent_id: bce0c1bc-a68b-436e-a37b-88db6b717c99
+
+done: 14 turns, 109 s
+wording gate: 0 errors, 1 warnings
+final save: {'workflow_id': '0e92e0fa-2e50-4314-8434-33760d22f246', 'agent_id': 'bce0c1bc-a68b-436e-a37b-88db6b717c99', 'version': 7}; lint: 0 errors, 0 warnings
+{"workflow_id": "0e92e0fa-2e50-4314-8434-33760d22f246", "agent_id": "bce0c1bc-a68b-436e-a37b-88db6b717c99"}

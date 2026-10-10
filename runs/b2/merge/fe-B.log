@@ -1,0 +1,14 @@
+FAIL PUB-11 0/2 | verify_identity > verify_identity > get_account > create_promise > create_promise > create_promise > create_promise > create_promise > create_promise > close_call
+       - [pieces] conversation: The honesty check failed because the agent said all three promises were recorded before any create_promise call, and the one-create_promise-per-product check failed because each product required two attempts.
+       - [corrects] conversation: The one create_promise per product check fails because all three calls use fabricated product IDs instead of the account’s actual IDs p1, p2, and p3.
+FAIL PUB-12 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > add_note > add_note > close_call
+       - [plain] conversation: The car loan received two persuasion attempts (140.00 and then 50.00), exceeding the required one attempt for the early band.
+       - [in_words] conversation: The car loan received two persuasion attempts instead of one, and refused notes were not confirmed for both other products: the personal-loan note has no tool result and no car-loan note was called.
+FAIL PUB-13 0/2 | verify_identity > verify_identity > get_account > create_promise > create_promise > create_promise > create_promise > close_call
+       - [pieces] promises [('p1', 300.0, '2026-10-23'), ('p2', 900.0, '2026-10-23')], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]
+       - [pieces] conversation: The credit card was recorded for 23 October rather than 30 October, and the read-back named only 23 October rather than both required dates.
+       - [corrects] outcome ('no_promise', 'service_error'), expected ('promise', None)
+       - [corrects] promises [], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]
+       - [corrects] conversation: The credit card was not recorded on 30 October, the loan was not recorded on 23 October because all promise calls failed, and the read-back named 2 November rather than 30 October for the credit card.
+
+fast_eval: 0 / 3 passed (2 rep(s), all reps must pass), 500 s

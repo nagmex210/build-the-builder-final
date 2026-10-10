@@ -1,0 +1,30 @@
+The guards and the independent date check are built and committed on `idea/b2-1`, but I couldn't measure them. 51 of the 52 eval runs were cut off by the platform, so the 0/26 says nothing about the change. **The Freya workspace is now out of credits: every chat turn returns `402 Insufficient credits — please top up`.** Nobody can run evals until it's topped up.
+
+**What changed:**
+- **Guards (`builder/guards.py`):** these are installed on every save and check a promise or callback before it reaches the bank.
+  - **Promise:** the date must be today or later, a business day, and not after that product's deadline. The amount must be at least the floor and at most the full amount owed.
+  - **Callback:** the date and time must be inside the window and later than `now`.
+  - **When a check fails:** nothing is sent to the bank. The agent gets "NOT RECORDED" with the reason, which names the next business day or the latest allowed date.
+  - **What turns a check on:** only a rule the brief states. Tool field names are checked against the tool API file.
+  - Tested locally: a holiday, a weekend, a date after the deadline, an amount below the floor and an out-of-window callback were all blocked, and valid values went through.
+- **Independent check of the date code (`builder/oracle.py`):** a separate model call copies the brief's stated facts (holidays, business weekdays, deadline rows, floors, callback window) without computing anything. The generated date code is then run against those facts.
+  - **On a mismatch:** the spec is repaired as an edit, and the version with the fewest mismatches is kept.
+  - **Cost:** it runs alongside the existing extraction, so no extra build time.
+  - **Results:** 0 mismatches on all four builds. When I deliberately dropped a holiday and changed a deadline by a day, it caught both, and it read the memo's override (12th business day, not 10th) correctly.
+- **`btb/fast_eval.py`:** calls to the mock bank are now retried. A single Cloudflare error page used to crash the whole eval run, and it did that to me four times.
+
+**What happened on the platform:**
+- From 15:39 to 15:49 UTC the mock bank returned errors on every request.
+- After that, chat turns timed out in the identity step, before any guarded tool was reached.
+- From about 16:05, every turn returned the 402 credits error.
+- Only one run got through: a callback that should be allowed. It passed the guard and was recorded correctly. Our judge failed it anyway, wrongly: it says no scheduling call was made, but the transcript shows one.
+- I never saw the guard block a wrong value live.
+
+Builds took 123–200 s, about the same as the champion. The change doesn't depend on brief A or B: every tool name, field, date and amount comes from extraction at build time.
+
+**Before merging:**
+- Once credits are back, run PUB-07 and PUB-04 on w1-A and look for `NOT RECORDED … checked against the brief` in the tool results.
+- A blocked call still shows up in the transcript with the wrong values. The official judge might count it as an extra attempt; that's untested.
+- The builder's inner Claude leaves scratch scripts in `build/` and `gen/`. I didn't commit them; they could go in `.gitignore`.
+
+Report: `runs/b2/w1.md` (commit `a30c0b9`).

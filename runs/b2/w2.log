@@ -1,0 +1,31 @@
+I implemented and committed the multi-product fix on `idea/b2-2`, but I have no score for it. Every eval was blocked by the platform: first an outage, then the Freya workspace ran out of credits. The report is in `runs/b2/w2.md`.
+
+**What I changed:** I targeted the champion's main multi-product failure. The agent makes up product ids like `credit_card_2288` from the product's type and digits. Each first `create_promise` fails with `unknown product_id` and is then retried with the right id. The ledger ends right, but the judge fails "one `create_promise` per product". The old hook only fixed an id when there was a single product.
+- **Id matching before every write** (`builder/harden.py`): if the agent sends an id that isn't in the account lookup, the hook matches it against each product's own short text fields (type, last digits). It swaps in the real id only when one product clearly matches best; on a tie or no match it changes nothing. For example `credit_card_2288` becomes `p1`, `car loan` becomes `p3`, and with two cards the last digits pick the right one.
+- **An `ids_to_use` line at the top of the account lookup result** when there are two or more products: the exact ids to copy, one call per product.
+- **Wording after a successful write:** it no longer always says "speak to the customer now", which could stop the agent before it records the next product. It now gives the count of successful calls so far, says never to repeat a product that already succeeded, and says to call the tool for the next agreed product if there is one.
+- **Instructions for the inner Claude build** (`routing.md`, `SKILL.md`): track each product separately (its own deadline, minimum amount and attempt count), read everything back once with one confirmation, make exactly one write per product, add notes before `close_call`, and call no tool after it. A note after `close_call` was the cause of the official PUB-12 failure.
+
+**Results:**
+
+| slot | build time | fast eval |
+|---|---|---|
+| w2-A | 124 s | stopped during the outage (chat 504 errors) |
+| w2-B | 123 s (rebuild 245 s) | 0/3, all timeouts right after the opening, no tool called |
+| w2-rA | 156 s | 0/10, all 504 / 500 / 402 errors |
+| w2-rB | 129 s (rebuild 134 s) | 0/3, same |
+
+These are outage results, not scores; the logs are kept in `runs/b2/w2/outage/`. None of the eval calls reached the account lookup, so there is no live evidence for or against the change.
+- 15:47–15:49: the mock bank returned errors.
+- From about 15:50: chat timed out with 504 errors.
+- From about 16:05: every chat turn returns `402 Insufficient credits — please top up`. It was still failing when I stopped at 16:35.
+
+The 402 affects the whole workspace, so the other workers' evals and your official runs are blocked until someone tops up the credits.
+
+**Offline checks:** I ran the hook code from the saved A, B and rB workflows locally on a three-product account response. The invented ids from the b1 transcripts mapped to `p1`/`p2`/`p3` for both `create_promise` and `add_note`, real ids were left unchanged, and the per-product deadline and minimum-amount fields were still present. The lint shows 0 errors on all builds.
+
+**Still open:**
+- In the rB build during the outage, the identity step looped: the customer gave the phone digits and the agent asked for the date of birth again. It may have been the outage; if it shows up on a healthy platform, it's an identity-routing bug outside this family.
+- A product's date after its own deadline (B rule 6 / PUB-13) is still left to the prompt; it belongs to the "code steps as guards" family.
+
+**Brief-agnostic:** yes. The code names no product type, id, value or code from brief A or B. It works on any items with an id that any lookup tool returns, and changes nothing unless one item clearly matches. When credits are back, B and raw-B should be measured first.

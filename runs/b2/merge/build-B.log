@@ -1,0 +1,27 @@
+  [Skill] {'skill': 'build-phone-agent', 'args': 'Slot: main-B. Tool API file: tools/openapi.json. Brief files: briefs/brief-a.md 
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat briefs/brief-a.md briefs/brief-b.md; wc -c tools/openapi.json docs/*.md .clau
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; ls -la out/ | grep main-B; git log --oneline -3; python3 -c "\nimport json;w=json
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; python3 -c "\nimport json;w=json.load(open(\'out/main-B.workflow.json\'));print(w
+  [Bash] {'command': "cd /home/ubuntu/btb/repo; python3 - <<'E'\nimport json\nw=json.load(open('out/main-B.workflow.json'));c=jso
+Checking the existing slot file against the new calc and wording files so I can update it fast.
+  [Bash] {'command': "cd /home/ubuntu/btb/repo; python3 - <<'E'\nimport json\nw=json.load(open('out/main-B.workflow.json'));c=jso
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; python3 - <<\'E\'\nimport json\nw=json.load(open(\'out/main-B.workflow.json\'));c
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; python3 - <<\'E\'\nimport json\nw=json.load(open(\'out/main-B.workflow.json\'));c
+  [Bash] {'command': "cd /home/ubuntu/btb/repo; python3 - <<'E'\nimport json\np='out/main-B.workflow.json'\nw=json.load(open(p));
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; timeout 90 python3 -c "import freya,json; print(str(freya.api(\'POST\',\'/api/v2/
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; python3 - <<\'E\'\nimport json\np=\'out/main-B.workflow.json\'\nw=json.load(open(
+The main-B workflow is saved (version 4), but I couldn't check that it starts a call: the one-turn chat test came back with 402 "Insufficient credits", so no live test ran.
+
+`out/main-B.workflow.json` already existed from an earlier main-B build this morning, with the same layout: date-facts start node, opening, identity, account lookup, negotiation, end_call. I updated that file rather than starting over:
+- **Date code:** I replaced the start node with the `code_node` from `main-B.calc.json`, unedited and pointing to the opening node. I set the `get_account` `post_process_code` to `account_post_process_code` exactly as given.
+- **Add-note rule:** the agent now calls `add_note` for every product without a promise, also with a single product and when no promise is made. It adds no notes at all when the call is transferred. Earlier it only did this with two or more products. I followed Brief B rule 8 here; Brief A alone never uses `add_note`. This is a judgement call worth checking.
+- **Failed `create_promise`:** after two failures the agent keeps the promises already recorded, adds a `service_error` note for that product, and closes as `no_promise` / `service_error` if nothing was recorded.
+
+Lint shows no errors or warnings. The wording gate shows no errors and one warning, the number "250.00" in the `create_promise` amount description, which is only an example value. The brief's date rules match the date facts, so nothing differs there.
+
+workflow_id: 0e92e0fa-2e50-4314-8434-33760d22f246, agent_id: bce0c1bc-a68b-436e-a37b-88db6b717c99
+
+done: 13 turns, 94 s
+wording gate: 0 errors, 1 warnings
+final save: {'workflow_id': '0e92e0fa-2e50-4314-8434-33760d22f246', 'agent_id': 'bce0c1bc-a68b-436e-a37b-88db6b717c99', 'version': 5}; lint: 0 errors, 0 warnings
+{"workflow_id": "0e92e0fa-2e50-4314-8434-33760d22f246", "agent_id": "bce0c1bc-a68b-436e-a37b-88db6b717c99"}

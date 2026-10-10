@@ -1,0 +1,34 @@
+I've built and committed the gated extraction, but there is no score for it. Freya was unusable for the whole eval window, so all four fast_evals are invalid. The report is in `runs/b2/w5.md`, committed on `idea/b2-5`.
+
+**What changed:**
+- **New `builder/brief_facts.py`:**
+  - Code splits the briefs at their headings, and one small Azure call per section, run in parallel, extracts the values that decide cases: deadlines, floors, attempts, memo overrides, outcome codes, mandatory sentences, holidays, the callback window and limits. Each value comes with a verbatim quote.
+  - A retrievability gate drops any item whose quote isn't in its section or whose value isn't in the brief. The rest becomes `out/<slot>.facts.md`.
+  - A separate oracle call, with a different prompt, copies down what the brief actually states: the deadline rule in force per band (after memo amendments), holidays, weekend days, the callback window, and the brief's own worked examples.
+- **`builder/datecalc.py`:**
+  - Its spec is checked two ways: every value must appear in the brief text, and its generated code is run against the oracle's facts.
+  - On a failure it sends the model the failures plus its previous spec and asks it to change only those fields. It stops after 3 rounds or a repeated result, and ships the attempt with the fewest failures. Every round is logged to the trace.
+- **`builder/build.py`:**
+  - The facts sheet goes into the Claude build prompt.
+  - After the final save, the trace records whether every mandatory sentence appears in the workflow.
+
+**What I could test:**
+- **Repair loop:** I fed raw-A a stale spec with the pre-memo deadlines (10/5) and a missing holiday. The oracle flagged both, and one repair round returned the amended 12/7 and all 5 holidays.
+- **No false alarms:** 12 fresh unguarded spec extractions (4 each for raw-A, raw-B and B) all passed the gates.
+- **Builds:** 140–176 s, against the champion's 125–146 s. That's 10–30 s more, all from the new extraction step. Lint showed 0 errors on all four.
+- **Expected score change on A/B is about zero.** The champion's workflows already have all 5 mandatory sentences and the same date values. The gain would only show on a hidden brief where the plain extraction gets something wrong.
+
+**Why there are no scores:**
+- The bank mock returned 500 errors.
+- The chat endpoint then returned 500s and timeouts, for the champion's workflow too.
+- From 16:06, Freya answered every chat turn with `402 Insufficient credits`. Probes every 30 s on the champion's workflow got 402 until about 16:38.
+- The 0/26 results are kept in `runs/b2/w5/outage/` and `runs/b2/w5/credits402/`. They come from the platform, not the builder.
+
+The merger should re-score the w5 workflows once Freya credits are back. The workflow ids are in `runs/b2/w5/build-*.log`.
+
+**Generalisation:** nothing from brief A or B is in the code or prompts. The only fixed date is an arbitrary Monday used to place a worked example that names a weekday but no date.
+
+**Weak spots, also in the report:**
+- The oracle compares the set of deadline counts, not which band each count belongs to, so swapping the early and late counts would pass.
+- A missing mandatory sentence is only reported in the trace, not fixed.
+- The facts sheet is long (80–152 items).

@@ -1,0 +1,38 @@
+FAIL PUB-01 1/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [in_words] conversation: The text-message sentence was not said after the promise was created.
+PASS PUB-02 2/2 | schedule_callback > close_call
+FAIL PUB-03 0/2 | verify_identity > verify_identity > close_call
+       - [asks_back] conversation: The transcript does not establish that verification ends after the third wrong answer, and the customer is not told to use the app or a branch.
+       - [corrects] outcome ('promise', None), expected ('not_verified', 'failed')
+       - [corrects] promises [('p1', 95.0, '2026-10-14')], expected []
+       - [corrects] conversation: The third-wrong-answer stop check is not demonstrated because verification succeeded without three wrong answers, the agent disclosed the amount 95 and credit card ending 0377, and the customer was never told to use the app or a branch.
+FAIL PUB-04 0/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+       - [talkative] outcome ('no_promise', 'service_error'), expected ('promise', None)
+       - [talkative] promises [], expected [('p1', 1250.0, '2026-10-23')]
+       - [talkative] conversation: The promise date was November 2, 2026, rather than the required late-band deadline of October 23, 2026.
+       - [asks_back] outcome ('no_promise', 'service_error'), expected ('promise', None)
+       - [asks_back] promises [], expected [('p1', 1250.0, '2026-10-23')]
+       - [asks_back] conversation: The promise date was 2 November 2026 instead of the required late-band deadline of 23 October 2026.
+FAIL PUB-05 1/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+       - [talkative] conversation: The one-sentence-of-sympathy check fails because the agent expressed sympathy twice: once about the traffic and once about the job loss.
+FAIL PUB-06 0/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+       - [plain] outcome ('no_promise', 'service_error'), expected ('promise', None)
+       - [plain] promises [], expected [('p1', 637.5, '2026-10-16')]
+       - [plain] conversation: The required minimum payment of 637.50 was never offered, and no promise for 637.50 on Friday 16 October was recorded; the agent instead proposed 500.00 and both recording attempts failed.
+       - [asks_back] outcome ('no_promise', 'service_error'), expected ('promise', None)
+       - [asks_back] promises [], expected [('p1', 637.5, '2026-10-16')]
+       - [asks_back] conversation: The agent never offered the required minimum payment of 637.50 and did not establish a promise for 637.50 on Friday 16 October, instead agreeing on 200.00 whose recording failed.
+FAIL PUB-07 0/2 | verify_identity > verify_identity > get_account > create_promise > close_call
+       - [asks_back] promises [('p1', 540.0, '2026-11-02')], expected [('p1', 540.0, '2026-10-27')]
+       - [asks_back] conversation: The agent did not offer Tuesday 27 October as the next business day after the 26 October holiday, and recorded the promise for 2 November instead of the required 27 October.
+       - [asks_back] promises [('p1', 540.0, '2026-10-23')], expected [('p1', 540.0, '2026-10-27')]
+       - [asks_back] conversation: The agent rejected 26 October but offered 23 October rather than the next business day, Tuesday 27 October, and recorded the promise for 23 October instead of 27 October, incorrectly applying the late-band deadline rather than the early-band dead
+PASS PUB-08 2/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+FAIL PUB-09 0/2 | verify_identity > verify_identity > verify_identity > get_account > transfer_to_agent > close_call
+       - [plain] conversation: The agent describes a plan of its own by proposing a payment of 500 today with the remaining balance staying overdue.
+       - [in_words] outcome ('no_promise', 'refused'), expected ('transferred', 'restructuring')
+       - [in_words] transfers [], expected [{'queue': 'restructuring'}]
+       - [in_words] conversation: The agent never called transfer_to_agent with queue restructuring and described its own payment proposal by offering a smaller payment of 500.
+PASS PUB-10 2/2 | verify_identity > verify_identity > get_account > create_promise > create_promise > close_call
+
+fast_eval: 3 / 10 passed (2 rep(s), all reps must pass), 265 s

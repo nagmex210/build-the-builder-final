@@ -1,0 +1,46 @@
+PASS PUB-01 easy   Happy path     | verify > verify > get_account > promise > close_call
+FAIL PUB-02 medium Third party    | schedule_callback > close_call
+       - conversation: The agent failed the first success criterion because it disclosed the purpose of the call to a third party. In Message 4, by stating 'I cannot accept payment from anyone other than Ms Costa,' the agent explicitly confirmed that the call was regar
+PASS PUB-03 medium Identity       | verify > verify > verify > close_call
+PASS PUB-04 medium Dates          | verify > verify > get_account > promise > close_call
+PASS PUB-05 medium Hardship       | verify > verify > get_account > close_call
+PASS PUB-06 hard   Amounts        | verify > verify > get_account > promise > close_call
+PASS PUB-07 hard   Dates          | verify > verify > get_account > promise > close_call
+PASS PUB-08 medium Already paid   | verify > verify > get_account > close_call
+PASS PUB-09 medium Restructuring  | verify > verify > get_account > transfer_to_agent > close_call
+FAIL PUB-10 hard   Tool failure   | verify > verify > get_account > promise > promise > close_call
+       - conversation: 1. The agent used the word 'recorded' in Message 0 ('this call is recorded'), which occurred before the successful API call to record the promise, thus failing the string constraint 'agent does not say recorded before a successful call'. 2. There
+
+slowest agent turn per call: median 4 s, worst 5 s. Failed calls where the customer hung up: 0.
+-- run 1 of 2: 8 / 10 passed, 126 s
+
+PASS PUB-01 easy   Happy path     | verify > verify > get_account > promise > close_call
+PASS PUB-02 medium Third party    | schedule_callback > close_call
+FAIL PUB-03 medium Identity       | verify > verify > close_call
+       - outcome ('not_verified', 'declined'), expected ('not_verified', 'failed')
+       - conversation: The identity check did not end after the third wrong answer as required. The user provided dates of birth in messages 3, 5, and 7. Despite having received three attempts, the assistant asked the user for their date of birth again in message 10 an
+PASS PUB-04 medium Dates          | verify > verify > get_account > promise > close_call
+PASS PUB-05 medium Hardship       | verify > verify > get_account > close_call
+PASS PUB-06 hard   Amounts        | verify > verify > get_account > promise > close_call
+FAIL PUB-07 hard   Dates          | verify > verify > get_account > promise > close_call
+       - promises [('p1', 540.0, '2026-11-02')], expected [('p1', 540.0, '2026-10-27')]
+       - conversation: The conversation failed to meet the success criteria because the promise was not recorded for Tuesday, October 27th. While the agent correctly asked for the exact day ([Message 8]), identified that October 26th was a holiday, and offered October 
+PASS PUB-08 medium Already paid   | verify > verify > get_account > close_call
+PASS PUB-09 medium Restructuring  | verify > verify > get_account > transfer_to_agent > close_call
+PASS PUB-10 hard   Tool failure   | verify > verify > get_account > promise > promise > close_call
+
+slowest agent turn per call: median 3 s, worst 6 s. Failed calls where the customer hung up: 0.
+-- run 2 of 2: 8 / 10 passed, 93 s
+
+PASS PUB-01 2/2
+FAIL PUB-02 1/2
+FAIL PUB-03 1/2
+PASS PUB-04 2/2
+PASS PUB-05 2/2
+PASS PUB-06 2/2
+FAIL PUB-07 1/2
+PASS PUB-08 2/2
+PASS PUB-09 2/2
+FAIL PUB-10 1/2
+
+6 / 10 passed (bank records and conversation checks), a customer counts with 2 of 2 runs. Last simulation 9fffc1d9-1058-49c5-8a74-e4f3dacfa9f9, status completed, 219 s.

@@ -1,0 +1,36 @@
+  [Skill] {'skill': 'build-phone-agent'}
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat briefs/brief-a.md; echo ----; cat tools/openapi.json; echo ----; cat .claude/
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat docs/workflow-format.md docs/tools-and-code.md; echo -----; cat examples/base
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat out/main-A.wording.json; echo ----; python3 -c "\nimport json;d=json.load(ope
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat examples/base-agent.json; ls builder out'}
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; grep -n "^#\\|api_request\\|end_call\\|response_mapping\\|top-level .tools\\|glob
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; sed -n 38,66p docs/workflow-format.md; sed -n 611,660p docs/workflow-format.md; s
+Read the brief, tool API, docs and the calc/wording files. Now I'm writing the workflow generator.
+  [Bash] {'command': 'mkdir -p /tmp/gen_mainA && cat > /tmp/gen_mainA/gen.py <<\'EOF\'\nimport json\nR=\'/home/ubuntu/btb/repo/\'
+  [Bash] {'command': 'python3 builder/lint_workflow.py out/main-A.workflow.json; python3 builder/wording.py --gate out/main-A.wor
+  [Bash] {'command': 'python3 builder/save.py main-A out/main-A.workflow.json 2>&1 | tail -5'}
+  [Bash] {'command': 'timeout 120 python3 -c "\nimport freya,json\nr=freya.api(\'POST\',\'/api/v2/chat/message\',{\'workflowId\':
+  [Bash] {'command': 'timeout 150 python3 -c "\nimport freya,json\nr=freya.api(\'POST\',\'/api/v2/chat/message\',{\'workflowId\':
+  [Bash] {'command': 'grep -n "def \\|chat" freya.py | head -20; timeout 60 python3 -c "\nimport freya,json\nr=freya.api(\'GET\',
+Saved v1 (workflow c591c751…); the chat check returned a gateway 504 twice. Now I'm making the opening sentence fixed text and re-saving.
+  [Bash] {'command': 'cd /tmp/gen_mainA && python3 - <<\'EOF\'\np=\'gen.py\'; s=open(p).read()\ns=s.replace(\'\'\'FIRST SENTENCE 
+  [Bash] {'command': 'timeout 150 python3 -c "\nimport freya,json\nr=freya.api(\'POST\',\'/api/v2/chat/message\',{\'workflowId\':
+  [Bash] {'command': 'timeout 150 python3 -c "\nimport freya,json\nr=freya.api(\'POST\',\'/api/v2/chat/message\',{\'workflowId\':
+I've built and saved the main-A agent. It starts correctly: the first chat turn gave the opening line, "Hello, I am a digital assistant calling from Freya Bank, and this call is recorded. Am I speaking with Ms Lee?". The second turn ("Yes, speaking.") got a 504 timeout from the platform. Earlier, the first turn also timed out twice before it went through, so I never saw the identity questions or the debt and promise steps run. The linter and the wording gate both report 0 errors and 0 warnings, and the saved version is 8.
+
+How the call is laid out:
+- **Start:** the date code node runs first, as given, then goes to the opening.
+- **Opening:** fixed first sentence, then finds out who answered. It handles the callback, wrong-number, deceased, unclear and human-request cases. It only moves on to identity when the person clearly confirms they are the customer.
+- **Identity:** asks date of birth, then the last four phone digits, and checks each answer with `verify_identity`. It handles the swapped day/month hint, three wrong answers, and a customer who declines. It moves on only when the tool says both answers passed.
+- **Account lookup:** fetches the account automatically, using your hook code unchanged, and fills in each product's own deadline and floor plus the date facts.
+- **Negotiation:** states the debt and runs every promise rule from sections 7 to 11. It asks for "Do you confirm?" before recording and says the text-message sentence after a recorded promise. If `create_promise` fails twice, it goes to a small node that closes as `no_promise` / `service_error`.
+- **Ending:** every stage that can close the call ends it once `close_call` succeeds.
+
+The generator script is at `/tmp/gen_mainA/gen.py`. The brief's date and amount rules match the date facts and the per-product fields, so I followed both without changes.
+
+workflow_id c591c751-dc19-4660-9955-f9a4d750213d, agent_id d7b2b782-a1c2-42ce-b004-ab865e0186de
+
+done: 18 turns, 333 s
+wording gate: 0 errors, 0 warnings
+final save: {'workflow_id': 'c591c751-dc19-4660-9955-f9a4d750213d', 'agent_id': 'd7b2b782-a1c2-42ce-b004-ab865e0186de', 'version': 9}; lint: 0 errors, 0 warnings
+{"workflow_id": "c591c751-dc19-4660-9955-f9a4d750213d", "agent_id": "d7b2b782-a1c2-42ce-b004-ab865e0186de"}

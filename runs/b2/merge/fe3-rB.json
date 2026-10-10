@@ -1,0 +1,132 @@
+{
+ "workflow_id": "e99b473c-2df6-4d05-927d-5b0085543563",
+ "passed": 0,
+ "total": 3,
+ "rows": [
+  {
+   "id": "PUB-11",
+   "style": "corrects",
+   "pass": false,
+   "failed": [
+    "conversation: The one create_promise per product check fails because the personal-loan and car-loan calls used invalid product IDs pl_1234 and cl_5678 instead of p2 and p3."
+   ],
+   "call_id": "34a2686e-c804-4278-9381-30e630745b94",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 9
+  },
+  {
+   "id": "PUB-12",
+   "style": "pieces",
+   "pass": false,
+   "failed": [
+    "notes [('cl_5678', 'refused'), ('pl_1234', 'refused')], expected [('p2', 'refused'), ('p3', 'refused')]",
+    "conversation: The refused notes used incorrect product IDs pl_1234 and cl_5678 instead of p2 and p3, and the agent made three car-loan persuasion attempts instead of the required one."
+   ],
+   "call_id": "3fb6b53b-b844-4715-a040-fe7be4b04640",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "add_note",
+    "add_note",
+    "close_call"
+   ],
+   "turns": 13
+  },
+  {
+   "id": "PUB-13",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "conversation: The loan was not recorded for 23 October because its create_promise call used an unknown product_id and failed."
+   ],
+   "call_id": "e1c1a2ed-6513-4fa5-a87c-9f4c94496923",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 7
+  },
+  {
+   "id": "PUB-11",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "conversation: The one create_promise per product check fails: three initial calls used invalid product IDs, and only two of the three corrected calls have confirmed successful results."
+   ],
+   "call_id": "b3358c68-fbcd-4c14-be94-6fa0a40ad08b",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 7
+  },
+  {
+   "id": "PUB-12",
+   "style": "corrects",
+   "pass": false,
+   "failed": [
+    "notes [('cl_5678', 'refused'), ('pl_1234', 'refused')], expected [('p2', 'refused'), ('p3', 'refused')]",
+    "conversation: The refused notes used incorrect product IDs (pl_1234 and cl_5678 instead of p2 and p3), and the agent made two car-loan persuasion attempts rather than the required one."
+   ],
+   "call_id": "42984284-111d-4a45-8a73-9137f1d7c9d8",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "add_note",
+    "add_note",
+    "close_call"
+   ],
+   "turns": 12
+  },
+  {
+   "id": "PUB-13",
+   "style": "asks_back",
+   "pass": true,
+   "failed": [],
+   "call_id": "3c419615-edc8-40fe-b312-faa4d7869ef5",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 8
+  }
+ ]
+}
