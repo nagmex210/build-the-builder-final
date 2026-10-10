@@ -1,6 +1,9 @@
 """The builder: reads a bank's brief (+ its tool API file) and creates a phone agent on Freya.
 
+    python3 builder/build.py <brief.md> <tool_api.json>                                  (submission form)
     python3 builder/build.py --slot <name> --tools <openapi.json> <brief.md> [<brief2.md> ...]
+
+Without --slot the slot is the last brief's file name (briefs/hidden-1.md -> hidden-1): reruns update that workflow.
 
 Prints {"workflow_id": ..., "agent_id": ...} as its last line. Writes the run's trace (start/end, every model
 call with its purpose, what it created on Freya, tests it ran) to runs/traces/<slot>-<time>.jsonl.
@@ -23,6 +26,7 @@ async def run(slot, tools, briefs):
     trace = KIT / "runs" / "traces" / f"{slot}-{time.strftime('%Y%m%d-%H%M%S')}.jsonl"
     trace.parent.mkdir(parents=True, exist_ok=True)
     os.environ["BTB_TRACE"] = str(trace)          # btb/llm.py appends its model calls here too
+    print(f"trace: {trace}", flush=True)
     options = ClaudeAgentOptions(
         cwd=KIT,
         model=os.environ.get("BUILDER_MODEL", "claude-opus-5-5"),
@@ -121,8 +125,29 @@ async def run(slot, tools, briefs):
     print(json.dumps({"workflow_id": state["workflow_id"], "agent_id": state["agent_id"]}))
 
 
-if __name__ == "__main__":
+def parse_args(argv=None):
+    """Submission form: build.py <brief.md> <tool_api.json>. Also: build.py [--slot S] [--tools T] <brief.md>...
+    A positional ending in .json is the tool API file; the slot defaults to the last brief's file name."""
     ap = argparse.ArgumentParser()
-    ap.add_argument("--slot", required=True); ap.add_argument("--tools", default="tools/openapi.json"); ap.add_argument("briefs", nargs="+")
-    a = ap.parse_args()
-    asyncio.run(run(a.slot, a.tools, a.briefs))
+    ap.add_argument("--slot"); ap.add_argument("--tools"); ap.add_argument("paths", nargs="+")
+    a = ap.parse_args(argv)
+    jsons = [p for p in a.paths if p.lower().endswith(".json")]
+    briefs = [p for p in a.paths if not p.lower().endswith(".json")]
+    if len(jsons) > 1 or (jsons and a.tools):
+        ap.error("give exactly one tool API file (a .json positional or --tools)")
+    if not briefs:
+        ap.error("give at least one brief file")
+    tools = jsons[0] if jsons else (a.tools or "tools/openapi.json")
+    for p in [tools, *briefs]:
+        if not pathlib.Path(p).is_file():
+            ap.error(f"file not found: {p}")
+    # Absolute paths: the build agent and datecalc run with cwd=KIT, the caller may not.
+    tools, briefs = str(pathlib.Path(tools).resolve()), [str(pathlib.Path(b).resolve()) for b in briefs]
+    slot = a.slot or pathlib.Path(briefs[-1]).stem
+    return slot, tools, briefs
+
+
+if __name__ == "__main__":
+    slot, tools, briefs = parse_args()
+    print(f"builder: slot={slot} tools={tools} briefs={' '.join(briefs)}", flush=True)
+    asyncio.run(run(slot, tools, briefs))

@@ -33,6 +33,8 @@ will score zero on Sunday. The merger rejects such changes.
 ## Layout
 
 - `builder/` — THE BUILDER. Entry point: `python3 builder/build.py --slot <name> --tools <openapi.json> <brief.md>...`
+  The submission form calls it as `python3 builder/build.py <brief.md> <tool_api.json>` (slot = the brief's file
+  name); keep that form working.
   It must print `{"workflow_id": ..., "agent_id": ...}` on its last line and write the trace to
   `runs/traces/<slot>-<timestamp>.txt`. (If `builder/` does not exist yet, the first merger creates it from
   `examples/agent_builder.py` + `.claude/skills/build-phone-agent/`.)
