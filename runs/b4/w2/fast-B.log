@@ -1,0 +1,23 @@
+ws2 w2-B -> 86b68012-3f4c-493c-9336-70f319f5b64a
+FAIL PUB-11 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > create_promise > create_promise > close_call
+       - [plain] outcome ('no_promise', 'service_error'), expected ('promise', None)
+       - [plain] promises [], expected [('p1', 220.0, '2026-10-16'), ('p2', 640.0, '2026-10-16'), ('p3', 75.0, '2026-10-16')]
+       - [plain] conversation: All three products being stated before any ask is not clearly established in the supplied transcript, and the create_promise calls used unknown product IDs rather than p1, p2, and p3, so none was recorded.
+       - [pieces] promises [('p1', 220.0, '2026-10-16')], expected [('p1', 220.0, '2026-10-16'), ('p2', 640.0, '2026-10-16'), ('p3', 75.0, '2026-10-16')]
+       - [pieces] conversation: The transcript does not clearly show all three products stated before any ask, a single read-back and confirmation covering all three, or one create_promise per product, and the agent falsely claimed the car-loan promise was recorded before its t
+FAIL PUB-12 0/2 | verify_identity > verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > create_promise > close_call > add_note > add_note > create_promise > add_note > add_note > close_call > close_call
+       - [asks_back] notes [], expected [('p2', 'refused'), ('p3', 'refused')]
+       - [asks_back] conversation: The transcript does not clearly establish the required phone-question repeat without a birth-date repeat, exactly one recorded credit-card promise, one recorded refused note for each other product, or two personal-loan attempts and one car-loan a
+       - [asks_back] notes [('CL-11234', 'refused'), ('PL-99821', 'refused')], expected [('p2', 'refused'), ('p3', 'refused')]
+       - [asks_back] conversation: The transcript does not clearly establish the required phone-only repeat, exactly one credit-card promise, refusal notes for both other products, or two personal-loan attempts, and it shows two car-loan payment attempts rather than one.
+FAIL PUB-13 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > create_promise > create_promise > create_promise > create_promise > add_note > close_call > add_note > close_call > close_call
+       - [plain] outcome ('no_promise', 'service_error'), expected ('promise', None)
+       - [plain] promises [('p2', 900.0, '2026-10-23')], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]
+       - [plain] notes [('PL-9921', 'service_error')], expected []
+       - [plain] conversation: The credit-card promise for 30 October failed with an unknown product_id, and neither a successful loan promise for 23 October nor a read-back naming both dates is shown.
+       - [corrects] outcome ('no_promise', 'service_error'), expected ('promise', None)
+       - [corrects] promises [('p1', 300.0, '2026-11-02')], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]
+       - [corrects] notes [('p1', 'service_error'), ('p2', 'service_error')], expected []
+       - [corrects] conversation: The credit card was not recorded for 30 October (the shown date is 2 November), the loan recording for 23 October failed, and no read-back names both required dates.
+
+fast_eval: 0 / 3 passed (2 rep(s), all reps must pass), 1726 s

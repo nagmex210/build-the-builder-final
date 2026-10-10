@@ -1,0 +1,161 @@
+{
+ "workflow_id": "86b68012-3f4c-493c-9336-70f319f5b64a",
+ "passed": 0,
+ "total": 3,
+ "rows": [
+  {
+   "id": "PUB-11",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "outcome ('no_promise', 'service_error'), expected ('promise', None)",
+    "promises [], expected [('p1', 220.0, '2026-10-16'), ('p2', 640.0, '2026-10-16'), ('p3', 75.0, '2026-10-16')]",
+    "conversation: All three products being stated before any ask is not clearly established in the supplied transcript, and the create_promise calls used unknown product IDs rather than p1, p2, and p3, so none was recorded."
+   ],
+   "call_id": "77f17e07-b3ae-4c39-afb7-daf8dae4cd3c",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 9
+  },
+  {
+   "id": "PUB-12",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "notes [], expected [('p2', 'refused'), ('p3', 'refused')]",
+    "conversation: The transcript does not clearly establish the required phone-question repeat without a birth-date repeat, exactly one recorded credit-card promise, one recorded refused note for each other product, or two personal-loan attempts and one car-loan attempt."
+   ],
+   "call_id": "24ad60b8-44df-4f1f-8e06-3ca1be7f82f7",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call",
+    "add_note",
+    "add_note",
+    "create_promise",
+    "add_note",
+    "add_note",
+    "close_call",
+    "close_call"
+   ],
+   "turns": 12
+  },
+  {
+   "id": "PUB-13",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "outcome ('no_promise', 'service_error'), expected ('promise', None)",
+    "promises [('p2', 900.0, '2026-10-23')], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]",
+    "notes [('PL-9921', 'service_error')], expected []",
+    "conversation: The credit-card promise for 30 October failed with an unknown product_id, and neither a successful loan promise for 23 October nor a read-back naming both dates is shown."
+   ],
+   "call_id": "26ed1ea5-6a6d-4c9b-b10a-09cdf6d83592",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "add_note",
+    "close_call",
+    "add_note",
+    "close_call",
+    "close_call"
+   ],
+   "turns": 10
+  },
+  {
+   "id": "PUB-11",
+   "style": "pieces",
+   "pass": false,
+   "failed": [
+    "promises [('p1', 220.0, '2026-10-16')], expected [('p1', 220.0, '2026-10-16'), ('p2', 640.0, '2026-10-16'), ('p3', 75.0, '2026-10-16')]",
+    "conversation: The transcript does not clearly show all three products stated before any ask, a single read-back and confirmation covering all three, or one create_promise per product, and the agent falsely claimed the car-loan promise was recorded before its tool call failed."
+   ],
+   "call_id": "96ae5892-46a3-4010-bb5e-0b2fa0406376",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 8
+  },
+  {
+   "id": "PUB-12",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "notes [('CL-11234', 'refused'), ('PL-99821', 'refused')], expected [('p2', 'refused'), ('p3', 'refused')]",
+    "conversation: The transcript does not clearly establish the required phone-only repeat, exactly one credit-card promise, refusal notes for both other products, or two personal-loan attempts, and it shows two car-loan payment attempts rather than one."
+   ],
+   "call_id": "6c36b810-45bf-492f-80da-1ae7c49bb650",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "add_note",
+    "add_note",
+    "close_call"
+   ],
+   "turns": 11
+  },
+  {
+   "id": "PUB-13",
+   "style": "corrects",
+   "pass": false,
+   "failed": [
+    "outcome ('no_promise', 'service_error'), expected ('promise', None)",
+    "promises [('p1', 300.0, '2026-11-02')], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]",
+    "notes [('p1', 'service_error'), ('p2', 'service_error')], expected []",
+    "conversation: The credit card was not recorded for 30 October (the shown date is 2 November), the loan recording for 23 October failed, and no read-back names both required dates."
+   ],
+   "call_id": "07329576-a578-40af-82ec-210592a6a2cf",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "add_note",
+    "add_note",
+    "close_call"
+   ],
+   "turns": 13
+  }
+ ]
+}
