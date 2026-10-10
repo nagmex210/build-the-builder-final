@@ -1,0 +1,8 @@
+FAIL PUB-13 0/2 | verify_identity > verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > close_call
+       - [asks_back] promises [('p1', 300.0, '2026-10-23'), ('p2', 900.0, '2026-10-23')], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]
+       - [asks_back] conversation: The credit card was recorded for 23 October rather than 30 October, and the read-back named 23 October for both products instead of both required dates.
+       - [corrects] promises [('p1', 300.0, '2026-10-23'), ('p2', 900.0, '2026-10-23')], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]
+       - [corrects] conversation: The credit card was recorded for 23 October instead of 30 October, and the read-back named only 23 October rather than both required dates.
+
+fast_eval: 0 / 1 passed (2 rep(s), all reps must pass), 184 s
+harness: 0 case(s) still INVALID after 2 re-run(s) (not a measurement), 0 rep(s) re-run

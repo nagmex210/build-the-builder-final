@@ -299,7 +299,7 @@ try:
                 _out = dict(ok=True, can_record=False, offer_date=_o.isoformat(), say='CANNOT BE RECORDED: ' + '; '.join(_why) +
                             '. CODE COMPUTED THE DATE TO OFFER: ' + fmt(_o) + '. Tell the customer in one short sentence why, and offer exactly ' +
                             fmt(_o) + ' (no other date).')
-    vars['guard_check_result'] = json.dumps(_out)
+    vars['guard_check_result'] = json.dumps(_out)    # one shared slot: parallel sibling calls can overwrite it (M20)
     config['url'] = noop_url(config.get('url'))
 except Exception:
     pass
@@ -336,7 +336,8 @@ def _add_check_tool(wf, promise, g, noop):
                           "description": "Code check of a promise date, BEFORE you answer the customer. Call it as soon as the customer "
                                          "names a day (after looking the day up in DATE FACTS), with the product_id and that date as YYYY-MM-DD. "
                                          "The result says CAN BE RECORDED (keep the customer's date) or CANNOT BE RECORDED with the one date "
-                                         "to offer. Say what `say` tells you. It records nothing.",
+                                         "to offer. Say what `say` tells you. It records nothing. ONE call per message: with several products, "
+                                         "check them one after the other, never two in parallel.",
                           "parameters": {"type": "object", "properties": {
                               "url": {"type": "string", "default": u[0] + "//" + u[2] + noop},
                               "method": {"type": "string", "default": "POST"},
@@ -350,7 +351,7 @@ def _add_check_tool(wf, promise, g, noop):
         tm = node.get("task_message")
         if isinstance(tm, str) and CHECK_NAME not in tm:
             node["task_message"] = (tm.rstrip() + "\nDATE CHECK IN CODE: whenever the customer names a payment day, call " + CHECK_NAME +
-                                    " (product_id, date) BEFORE you answer, and say what its result tells you: keep their date when it "
+                                    " (product_id, date) BEFORE you answer, one product per message, and say what its result tells you: keep their date when it "
                                     "CAN BE RECORDED, otherwise offer exactly its offer_date. Never offer the deadline instead of a date "
                                     "the check accepted.")
         added = True
