@@ -123,6 +123,11 @@ The public cases are a sample; Sunday's 60 customers are unseen. Learn MECHANISM
    fast evals, the OFFICIAL scorer results (Freya's own simulator and judge, the closest to Sunday: read those
    transcripts first; find call ids in runs/<prev batch>/merge*/ and official*), the brief C check, and the
    keep/discard decision. Note where the official judge and our fast judge disagree (a harness problem).
+0c. DIGEST FIRST (Azure, saves the Claude budget): run `python3 btb/digest.py <all new eval JSONs> --out
+   runs/analyst/digest-<batch>.jsonl`. It classifies every call (failure kind, mechanism, fault, fix rule; for
+   passes what carried them) with gpt-6-astra. Work from the digest; open raw transcripts only to check a claim.
+0d. READ THE CODE: `git diff main idea/<batch>-<N> -- builder/ .claude/` for every worker, and the champion's
+   builder/. Tie each mechanism to the code that causes or fixes it (file + function).
 1. Read every new result: the batch's worker reports and eval JSONs (`git show idea/<batch>-<N>:<path>`), and
    transcripts of failing AND passing calls (`freya.get_call(call_id)["messages"]`).
 2. Update `btb/mechanisms.md` (keep it under ~150 lines, rewrite rather than append forever):
