@@ -331,6 +331,10 @@ def _run_one(workflow_id, sc, lib):
             hist += [{"role": "assistant", "content": msg}]
     except Exception as e:  # noqa: BLE001
         err = str(e)[:200]
+    if call_id:
+        now_calls = ledger(sess["customer_id"]).get("calls") or []
+        if not now_calls or now_calls[-1]["tool"] != "close_call":
+            time.sleep(4)                                   # let the platform save a hang-up that came without close
     hung = hang_up_events(call_id) if call_id else []      # read before our own chat/end adds its event
     if call_id:
         try:

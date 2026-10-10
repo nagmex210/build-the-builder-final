@@ -195,8 +195,9 @@ def close_structure(wf, canned=None):
             d = re.sub(r'Before you call this, in the same turn, say exactly: "[^"]*" \(unless you already said it\)\. ', "", fn.get("description") or "")
             if "says the goodbye" not in d:
                 d = _drop_bye(re.sub(r",?\s*after you (?:have )?said[^.,;]*\bgoodbye\b", "", d, flags=re.I))
+                # the goodbye text is NOT quoted here: quoted text is said word for word (M10), so the model said it too
                 d = ("Call this to end the call, INSTEAD of saying goodbye: after it succeeds the system says the goodbye "
-                     f'("{goodbye}") and hangs up. Never say goodbye yourself. ' + d)
+                     "and hangs up. Never say goodbye or a closing thank-you yourself. " + d)
             fn["description"] = d
     sp = wf.get("system_prompt") or ""
     if "CLOSING (overrides" not in sp:
@@ -231,7 +232,7 @@ def apply(wf, canned):
             t["post_process_code"] = ((t.get("post_process_code") or "").rstrip() + "\n" + HOOK.replace("__LINES__", repr(by_tool[name])).lstrip("\n"))
             done.append("say_now:" + name)
     sp = wf.get("system_prompt") or ""
-    if MARK not in sp and (opening or lines or goodbye):
+    if MARK not in sp and (opening or lines or goodbye):   # goodbye text itself: close_structure's end_call node
         block = [MARK, "These sentences are mandatory. Say them word for word when due, never reword, shorten or reorder them, "
                  "and never say them earlier than their moment:"]
         if opening:
@@ -239,7 +240,7 @@ def apply(wf, canned):
         for l in lines:
             block.append(f'- {_clean(l.get("when")).rstrip(".")}: "{_clean(l["text"])}"')
         if goodbye:
-            block.append(f'- Goodbye (spoken automatically by the system after {close_tool or "the close tool"} succeeds; never say it yourself): "{goodbye}"')
+            block.append(f'- Goodbye: NOT yours. The system says it automatically after {close_tool or "the close tool"} succeeds; never say any goodbye yourself.')
         wf["system_prompt"] = (sp.rstrip() + "\n\n" + "\n".join(block)).strip()
         done.append("system_prompt block")
     return done
