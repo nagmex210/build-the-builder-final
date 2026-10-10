@@ -53,6 +53,12 @@ will score zero on Sunday. The merger rejects such changes.
 `score = fast_eval passes on A (10 cases) + B (3 cases) + raw-A + raw-B, --reps 2 --style random`
 (= cases that passed both reps, out of 26). The merger confirms with the official scorer on A and B.
 
+## NEVER END YOUR TURN WHILE WORK IS RUNNING
+
+You run non-interactively (`claude -p`): when you send a final message, the session ends and every background job
+dies. Run builds in parallel inside ONE foreground Bash call (`cmd1 & cmd2 & wait`, timeout up to 20 min) and never
+use run_in_background. Only stop after your report is committed.
+
 ## WORKER (you were started in a git worktree `wt<N>` on branch `idea/<batch>-<N>`)
 
 1. Read: this file, `btb/ideas.md` (idea bank), `journal.md` (what was tried; do not repeat a discard unless the mechanism changes),
