@@ -133,7 +133,7 @@ def floor_for(p):
             amt = max(amt, float(r['min_amount']))
         return amt
     return None
-def build_facts(now):
+def build_facts(now, only_bands=None):
     t = today_of(now)
     one = datetime.timedelta(days=1)
     L = []
@@ -163,6 +163,8 @@ def build_facts(now):
             cond.append('types ' + '/'.join(str(x) for x in b['product_types']))
         if SPEC.get('band_field'):
             cond.append(str(SPEC.get('band_field')) + ' ' + str(b.get('min')) + ' to ' + str(b.get('max')))
+        if only_bands is not None and str(b.get('name')) not in only_bands:
+            continue                         # after the account loads: only this customer's own bands
         L.append('DEADLINE for band "' + str(b.get('name')) + '" (' + ', '.join(cond) + '): ' + fmt(dl) +
                  ' = ' + str(b.get('deadline_count')) + ' ' + str(b.get('deadline_unit')).replace('_', ' ') + ' after today' +
                  ('' if b.get('attempts') is None else '; persuasion attempts: ' + str(b.get('attempts'))))
@@ -200,6 +202,8 @@ def build_facts(now):
             s = ('HOLIDAY' if d.isoformat() in HOL else 'weekend') + ', not a business day -> next business day ' + fmt(next_bd(d))
         tags = []
         for b, dl in zip(SPEC.get('bands') or [], dls):
+            if only_bands is not None and str(b.get('name')) not in only_bands:
+                continue                     # tag only the bands of this customer's products ("after X deadline" misleads others)
             if d == dl:
                 tags.append('DEADLINE ' + str(b.get('name')))
             elif d > dl:
@@ -257,7 +261,8 @@ try:
                 pass
         if isinstance(data, dict) and t is not None:
             try:
-                _t, f = build_facts(vars.get(SPEC.get('now_variable') or 'now'))
+                _used = set(str(p.get('band')) for p in prods if isinstance(p, dict) and p.get('band') is not None) if isinstance(prods, list) else None
+                _t, f = build_facts(vars.get(SPEC.get('now_variable') or 'now'), _used or None)
                 data['date_facts'] = f
                 vars['date_facts'] = f
                 vars['date_facts_state'] = 'known'
