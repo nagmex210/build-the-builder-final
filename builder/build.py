@@ -105,7 +105,7 @@ async def self_simulate(slot, tools, briefs, trace, wf_file, final_pass, options
     except Exception as e:  # noqa: BLE001
         log(trace, event="test", what="self-simulation round 1", error=str(e)[:300]); print(f"self-test skipped: {e}", flush=True)
         return
-    n_play = len(r1["rows"]) or len(personas)
+    n_play = max(len(r1["rows"]), r1["n"]) or len(personas)
     errs = sorted({str(r.get("harness_error"))[:120] for r in r1["rows"] if r.get("harness_error")})
     log(trace, event="test", what="self-simulation round 1: deterministic ledger checks", where=r1["where"], n=r1["n"],
         played=n_play, failed=r1["n_failed"], checks_failed=r1["n_checks_failed"], seconds=round(time.time() - t_start), rows=r1["rows"],
@@ -155,8 +155,10 @@ async def self_simulate(slot, tools, briefs, trace, wf_file, final_pass, options
         wf_file.write_text(best); final_pass("restore"); return
     t = time.time()
     try:
-        r2 = await loop.run_in_executor(None, selftest.run_tests, slot, json.loads(wf_file.read_text()), personas, calc_file,
-                                        max(120, min(ROUND_S, left())))
+        r2_budget = min(ROUND_S, left() - MARGIN_S)   # was max(120, ...): could run past the build's time left
+        if r2_budget < MIN_ROUND_S:
+            raise RuntimeError(f"no time left to re-test the fix ({left():.0f} s of the build budget left)")
+        r2 = await loop.run_in_executor(None, selftest.run_tests, slot, json.loads(wf_file.read_text()), personas, calc_file, r2_budget)
     except Exception as e:  # noqa: BLE001
         r2 = None; log(trace, event="test", what="self-simulation round 2", error=str(e)[:300])
     if r2:

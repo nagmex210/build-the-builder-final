@@ -22,3 +22,22 @@ build.BUILD_T0 = time.time() - (build.BUILD_TOTAL_S - left)
 asyncio.run(build.self_simulate("x", "tools.json", [str(brief)], d / "trace.jsonl", wf, lambda tag: True, None))
 print("round-1 timeouts given to run_tests:", calls, "with", left, "s of the build budget left")
 assert all(t <= left for t in calls), f"self-test round 1 may run {max(calls)} s with only {left} s of the 30-min budget left"
+
+# Round 2 (after a fix round) had the same defect: timeout max(120, min(ROUND_S, left())) > left when < 120 s are left.
+calls.clear()
+def run_tests2(slot, wf, personas, calc_file, timeout=420, **k):
+    calls.append(timeout)
+    if len(calls) == 1:   # round 1 fails a check; the fix round then eats the time
+        return {"where": "test", "n": 2, "n_failed": 1, "n_checks_failed": 1, "rows": [{"title": "p", "failed": ["x"], "tools": [], "script": "s"}]}
+    return {"where": "test", "n": 2, "n_failed": 0, "n_checks_failed": 0, "rows": []}
+fake.run_tests = run_tests2
+fake.failure_text = lambda r: "- x"
+async def fake_claude(prompt, options, trace, label=""):
+    wf.write_text('{"edited": 1}'); build.BUILD_T0 -= 900   # the fix round edits the file and takes most of the time left
+build.claude_stream = fake_claude
+build.dataclasses = types.SimpleNamespace(replace=lambda o, **k: None)
+build.BUILD_T0 = time.time() - (build.BUILD_TOTAL_S - 1000); wf.write_text("{}")
+asyncio.run(build.self_simulate("x", "tools.json", [str(brief)], d / "trace.jsonl", wf, lambda tag: True, None))
+left2 = build.BUILD_TOTAL_S - (time.time() - build.BUILD_T0)
+print("round timeouts:", calls, "build budget left at the end:", round(left2))
+assert len(calls) < 2 or calls[1] <= max(0, left2 + 5), f"round 2 got {calls[1]} s with {left2:.0f} s left"
