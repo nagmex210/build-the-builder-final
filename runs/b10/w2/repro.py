@@ -38,13 +38,20 @@ def r1():
 
 def r2():
     print("R2 two create_promise in ONE turn, hooks interleaved (pre1 pre2 call1 call2 post1 post2): P1 after deadline, P2 valid")
-    for order in ("sequential", "interleaved"):
+    import copy
+    for order in ("sequential", "interleaved", "sibling-vars"):
         v = fresh()
         b1 = {"customer_id": "C1", "product_id": "P1", "amount": "500", "date": "2026-10-30"}
         b2 = {"customer_id": "C1", "product_id": "P2", "amount": "300", "date": "2026-10-16"}
         if order == "sequential":
             c1 = pre(T, v, b1); r1_ = post(T, v, http(c1) or BANK_OK("P1"), c1)
             c2 = pre(T, v, b2); r2_ = post(T, v, http(c2) or BANK_OK("P2"), c2)
+        elif order == "sibling-vars":
+            # seen on Freya (probe): a post-hook can read a SIBLING's vars instead of its own pre-hook's writes
+            v1, v2 = copy.deepcopy(v), copy.deepcopy(v)
+            c1 = pre(T, v1, b1); c2 = pre(T, v2, b2)
+            x1 = http(c1) or BANK_OK("P1"); x2 = http(c2) or BANK_OK("P2")
+            r1_ = post(T, v2, x1, c1); r2_ = post(T, v1, x2, c2); v = v1
         else:
             c1 = pre(T, v, b1); c2 = pre(T, v, b2)
             x1 = http(c1) or BANK_OK("P1"); x2 = http(c2) or BANK_OK("P2")
@@ -134,6 +141,19 @@ def r7():
     for pid in ("credit_card_2288", "pl_1234", "CC_2288", "loan", "p3"):
         c = pre(T, v, {"customer_id": "C1", "product_id": pid, "amount": "300", "date": "2026-10-16"})
         print(f"  model sent {pid:18s} -> request product_id = {c['body']['product_id']}")
+
+
+
+def r8():
+    print("R8 regressions: identical re-send of a recorded promise; a bank 500 while a stray block flag is set")
+    v = fresh()
+    good = {"customer_id": "C1", "product_id": "P1", "amount": "500", "date": "2026-10-16"}
+    print("  first send   :", outcome(call(v, good, lambda: BANK_OK("P1")))[:90])
+    print("  re-send      :", outcome(call(v, good, lambda: BANK_OK("P1")))[:90])
+    v = fresh()
+    c = pre(T, v, dict(good, product_id="P2", amount="300"))
+    v["guard_block_create_promise"] = "a sibling's reason"
+    print("  500 + flag   :", outcome(post(T, v, BANK_500(), c))[:90])
 
 
 if __name__ == "__main__":

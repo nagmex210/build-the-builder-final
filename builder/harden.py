@@ -78,7 +78,7 @@ try:
             _n = 1
             if _v is not None:
                 try:
-                    _n = int(_v.get('tool_failures_' + _t) or 0) + (0 if _v.get('guard_block_' + _t) else 1)
+                    _n = int(_v.get('tool_failures_' + _t) or 0) + 1
                 except Exception:
                     _n = 1
                 _v['tool_failures_' + _t] = _n
