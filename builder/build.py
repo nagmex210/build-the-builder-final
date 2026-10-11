@@ -287,6 +287,9 @@ async def run(slot, tools, briefs):
         env={"BASH_DEFAULT_TIMEOUT_MS": "900000", "BASH_MAX_TIMEOUT_MS": "1200000", "CLAUDE_CODE_DISABLE_BACKGROUND_TASKS": "1",
              "BTB_TRACE": str(trace)},
     )
+    with trace.open("a") as out:
+        out.write(json.dumps({"event": "start", "at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(t0)), "slot": slot, "tools": tools,
+                              "briefs": briefs, "model": options.model}) + "\n")
     prompt = (f"Use the build-phone-agent skill. Slot: {slot}. Tool API file: {tools}. Brief files: {' '.join(briefs)}. "
               f"Write the workflow to out/{slot}.workflow.json and save it with slot {slot}. "
               f"Do not run tools/run_cases.py or any practice cases (a new brief comes without them), and do not read "
@@ -361,9 +364,6 @@ async def run(slot, tools, briefs):
         prompt += ("\n\n" + situations.prompt_block(sit_spec) + "\nBefore every save run `python3 builder/situations.py check "
                    f"out/{slot}.workflow.json out/{slot}.situations.json` and fix each problem it lists (or, if the brief "
                    "shows the extracted situation is wrong, say so in your final line).")
-    with trace.open("a") as out:
-        out.write(json.dumps({"event": "start", "at": time.strftime("%Y-%m-%dT%H:%M:%S%z"), "slot": slot, "tools": tools,
-                              "briefs": briefs, "model": options.model}) + "\n")
 
     print(f"[model] build agent: Claude Agent SDK, {options.model}, skill build-phone-agent, budget {BUDGET_S // 60} min", flush=True)
 
@@ -471,7 +471,7 @@ async def run(slot, tools, briefs):
         log(trace, event="stale", what="no workflow saved in this run: not reporting the previous build's agent", previous=state)
         state = None
     with trace.open("a") as out:
-        out.write(json.dumps({"event": "end", "at": time.strftime("%Y-%m-%dT%H:%M:%S%z"), "seconds": round(time.time() - t0),
+        out.write(json.dumps({"event": "end", "at": now(), "seconds": round(time.time() - t0),
                               "created": state}) + "\n")
     stop_tail.set(); tailer.join(5)
     if state:
