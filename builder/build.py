@@ -144,6 +144,51 @@ async def self_simulate(slot, tools, briefs, trace, wf_file, final_pass, options
         log(trace, event="ship", what="fix kept: no worse on the deterministic checks")
 
 
+async def build_check(slot, tools, briefs, trace, wf_file, final_pass, options_base):
+    """Build reliability: deterministic post-build check (builder/buildcheck.py: unreachable nodes, broken transitions,
+    literal or unbound ids in write bodies, writes without the known-ids hook, unbound {{vars}} in prompts). Any ERROR
+    gets one Claude EDIT round with the exact list; ship whichever version has fewer errors."""
+    import buildcheck
+    api = json.loads(pathlib.Path(tools).read_text())
+    errs, warns = buildcheck.problems(json.loads(wf_file.read_text()), api)
+    log(trace, event="test", what="buildcheck: deterministic broken-build check", errors=errs, warnings=warns)
+    print(f"buildcheck: {len(errs)} error(s), {len(warns)} warning(s){': ' + '; '.join(errs) if errs else ''}", flush=True)
+    left = BUILD_TOTAL_S - (time.time() - BUILD_T0) - (SELFTEST_BUDGET_S // 3 if SELFTEST else 60)
+    if not errs or left < 150:
+        if errs:
+            log(trace, event="ship", what="buildcheck errors left: no time for a repair round", errors=errs)
+        return
+    best = wf_file.read_text()
+    fix_s = max(120, min(360, left))
+    options = dataclasses.replace(options_base, skills=None, allowed_tools=["Read", "Edit", "Grep", "Bash"], max_turns=40)
+    prompt = (f"You repair a Freya phone-agent workflow that a deterministic check found BROKEN. The workflow file is "
+              f"out/{slot}.workflow.json. Brief files: {' '.join(briefs)}. Tool API file: {tools}. Docs: docs/. Errors:\n- "
+              + "\n- ".join(errs) + "\n\nFix exactly these errors with the Edit tool in place: connect unreachable nodes with the "
+              "transition the brief implies (or remove a node nothing needs), point broken transitions at existing nodes, bind id "
+              "fields to {{variables}} filled from the account lookup (never a literal id), define or remove unbound {{variables}} "
+              "in prompts. Keep everything else exactly (do not touch the start code node, any post_process_code or "
+              "pre_process_code, or any rule of the brief). Then run `python3 builder/buildcheck.py "
+              f"out/{slot}.workflow.json {tools}` until it prints no ERROR, and check the JSON loads. Do not save to Freya. "
+              f"You have {int(fix_s // 60)} minutes.")
+    t = time.time()
+    try:
+        await asyncio.wait_for(claude_stream(prompt, options, trace, "buildcheck repair"), timeout=fix_s)
+    except Exception as e:  # noqa: BLE001
+        log(trace, event="budget", what="buildcheck repair stopped", error=str(e)[:200])
+    try:
+        errs2, _ = buildcheck.problems(json.loads(wf_file.read_text()), api)
+    except Exception:  # noqa: BLE001
+        errs2 = None
+    if errs2 is None or len(errs2) >= len(errs) or not final_pass("buildcheck repair"):
+        wf_file.write_text(best); final_pass("buildcheck restore")
+        log(trace, event="ship", what="buildcheck repair not better: restored the build", errors_before=errs, errors_after=errs2)
+        print(f"buildcheck repair not better ({errs2 if errs2 is None else len(errs2)} vs {len(errs)}): restored", flush=True)
+    else:
+        errs2, _ = buildcheck.problems(json.loads(wf_file.read_text()), api)
+        log(trace, event="ship", what="buildcheck repair kept", errors_before=errs, errors_after=errs2, seconds=round(time.time() - t))
+        print(f"buildcheck repair kept: {len(errs)} -> {len(errs2)} error(s)", flush=True)
+
+
 async def claude_stream(prompt, options, trace, label="build agent"):
     turn, bash_ids = 0, set()
     with trace.open("a") as out:
@@ -336,8 +381,28 @@ async def run(slot, tools, briefs):
                 out.write(json.dumps({"event": "final pass failed", "error": str(e)[:300]}) + "\n")
             return None
 
-    if final_pass("build") and SELFTEST:
+    if not wf_file.exists() and BUILD_TOTAL_S - (time.time() - BUILD_T0) > 600:
+        # Build reliability: the agent ended (error, quota, time) without writing any workflow: one rebuild in the time left.
+        log(trace, event="rebuild", what="build agent wrote no workflow file: one rebuild", seconds=round(time.time() - t0))
+        print("buildcheck: no workflow written -> one rebuild", flush=True)
+        try:
+            await asyncio.wait_for(claude_stream(prompt + " This is a REBUILD: the first attempt wrote nothing. Save a complete "
+                                                 "version within 6 minutes.", options, trace, "rebuild"),
+                                   timeout=max(300, BUILD_TOTAL_S - (time.time() - BUILD_T0) - 420))
+        except Exception as e:  # noqa: BLE001
+            log(trace, event="rebuild stopped", error=str(e)[:200])
+    saved = final_pass("build")
+    if saved:
+        await build_check(slot, tools, briefs, trace, wf_file, final_pass, options)
+    if saved and SELFTEST:
         await self_simulate(slot, tools, briefs, trace, wf_file, final_pass, options)
+        st = KIT / "out" / f"{slot}.selftest1.json"
+        if st.exists():
+            import buildcheck
+            errs, _ = buildcheck.problems(json.loads(wf_file.read_text()), json.loads(pathlib.Path(tools).read_text()),
+                                          json.loads(st.read_text()))
+            log(trace, event="test", what="buildcheck after self-simulation (round-1 record: catastrophic failure?)", errors=errs)
+            print(f"buildcheck (shipped): {len(errs)} problem(s){': ' + '; '.join(errs) if errs else ''}", flush=True)
     state = json.loads((KIT / ".freya-agents.json").read_text()).get(slot) if (KIT / ".freya-agents.json").exists() else None
     with trace.open("a") as out:
         out.write(json.dumps({"event": "end", "at": time.strftime("%Y-%m-%dT%H:%M:%S%z"), "seconds": round(time.time() - t0),
