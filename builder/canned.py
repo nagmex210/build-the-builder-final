@@ -77,11 +77,19 @@ BRIEF
 """
 
 
+def fill_prompt(prompt, tool_txt, brief):
+    """Fill the TOOLS / BRIEF placeholder lines only. A bare .replace("BRIEF", brief) also replaced the "BRIEF:" header
+    (the brief went in twice, the header vanished) and any "BRIEF" inside the tool API text."""
+    tail = "TOOL API FILE:\nTOOLS\n\nBRIEF:\nBRIEF\n"
+    assert prompt.endswith(tail)
+    return prompt[:-len(tail)] + "TOOL API FILE:\n" + tool_txt + "\n\nBRIEF:\n" + brief + "\n"
+
+
 def extract(slot, tools, briefs, variables=("customer_id", "first_name", "last_name", "title", "now")):
     from llm import chat_json
     brief = "\n\n".join(f"===== {b} =====\n" + pathlib.Path(b).read_text() for b in briefs)
     tool_txt = pathlib.Path(tools).read_text()[:30000]
-    prompt = (PROMPT.replace("VARS", ", ".join(variables)).replace("TOOLS", tool_txt).replace("BRIEF", brief))
+    prompt = fill_prompt(PROMPT.replace("VARS", ", ".join(variables)), tool_txt, brief)
     spec = chat_json([{"role": "user", "content": prompt}], tier="strong", purpose="A3: extract the brief's mandatory sentences as fixed text",
                      max_tokens=3000, effort="medium")
     spec = resolve_conflicts(spec)

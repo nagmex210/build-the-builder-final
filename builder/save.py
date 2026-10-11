@@ -40,10 +40,34 @@ def finish_and_save(slot, wf, canned=None):
     if sit.exists():
         names = names + apply_situations(wf, json.loads(sit.read_text()))
     # Lock the shared slot file: two builds running in parallel (two briefs) must not overwrite each other's slot.
-    with open(KIT / ".freya-agents.json.lock", "w") as lock:
-        fcntl.flock(lock, fcntl.LOCK_EX)
-        state = freya.save_workflow(slot, wf, state_file=str(KIT / ".freya-agents.json"))
+    state = locked_save(slot, wf, KIT / ".freya-agents.json")
     return names, state
+
+
+def locked_save(slot, wf, state_file, tries=4):
+    """freya.save_workflow under an exclusive lock on <state_file>.lock (it reads, then truncates and rewrites the file).
+    A platform 5xx is retried (b9 main-B: the fix round's save and the restore both 504'd once, the build then reported the
+    slot's older version and Freya kept whichever PUT landed). An update PUT of the same workflow is idempotent."""
+    import re, time
+    for attempt in range(tries):
+        try:
+            with open(str(state_file) + ".lock", "w") as lock:
+                fcntl.flock(lock, fcntl.LOCK_EX)
+                return freya.save_workflow(slot, wf, state_file=str(state_file))
+        except RuntimeError as e:
+            if not re.search(r"-> 5\d\d", str(e)) or attempt == tries - 1:
+                raise
+            print(f"save {slot}: platform {str(e)[:80]}; retry {attempt + 1}", file=sys.stderr, flush=True)
+            time.sleep(10 + 10 * attempt)
+
+
+def read_state(slot, state_file=None):
+    """The slot's saved state, read under the same lock: an unlocked read while a parallel build's save rewrites the
+    file sees it empty or half-written (JSONDecodeError at the end of an otherwise good build)."""
+    f = pathlib.Path(state_file or KIT / ".freya-agents.json")
+    with open(str(f) + ".lock", "w") as lock:
+        fcntl.flock(lock, fcntl.LOCK_SH)
+        return json.loads(f.read_text()).get(slot) if f.exists() else None
 
 
 if __name__ == "__main__":

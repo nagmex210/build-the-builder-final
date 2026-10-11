@@ -87,24 +87,41 @@ async def self_simulate(slot, tools, briefs, trace, wf_file, final_pass, options
     text = "\n\n".join(pathlib.Path(b).read_text() for b in briefs)
     calc_file = KIT / "out" / f"{slot}.calc.json"
     loop = asyncio.get_running_loop()
+    # Round 1 is bounded by the build's time left too (it used to get ROUND_S whatever was left: a late build ran past 30 min).
+    MARGIN_S, MIN_ROUND_S = 60, 120
+    if left() < MIN_ROUND_S + MARGIN_S + 60:
+        log(trace, event="test", what="self-simulation round 1", error=f"SELF-TEST DID NOT RUN: only {left():.0f} s of the build budget left")
+        print(f"self-test skipped: only {left():.0f} s of the build budget left", flush=True)
+        return
     try:
         personas = await loop.run_in_executor(None, selftest.write_personas, text, tools, KIT / "public-test-set.json", SELFTEST_N)
         log(trace, event="test", what="self-simulation: personas + ledger checks written from the brief",
             personas=[{"title": p["title"], "customer": p["customer"], "script": p["script"], "checks": p["checks"]} for p in personas])
         wf1 = json.loads(wf_file.read_text())
-        r1 = await loop.run_in_executor(None, selftest.run_tests, slot, wf1, personas, calc_file, ROUND_S)
+        r1_budget = min(ROUND_S, left() - MARGIN_S)
+        if r1_budget < MIN_ROUND_S:
+            raise RuntimeError(f"SELF-TEST DID NOT RUN: only {left():.0f} s of the build budget left after writing personas")
+        r1 = await loop.run_in_executor(None, selftest.run_tests, slot, wf1, personas, calc_file, r1_budget)
     except Exception as e:  # noqa: BLE001
         log(trace, event="test", what="self-simulation round 1", error=str(e)[:300]); print(f"self-test skipped: {e}", flush=True)
         return
+    n_play = max(len(r1["rows"]), r1["n"]) or len(personas)
+    errs = sorted({str(r.get("harness_error"))[:120] for r in r1["rows"] if r.get("harness_error")})
     log(trace, event="test", what="self-simulation round 1: deterministic ledger checks", where=r1["where"], n=r1["n"],
-        failed=r1["n_failed"], checks_failed=r1["n_checks_failed"], seconds=round(time.time() - t_start), rows=r1["rows"])
-    print(f"self-test 1 ({r1['where']}): {r1['n_failed']}/{r1['n']} personas failed a check ({r1['n_checks_failed']} checks)", flush=True)
+        played=n_play, failed=r1["n_failed"], checks_failed=r1["n_checks_failed"], seconds=round(time.time() - t_start), rows=r1["rows"],
+        **({"result": f"SELF-TEST DID NOT RUN: 0 of {n_play} chats completed"} if not r1["n"] else {}))
+    if not r1["n"]:   # 0/0 used to print like a pass (b8: workspace 2 answered 402 to every chat)
+        print(f"self-test 1 ({r1['where']}): SELF-TEST DID NOT RUN: 0 of {n_play} persona chats completed"
+              f"{' (' + '; '.join(errs[:2]) + ')' if errs else ''}", flush=True)
+    else:
+        print(f"self-test 1 ({r1['where']}): {r1['n_failed']}/{r1['n']} completed persona chats failed a check "
+              f"({r1['n_checks_failed']} checks; {n_play - r1['n']} of {n_play} chats did not complete)", flush=True)
     (KIT / "out" / f"{slot}.selftest1.json").write_text(json.dumps({"personas": personas, **r1}, indent=1, default=str))
     r1_s = time.time() - t_start
     retest_s = min(ROUND_S, r1_s + 60)          # the re-test takes about as long as round 1 did (platform load)
     if not r1["n_failed"] or r1["n"] < len(personas) or left() < retest_s + 90:
-        log(trace, event="ship", what="no fix round", why="no failed check" if not r1["n_failed"] else
-            ("too few valid chats" if r1["n"] < len(personas) else "no time left"))
+        log(trace, event="ship", what="no fix round", why="self-test did not run (no chat completed)" if not r1["n"] else
+            ("too few valid chats" if r1["n"] < len(personas) else ("no failed check" if not r1["n_failed"] else "no time left")))
         return
     best = wf_file.read_text()
     fails = selftest.failure_text(r1)
@@ -138,8 +155,10 @@ async def self_simulate(slot, tools, briefs, trace, wf_file, final_pass, options
         wf_file.write_text(best); final_pass("restore"); return
     t = time.time()
     try:
-        r2 = await loop.run_in_executor(None, selftest.run_tests, slot, json.loads(wf_file.read_text()), personas, calc_file,
-                                        max(120, min(ROUND_S, left())))
+        r2_budget = min(ROUND_S, left() - MARGIN_S)   # was max(120, ...): could run past the build's time left
+        if r2_budget < MIN_ROUND_S:
+            raise RuntimeError(f"no time left to re-test the fix ({left():.0f} s of the build budget left)")
+        r2 = await loop.run_in_executor(None, selftest.run_tests, slot, json.loads(wf_file.read_text()), personas, calc_file, r2_budget)
     except Exception as e:  # noqa: BLE001
         r2 = None; log(trace, event="test", what="self-simulation round 2", error=str(e)[:300])
     if r2:
@@ -234,7 +253,8 @@ def clear_slot(slot):
     Sunday the slot is new; every build starts as if it were. Old files move out of the kit (not deleted)."""
     import re as _re, shutil, tempfile
     keys = {slot, slot.replace("-", ""), slot.replace("-", "_")}
-    pat = _re.compile(r"(^|[^A-Za-z0-9])(" + "|".join(_re.escape(k) for k in keys) + r")([^A-Za-z0-9]|$)")
+    # '-' is never a boundary and '_' not after the name: slot 'brief-a' must not take 'brief-a-raw.*' (another slot's files)
+    pat = _re.compile(r"(^|[^A-Za-z0-9-])(" + "|".join(_re.escape(k) for k in keys) + r")([^A-Za-z0-9_-]|$)")
     dest, moved = None, []
     for d in (KIT / "out", KIT / "scratch"):
         for f in (d.iterdir() if d.exists() else []):
@@ -440,7 +460,8 @@ async def run(slot, tools, briefs):
                                           json.loads(st.read_text()))
             log(trace, event="test", what="buildcheck after self-simulation (round-1 record: catastrophic failure?)", errors=errs)
             print(f"buildcheck (shipped): {len(errs)} problem(s){': ' + '; '.join(errs) if errs else ''}", flush=True)
-    state = json.loads((KIT / ".freya-agents.json").read_text()).get(slot) if (KIT / ".freya-agents.json").exists() else None
+    from save import read_state
+    state = read_state(slot, KIT / ".freya-agents.json")
     if state and not saved:
         # Build reliability (seen b8): the agent failed, nothing was saved in THIS run, and the slot's state still named the
         # previous build's agent, which was then printed as this build's result. A build that saved nothing fails loudly.
@@ -460,7 +481,14 @@ async def run(slot, tools, briefs):
         try:
             sys.path.insert(0, str(KIT))
             import freya
-            freya.export_workflow(state["workflow_id"], str(export))
+            for attempt in range(3):   # a GET 504 under load left no export (b9 main-B); a GET is safe to repeat
+                try:
+                    freya.export_workflow(state["workflow_id"], str(export))
+                    break
+                except RuntimeError as e:
+                    if "-> 5" not in str(e) or attempt == 2:
+                        raise
+                    time.sleep(10)
             json.loads(export.read_text())
             print(f"[freya] exported: {export}", flush=True)
         except Exception as e:  # noqa: BLE001

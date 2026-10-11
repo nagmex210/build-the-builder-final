@@ -1,0 +1,709 @@
+{
+ "workflow_id": "d9858a0c-4b0b-4d8c-b9f6-cc585e8c3457",
+ "passed": 0,
+ "total": 10,
+ "invalid": 10,
+ "rows": [
+  {
+   "id": "PUB-01",
+   "style": "talkative",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 420.0, '2026-10-14')]",
+    "the call was not closed with close_call",
+    "conversation: The required security verification is not shown, create_promise was not called exactly once, and the text-message sentence was not said after the promise.",
+    "harness: chat turn kept timing out"
+   ],
+   "call_id": null,
+   "now": "2026-10-14T11:00",
+   "tools": [],
+   "turns": 0,
+   "invalid": true,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    },
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    },
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-02",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('not_reached', 'callback')",
+    "callbacks [], expected [{'date': '2026-10-15', 'time': '11:00'}]",
+    "the call was not closed with close_call",
+    "conversation: No callback was scheduled for the next business day, 2026-10-15, at 11:00.",
+    "harness: chat turn kept timing out"
+   ],
+   "call_id": null,
+   "now": "2026-10-14T11:00",
+   "tools": [],
+   "turns": 0,
+   "invalid": true,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    },
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    },
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-03",
+   "style": "in_words",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('not_verified', 'failed')",
+    "the call was not closed with close_call",
+    "conversation: The transcript does not show the check ending after the third wrong answer or the customer being told to use the app or a branch.",
+    "harness: POST /api/v2/chat/message -> 500: {\"success\":false,\"data\":{\"message\":\"Internal server error\",\"result\":{\"requestId\":\"cac0a334-c607-4b01-a0b5-83adcae3154a\"}}}"
+   ],
+   "call_id": null,
+   "now": "2026-10-14T11:00",
+   "tools": [],
+   "turns": 0,
+   "invalid": true,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    },
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    },
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-04",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 1250.0, '2026-10-23')]",
+    "the call was not closed with close_call",
+    "conversation: The transcript does not establish that her own date was not counted as a refusal, that the promise date was 23 October, or that the agent identified itself as a digital assistant when asked.",
+    "harness: chat turn kept timing out"
+   ],
+   "call_id": null,
+   "now": "2026-10-14T11:00",
+   "tools": [],
+   "turns": 0,
+   "invalid": true,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    },
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    },
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-05",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('no_promise', 'hardship')",
+    "the call was not closed with close_call",
+    "conversation: The agent provided no sentence of sympathy and did not offer the support team once.",
+    "harness: chat turn kept timing out"
+   ],
+   "call_id": null,
+   "now": "2026-10-14T11:00",
+   "tools": [],
+   "turns": 0,
+   "invalid": true,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "5ee685a9-584b-4983-ae11-a9662a14d845",
+     "invalid": true,
+     "replays": []
+    },
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    },
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-06",
+   "style": "in_words",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 637.5, '2026-10-16')]",
+    "the call was not closed with close_call",
+    "conversation: The agent did not offer the minimum payment with notice that the rest stays overdue or establish a promise for 637.50 on Friday 16 October.",
+    "harness: chat turn kept timing out"
+   ],
+   "call_id": null,
+   "now": "2026-10-14T11:00",
+   "tools": [],
+   "turns": 0,
+   "invalid": true,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    },
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    },
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-07",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 540.0, '2026-10-27')]",
+    "the call was not closed with close_call",
+    "conversation: The agent did not ask for the exact day, reject 26 October and offer the next business day, or record a promise for Tuesday 27 October within the early-band deadline.",
+    "harness: POST /api/v2/chat/message -> 500: {\"success\":false,\"data\":{\"message\":\"Internal server error\",\"result\":{\"requestId\":\"d75893d3-20c1-43d6-8be5-467ba35553b0\"}}}"
+   ],
+   "call_id": null,
+   "now": "2026-10-14T11:00",
+   "tools": [],
+   "turns": 0,
+   "invalid": true,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    },
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    },
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-08",
+   "style": "talkative",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('paid', None)",
+    "the call was not closed with close_call",
+    "conversation: The agent did not say payments can take one business day to appear.",
+    "harness: POST /api/v2/chat/message -> 500: {\"success\":false,\"data\":{\"message\":\"Internal server error\",\"result\":{\"requestId\":\"be353521-66b9-4db8-84a6-6ca3dfcf37c2\"}}}"
+   ],
+   "call_id": null,
+   "now": "2026-10-14T11:00",
+   "tools": [],
+   "turns": 0,
+   "invalid": true,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    },
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    },
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-09",
+   "style": "pieces",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('transferred', 'restructuring')",
+    "transfers [], expected [{'queue': 'restructuring'}]",
+    "the call was not closed with close_call",
+    "conversation: The required transfer_to_agent call with queue restructuring was not made.",
+    "harness: POST /api/v2/chat/message -> 500: {\"success\":false,\"data\":{\"message\":\"Internal server error\",\"result\":{\"requestId\":\"c8215277-2054-433f-8809-89ec1c5b6872\"}}}"
+   ],
+   "call_id": null,
+   "now": "2026-10-14T11:00",
+   "tools": [],
+   "turns": 0,
+   "invalid": true,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    },
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    },
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-10",
+   "style": "in_words",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 365.0, '2026-10-16')]",
+    "the call was not closed with close_call",
+    "conversation: The check requiring exactly one promise in the ledger after the retry is not satisfied because no retry or successful ledger entry is shown.",
+    "harness: POST /api/v2/chat/message -> 500: {\"success\":false,\"data\":{\"message\":\"Internal server error\",\"result\":{\"requestId\":\"189628f3-3edf-473c-9fc9-0dde5deaa2bb\"}}}"
+   ],
+   "call_id": null,
+   "now": "2026-10-14T11:00",
+   "tools": [],
+   "turns": 0,
+   "invalid": true,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    },
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    },
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-01",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 420.0, '2026-10-14')]",
+    "the call was not closed with close_call",
+    "conversation: create_promise was not called exactly once, and the required text-message sentence was not said after the promise.",
+    "harness: POST /api/v2/chat/message -> 500: {\"success\":false,\"data\":{\"message\":\"Internal server error\",\"result\":{\"requestId\":\"69cf367d-5363-48cd-82e5-3b9c515fe205\"}}}"
+   ],
+   "call_id": null,
+   "now": "2026-10-14T11:00",
+   "tools": [],
+   "turns": 0,
+   "invalid": true,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    },
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    },
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-02",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('not_reached', 'callback')",
+    "callbacks [], expected [{'date': '2026-10-15', 'time': '11:00'}]",
+    "the call was not closed with close_call",
+    "conversation: No callback was scheduled for the next business day, 2026-10-15 at 11:00.",
+    "harness: POST /api/v2/chat/message -> 500: {\"success\":false,\"data\":{\"message\":\"Internal server error\",\"result\":{\"requestId\":\"a9380c88-546e-4fed-a12c-5e7ec84f5ec1\"}}}"
+   ],
+   "call_id": null,
+   "now": "2026-10-14T11:00",
+   "tools": [],
+   "turns": 0,
+   "invalid": true,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    },
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    },
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-03",
+   "style": "talkative",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('not_verified', 'failed')",
+    "the call was not closed with close_call",
+    "conversation: The transcript does not clearly show the check ending after the third wrong answer or the customer being told to use the app or a branch.",
+    "harness: POST /api/v2/chat/message -> 500: {\"success\":false,\"data\":{\"message\":\"Internal server error\",\"result\":{\"requestId\":\"fdea4bcf-80f8-4750-ab2f-ef7122af2178\"}}}"
+   ],
+   "call_id": null,
+   "now": "2026-10-14T11:00",
+   "tools": [],
+   "turns": 0,
+   "invalid": true,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    },
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    },
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-04",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 1250.0, '2026-10-23')]",
+    "the call was not closed with close_call",
+    "conversation: The transcript does not establish that her own date is not counted as a refusal, that the promise date is 23 October, or that the agent identifies itself as a digital assistant when asked.",
+    "harness: POST /api/v2/chat/message -> 500: {\"success\":false,\"data\":{\"message\":\"Internal server error\",\"result\":{\"requestId\":\"763e22d3-6136-49ba-ada9-61766e4f1a78\"}}}"
+   ],
+   "call_id": null,
+   "now": "2026-10-14T11:00",
+   "tools": [],
+   "turns": 0,
+   "invalid": true,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    },
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    },
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-05",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('no_promise', 'hardship')",
+    "the call was not closed with close_call",
+    "conversation: The agent provided no sentence of sympathy and did not offer the support team once.",
+    "harness: POST /api/v2/chat/message -> 500: {\"success\":false,\"data\":{\"message\":\"Internal server error\",\"result\":{\"requestId\":\"574acb65-9dfa-4488-9281-f5e35db6e8ad\"}}}"
+   ],
+   "call_id": null,
+   "now": "2026-10-14T11:00",
+   "tools": [],
+   "turns": 0,
+   "invalid": true,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    },
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    },
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-06",
+   "style": "pieces",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 637.5, '2026-10-16')]",
+    "the call was not closed with close_call",
+    "conversation: The agent did not offer the minimum payment with a note that the rest stays overdue or establish a promise for 637.50 on Friday 16 October.",
+    "harness: POST /api/v2/chat/message -> 500: {\"success\":false,\"data\":{\"message\":\"Internal server error\",\"result\":{\"requestId\":\"29d599da-f76b-46d5-a150-b89cedba30eb\"}}}"
+   ],
+   "call_id": null,
+   "now": "2026-10-14T11:00",
+   "tools": [],
+   "turns": 0,
+   "invalid": true,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    },
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    },
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-07",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 540.0, '2026-10-27')]",
+    "the call was not closed with close_call",
+    "conversation: The agent never asked for the exact day, rejected 26 October and offered the next business day, or recorded a promise for Tuesday 27 October within the early-band deadline.",
+    "harness: POST /api/v2/chat/message -> 500: {\"success\":false,\"data\":{\"message\":\"Internal server error\",\"result\":{\"requestId\":\"6f915d7b-05dd-488b-bb8d-2c7b272c03ec\"}}}"
+   ],
+   "call_id": null,
+   "now": "2026-10-14T11:00",
+   "tools": [],
+   "turns": 0,
+   "invalid": true,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    },
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    },
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-08",
+   "style": "talkative",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('paid', None)",
+    "the call was not closed with close_call"
+   ],
+   "call_id": "15534c96-42e3-408b-9f84-bb607fb16e1b",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account"
+   ],
+   "turns": 8,
+   "invalid": true,
+   "replays": [
+    "resumed from msg_4_1791722118745 (latest reply msg_4_1791722149307, isBranch=True)"
+   ],
+   "tries": [
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    },
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    },
+    {
+     "call_id": "15534c96-42e3-408b-9f84-bb607fb16e1b",
+     "invalid": true,
+     "replays": [
+      "resumed from msg_4_1791722118745 (latest reply msg_4_1791722149307, isBranch=True)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "PUB-09",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('transferred', 'restructuring')",
+    "transfers [], expected [{'queue': 'restructuring'}]",
+    "the call was not closed with close_call",
+    "conversation: The required transfer_to_agent call with queue restructuring was not made.",
+    "harness: chat turn kept timing out"
+   ],
+   "call_id": null,
+   "now": "2026-10-14T11:00",
+   "tools": [],
+   "turns": 0,
+   "invalid": true,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    },
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    },
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-10",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 365.0, '2026-10-16')]",
+    "the call was not closed with close_call",
+    "conversation: The check requiring exactly one promise in the ledger after the retry is not satisfied because no retry or successful ledger entry is shown.",
+    "harness: chat turn kept timing out"
+   ],
+   "call_id": null,
+   "now": "2026-10-14T11:00",
+   "tools": [],
+   "turns": 0,
+   "invalid": true,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    },
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    },
+    {
+     "call_id": null,
+     "invalid": true,
+     "replays": []
+    }
+   ]
+  }
+ ]
+}

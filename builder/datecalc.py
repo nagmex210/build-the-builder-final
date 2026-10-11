@@ -177,16 +177,21 @@ def round_amt(amt, r):
     q = round(q, 6)
     q = math.ceil(q) if mode == 'up' else (math.floor(q) if mode == 'down' else math.floor(q + 0.5))
     return round(q * unit, 2)
+def hm_norm(x):
+    # '9:30', '09:30', '9.30', '14:00:00' -> 'HH:MM' (a string compare of '15:00' >= '9:30' is False)
+    import re
+    m = re.search(r'(\d{1,2})[:.h](\d{2})', str(x or ''))
+    return '%02d:%02d' % (int(m.group(1)), int(m.group(2))) if m else ''
 def hm_of(now):
     s = str(now or '')
-    return s[11:16] if len(s) >= 16 and s[13] == ':' else ''
+    return hm_norm(s[10:]) if len(s) > 10 else ''
 def earliest_promise(now):
     t = today_of(now)
     n = SPEC.get('promise_min_days_ahead')
     e = t
     if n is not None and int(n) > 0:
         e = add_units(t, int(n), SPEC.get('promise_min_days_unit') or 'calendar_days')
-    co = str(SPEC.get('promise_cutoff_time') or '')[:5]
+    co = hm_norm(SPEC.get('promise_cutoff_time'))
     hm = hm_of(now)
     if co and hm and e == t and hm >= co:
         e = next_bd(t)
@@ -205,14 +210,17 @@ def floor_for(p):
         if r.get('field') and num(p.get(r['field'])) is not None:
             amt = num(p.get(r['field']))
         elif r.get('percent_of_field') and r.get('percent') is not None and num(p.get(r['percent_of_field'])) is not None:
-            amt = round(num(p.get(r['percent_of_field'])) * float(r['percent']) / 100.0, 2)
+            amt = num(p.get(r['percent_of_field'])) * float(r['percent']) / 100.0   # round_amt rounds (a cent cut first broke 'round up')
         elif r.get('fixed') is not None:
             amt = float(r['fixed'])
         if amt is None:
             continue
-        if r.get('min_amount') is not None:
+        amt = round_amt(amt, r)
+        if str(r.get('round') or 'none').lower() not in ('up', 'down', 'nearest') or not num(r.get('round_to')):
+            amt = round(amt, 2)
+        if r.get('min_amount') is not None:      # after rounding: rounding down must not undo the minimum
             amt = max(amt, float(r['min_amount']))
-        return round_amt(amt, r)
+        return amt
     return None
 def build_facts(now, only_bands=None):
     t = today_of(now)
@@ -255,7 +263,7 @@ def build_facts(now, only_bands=None):
                  ('' if b.get('attempts') is None else '; persuasion attempts: ' + str(b.get('attempts'))))
     ep = earliest_promise(now)
     if ep != t or SPEC.get('promise_cutoff_time'):
-        co = str(SPEC.get('promise_cutoff_time') or '')[:5]
+        co = hm_norm(SPEC.get('promise_cutoff_time'))
         L.append('EARLIEST PROMISE DATE: ' + fmt(ep) + ('  <- today is NOT possible' if ep != t else '  (today is still possible)') +
                  ((' (a promise for today only before ' + co + '; now is ' + (hm_of(now) or '?') + ')') if co else ''))
     if SPEC.get('promise_dates_min_gap_days') is not None:
@@ -438,7 +446,7 @@ def rule_tests(spec, code):
                 if abs(q - round(q)) > 1e-6 or (mode == "up" and y < x - 1e-9) or (mode == "down" and y > x + 1e-9) or abs(y - x) >= float(unit) + 1e-9:
                     probs.append(f"floor rounding '{mode}' to {unit} wrong: {x} -> {y}")
                     break
-    co = str(spec.get("promise_cutoff_time") or "")[:5]
+    co = g["hm_norm"](spec.get("promise_cutoff_time"))
     if co:
         for k in range(7):
             t = start + datetime.timedelta(days=k)
