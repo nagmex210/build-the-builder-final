@@ -10,3 +10,16 @@ SUBMISSION CHECK: read the README submission and trace rules and check one full 
 ## and for the b10 MERGER: VERIFY before keeping anything. A bug fix is kept only with its before/after repro
 ## re-run by you; a simplification only if the workflow diff is empty and official A/B do not drop. Unverified = not kept.
 ## No next families after b10 (the loop stops; final rehearsal follows).
+
+## b9 merger: TRY the memory tool (owner request), on top of your merge, and REPORT it
+"Once" limits on things that are only SPOKEN (sympathy sentence, support-team offer, any repeated offer) have no
+tool behind them, so w4's entry counter cannot catch a repeat inside the same node visit (official PUB-05 run:
+sympathy in two messages of one visit). Add a code-only tool inside the workflow (the code-only tool type idea/b8-1
+found; never an outside URL), e.g. `mark_said(item)`: the agent calls it right after saying a once-limited line;
+code adds the item to a call-wide variable, and every node prompt shows a MEMORY line rendered from it
+("MEMORY (code-kept): sympathy USED; support team offered 1/1; lowest amount offered 1/1 for <product>"). The list
+of once-limited items comes from the brief at build time (no brief A/B text in builder/). Combine with w4's entry
+counter and floor flag (they cover entries and tool-backed offers).
+Measure: official A (PUB-05, PUB-06) and raw-A, plus fast_eval --only PUB-05,PUB-06 --reps 3 with and without the
+tool. Keep it under the normal accept rule. Either way, write a "Memory tool (way 2)" section in the journal and in
+runs/b9/memory_tool.md: what was built, numbers with/without, kept or not, and why.
