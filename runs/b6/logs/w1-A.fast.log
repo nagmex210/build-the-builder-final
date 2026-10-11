@@ -1,0 +1,24 @@
+PASS PUB-01 2/2 | verify_identity > verify_identity > get_account > create_promise > close_call
+PASS PUB-02 2/2 | schedule_callback > close_call
+FAIL PUB-03 1/2 | verify_identity > verify_identity > verify_identity > close_call
+       - [pieces] outcome ('promise', None), expected ('not_verified', 'failed')
+       - [pieces] promises [('p1', 95.0, '2026-10-14')], expected []
+       - [pieces] conversation: The agent disclosed the credit card and past-due amount and never told the customer to use the app or a branch.
+PASS PUB-04 2/2 | verify_identity > verify_identity > get_account > create_promise > close_call
+PASS PUB-05 2/2 | verify_identity > verify_identity > get_account > close_call
+FAIL PUB-06 0/2 | verify_identity > verify_identity > get_account > close_call
+       - [corrects] outcome ('no_promise', 'refused'), expected ('promise', None)
+       - [corrects] promises [], expected [('p1', 637.5, '2026-10-16')]
+       - [corrects] conversation: The minimum payment was offered repeatedly rather than once, initially with the incorrect amount of 150.00, and no promise for 637.50 on Friday 16 October was recorded.
+       - [pieces] conversation: The minimum payment was offered more than once, initially using the incorrect amount of 125.00 rather than 637.50.
+PASS PUB-07 2/2 | verify_identity > verify_identity > get_account > create_promise > close_call
+PASS PUB-08 2/2 | verify_identity > verify_identity > get_account > close_call
+FAIL PUB-09 1/2 | verify_identity > verify_identity > get_account > close_call
+       - [pieces] outcome ('no_promise', 'refused'), expected ('transferred', 'restructuring')
+       - [pieces] transfers [], expected [{'queue': 'restructuring'}]
+       - [pieces] conversation: The agent never called transfer_to_agent with queue restructuring and proposed its own payment arrangement of 400 by October 23.
+FAIL PUB-10 1/2 | verify_identity > verify_identity > get_account > create_promise > create_promise > close_call
+       - [corrects] promises [('p1', 365.0, '2026-10-20')], expected [('p1', 365.0, '2026-10-16')]
+
+fast_eval: 6 / 10 passed (2 rep(s), all reps must pass), 1714 s
+harness: 0 case(s) still INVALID after 2 re-run(s) (not a measurement), 0 rep(s) re-run

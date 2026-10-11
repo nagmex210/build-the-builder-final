@@ -46,7 +46,10 @@ try:
                 _wq, _wok = [], dict()
             _prev = _wok.get(_t + '#' + str(_wq[0])) if (len(_wq) == 2 and isinstance(_wok, dict)) else None
             _err0 = str(_d.get('error') or result.get('message') or '').lower()
-            if _v.get('dup_hit_' + _t):
+            _ack = all(str(k).endswith('_id') for k in _d.keys() if k not in ('ok', 'error', 'tool_outcome', 'what_to_do_next', 'message'))
+            _bare = not [k for k in _d.keys() if k not in ('ok', 'status', 'message', 'what_to_do_next', 'tool_outcome')]
+            if _v.get('dup_hit_' + _t) and _bare:
+                # only the no-op's bare answer: a parallel sibling of the same tool (M20 shares the flag) keeps its own result
                 _same = 'the same values were sent again'
             elif _failed and isinstance(_prev, dict) and (any(w in _err0 for w in ('exist', 'duplicate')) or ('already' in _err0 and 'closed' not in _err0)):
                 _same = ('the bank answered: ' + str(_d.get('error') or result.get('message'))[:120] +
@@ -67,7 +70,7 @@ try:
                                       'Continue with the next step.')
                 result['data'] = _d
                 _failed = False
-            elif not _failed and len(_wq) == 2 and isinstance(_wok, dict) and not _v.get('guard_block_' + _t):
+            elif not _failed and _ack and len(_wq) == 2 and isinstance(_wok, dict) and not _v.get('guard_block_' + _t):
                 _wok[_t + '#' + str(_wq[0])] = dict(fp=_wq[1], ids=dict((k, x) for k, x in _d.items()
                                                                        if str(k).endswith('_id') and isinstance(x, (str, int))))
                 _v['writes_ok'] = _json.dumps(_wok)

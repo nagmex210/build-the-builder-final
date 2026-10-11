@@ -1,0 +1,19 @@
+FAIL PUB-11 0/2 | verify_identity > verify_identity > get_account > create_promise > create_promise > create_promise > create_promise > close_call
+       - [asks_back] conversation: The one create_promise per product check fails because the credit-card promise required two create_promise calls, the first with an invalid product ID.
+       - [talkative] conversation: The one create_promise per product check fails because the credit card had two create_promise attempts, first with an invalid product ID and then with p1.
+FAIL PUB-12 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > add_note > add_note > close_call
+       - [plain] conversation: The car loan received two persuasion attempts after the initial refusal, rather than the required one for the early band.
+       - [plain] outcome ('no_promise', 'refused'), expected ('promise', None)
+       - [plain] promises [], expected [('p1', 510.0, '2026-10-15')]
+       - [plain] notes [], expected [('p2', 'refused'), ('p3', 'refused')]
+       - [plain] conversation: The phone question was not asked again, no credit-card promise was recorded, neither other product received its own refused note, and the required two personal-loan attempts and one car-loan attempt were missing.
+FAIL PUB-13 0/2 | verify_identity > verify_identity > transfer_to_agent > close_call
+       - [in_words] outcome ('transferred', 'human'), expected ('promise', None)
+       - [in_words] promises [], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]
+       - [in_words] transfers [{'queue': 'general'}], expected []
+       - [in_words] conversation: No payment-recording tool call recorded the credit card for 30 October 2026 or the loan for its 23 October 2026 deadline, and the read-back did not name both dates.
+       - [asks_back] promises [('p1', 300.0, '2026-10-23'), ('p2', 900.0, '2026-10-23')], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]
+       - [asks_back] conversation: The credit card was recorded for 23 October instead of 30 October, and the read-back named 23 October for both products rather than both required dates.
+
+fast_eval: 0 / 3 passed (2 rep(s), all reps must pass), 1581 s
+harness: 0 case(s) still INVALID after 2 re-run(s) (not a measurement), 0 rep(s) re-run
