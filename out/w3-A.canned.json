@@ -1,163 +1,87 @@
 {
- "opening": "I am a digital assistant calling from Freya Bank, and we record this call. Am I speaking with {{title}} {{last_name}}?",
+ "opening": "Hello, I\u2019m calling from Freya Bank as a digital assistant, and this call is being captured. Am I speaking with {{title}} {{last_name}}?",
  "lines": [
   {
-   "text": "I am Freya Bank's digital assistant.",
-   "when": "The person asks whether the agent is a robot or an AI.",
+   "text": "I am sorry for your loss.",
+   "when": "The person answering says the customer has died.",
    "tool": "",
    "outcome": ""
   },
   {
-   "text": "I am sorry for your loss.",
-   "when": "Someone reports that the customer has died, or the customer mentions a death in the family.",
+   "text": "These questions help protect your account.",
+   "when": "The customer does not want to answer a security question; explain this once.",
    "tool": "",
    "outcome": ""
   },
   {
    "text": "Please use the mobile app or visit a branch.",
-   "when": "The identity check ends after three wrong answers.",
+   "when": "After three wrong identity answers.",
    "tool": "",
    "outcome": ""
   },
   {
-   "text": "These questions protect your account.",
-   "when": "The customer first declines a security question or asks what the call is about instead of answering; explain only once.",
+   "text": "I\u2019m calling from the collections team about a late payment.",
+   "when": "After identity is verified and the account information is available.",
+   "tool": "get_account",
+   "outcome": "success"
+  },
+  {
+   "text": "I\u2019m sorry to hear that.",
+   "when": "The customer mentions illness, a death in the family, or job loss.",
    "tool": "",
    "outcome": ""
   },
   {
-   "text": "I am sorry you are going through this.",
-   "when": "The customer mentions illness or job loss.",
-   "tool": "",
-   "outcome": ""
-  },
-  {
-   "text": "You can change your promise in the mobile app.",
-   "when": "The customer asks to change or cancel a promise already successfully recorded during this call.",
-   "tool": "",
-   "outcome": ""
-  },
-  {
-   "text": "I could not record your promise.",
-   "when": "The second and final create_promise attempt fails.",
+   "text": "The rest stays overdue.",
+   "when": "The customer says the full amount is too much and the agent offers the floor.",
    "tool": "",
    "outcome": ""
   },
   {
    "text": "You will receive a text message confirming this promise.",
-   "when": "A payment promise has been successfully recorded.",
+   "when": "After a promise is successfully recorded.",
    "tool": "create_promise",
    "outcome": "success"
   },
   {
-   "text": "Payments can take one business day to appear.",
-   "when": "The customer says they have already paid the current past-due amount.",
+   "text": "I could not record it.",
+   "when": "The second attempt to record a promise fails.",
    "tool": "",
    "outcome": ""
   },
   {
-   "text": "You can verify this call by phoning Freya Bank's customer service number.",
-   "when": "The person asks whether the call is a scam.",
+   "text": "Payments can take one business day to appear.",
+   "when": "The customer says they already paid this past-due amount.",
+   "tool": "",
+   "outcome": ""
+  },
+  {
+   "text": "You can verify this call by phoning Freya Bank\u2019s customer service number.",
+   "when": "The customer asks whether this is a scam.",
    "tool": "",
    "outcome": ""
   }
  ],
- "goodbye": "Thank you, and goodbye.",
+ "goodbye": "Thank you for your time. Goodbye.",
  "close_tool": "close_call",
  "gated_words": [
   {
    "word": "recorded",
    "tool": "create_promise",
    "outcome": "success",
-   "rule": "Say the promise is recorded only after `create_promise` returns `ok: true`."
-  },
-  {
-   "word": "collections",
-   "tool": "verify_identity",
-   "outcome": "success",
-   "rule": "Do not say \"collections\", \"debt\", \"payment\" or the product before identity is verified; both questions must pass."
-  },
-  {
-   "word": "debt",
-   "tool": "verify_identity",
-   "outcome": "success",
-   "rule": "Do not say \"collections\", \"debt\", \"payment\" or the product before identity is verified; both questions must pass."
-  },
-  {
-   "word": "payment",
-   "tool": "verify_identity",
-   "outcome": "success",
-   "rule": "Do not say \"collections\", \"debt\", \"payment\" or the product before identity is verified; both questions must pass."
-  },
-  {
-   "word": "credit card",
-   "tool": "verify_identity",
-   "outcome": "success",
-   "rule": "Do not say \"collections\", \"debt\", \"payment\" or the product before identity is verified."
-  },
-  {
-   "word": "personal loan",
-   "tool": "verify_identity",
-   "outcome": "success",
-   "rule": "Do not say \"collections\", \"debt\", \"payment\" or the product before identity is verified."
-  },
-  {
-   "word": "car loan",
-   "tool": "verify_identity",
-   "outcome": "success",
-   "rule": "Do not say \"collections\", \"debt\", \"payment\" or the product before identity is verified."
+   "rule": "\u201cSay the promise is recorded only after `create_promise` returns `ok: true`.\u201d"
   }
  ],
  "conflicts": [
   {
-   "rules": "Rule 1: \"the call is recorded\"; rule 37: \"Say the promise is recorded only after `create_promise` returns `ok: true`\".",
-   "literal_reading": "A word-level interpretation of rule 37 gates \"recorded\", although the opening must communicate recording before any promise exists.",
-   "resolution": "Use the active recording notice \"we record this call\" in the opening, preserving the notice without using \"recorded\"."
+   "rules": "Rule 1 requires saying the call is recorded; rule 37 says, \u201cSay the promise is recorded only after `create_promise` returns `ok: true`.\u201d",
+   "literal_reading": "A strict word-by-word reading could treat \u201crecorded\u201d as prohibited before a successful promise-recording call, conflicting with the required opening notice.",
+   "resolution": "Use \u201cbeing captured\u201d in the opening to give the required recording notice without saying the gated word. Say the promise is recorded only after `create_promise` succeeds."
   },
   {
-   "rules": "Rule 5: \"Say nothing beyond the opening sentence of rule 1\" and \"Ask when the customer can be reached\"; rule 9: \"I am sorry for your loss.\"; rule 47: \"Thank the customer and say goodbye\".",
-   "literal_reading": "An absolute ban on everything beyond the first sentence prohibits the callback question, condolence and closing.",
-   "resolution": "No wording satisfies all these rules under that absolute reading. The operational interpretation is to prohibit additional disclosure about the reason for calling while permitting the expressly required callback question, condolence and goodbye; this requires a scope clarification rather than a literal reconciliation."
-  },
-  {
-   "rules": "Rule 5: \"Ask when the customer can be reached\"; rule 9: \"ask nothing else\" when the customer has died.",
-   "literal_reading": "A deceased customer's representative is someone else answering, so the general callback question conflicts with the prohibition on further questions.",
-   "resolution": "Apply rule 9 as the specific deceased-customer branch: give the quoted condolence, ask no callback question and close."
-  },
-  {
-   "rules": "Rule 11: \"Ask two security questions\"; rule 12: \"A wrong answer may be asked again\"; rule 13 requires a month-as-a-word retry.",
-   "literal_reading": "If two means two total utterances, any retry exceeds the limit.",
-   "resolution": "Use exactly two distinct security questions, in the prescribed order. Repetitions and clarification of an answer do not introduce a third security question."
-  },
-  {
-   "rules": "Rules 26 and 27: offer the floor \"once\"; rule 26: \"Attempt 2 may name the floor again\"; rule 30 specifies floor-based persuasion attempts; rule 31: \"Do not repeat an offer the customer already refused\".",
-   "literal_reading": "The floor can appear in an initial offer and later persuasion, apparently violating both the once-only limit and the prohibition on repeating refused offers.",
-   "resolution": "Make the initial floor concession only once. Treat a subsequent offer as an amount-and-date pair, not merely an amount: a permitted persuasion attempt may name the same floor with a different eligible date, but must not repeat an already refused pair. If no distinct permitted pair remains, stop."
-  },
-  {
-   "rules": "Rule 19: a promise date must be \"today or later\"; rule 20: for a weekend or holiday \"not after the deadline, offer the next business day\".",
-   "literal_reading": "A past weekend or holiday satisfies \"not after the deadline\", but its next business day may also be in the past.",
-   "resolution": "The rule 20 suggestion cannot itself become a promise unless it also satisfies rule 19. For a past suggestion, obtain a new eligible date before confirmation or recording."
-  },
-  {
-   "rules": "Rule 24: \"The agent proposes every amount\"; rule 27: \"If the customer proposes an amount ... accept it\".",
-   "literal_reading": "An exclusive reading of who may propose amounts forbids the customer-originated amounts that rule 27 explicitly accepts.",
-   "resolution": "Never solicit an open-ended amount. When the customer volunteers an eligible amount, adopt and propose that amount in the agent's confirmation before seeking agreement."
-  },
-  {
-   "rules": "Rule 2 requires the named-customer question; rule 28 says \"First ask: 'Can you make this payment today?'\".",
-   "literal_reading": "Both questions could be interpreted as the first question of the call.",
-   "resolution": "The named-customer question is first in the call. The quoted paying-today question is first in the payment-promise stage, after identity verification and account disclosure."
-  },
-  {
-   "rules": "Rule 1 forbids \"payment\" before identity verification; rule 39 requires explaining that \"payments can take one business day to appear\".",
-   "literal_reading": "A customer may report having paid before verification, requiring a payment-related explanation while the singular word is gated.",
-   "resolution": "Say \"Payments can take one business day to appear.\" This preserves the required explanation without using the exact gated singular form or disclosing account details."
-  },
-  {
-   "rules": "The extraction request requires every mandatory fixed statement, but also limits `lines` to \"at most 10\" and requires each entry to contain an \"exact sentence\".",
-   "literal_reading": "The brief contains more than ten qualifying fixed statements even after excluding questions, negotiation steps and variable account details.",
-   "resolution": "There is no fully exhaustive ten-entry solution under the single-sentence constraint. The ten entries above prioritize event-specific notices. Additional required statements include \"I do not have that information.\" for questions the tools cannot answer and \"I am calling from the collections team about a late payment.\" after verified account retrieval. Negotiation also requires explaining that the remainder stays overdue and that a below-floor amount cannot be accepted."
+   "rules": "Rule 2 requires asking \u201cAm I speaking with {title} {last_name}?\u201d; rule 5 says, \u201cSay nothing beyond the opening sentence of rule 1. Ask when the customer can be reached.\u201d",
+   "literal_reading": "A strict reading could treat the required identity question as speech beyond the opening sentence, while rule 5 also requires a reachability question when someone else answers.",
+   "resolution": "Use the identity question as part of the mandatory opening on every call. If someone else answers, ask when the customer can be reached without giving a reason for the call or disclosing account information."
   }
  ],
  "self_conflict_check": []

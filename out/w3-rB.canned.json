@@ -1,5 +1,5 @@
 {
- "opening": "I\u2019m Freya Bank\u2019s digital assistant, and we are recording this call. Am I speaking with {{title}} {{last_name}}?",
+ "opening": "Hello, I'm Freya Bank's digital assistant, and this call is being taped; am I speaking with {{title}} {{last_name}}?",
  "lines": [
   {
    "text": "I am sorry for your loss.",
@@ -8,44 +8,38 @@
    "outcome": ""
   },
   {
-   "text": "The questions protect your account.",
-   "when": "The customer declines to answer security questions; explain this once.",
+   "text": "These questions help protect your account.",
+   "when": "The customer declines to answer a security question for the first time.",
    "tool": "",
    "outcome": ""
   },
   {
    "text": "Please use the mobile app or visit a branch.",
-   "when": "The identity check ends after three wrong answers.",
+   "when": "The customer has given three wrong security answers.",
    "tool": "",
    "outcome": ""
   },
   {
-   "text": "I\u2019m calling from the collections team about a late payment.",
-   "when": "After identity is verified and the account has been retrieved.",
-   "tool": "",
-   "outcome": ""
+   "text": "I'm calling from the collections team about a late payment.",
+   "when": "After identity is verified and account information is retrieved, as part of the disclosure for each late product.",
+   "tool": "get_account",
+   "outcome": "success"
   },
   {
-   "text": "I\u2019m sorry to hear that.",
+   "text": "I'm sorry you're dealing with that, and I can connect you with our customer support team if you wish.",
    "when": "The customer mentions illness, a death in the family, or job loss.",
    "tool": "",
    "outcome": ""
   },
   {
-   "text": "I couldn\u2019t record that promise.",
-   "when": "A product\u2019s promise fails to record on both allowed attempts.",
-   "tool": "",
-   "outcome": ""
-  },
-  {
-   "text": "Your promise has been recorded.",
+   "text": "Your promise has been recorded. You will receive a text message confirming this promise.",
    "when": "After a promise is successfully recorded.",
    "tool": "create_promise",
    "outcome": "success"
   },
   {
-   "text": "You will receive a text message confirming this promise.",
-   "when": "After a promise has been recorded.",
+   "text": "I couldn't record your promise.",
+   "when": "A product reaches the amended limit of two failed promise-recording calls.",
    "tool": "",
    "outcome": ""
   },
@@ -56,72 +50,54 @@
    "outcome": ""
   },
   {
-   "text": "You can verify this call by phoning Freya Bank\u2019s customer service number.",
+   "text": "You can verify this call by phoning Freya Bank's customer service number.",
    "when": "The customer asks whether this is a scam.",
+   "tool": "",
+   "outcome": ""
+  },
+  {
+   "text": "I don't have that information.",
+   "when": "The customer asks a question that cannot be answered from the tools.",
    "tool": "",
    "outcome": ""
   }
  ],
- "goodbye": "Thank you. Goodbye.",
+ "goodbye": "Thank you for your time, and goodbye.",
  "close_tool": "close_call",
  "gated_words": [
   {
    "word": "recorded",
    "tool": "create_promise",
    "outcome": "success",
-   "rule": "The agent shall say that the promise is recorded only after create_promise returns ok: true."
+   "rule": "\u201cThe agent shall say that the promise is recorded only after create_promise returns ok: true.\u201d"
   }
  ],
  "conflicts": [
   {
-   "rules": "The opening must state that the call is recorded; the promise may be described as \u201crecorded\u201d only after create_promise succeeds.",
-   "literal_reading": "The required opening notice contains the gated word \u201crecorded\u201d before the promise-recording event.",
-   "resolution": "Say \u201cthis call is being recorded\u201d in the opening. This gives the required recording notice without using the gated word."
+   "rules": "\u201cThe first sentence shall ... state that the call is recorded\u201d and \u201cthe agent shall say that the promise is recorded only after create_promise returns ok: true.\u201d",
+   "literal_reading": "The required recording notice could be read as using the gated word \u201crecorded\u201d before a successful promise tool result.",
+   "resolution": "Give the required call-recording notice with the synonym \u201cbeing taped\u201d; use \u201crecorded\u201d for a promise only after create_promise succeeds."
   },
   {
-   "rules": "Brief A rule 28 says the first request shall be \u201cCan you make this payment today?\u201d; Brief B clause 4 replaces that request with asking whether the customer can pay all products today.",
-   "literal_reading": "Both could be read as requiring the first payment question, but they specify different questions.",
-   "resolution": "Use Brief B\u2019s all-products-today question first; if the customer cannot pay all products, handle each product in returned order without repeating the today question."
+   "rules": "\u201cThe agent shall ask: \u2018Am I speaking with {title} {last_name}?\u2019\u201d and \u201cshall say nothing beyond the opening sentence required by clause 1\u201d; clause 5 also says \u201cThe agent shall ask when the customer can be reached.\u201d",
+   "literal_reading": "A strict reading of \u201cnothing beyond\u201d could prohibit both the required identity question and the required callback-time question when another person answers.",
+   "resolution": "Put the identity question in the opening sentence alongside the caller identification and notice. If another person answers, ask only the required callback-time question beyond that opening, without disclosing why the bank called."
   },
   {
-   "rules": "Brief A rule 34 requires a read-back and \u201cDo you confirm?\u201d; Brief B clause 7 requires all promises to be read back together and one confirmation.",
-   "literal_reading": "The inherited rule could be read as requiring confirmation separately for each product, while Brief B requires only one combined confirmation.",
-   "resolution": "Read back all promises together and ask \u201cDo you confirm?\u201d once."
+   "rules": "Brief A: \u201cBrief A shall never use add_note.\u201d Brief B: \u201cFor each product without a promise, the agent shall call add_note.\u201d",
+   "literal_reading": "The inherited prohibition could be read to forbid the notes Brief B requires for products without promises.",
+   "resolution": "Apply the prohibition to Brief A calls on their own; for this Brief B multi-product flow, add notes only as Brief B requires, and never add notes on a transfer."
   },
   {
-   "rules": "Brief A rule 46 says Brief A shall never use add_note; Brief B clause 8 requires add_note for each product without a promise.",
-   "literal_reading": "Because Brief B extends Brief A, the inherited prohibition could be read as barring the notes Brief B requires.",
-   "resolution": "Apply Brief B\u2019s product-note requirement to Brief B calls; add no notes on transfers, as Brief B clause 10 expressly requires."
+   "rules": "Brief A: an \u201calready paid\u201d claim closes as paid, and a dispute closes as no_promise / dispute. Brief B: a paid claim or dispute on one product \u201cshall not terminate the call\u201d; the agent shall note that product and continue with the others.",
+   "literal_reading": "Brief A could be read to require ending the call immediately, while Brief B requires continuing with the other products.",
+   "resolution": "For a multi-product call, note the paid or disputed product and continue with the remaining products under Brief B; use Brief B\u2019s closing disposition."
   },
   {
-   "rules": "Brief B clause 8 requires notes for products without promises; Brief B clause 10 says no notes whatsoever may be added on any transfer.",
-   "literal_reading": "A product without a promise on a transfer call could appear to require a note and forbid one.",
-   "resolution": "On any transfer, add no notes; otherwise add the required notes for products without promises."
-  },
-  {
-   "rules": "Brief B clause 1 sets a maximum of two products; the later memo replaces that maximum with three.",
-   "literal_reading": "The extract and memo specify different maximum product counts.",
-   "resolution": "Follow the later memo: the maximum is three products."
-  },
-  {
-   "rules": "Brief B clause 11 sets three failed create_promise calls as the limit; the later memo replaces it with two failed calls.",
-   "literal_reading": "The extract and memo specify different failure limits.",
-   "resolution": "Follow the later memo: retry once after a failed call, and apply clause 11\u2019s product-level failure treatment after the second failed call."
-  },
-  {
-   "rules": "Brief A rule 37 says a second recording failure leads to a no_promise/service_error closure; Brief B clause 11 replaces that single-product failure closure with product-level handling and a note, subject to the transfer prohibition.",
-   "literal_reading": "The inherited closure instruction could be read as requiring the call to close immediately, while Brief B requires handling the failed product and continuing.",
-   "resolution": "Use Brief B\u2019s product-level handling: note the failed product when permitted and continue; do not add notes on a transfer."
+   "rules": "Brief A: after a second failed create_promise call, \u201cclose as no_promise / service_error.\u201d Brief B, as amended by its memo: after two failed calls for a product, \u201cadd_note\u201d for that product with reason service_error and retain promises recorded for other products.",
+   "literal_reading": "The inherited single-product closure could be read to require ending the whole call, contrary to Brief B\u2019s product-level handling.",
+   "resolution": "Apply Brief B\u2019s amended two-failure limit and product-level note-and-continue treatment in the multi-product flow; retain Brief A\u2019s other recording requirements where they still apply."
   }
  ],
- "self_conflict_check": [
-  {
-   "text": "opening",
-   "gated": [
-    "recorded"
-   ],
-   "before": "I\u2019m Freya Bank\u2019s digital assistant, and this call is being recorded. Am I speaking with {{title}} {{last_name}}?",
-   "after": "I\u2019m Freya Bank\u2019s digital assistant, and we are recording this call. Am I speaking with {{title}} {{last_name}}?"
-  }
- ]
+ "self_conflict_check": []
 }

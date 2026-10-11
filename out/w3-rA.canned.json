@@ -1,95 +1,134 @@
 {
- "opening": "Hello, this is Freya Bank's digital assistant. The call is being recorded. Am I speaking with {{title}} {{last_name}}?",
+ "opening": "Hello, this is Freya Bank's digital assistant, and we record this call. Am I speaking with {{title}} {{last_name}}?",
  "lines": [
   {
    "text": "I am sorry for your loss.",
-   "when": "When the person answering states that the customer has died",
-   "tool": "",
-   "outcome": "not_reached/deceased"
-  },
-  {
-   "text": "The questions protect your account.",
-   "when": "When the customer does not wish to answer the security questions, said once before a final refusal",
+   "when": "The person answering says the customer has died.",
    "tool": "",
    "outcome": ""
   },
   {
-   "text": "Please say the month as a word.",
-   "when": "When verify_identity returns a hint that the day and month were swapped",
-   "tool": "verify_identity",
+   "text": "Please use the mobile app or a branch.",
+   "when": "The customer reaches the third wrong identity answer.",
+   "tool": "",
    "outcome": ""
   },
   {
-   "text": "Please use the mobile app or a branch for help with your account.",
-   "when": "After three wrong answers to security questions, before closing",
+   "text": "I am calling from the collections team about a late payment.",
+   "when": "After identity is verified and the account disclosure is made.",
    "tool": "",
-   "outcome": "not_verified/failed"
+   "outcome": ""
   },
   {
-   "text": "I am calling from the collections team about a late payment on your {{product}}.",
-   "when": "After identity is verified and account info retrieved",
-   "tool": "get_account",
-   "outcome": "success"
+   "text": "I am sorry to hear that.",
+   "when": "The customer mentions illness, a death in the family, or job loss.",
+   "tool": "",
+   "outcome": ""
   },
   {
    "text": "Payments can take one business day to appear.",
-   "when": "In response to the customer saying \"I already paid\"",
+   "when": "The customer says they already paid the past-due amount.",
    "tool": "",
-   "outcome": "paid"
+   "outcome": ""
+  },
+  {
+   "text": "I am Freya Bank's digital assistant.",
+   "when": "The customer asks whether the agent is a robot or AI.",
+   "tool": "",
+   "outcome": ""
+  },
+  {
+   "text": "You can verify this call by phoning Freya Bank's customer service number.",
+   "when": "The customer asks whether this is a scam.",
+   "tool": "",
+   "outcome": ""
+  },
+  {
+   "text": "I don't have that information.",
+   "when": "The customer asks a question that cannot be answered from the tools.",
+   "tool": "",
+   "outcome": ""
+  },
+  {
+   "text": "I could not record the promise.",
+   "when": "The second attempt to record the promise fails.",
+   "tool": "",
+   "outcome": ""
   },
   {
    "text": "You will receive a text message confirming this promise.",
-   "when": "After create_promise returns ok: true",
+   "when": "A promise has been recorded.",
    "tool": "create_promise",
    "outcome": "success"
-  },
-  {
-   "text": "I cannot record that amount. The minimum payment is the lowest I can accept.",
-   "when": "When the customer proposes an amount below the floor and does not accept the floor",
-   "tool": "",
-   "outcome": "no_promise/refused"
-  },
-  {
-   "text": "The customer can verify the call by phoning Freya Bank's customer service number.",
-   "when": "In response to \"Is this a scam?\"",
-   "tool": "",
-   "outcome": ""
   }
  ],
  "goodbye": "Thank you for your time. Goodbye.",
  "close_tool": "close_call",
  "gated_words": [
   {
-   "word": "promise",
-   "tool": "create_promise",
-   "outcome": "success",
-   "rule": "The agent shall say that the promise is recorded only after create_promise returns ok: true."
-  },
-  {
    "word": "collections",
-   "tool": "",
-   "outcome": "",
-   "rule": "Until identity has been verified, the agent shall not say \"collections\"."
+   "tool": "verify_identity",
+   "outcome": "success",
+   "rule": "\u201cUntil identity has been verified, the agent shall not say \u2018collections\u2019\u201d"
   },
   {
    "word": "debt",
-   "tool": "",
-   "outcome": "",
-   "rule": "Until identity has been verified, the agent shall not say \"debt\"."
+   "tool": "verify_identity",
+   "outcome": "success",
+   "rule": "\u201cUntil identity has been verified, the agent shall not say \u2026 \u2018debt\u2019\u201d"
   },
   {
    "word": "payment",
-   "tool": "",
-   "outcome": "",
-   "rule": "Until identity has been verified, the agent shall not say \"payment\"."
+   "tool": "verify_identity",
+   "outcome": "success",
+   "rule": "\u201cUntil identity has been verified, the agent shall not say \u2026 \u2018payment\u2019\u201d"
   },
   {
-   "word": "product",
-   "tool": "",
-   "outcome": "",
-   "rule": "Until identity has been verified, the agent shall not say the product."
+   "word": "credit card ending 4821",
+   "tool": "verify_identity",
+   "outcome": "success",
+   "rule": "\u201cUntil identity has been verified, the agent shall not say \u2026 the product\u201d"
+  },
+  {
+   "word": "personal loan",
+   "tool": "verify_identity",
+   "outcome": "success",
+   "rule": "\u201cUntil identity has been verified, the agent shall not say \u2026 the product\u201d"
+  },
+  {
+   "word": "car loan",
+   "tool": "verify_identity",
+   "outcome": "success",
+   "rule": "\u201cUntil identity has been verified, the agent shall not say \u2026 the product\u201d"
+  },
+  {
+   "word": "recorded",
+   "tool": "create_promise",
+   "outcome": "success",
+   "rule": "\u201cThe agent shall say that the promise is recorded only after create_promise returns ok: true.\u201d"
   }
  ],
- "conflicts": [],
+ "conflicts": [
+  {
+   "rules": "Clause 1: \u201cstate that the call is recorded\u201d; clause 37: \u201csay that the promise is recorded only after create_promise returns ok: true.\u201d",
+   "literal_reading": "The required opening notice uses \u201crecorded\u201d before the event that permits that word.",
+   "resolution": "Use \u201cwe record this call\u201d in the opening: it gives the required recording notice without saying the gated word \u201crecorded.\u201d"
+  },
+  {
+   "rules": "Clause 5: \u201csay nothing beyond the opening sentence required by clause 1\u201d; clause 5: \u201cThe agent shall ask when the customer can be reached\u201d; clause 2: \u201cThe agent shall ask: \u2018Am I speaking with {title} {last_name}?\u2019\u201d",
+   "literal_reading": "The identity question and callback-availability question go beyond clause 1\u2019s opening sentence.",
+   "resolution": "Give the clause 1 notice, ask the clause 2 identity question, and, if another person answers, ask only the required callback-availability question without disclosing why the bank is calling."
+  },
+  {
+   "rules": "Clause 5: \u201cThe agent shall ask when the customer can be reached\u201d; clause 9: \u201cask nothing else\u201d when the customer has died.",
+   "literal_reading": "The callback question required by clause 5 would violate clause 9\u2019s instruction to ask nothing else.",
+   "resolution": "In the deceased-customer situation, say the required expression of sympathy and ask no questions."
+  },
+  {
+   "rules": "Clause 5: \u201csay nothing beyond the opening sentence required by clause 1\u201d; clause 4: when asked whether the agent is a robot or AI, \u201cstate that it is Freya Bank's digital assistant and continue.\u201d",
+   "literal_reading": "Answering the robot or AI question after the opening adds speech beyond what clause 5 permits for another person answering.",
+   "resolution": "If asked, give only the required identification, \u201cI am Freya Bank's digital assistant,\u201d and do not disclose why the bank is calling."
+  }
+ ],
  "self_conflict_check": []
 }

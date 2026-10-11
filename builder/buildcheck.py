@@ -163,7 +163,8 @@ def problems(wf, api=None, selftest=None):
         pre, post = t.get("pre_process_code") or "", t.get("post_process_code") or ""
         if "known_ids" in post and ("_known" in post or "known_ids'] =" in post):
             lookup_has_known = True
-        is_write = not any(x.startswith(("get_", "check_", "lookup_", "verify_")) for x in (name, path))
+        # a bank write = an operation of the tool API file (code-only helper tools of the builder are not bank writes)
+        is_write = (not ops or name in ops or path in ops) and not any(x.startswith(("get_", "check_", "lookup_", "verify_")) for x in (name, path))
         prod_ids = [f for f in body if ID_FIELD.search(f) and not CUSTOMER.search(f)]
         if is_write and prod_ids:
             id_writes.append(name)

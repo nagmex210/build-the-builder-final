@@ -1,89 +1,146 @@
 {
- "opening": "Hello, I am Freya Bank's digital assistant and this call is recorded. Am I speaking with {{title}} {{last_name}}?",
+ "opening": "I am a digital assistant calling from Freya Bank, and we record this call. Am I speaking with {{title}} {{last_name}}?",
  "lines": [
   {
+   "text": "I am Freya Bank's digital assistant.",
+   "when": "The customer asks whether the caller is a robot or an AI.",
+   "tool": "",
+   "outcome": ""
+  },
+  {
    "text": "I am sorry for your loss.",
-   "when": "When the person answering says the customer has died",
+   "when": "Someone says the customer has died; ask nothing further.",
    "tool": "",
    "outcome": ""
   },
   {
-   "text": "The questions protect your account.",
-   "when": "If the customer does not want to answer the security questions, explain once",
+   "text": "Please use the mobile app or visit a branch.",
+   "when": "The identity check ends after three counted wrong answers.",
    "tool": "",
    "outcome": ""
   },
   {
-   "text": "Please say the month as a word.",
-   "when": "If the verify_identity tool returns a day_month_swapped hint after a date answer",
-   "tool": "verify_identity",
-   "outcome": "empty"
-  },
-  {
-   "text": "Please use the mobile app or visit a branch for this.",
-   "when": "After three wrong answers to security questions, before closing as not_verified/failed",
+   "text": "These questions protect your account.",
+   "when": "The customer first declines a security question or asks what the call is about instead of answering; explain only once.",
    "tool": "",
    "outcome": ""
   },
   {
-   "text": "I am calling from the collections team about a late payment.",
-   "when": "After both identity questions pass and get_account is called",
-   "tool": "get_account",
-   "outcome": "success"
+   "text": "I am sorry you are going through this.",
+   "when": "The customer mentions illness, a death in the family or job loss.",
+   "tool": "",
+   "outcome": ""
+  },
+  {
+   "text": "You can change your promise in the mobile app.",
+   "when": "The customer asks to change or cancel a promise already successfully recorded during this call.",
+   "tool": "",
+   "outcome": ""
+  },
+  {
+   "text": "I could not record your promise.",
+   "when": "Both permitted create_promise attempts for a product fail; retain any other successful promises and note this product's service error unless transferring.",
+   "tool": "",
+   "outcome": ""
   },
   {
    "text": "You will receive a text message confirming this promise.",
-   "when": "After a recorded promise (create_promise returns ok:true)",
+   "when": "A promise is successfully recorded.",
    "tool": "create_promise",
    "outcome": "success"
   },
   {
    "text": "Payments can take one business day to appear.",
-   "when": "When the customer says 'I already paid'",
+   "when": "The customer says they have already paid the past-due amount for a product; continue with other products.",
    "tool": "",
    "outcome": ""
   },
   {
-   "text": "I do not have that information.",
-   "when": "When the customer asks a question the tools cannot answer",
-   "tool": "",
-   "outcome": ""
-  },
-  {
-   "text": "You can verify the call by phoning Freya Bank's customer service number.",
-   "when": "When the customer asks 'Is this a scam?'",
+   "text": "You can verify this call by phoning Freya Bank's customer service number.",
+   "when": "The customer asks whether the call is a scam.",
    "tool": "",
    "outcome": ""
   }
  ],
- "goodbye": "Thank you for your time. Goodbye.",
+ "goodbye": "Thank you for your time, and goodbye.",
  "close_tool": "close_call",
  "gated_words": [
+  {
+   "word": "recorded",
+   "tool": "create_promise",
+   "outcome": "success",
+   "rule": "Say the promise is recorded only after `create_promise` returns `ok: true`."
+  },
   {
    "word": "collections",
    "tool": "verify_identity",
    "outcome": "success",
-   "rule": "Do not say 'collections' before identity is verified"
+   "rule": "Do not say \"collections\", \"debt\", \"payment\" or the product before identity is verified; both security questions must pass."
   },
   {
    "word": "debt",
    "tool": "verify_identity",
    "outcome": "success",
-   "rule": "Do not say 'debt' before identity is verified"
+   "rule": "Do not say \"collections\", \"debt\", \"payment\" or the product before identity is verified; both security questions must pass."
   },
   {
    "word": "payment",
    "tool": "verify_identity",
    "outcome": "success",
-   "rule": "Do not say 'payment' before identity is verified"
-  },
-  {
-   "word": "product",
-   "tool": "verify_identity",
-   "outcome": "success",
-   "rule": "Do not say the product before identity is verified"
+   "rule": "Do not say \"collections\", \"debt\", \"payment\" or the product before identity is verified; both security questions must pass."
   }
  ],
- "conflicts": [],
+ "conflicts": [
+  {
+   "rules": "A1: \"say ... that the call is recorded\"; A37: \"Say the promise is recorded only after `create_promise` returns `ok: true`.\"",
+   "literal_reading": "A word-level reviewer could prohibit \"recorded\" in the opening, before any promise succeeds.",
+   "resolution": "Use \"we record this call\" in the opening. This preserves the recording notice without using \"recorded\" before a successful promise write."
+  },
+  {
+   "rules": "A5: \"Say nothing beyond the opening sentence of rule 1\" and \"Ask when the customer can be reached\"; A2 requires the named-customer question; A9 requires sympathy; A47 requires thanks and goodbye.",
+   "literal_reading": "An absolute ban on speech beyond the first sentence prohibits the required questions, sympathy and closing.",
+   "resolution": "There is no simultaneous literal solution to the absolute ban. The operational reading must limit it to additional disclosure about the reason for calling or the account, while permitting the expressly required questions, sympathy and closing."
+  },
+  {
+   "rules": "A11: \"Ask two security questions\"; A12: \"A wrong answer may be asked again\"; A13 requires a swapped-date retry.",
+   "literal_reading": "If \"two\" counts utterances rather than distinct security fields, any retry exceeds the limit.",
+   "resolution": "Use exactly two distinct security fields, in the required order. Retries repeat the current field rather than introducing another security question."
+  },
+  {
+   "rules": "A12: \"Three wrong answers in total end the check\"; A13: \"That retry does not count as a wrong answer.\"",
+   "literal_reading": "Counting every unsuccessful answer as wrong would include a swapped-date clarification that A13 excludes.",
+   "resolution": "Count only chargeable wrong answers toward the three-answer limit. A swapped-date clarification is expressly excluded; an unreadable date rejected without a counted wrong answer is also excluded."
+  },
+  {
+   "rules": "A26: \"offer the floor, once\" and \"Attempt 2 may name the floor again, on the deadline\"; A27: \"offer the floor once\"; A31: \"Do not repeat an offer the customer already refused.\"",
+   "literal_reading": "A strict amount-only interpretation prohibits the later floor offer that the persuasion rules permit.",
+   "resolution": "Make the initial floor concession only once. Treat a complete offer as an amount-and-date pair: a later permitted attempt may use the floor with a different date, but must not repeat an already-refused pair or exceed the product's attempt limit."
+  },
+  {
+   "rules": "B7: \"call `create_promise` once per product\"; A37: \"If it fails, try once more\"; B11: \"If one `create_promise` fails twice\".",
+   "literal_reading": "Exactly one tool invocation per product prohibits the expressly required second invocation after failure.",
+   "resolution": "There is no simultaneous literal solution if \"once\" counts invocations. B11 expressly establishes two possible attempts, so treat B7 as one logical promise creation per product: retry once only after failure, and never retry a successful creation."
+  },
+  {
+   "rules": "B2: \"State every late product ... before asking for anything\"; A2 requires the opening identity question; A11 requires security questions; A1 prohibits product disclosure before verification.",
+   "literal_reading": "An unrestricted \"before asking for anything\" requires product disclosure before the questions needed to permit that disclosure.",
+   "resolution": "There is no simultaneous literal solution with an unrestricted reading. Apply B2 within the post-verification account discussion: complete identity checks, retrieve the account, state every late product, then ask about paying."
+  },
+  {
+   "rules": "B8: \"For each product without a promise call `add_note`\"; B9: \"Note it and continue with the others\"; B10: \"On any transfer ... add no notes at all, before or after it.\"",
+   "literal_reading": "Writing notes immediately can violate the retrospective no-notes requirement if a later product leads to a transfer.",
+   "resolution": "Keep pending reasons in conversation state and defer all add_note calls until the non-transfer closing path is settled. Discard pending notes on any transfer. This requires reading \"Note it and continue\" as retaining the reason, not immediately invoking add_note."
+  },
+  {
+   "rules": "B7: \"ask for one confirmation\"; A35: \"check the new value ... and read it back again\"; A34 permits creation \"only after a clear yes\".",
+   "literal_reading": "Exactly one confirmation question for the entire call would prevent confirmation of terms changed after the first read-back.",
+   "resolution": "Seek one joint confirmation for each current set of promises, rather than separate confirmations per product. Changed terms replace the previous set and require a fresh joint read-back and clear yes."
+  },
+  {
+   "rules": "A19: \"A promise date must be today or later\"; A30: \"propose the last business day of this week. If today is that day, propose the last business day of next week.\"",
+   "literal_reading": "On a weekend, or a holiday after the week's last business day, A30 specifies a date already in the past and its stated exception does not apply.",
+   "resolution": "No simultaneous literal solution is specified for those call dates. The bank must clarify the scheduling rule; the agent must not record a past date."
+  }
+ ],
  "self_conflict_check": []
 }
