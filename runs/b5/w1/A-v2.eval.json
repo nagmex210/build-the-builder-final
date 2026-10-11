@@ -1,0 +1,114 @@
+{
+ "workflow_id": "a4f4a72b-9594-4af5-a2b7-6311a0c14210",
+ "passed": 3,
+ "total": 4,
+ "invalid": 0,
+ "rows": [
+  {
+   "id": "PUB-01",
+   "style": null,
+   "pass": true,
+   "failed": [],
+   "call_id": "20b9c83c-cf1b-469a-8db8-e853ada9c1dc",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 6,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "20b9c83c-cf1b-469a-8db8-e853ada9c1dc",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-04",
+   "style": "asks_back",
+   "pass": true,
+   "failed": [],
+   "call_id": "ac8b1d89-6443-44f3-a530-7b7863338926",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 8,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "ac8b1d89-6443-44f3-a530-7b7863338926",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-05",
+   "style": "talkative",
+   "pass": false,
+   "failed": [
+    "conversation: The support team was offered twice rather than once."
+   ],
+   "call_id": "f09dd73a-d912-4dfe-b28a-27ad80381bfe",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 8,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "f09dd73a-d912-4dfe-b28a-27ad80381bfe",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-08",
+   "style": "in_words",
+   "pass": true,
+   "failed": [],
+   "call_id": "3241e4c9-3ffc-4d89-9039-dd932449851d",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 5,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "3241e4c9-3ffc-4d89-9039-dd932449851d",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  }
+ ]
+}

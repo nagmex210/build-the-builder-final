@@ -1,0 +1,538 @@
+{
+ "workflow_id": "a65e2026-61b2-42a6-9345-627cd78adaee",
+ "passed": 3,
+ "total": 10,
+ "invalid": 0,
+ "rows": [
+  {
+   "id": "PUB-01",
+   "style": "in_words",
+   "pass": true,
+   "failed": [],
+   "call_id": "6e09c3cd-4d74-46a0-a124-59e047dfbef6",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 6,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "6e09c3cd-4d74-46a0-a124-59e047dfbef6",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-02",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "conversation: No callback was scheduled for the next business day, October 15, 2026, at 11:00."
+   ],
+   "call_id": "383679c4-c88e-4a42-89ef-e38c27f725c4",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "schedule_callback",
+    "close_call"
+   ],
+   "turns": 3,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "383679c4-c88e-4a42-89ef-e38c27f725c4",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-03",
+   "style": "pieces",
+   "pass": false,
+   "failed": [
+    "outcome ('promise', None), expected ('not_verified', 'failed')",
+    "conversation: Verification continued after the third wrong answer, the agent disclosed the amount and product, never directed the customer to the app or a branch, and falsely claimed identity verification and a recorded payment promise without supporting tool results."
+   ],
+   "call_id": "244776e0-e891-41d0-832e-8624d0a28a9c",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "close_call"
+   ],
+   "turns": 13,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "244776e0-e891-41d0-832e-8624d0a28a9c",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-04",
+   "style": "in_words",
+   "pass": true,
+   "failed": [],
+   "call_id": "0e2b92d5-375f-405f-bf3f-1c702ba23a9f",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 7,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "0e2b92d5-375f-405f-bf3f-1c702ba23a9f",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-05",
+   "style": "asks_back",
+   "pass": true,
+   "failed": [],
+   "call_id": "a027b96a-5c89-4161-a995-d0f0a2f72355",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 6,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "a027b96a-5c89-4161-a995-d0f0a2f72355",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-06",
+   "style": "corrects",
+   "pass": false,
+   "failed": [
+    "promises [('p1', 250.0, '2026-10-16')], expected [('p1', 637.5, '2026-10-16')]",
+    "conversation: The agent offered an incorrect minimum payment of 250.00 instead of 637.50 and recorded a promise for 250.00 rather than the required 637.50 on Friday 16 October."
+   ],
+   "call_id": "a589d4b1-77b9-4d34-a664-1d1d141d18f6",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 8,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "a589d4b1-77b9-4d34-a664-1d1d141d18f6",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-07",
+   "style": "in_words",
+   "pass": false,
+   "failed": [
+    "promises [('p1', 540.0, '2026-11-02')], expected [('p1', 540.0, '2026-10-27')]",
+    "conversation: The agent did not offer Tuesday 27 October as the next business day after 26 October, and no promise was recorded for Tuesday 27 October within the early-band deadline."
+   ],
+   "call_id": "9dc1d3dd-6189-4516-80c8-a86648df4bca",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 8,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "9dc1d3dd-6189-4516-80c8-a86648df4bca",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-08",
+   "style": "asks_back",
+   "pass": true,
+   "failed": [],
+   "call_id": "bcfcc403-89a7-4f7b-8861-f7f1656e91b5",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 7,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "bcfcc403-89a7-4f7b-8861-f7f1656e91b5",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-09",
+   "style": "pieces",
+   "pass": false,
+   "failed": [
+    "outcome ('no_promise', 'refused'), expected ('transferred', 'restructuring')",
+    "transfers [], expected [{'queue': 'restructuring'}]",
+    "conversation: The agent never called transfer_to_agent with queue restructuring and described its own payment plan by offering a reduced payment of 500."
+   ],
+   "call_id": "1615d65c-380a-4f6a-93b0-a8f2543c46eb",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 13,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "1615d65c-380a-4f6a-93b0-a8f2543c46eb",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-10",
+   "style": "in_words",
+   "pass": true,
+   "failed": [],
+   "call_id": "8a6bb11d-5f71-4337-ae38-c61ecc814b8d",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 7,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "8a6bb11d-5f71-4337-ae38-c61ecc814b8d",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-01",
+   "style": "pieces",
+   "pass": true,
+   "failed": [],
+   "call_id": "2fd5ade2-16d2-496a-baad-15acb5b66b3d",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 6,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "2fd5ade2-16d2-496a-baad-15acb5b66b3d",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-02",
+   "style": "corrects",
+   "pass": true,
+   "failed": [],
+   "call_id": "76fdcd27-286c-4b91-975f-3cf27b5021e5",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "schedule_callback",
+    "close_call"
+   ],
+   "turns": 3,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "76fdcd27-286c-4b91-975f-3cf27b5021e5",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-03",
+   "style": "pieces",
+   "pass": true,
+   "failed": [],
+   "call_id": "6641f04d-7217-4c81-8d9b-1e6f73636605",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "close_call"
+   ],
+   "turns": 4,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "6641f04d-7217-4c81-8d9b-1e6f73636605",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-04",
+   "style": "in_words",
+   "pass": true,
+   "failed": [],
+   "call_id": "c047f642-0255-41b0-959a-fef490d618e3",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 7,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "c047f642-0255-41b0-959a-fef490d618e3",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-05",
+   "style": "in_words",
+   "pass": true,
+   "failed": [],
+   "call_id": "f0f5c603-ef51-4828-a380-0415fe782fd4",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 6,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "f0f5c603-ef51-4828-a380-0415fe782fd4",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-06",
+   "style": "corrects",
+   "pass": false,
+   "failed": [
+    "promises [('p1', 450.0, '2026-10-15')], expected [('p1', 637.5, '2026-10-16')]",
+    "conversation: The agent did not offer the minimum payment of 637.50 once with the note that the rest stays overdue, and recorded a promise for 450.00 on Thursday 15 October rather than 637.50 on Friday 16 October."
+   ],
+   "call_id": "f28b3520-f9d4-44df-9e53-c63da57ef071",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 8,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "f28b3520-f9d4-44df-9e53-c63da57ef071",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-07",
+   "style": "talkative",
+   "pass": true,
+   "failed": [],
+   "call_id": "be937872-1162-447d-9526-6dc9feceb764",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 9,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "be937872-1162-447d-9526-6dc9feceb764",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-08",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "conversation: The agent did not say that payments can take one business day to appear."
+   ],
+   "call_id": "0221992f-1553-4c2c-93b0-eb8e1ee867f6",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 6,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "0221992f-1553-4c2c-93b0-eb8e1ee867f6",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-09",
+   "style": "talkative",
+   "pass": true,
+   "failed": [],
+   "call_id": "3139cbb4-cedc-479a-8a3b-f648637a50c6",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "transfer_to_agent",
+    "close_call"
+   ],
+   "turns": 6,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "3139cbb4-cedc-479a-8a3b-f648637a50c6",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-10",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "conversation: The check requiring exactly one promise in the ledger after the retry fails because the retry has no tool result confirming successful creation."
+   ],
+   "call_id": "2923dd67-69cd-495c-ab5b-45dedea3348c",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 7,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "2923dd67-69cd-495c-ab5b-45dedea3348c",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  }
+ ]
+}

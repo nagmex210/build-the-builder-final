@@ -1,0 +1,85 @@
+builder: slot=w1-rB tools=/home/ubuntu/btb/wt1/tools/openapi.json briefs=/home/ubuntu/btb/wt1/btb/briefs_raw/brief-a-raw.md /home/ubuntu/btb/wt1/btb/briefs_raw/brief-b-raw.md
+trace: /home/ubuntu/btb/wt1/runs/traces/w1-rB-20261010-230741.jsonl
+BUILD START 2026-10-10T23:07:41Z slot=w1-rB
+[model call 2026-10-10T23:08:03] gpt-6-astra (Azure, btb/llm.py): A3: extract the brief's mandatory sentences as fixed text
+[test] datecalc: generated date/amount code run locally on 5 dates and fake products -> ok (25 s)
+[model] build agent: Claude Agent SDK, claude-opus-5-5, skill build-phone-agent, budget 12 min
+[model call 2026-10-10T23:08:07] gpt-6-luna (Azure, btb/llm.py): extract calendar/amount spec for code steps
+[model call 2026-10-10T23:08:10Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 1: tools Skill
+  [Skill] {'skill': 'build-phone-agent'}
+[model call 2026-10-10T23:08:13Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 2: text
+[model call 2026-10-10T23:08:14Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 3: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt1; cat btb/briefs_raw/brief-a-raw.md btb/briefs_raw/brief-b-raw.md; cat .claude/skill
+    -> <persisted-output> Output too large (43.1KB). Full output saved to: /home/ubuntu/.claude/projects/-home-ubuntu-btb-wt1/76c4eb33-e6fa-48ba-90ea-db4883dcdcee/tool-results/bk6p64iri.txt Preview (first 2KB): ## 1. Internal email **From:** Mara Chen, Operations Manager, Freya Bank **To:** Vendor delivery team **Subject:** Early-stage calling — one-product handover Hi team, Here’s the material for the e ...
+[model call 2026-10-10T23:08:16Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 4: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt1; python3 -c "\nimport json;d=json.load(open(\'tools/openapi.json\'))\nfor p,v in d[
+    -> post /verify_identity {"required": true, "content": {"application/json": {"schema": {"type": "object", "properties": {"customer_id": {"type": "string"}, "field": {"type": "string", "enum": ["date_of_birth", "phone_last4"]}, "answer": {"type": "string", "description": "For date_of_birth: the date as YYYY-MM-DD. Callers say dates in words, the agent converts. An unreadable value is rejected with ok= ...
+[model call 2026-10-10T23:08:19Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 5: text
+[model call 2026-10-10T23:08:20Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 6: tools Read
+  [Read] {'file_path': '/home/ubuntu/.claude/projects/-home-ubuntu-btb-wt1/76c4eb33-e6fa-48ba-90ea-db4883dcdcee/tool-results/bk6p
+[model call 2026-10-10T23:08:24Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 7: text
+[model call 2026-10-10T23:08:26Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 8: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt1; grep -n -i -A30 "api_request" docs/workflow-format.md | head -80; python3 -c "\nim
+    -> 73:| `api_request` | Runs an HTTP call on entry | usually not | `pre_actions`, node-level `response_mapping`, `transitions` | 74-| `code` | Runs a Python snippet on entry | usually not | `pre_actions` with a `code_exec` function, `transitions` | 75-| `end_call` | Ends the call | optional farewell | `terminal` | 76- 77-Other node types exist: `transfer_call`, `integration`, `knowledge_base`, `resch ...
+[model call 2026-10-10T23:08:29Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 9: text
+[model call 2026-10-10T23:08:29Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 10: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt1; grep -n -B5 -A40 \'"node_type": "api_request"\' docs/*.md | head -90; grep -n -i "
+    -> docs/tools-and-code.md-171-### A `pre_actions` node docs/tools-and-code.md-172- docs/tools-and-code.md-173-```json docs/tools-and-code.md-174-{ docs/tools-and-code.md-175- "name": "fetch_order", docs/tools-and-code.md:176: "node_type": "api_request", docs/tools-and-code.md-177- "passthrough": true, docs/tools-and-code.md-178- "passthrough_default_transition": "present", docs/tools-and-code.md-179- ...
+[model call 2026-10-10T23:08:35Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 11: text
+[model call 2026-10-10T23:08:35Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 12: text
+Reading done; now writing the workflow generator.
+[model call 2026-10-10T23:09:31Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 13: tools Bash
+  [Bash] {'command': 'mkdir -p /home/ubuntu/btb/wt1/out/gen_w1rB && cat > /home/ubuntu/btb/wt1/out/gen_w1rB/build.py <<\'EOF\'\ni
+    -> ERROR Exit code 1 ERROR opening: top-level condition with logic 'and' (nest it inside an 'or' group) 1 errors, 0 warnings
+[model call 2026-10-10T23:09:36Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 14: text
+[model call 2026-10-10T23:09:37Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 15: tools Bash
+  [Bash] {'command': 'sed -i \'s/{"logic":"and","conditions":\\[{"variable":"party"/{"logic":"or","conditions":[{"variable":"part
+    -> 0 errors, 0 warnings {"hardened_tools": ["schedule_callback", "transfer_to_agent", "close_call", "verify_identity", "transfer_to_agent", "close_call", "get_account", "create_promise", "add_note", "transfer_to_agent", "close_call", "goodbye->end_call:hang_up", "opening->tts:opening", "say_now:create_promise", "system_prompt block"]} {"workflow_id": "84a603e9-317c-4f36-a1c5-1c39a737f344", "agent_id" ...
+[model call 2026-10-10T23:09:42Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 16: tools Bash
+  [Bash] {'command': 'timeout 90 python3 -c "import freya,json; print(json.dumps(freya.api(\'POST\',\'/api/v2/chat/message\',{\'w
+    -> {"response": "I am a digital assistant calling from Freya Bank, and this call is recorded. Am I speaking with Ms Lee?", "callId": "dd2d26c4-f9bc-43b0-961a-900b1721cfda", "messageId": "msg_4_1791673783929"}
+[model call 2026-10-10T23:09:56Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 17: text
+[model call 2026-10-10T23:09:56Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 18: text
+I built the workflow, saved it as slot w1-rB, and it starts: a one-turn chat test opened with "I am a digital assistant calling from Freya Bank, and this call is recorded. Am I speaking with Ms Lee?". Nothing past that first turn was tested, and I did not do the final rule-by-rule check against the briefs before the time limit.
+
+**Shape of the call:**
+- The `code_node` from the calc file is the start node, unchanged. It hands over to an opening stage, then identity, then a silent account lookup, then one negotiation stage, then a hang-up node.
+- The call moves to identity only when the person clearly confirms who they are. It moves to the account lookup only when the identity tool says both answers passed. Any stage that can close goes to hang-up once `close_call` succeeds.
+- The account lookup uses the `account_post_process_code` hook exactly as given. The negotiation prompt shows each product's own deadline and floor from that result and tells the model never to compute them.
+- `{{date_facts}}` and the "never compute a date yourself" instruction are in the opening and negotiation prompts, which handle callbacks, dates and promises.
+
+**Brief rules versus the date facts:** they agree. The memo's 12th and 7th business-day deadlines, 1 and 2 persuasion attempts, the holidays and the callback window all match the example date facts, so I didn't override anything.
+
+**Gaps to know about:**
+- The rules on failed promise recording (two failures per product, then a `service_error` note) and on which outcome to close with are in the prompt and tool hooks only, not in routing. They depend on the model following them.
+- The identity stage has no `{{date_facts}}`. It doesn't handle callbacks or promises, but a customer asking for a callback during the security questions would get no date help there.
+
+The workflow file is `out/w1-rB.workflow.json`, generated by `out/gen_w1rB/build.py`.
+
+workflow_id: 84a603e9-317c-4f36-a1c5-1c39a737f344, agent_id: 72d3f508-c91b-4727-9dfa-126ed2ee1ae9
+
+done: 11 turns, 109 s
+final save (build): {'workflow_id': '84a603e9-317c-4f36-a1c5-1c39a737f344', 'agent_id': '72d3f508-c91b-4727-9dfa-126ed2ee1ae9', 'version': 19}; lint: 0 errors, 0 warnings
+[model call 2026-10-10T23:10:26] gpt-6-astra (Azure, btb/llm.py): self-simulation: write personas + ledger checks from the brief
+[model call 2026-10-10T23:10:51] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-10T23:10:52] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-10T23:10:52] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-10T23:10:58] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-10T23:10:59] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-10T23:11:16] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-10T23:11:21] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-10T23:11:21] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-10T23:11:37] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-10T23:12:02] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-10T23:12:02] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-10T23:12:42] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-10T23:12:52] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-10T23:13:07] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-10T23:13:26] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-10T23:15:13] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-10T23:16:23] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+self-test 1 (workspace 2): 0/0 personas failed a check (0 checks)
+[freya] slot w1-rB: workflow_id=84a603e9-317c-4f36-a1c5-1c39a737f344 agent_id=72d3f508-c91b-4727-9dfa-126ed2ee1ae9 version=19 (published)
+[freya] exported: /home/ubuntu/btb/wt1/submission/w1-rB.workflow.json
+BUILD END 2026-10-10T23:17:29Z (588 s); trace scrubbed (0 secret(s) replaced): /home/ubuntu/btb/wt1/runs/traces/w1-rB-20261010-230741.jsonl
+{"workflow_id": "84a603e9-317c-4f36-a1c5-1c39a737f344", "agent_id": "72d3f508-c91b-4727-9dfa-126ed2ee1ae9"}

@@ -1,0 +1,192 @@
+{
+ "workflow_id": "731d191e-cf39-48d6-8350-c40ed296be2f",
+ "passed": 1,
+ "total": 3,
+ "invalid": 0,
+ "rows": [
+  {
+   "id": "PUB-11",
+   "style": "in_words",
+   "pass": true,
+   "failed": [],
+   "call_id": "5c9ff581-0318-40ad-afdd-04a777e6ea2f",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 7,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "5c9ff581-0318-40ad-afdd-04a777e6ea2f",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-12",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "outcome ('no_promise', 'refused'), expected ('promise', None)",
+    "notes [('p1', 'service_error'), ('p2', 'refused'), ('p2', 'refused'), ('p3', 'refused')], expected [('p2', 'refused'), ('p3', 'refused')]",
+    "conversation: The personal loan received two refused notes instead of one, and the car loan received multiple persuasion attempts instead of one."
+   ],
+   "call_id": "e02d56e8-5610-41b7-adc7-bf9613a62296",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "add_note",
+    "create_promise",
+    "add_note",
+    "add_note",
+    "create_promise",
+    "add_note",
+    "close_call"
+   ],
+   "turns": 11,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "e02d56e8-5610-41b7-adc7-bf9613a62296",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-13",
+   "style": "corrects",
+   "pass": false,
+   "failed": [
+    "promises [('p1', 300.0, '2026-10-23'), ('p2', 900.0, '2026-11-02')], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]",
+    "conversation: The credit card was recorded for 23 October instead of 30 October, the loan was recorded for 2 November instead of its 23 October deadline, and the read-back did not name both required dates."
+   ],
+   "call_id": "1b048a35-c0f8-4a1e-a9f4-4cc4514d3f78",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 10,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "1b048a35-c0f8-4a1e-a9f4-4cc4514d3f78",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-11",
+   "style": "pieces",
+   "pass": true,
+   "failed": [],
+   "call_id": "7c3e69f3-d917-47ec-9b8d-36f308bd83d3",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 9,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "7c3e69f3-d917-47ec-9b8d-36f308bd83d3",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-12",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "conversation: The car loan received two persuasion attempts after the initial refusal, rather than the required one for the early band."
+   ],
+   "call_id": "836684ee-4e3c-41dd-b12c-6a15e1fb9483",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "add_note",
+    "add_note",
+    "close_call"
+   ],
+   "turns": 14,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "836684ee-4e3c-41dd-b12c-6a15e1fb9483",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-13",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "promises [('p1', 900.0, '2026-10-23'), ('p2', 300.0, '2026-10-23')], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]",
+    "conversation: The credit card was recorded for 23 October instead of 30 October, the read-back did not name both required dates, and the agent claimed the agreement was recorded even though the recorded amounts were swapped between products."
+   ],
+   "call_id": "66a0d21c-b9a6-41e9-bb99-efcbf921850c",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 8,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "66a0d21c-b9a6-41e9-bb99-efcbf921850c",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  }
+ ]
+}

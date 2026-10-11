@@ -1,0 +1,551 @@
+{
+ "workflow_id": "d9858a0c-4b0b-4d8c-b9f6-cc585e8c3457",
+ "passed": 2,
+ "total": 10,
+ "invalid": 0,
+ "rows": [
+  {
+   "id": "PUB-01",
+   "style": "asks_back",
+   "pass": true,
+   "failed": [],
+   "call_id": "b43414ee-2dba-4381-90e8-b2e816e584af",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 7,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "b43414ee-2dba-4381-90e8-b2e816e584af",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-02",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "conversation: The callback was not scheduled for the next business day, October 15, at 11:00, because no scheduling tool call was made."
+   ],
+   "call_id": "14c243f2-35de-4750-87e8-bde5bbb4d8db",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "schedule_callback",
+    "close_call"
+   ],
+   "turns": 5,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "14c243f2-35de-4750-87e8-bde5bbb4d8db",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-03",
+   "style": "asks_back",
+   "pass": true,
+   "failed": [],
+   "call_id": "2df717c8-0f3a-432f-9d4a-8737a308797e",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "close_call"
+   ],
+   "turns": 6,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "2df717c8-0f3a-432f-9d4a-8737a308797e",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-04",
+   "style": "asks_back",
+   "pass": true,
+   "failed": [],
+   "call_id": "d1f18b8e-1b05-4d55-addb-217918776bc8",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 7,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "451816ab-f13f-417d-9b97-b604dd80be57",
+     "invalid": true,
+     "replays": [
+      "resumed from msg_4_1791676770892 (latest reply msg_15_1791676777216, isBranch=True)"
+     ]
+    },
+    {
+     "call_id": "d1f18b8e-1b05-4d55-addb-217918776bc8",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-05",
+   "style": "corrects",
+   "pass": false,
+   "failed": [
+    "conversation: The support team was offered three times rather than once."
+   ],
+   "call_id": "cb8a3786-b815-4908-b08d-3846fbaf8f75",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 8,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "cb8a3786-b815-4908-b08d-3846fbaf8f75",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-06",
+   "style": "pieces",
+   "pass": false,
+   "failed": [
+    "promises [('p1', 150.0, '2026-10-16')], expected [('p1', 637.5, '2026-10-16')]",
+    "conversation: The agent offered an incorrect minimum payment of 150.00 instead of 637.50 and recorded a promise for 150.00 rather than the required 637.50 on Friday, October 16."
+   ],
+   "call_id": "38a9b0e9-76a2-4583-8fa7-fe357a78baca",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 9,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "38a9b0e9-76a2-4583-8fa7-fe357a78baca",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-07",
+   "style": "talkative",
+   "pass": false,
+   "failed": [
+    "conversation: The agent did not offer the next business day after 26 October; it offered 2 November instead, and the customer proposed Tuesday 27 October."
+   ],
+   "call_id": "b98f4c04-1678-45cb-b4c4-7a7ce3f35df9",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 8,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "b98f4c04-1678-45cb-b4c4-7a7ce3f35df9",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-08",
+   "style": "corrects",
+   "pass": false,
+   "failed": [
+    "conversation: The agent did not say that payments can take one business day to appear."
+   ],
+   "call_id": "9940a77f-0ca4-4270-820f-63aed8ae2432",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 5,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "9940a77f-0ca4-4270-820f-63aed8ae2432",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-09",
+   "style": "corrects",
+   "pass": false,
+   "failed": [
+    "conversation: The agent describes its own repayment plan by offering a minimum payment of 400 on October 23, although the account specifies a minimum of 700."
+   ],
+   "call_id": "52eb98e6-b32c-49e9-a52b-ba12b53ea0d0",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "transfer_to_agent",
+    "close_call"
+   ],
+   "turns": 8,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "52eb98e6-b32c-49e9-a52b-ba12b53ea0d0",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-10",
+   "style": "in_words",
+   "pass": false,
+   "failed": [
+    "conversation: The check requiring exactly one promise in the ledger after the retry fails because create_promise failed with nothing recorded and no retry occurred."
+   ],
+   "call_id": "082bc15a-31c3-4f7b-9d30-fe6b7043bc71",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 7,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "082bc15a-31c3-4f7b-9d30-fe6b7043bc71",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-01",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "conversation: The create_promise tool was never called, and the required text-message sentence was not said after the promise."
+   ],
+   "call_id": "21dcf7fe-5fe0-425c-9790-b3c1e531575e",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 6,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "21dcf7fe-5fe0-425c-9790-b3c1e531575e",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-02",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "conversation: The callback was not scheduled for the next business day at 11:00; the agent only asked for confirmation and made no scheduling tool call."
+   ],
+   "call_id": "5c174e2c-8382-4e6a-a6bf-b981e6626cd3",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "schedule_callback",
+    "close_call"
+   ],
+   "turns": 5,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "5c174e2c-8382-4e6a-a6bf-b981e6626cd3",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-03",
+   "style": null,
+   "pass": true,
+   "failed": [],
+   "call_id": "00ca4e88-4a9a-45d6-b9bf-ec8b1876efe0",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "close_call"
+   ],
+   "turns": 5,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "00ca4e88-4a9a-45d6-b9bf-ec8b1876efe0",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-04",
+   "style": "in_words",
+   "pass": true,
+   "failed": [],
+   "call_id": "13d89385-8cef-44e8-b18a-17881c520a46",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 7,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "13d89385-8cef-44e8-b18a-17881c520a46",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-05",
+   "style": "in_words",
+   "pass": true,
+   "failed": [],
+   "call_id": "d85f492a-ffe5-4d0c-acea-ed75ea575649",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 6,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "d85f492a-ffe5-4d0c-acea-ed75ea575649",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-06",
+   "style": "pieces",
+   "pass": false,
+   "failed": [
+    "promises [('p1', 110.0, '2026-10-16')], expected [('p1', 637.5, '2026-10-16')]",
+    "conversation: The agent offered an incorrect minimum payment of 110.00 instead of 637.50 and recorded a promise for 110.00 rather than the required 637.50 on Friday, October 16."
+   ],
+   "call_id": "4bade317-9707-4648-b79f-54ca09861441",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 8,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "4bade317-9707-4648-b79f-54ca09861441",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-07",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "conversation: The agent did not ask once for the exact day and never made a tool call to record the promise for Tuesday, October 27th."
+   ],
+   "call_id": "ad9ec90d-3723-4118-b554-2bfcf3bb272b",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 8,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "ad9ec90d-3723-4118-b554-2bfcf3bb272b",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-08",
+   "style": "corrects",
+   "pass": true,
+   "failed": [],
+   "call_id": "2689b0bc-fff7-4665-86b3-6fae06400eec",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 5,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "2689b0bc-fff7-4665-86b3-6fae06400eec",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-09",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "outcome ('no_promise', 'refused'), expected ('transferred', 'restructuring')",
+    "transfers [], expected [{'queue': 'restructuring'}]",
+    "conversation: The agent never called transfer_to_agent with queue restructuring and described its own payment proposal of 450 by October 23."
+   ],
+   "call_id": "13cbc7f1-2d91-493f-8552-c882f625b1b9",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 7,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "13cbc7f1-2d91-493f-8552-c882f625b1b9",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-10",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "conversation: The check requiring exactly one promise in the ledger after the retry is not clearly satisfied because the retry has no tool result confirming success."
+   ],
+   "call_id": "b11a44a5-870d-4427-aca7-1b05e6ccad2d",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 7,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "b11a44a5-870d-4427-aca7-1b05e6ccad2d",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  }
+ ]
+}

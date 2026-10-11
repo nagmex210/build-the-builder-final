@@ -1,0 +1,27 @@
+PASS PUB-01 2/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+FAIL PUB-02 1/2 | schedule_callback > close_call
+       - [plain] conversation: No callback was scheduled for the next business day, October 15, 2026, at 11:00.
+FAIL PUB-03 1/2 | verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > close_call
+       - [pieces] outcome ('promise', None), expected ('not_verified', 'failed')
+       - [pieces] conversation: Verification continued after the third wrong answer, the agent disclosed the amount and product, never directed the customer to the app or a branch, and falsely claimed identity verification and a recorded payment promise without supporting tool 
+PASS PUB-04 2/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+PASS PUB-05 2/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+FAIL PUB-06 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [corrects] promises [('p1', 250.0, '2026-10-16')], expected [('p1', 637.5, '2026-10-16')]
+       - [corrects] conversation: The agent offered an incorrect minimum payment of 250.00 instead of 637.50 and recorded a promise for 250.00 rather than the required 637.50 on Friday 16 October.
+       - [corrects] promises [('p1', 450.0, '2026-10-15')], expected [('p1', 637.5, '2026-10-16')]
+       - [corrects] conversation: The agent did not offer the minimum payment of 637.50 once with the note that the rest stays overdue, and recorded a promise for 450.00 on Thursday 15 October rather than 637.50 on Friday 16 October.
+FAIL PUB-07 1/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [in_words] promises [('p1', 540.0, '2026-11-02')], expected [('p1', 540.0, '2026-10-27')]
+       - [in_words] conversation: The agent did not offer Tuesday 27 October as the next business day after 26 October, and no promise was recorded for Tuesday 27 October within the early-band deadline.
+FAIL PUB-08 1/2 | verify_identity > verify_identity > verify_identity > verify_identity > get_account > close_call
+       - [asks_back] conversation: The agent did not say that payments can take one business day to appear.
+FAIL PUB-09 1/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+       - [pieces] outcome ('no_promise', 'refused'), expected ('transferred', 'restructuring')
+       - [pieces] transfers [], expected [{'queue': 'restructuring'}]
+       - [pieces] conversation: The agent never called transfer_to_agent with queue restructuring and described its own payment plan by offering a reduced payment of 500.
+FAIL PUB-10 1/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > close_call
+       - [asks_back] conversation: The check requiring exactly one promise in the ledger after the retry fails because the retry has no tool result confirming successful creation.
+
+fast_eval: 3 / 10 passed (2 rep(s), all reps must pass), 2250 s
+harness: 0 case(s) still INVALID after 2 re-run(s) (not a measurement), 0 rep(s) re-run

@@ -1,0 +1,16 @@
+FAIL PUB-11 1/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > create_promise > close_call
+       - [corrects] promises [('p1', 220.0, '2026-10-20'), ('p2', 640.0, '2026-10-20'), ('p3', 75.0, '2026-10-20')], expected [('p1', 220.0, '2026-10-16'), ('p2', 640.0, '2026-10-16'), ('p3', 75.0, '2026-10-16')]
+       - [corrects] conversation: The required create_promise call for each of the three products was never made.
+FAIL PUB-12 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > add_note > add_note > close_call
+       - [pieces] conversation: The car loan received two persuasion attempts after the initial refusal instead of the required one, and the agent said “I've noted that” before any recording tool call was made.
+       - [in_words] outcome ('no_promise', 'service_error'), expected ('promise', None)
+       - [in_words] notes [('p1', 'service_error'), ('p2', 'refused'), ('p3', 'refused')], expected [('p2', 'refused'), ('p3', 'refused')]
+       - [in_words] conversation: The car loan received two persuasion attempts after the initial payment request, instead of the required one for the early band.
+FAIL PUB-13 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > close_call
+       - [corrects] promises [('p1', 900.0, '2026-11-02'), ('p2', 300.0, '2026-10-23')], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]
+       - [corrects] conversation: The credit card was not recorded for October 30, and the read-back named October 23 and November 2 rather than October 30 for the card and October 23 for the loan.
+       - [corrects] promises [('p1', 300.0, '2026-10-20'), ('p2', 900.0, '2026-10-20')], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]
+       - [corrects] conversation: The credit card and loan were both recorded for 20 October rather than 30 October and 23 October respectively, and the read-back did not name the required dates.
+
+fast_eval: 0 / 3 passed (2 rep(s), all reps must pass), 2534 s
+harness: 0 case(s) still INVALID after 2 re-run(s) (not a measurement), 0 rep(s) re-run

@@ -1,0 +1,31 @@
+  invalid rep PUB-04 (try 1): ['resumed from msg_4_1791676770892 (latest reply msg_15_1791676777216, isBranch=True)']
+FAIL PUB-01 1/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [asks_back] conversation: The create_promise tool was never called, and the required text-message sentence was not said after the promise.
+FAIL PUB-02 0/2 | schedule_callback > close_call
+       - [asks_back] conversation: The callback was not scheduled for the next business day, October 15, at 11:00, because no scheduling tool call was made.
+       - [asks_back] conversation: The callback was not scheduled for the next business day at 11:00; the agent only asked for confirmation and made no scheduling tool call.
+PASS PUB-03 2/2 | verify_identity > verify_identity > verify_identity > close_call
+PASS PUB-04 2/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+FAIL PUB-05 1/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+       - [corrects] conversation: The support team was offered three times rather than once.
+FAIL PUB-06 0/2 | verify_identity > verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [pieces] promises [('p1', 150.0, '2026-10-16')], expected [('p1', 637.5, '2026-10-16')]
+       - [pieces] conversation: The agent offered an incorrect minimum payment of 150.00 instead of 637.50 and recorded a promise for 150.00 rather than the required 637.50 on Friday, October 16.
+       - [pieces] promises [('p1', 110.0, '2026-10-16')], expected [('p1', 637.5, '2026-10-16')]
+       - [pieces] conversation: The agent offered an incorrect minimum payment of 110.00 instead of 637.50 and recorded a promise for 110.00 rather than the required 637.50 on Friday, October 16.
+FAIL PUB-07 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [talkative] conversation: The agent did not offer the next business day after 26 October; it offered 2 November instead, and the customer proposed Tuesday 27 October.
+       - [asks_back] conversation: The agent did not ask once for the exact day and never made a tool call to record the promise for Tuesday, October 27th.
+FAIL PUB-08 1/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+       - [corrects] conversation: The agent did not say that payments can take one business day to appear.
+FAIL PUB-09 0/2 | verify_identity > verify_identity > verify_identity > get_account > transfer_to_agent > close_call
+       - [corrects] conversation: The agent describes its own repayment plan by offering a minimum payment of 400 on October 23, although the account specifies a minimum of 700.
+       - [plain] outcome ('no_promise', 'refused'), expected ('transferred', 'restructuring')
+       - [plain] transfers [], expected [{'queue': 'restructuring'}]
+       - [plain] conversation: The agent never called transfer_to_agent with queue restructuring and described its own payment proposal of 450 by October 23.
+FAIL PUB-10 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > close_call
+       - [in_words] conversation: The check requiring exactly one promise in the ledger after the retry fails because create_promise failed with nothing recorded and no retry occurred.
+       - [asks_back] conversation: The check requiring exactly one promise in the ledger after the retry is not clearly satisfied because the retry has no tool result confirming success.
+
+fast_eval: 2 / 10 passed (2 rep(s), all reps must pass), 2571 s
+harness: 0 case(s) still INVALID after 2 re-run(s) (not a measurement), 1 rep(s) re-run

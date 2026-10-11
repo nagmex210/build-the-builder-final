@@ -1,0 +1,9 @@
+workspace 2: workflow a4f4a72b-9594-4af5-a2b7-6311a0c14210
+PASS PUB-01 1/1 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+PASS PUB-04 1/1 | verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+FAIL PUB-05 0/1 | verify_identity > verify_identity > verify_identity > get_account > close_call
+       - [talkative] conversation: The support team was offered twice rather than once.
+PASS PUB-08 1/1 | verify_identity > verify_identity > verify_identity > get_account > close_call
+
+fast_eval: 3 / 4 passed (1 rep(s), all reps must pass), 65 s
+harness: 0 case(s) still INVALID after 2 re-run(s) (not a measurement), 0 rep(s) re-run

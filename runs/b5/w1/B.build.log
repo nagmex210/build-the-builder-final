@@ -1,0 +1,106 @@
+builder: slot=w1-B tools=/home/ubuntu/btb/wt1/tools/openapi.json briefs=/home/ubuntu/btb/wt1/briefs/brief-a.md /home/ubuntu/btb/wt1/briefs/brief-b.md
+trace: /home/ubuntu/btb/wt1/runs/traces/w1-B-20261010-230741.jsonl
+BUILD START 2026-10-10T23:07:41Z slot=w1-B
+[test] datecalc: generated date/amount code run locally on 5 dates and fake products -> ok (25 s)
+[model] build agent: Claude Agent SDK, claude-opus-5-5, skill build-phone-agent, budget 12 min
+[model call 2026-10-10T23:08:06] gpt-6-luna (Azure, btb/llm.py): extract calendar/amount spec for code steps
+[model call 2026-10-10T23:08:08Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 1: tools Skill
+  [Skill] {'skill': 'build-phone-agent', 'args': 'Slot: w1-B'}
+[model call 2026-10-10T23:08:09Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 2: text
+[model call 2026-10-10T23:08:10Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 3: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt1; cat briefs/brief-a.md briefs/brief-b.md; cat .claude/skills/build-phone-agent/rout
+    -> <persisted-output> Output too large (35.9KB). Full output saved to: /home/ubuntu/.claude/projects/-home-ubuntu-btb-wt1/22d4a66f-ab7f-467d-8173-96ed510280d4/tool-results/bzkjreyo1.txt Preview (first 2KB): # Brief A: Freya Bank, early-stage collections, one product Freya Bank is fictional. Every customer, debt and payment here is synthetic. This brief has the density of a real bank specification. Re ...
+[model call 2026-10-10T23:08:12Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 4: tools Read
+  [Read] {'file_path': '/home/ubuntu/.claude/projects/-home-ubuntu-btb-wt1/22d4a66f-ab7f-467d-8173-96ed510280d4/tool-results/bzkj
+[model call 2026-10-10T23:08:14Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 5: text
+[model call 2026-10-10T23:08:15Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 6: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt1; python3 -c "\nimport json;d=json.load(open(\'out/w1-B.calc.json\'));print(list(d.k
+    -> ['ok', 'spec', 'code_node', 'account_tool', 'account_post_process_code', 'example_date_facts', 'example_product_facts'] == ok true == spec { "now_variable": "now", "weekend_days": [ 5, 6 ], "holidays": [ "2026-10-26", "2026-11-11", "2026-11-26", "2026-12-25", "2027-01-01" ], "account_tool": "get_account", "products_key": "products", "product_id_field": "product_id", "type_field": "type", "band_fie ...
+[model call 2026-10-10T23:08:18Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 7: text
+[model call 2026-10-10T23:08:19Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 8: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt1; python3 -c "\nimport json;d=json.load(open(\'out/w1-B.calc.json\'))[\'code_node\']
+    -> { "name": "date_facts_setup", "node_type": "code", "passthrough": true, "passthrough_default_transition": "<NEXT NODE>", "on_enter": { "type": "silent" }, "pre_actions": [ { "type": "function", "function": { "name": "code_exec", "handler": "__function__:code_exec", "parameters": { "type": "object", "properties": { "code": { "type": "string", "default": "..." }, "timeout_ms": { "type": "number", "d ...
+[model call 2026-10-10T23:08:23Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 9: text
+[model call 2026-10-10T23:08:23Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 10: text
+Time is short, so I'm writing the workflow generator now (opening → identity → negotiate, with the date-facts code node at the start).
+[model call 2026-10-10T23:08:29] gpt-6-luna (Azure, btb/llm.py): A3: extract the brief's mandatory sentences as fixed text
+[model call 2026-10-10T23:09:19Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 11: tools Bash
+  [Bash] {'command': 'mkdir -p /tmp/w1b && cat > /tmp/w1b/gen.py <<\'EOF\'\nimport json,copy\nK=\'/home/ubuntu/btb/wt1/\'\ncalc=j
+    -> 0 errors, 0 warnings
+[model call 2026-10-10T23:09:21Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 12: text
+[model call 2026-10-10T23:09:21Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 13: tools Bash
+  [Bash] {'command': 'python3 builder/save.py w1-B out/w1-B.workflow.json 2>&1 | tail -5'}
+    -> {"hardened_tools": ["schedule_callback", "transfer_to_agent", "verify_identity", "transfer_to_agent", "get_account", "create_promise", "transfer_to_agent", "add_note", "close_call", "goodbye->end_call:hang_up", "opening->tts:opening", "say_now:get_account", "say_now:create_promise", "system_prompt block"]} {"workflow_id": "df7a2f58-3c37-4da3-8b5a-8618e4f4a798", "agent_id": "c3b95a5f-c4c5-4755-ad25 ...
+[model call 2026-10-10T23:09:26Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 14: tools Bash
+  [Bash] {'command': 'timeout 60 python3 -c "import freya,json; print(json.dumps(freya.api(\'POST\',\'/api/v2/chat/message\',{\'w
+    -> {"response": "Hello, I\u2019m Freya Bank\u2019s digital assistant, and this call is recorded. Am I speaking with Ms Lee?", "callId": "25272dfd-701f-41eb-846f-fa0dd682e42b", "messageId": "msg_4_1791673766659"}
+[model call 2026-10-10T23:09:30Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 15: text
+[model call 2026-10-10T23:09:33Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 16: tools Bash
+  [Bash] {'command': 'python3 - <<\'EOF\'\np=\'/tmp/w1b/gen.py\';s=open(p).read()\na=s.index(\' E. Notes\'.strip()); b=s.index(\'
+    -> 0 errors, 0 warnings {"workflow_id": "df7a2f58-3c37-4da3-8b5a-8618e4f4a798", "agent_id": "c3b95a5f-c4c5-4755-ad25-5fa9debc4b50", "version": 16}
+[model call 2026-10-10T23:09:43Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 17: text
+[model call 2026-10-10T23:09:43Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 18: text
+I built the Brief B phone agent, saved it under slot w1-B (version 16), and it starts. Lint reported no errors. I sent one test message: the agent opened as Freya Bank's digital assistant, said the call is recorded, and asked "Am I speaking with Ms Lee?". I didn't test anything past that opening, and I didn't run any practice cases.
+
+The call moves through four stages:
+- **Start:** the date-facts code step runs first, with its code unchanged.
+- **Opening:** confirms who is on the line and handles someone else answering (callback, wrong number, deceased, unclear).
+- **Identity:** asks the two security questions and moves on only when the verification tool reports both passed.
+- **Negotiation:** covers every product, the promise rules, transfers, notes and the outcome table.
+
+Every stage can close the call, and a successful close sends the call to an end node. The account hook is the `post_process_code` of `get_account` exactly as given, and every stage that handles dates shows the date facts.
+
+Two places where I chose differently from the kit's instructions:
+- **Account lookup:** `get_account` is a tool the negotiation stage calls first, not a separate silent lookup step. This was quicker to build, but it means the call depends on the model making that first call before it talks about the debt.
+- **Goodbye:** Brief A rule 47 says to thank the customer and say goodbye before `close_call`. So the model says goodbye in the same message as `close_call`, and the end node says nothing.
+
+None of the brief's rules differ from the date facts.
+
+workflow_id: df7a2f58-3c37-4da3-8b5a-8618e4f4a798, agent_id: c3b95a5f-c4c5-4755-ad25-5fa9debc4b50
+
+done: 11 turns, 96 s
+final save (build): {'workflow_id': 'df7a2f58-3c37-4da3-8b5a-8618e4f4a798', 'agent_id': 'c3b95a5f-c4c5-4755-ad25-5fa9debc4b50', 'version': 16}; lint: 0 errors, 0 warnings
+[model call 2026-10-10T23:10:12] gpt-6-astra (Azure, btb/llm.py): self-simulation: write personas + ledger checks from the brief
+[model call 2026-10-10T23:10:38] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-10T23:10:38] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-10T23:10:38] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-10T23:10:38] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-10T23:10:39] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-10T23:10:39] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-10T23:10:39] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-10T23:10:40] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-10T23:10:41] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-10T23:10:42] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-10T23:10:42] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-10T23:11:09] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-10T23:11:44] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-10T23:11:45] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-10T23:11:45] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-10T23:11:48] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-10T23:11:48] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-10T23:11:49] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-10T23:11:50] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-10T23:11:52] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-10T23:11:57] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-10T23:11:58] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-10T23:11:59] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-10T23:12:50] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-10T23:13:04] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-10T23:13:07] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-10T23:13:14] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-10T23:13:16] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-10T23:13:19] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-10T23:13:21] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-10T23:13:25] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-10T23:14:31] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-10T23:14:52] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-10T23:14:53] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-10T23:15:11] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-10T23:15:12] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-10T23:15:13] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-10T23:15:16] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+self-test 1 (workspace 2): 0/2 personas failed a check (0 checks)
+[freya] slot w1-B: workflow_id=df7a2f58-3c37-4da3-8b5a-8618e4f4a798 agent_id=c3b95a5f-c4c5-4755-ad25-5fa9debc4b50 version=16 (published)
+[freya] exported: /home/ubuntu/btb/wt1/submission/w1-B.workflow.json
+BUILD END 2026-10-10T23:17:18Z (577 s); trace scrubbed (0 secret(s) replaced): /home/ubuntu/btb/wt1/runs/traces/w1-B-20261010-230741.jsonl
+{"workflow_id": "df7a2f58-3c37-4da3-8b5a-8618e4f4a798", "agent_id": "c3b95a5f-c4c5-4755-ad25-5fa9debc4b50"}

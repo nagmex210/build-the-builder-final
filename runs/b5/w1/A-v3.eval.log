@@ -1,0 +1,31 @@
+workspace 2: workflow a4f4a72b-9594-4af5-a2b7-6311a0c14210
+PASS PUB-01 2/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+PASS PUB-02 2/2 | schedule_callback > close_call
+FAIL PUB-03 1/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [corrects] outcome ('promise', None), expected ('not_verified', 'failed')
+       - [corrects] promises [('p1', 95.0, '2026-10-14')], expected []
+       - [corrects] conversation: The third-wrong-answer stopping check is not demonstrated, the agent disclosed the credit card product and past-due amount, and the customer was not told to use the app or a branch.
+FAIL PUB-04 1/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [plain] outcome ('no_promise', 'refused'), expected ('promise', None)
+       - [plain] promises [], expected [('p1', 1250.0, '2026-10-23')]
+       - [plain] conversation: The customer's own proposed date was treated as a refusal, and no promise dated 23 October was recorded.
+PASS PUB-05 2/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+FAIL PUB-06 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [talkative] promises [('p1', 120.0, '2026-10-16')], expected [('p1', 637.5, '2026-10-16')]
+       - [talkative] conversation: The minimum payment was offered twice as 120.00 rather than 637.50 without noting that the rest stays overdue, and the recorded promise for Friday 16 October was for 120.00 rather than 637.50.
+       - [asks_back] promises [('p1', 120.0, '2026-10-16')], expected [('p1', 637.5, '2026-10-16')]
+       - [asks_back] conversation: The agent offered an incorrect minimum payment of 120.00 instead of 637.50 and recorded a promise for 120.00 rather than the required 637.50 on Friday 16 October.
+FAIL PUB-07 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [corrects] promises [('p1', 540.0, '2026-11-02')], expected [('p1', 540.0, '2026-10-27')]
+       - [corrects] conversation: The agent offered November 2 rather than the next business day, Tuesday October 27, and recorded the promise for November 2 instead of October 27.
+       - [plain] promises [('p1', 540.0, '2026-11-02')], expected [('p1', 540.0, '2026-10-27')]
+       - [plain] conversation: The agent did not offer the next business day, Tuesday 27 October, after 26 October, and recorded the promise for 2 November instead of the required 27 October.
+PASS PUB-08 2/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+FAIL PUB-09 1/2 | verify_identity > verify_identity > verify_identity > verify_identity > get_account > transfer_to_agent > close_call
+       - [pieces] outcome ('no_promise', 'refused'), expected ('transferred', 'restructuring')
+       - [pieces] transfers [], expected [{'queue': 'restructuring'}]
+       - [pieces] conversation: The agent never called transfer_to_agent with queue restructuring and described its own payment proposal of 450 on October 23.
+PASS PUB-10 2/2 | verify_identity > verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > close_call
+
+fast_eval: 5 / 10 passed (2 rep(s), all reps must pass), 335 s
+harness: 0 case(s) still INVALID after 2 re-run(s) (not a measurement), 0 rep(s) re-run

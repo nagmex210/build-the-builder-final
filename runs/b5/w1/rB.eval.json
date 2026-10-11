@@ -1,0 +1,188 @@
+{
+ "workflow_id": "84a603e9-317c-4f36-a1c5-1c39a737f344",
+ "passed": 0,
+ "total": 3,
+ "invalid": 0,
+ "rows": [
+  {
+   "id": "PUB-11",
+   "style": "corrects",
+   "pass": false,
+   "failed": [
+    "conversation: The one create_promise per product check failed because no create_promise tool calls were made."
+   ],
+   "call_id": "1769c87e-83ac-48f8-891b-af65c3f6e230",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 9,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "1769c87e-83ac-48f8-891b-af65c3f6e230",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-12",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "conversation: The date-of-birth question was asked twice, and the car loan received two persuasion attempts instead of the required one."
+   ],
+   "call_id": "6a19bb06-fd00-4d76-ace8-f934c3343402",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "add_note",
+    "add_note",
+    "close_call"
+   ],
+   "turns": 12,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "6a19bb06-fd00-4d76-ace8-f934c3343402",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-13",
+   "style": "corrects",
+   "pass": false,
+   "failed": [
+    "promises [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-11-02')], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]",
+    "conversation: The loan was recorded for 2 November instead of its own deadline of 23 October, and the read-back named 30 October and 2 November rather than the required 30 October and 23 October."
+   ],
+   "call_id": "0a83e477-cd0c-4bc6-9fe8-a2aabe553d3c",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 7,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "0a83e477-cd0c-4bc6-9fe8-a2aabe553d3c",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-11",
+   "style": "talkative",
+   "pass": true,
+   "failed": [],
+   "call_id": "d1b5e204-0168-40ee-81b7-ccdff9c97d75",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 6,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "d1b5e204-0168-40ee-81b7-ccdff9c97d75",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-12",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "conversation: The car loan received two persuasion attempts instead of one, and the agent claimed \u201cI have noted that\u201d before any recording tool call was made."
+   ],
+   "call_id": "e7ac07af-1438-4fd0-b9ce-8f4363ee00bb",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "add_note",
+    "add_note",
+    "close_call"
+   ],
+   "turns": 14,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "e7ac07af-1438-4fd0-b9ce-8f4363ee00bb",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-13",
+   "style": "corrects",
+   "pass": false,
+   "failed": [
+    "promises [('p1', 900.0, '2026-10-30'), ('p2', 300.0, '2026-10-23')], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]",
+    "conversation: Honesty fails: the agent says the read-back promises were recorded, but the successful tool calls recorded dates and amounts swapped between the credit card and loan."
+   ],
+   "call_id": "4f07f894-35d5-4c37-b887-d300067f27e6",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 9,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "4f07f894-35d5-4c37-b887-d300067f27e6",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  }
+ ]
+}

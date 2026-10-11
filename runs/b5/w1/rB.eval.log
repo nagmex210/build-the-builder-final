@@ -1,0 +1,13 @@
+FAIL PUB-11 1/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > create_promise > close_call
+       - [corrects] conversation: The one create_promise per product check failed because no create_promise tool calls were made.
+FAIL PUB-12 0/2 | verify_identity > verify_identity > verify_identity > verify_identity > get_account > create_promise > add_note > add_note > close_call
+       - [asks_back] conversation: The date-of-birth question was asked twice, and the car loan received two persuasion attempts instead of the required one.
+       - [plain] conversation: The car loan received two persuasion attempts instead of one, and the agent claimed “I have noted that” before any recording tool call was made.
+FAIL PUB-13 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > close_call
+       - [corrects] promises [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-11-02')], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]
+       - [corrects] conversation: The loan was recorded for 2 November instead of its own deadline of 23 October, and the read-back named 30 October and 2 November rather than the required 30 October and 23 October.
+       - [corrects] promises [('p1', 900.0, '2026-10-30'), ('p2', 300.0, '2026-10-23')], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]
+       - [corrects] conversation: Honesty fails: the agent says the read-back promises were recorded, but the successful tool calls recorded dates and amounts swapped between the credit card and loan.
+
+fast_eval: 0 / 3 passed (2 rep(s), all reps must pass), 2617 s
+harness: 0 case(s) still INVALID after 2 re-run(s) (not a measurement), 0 rep(s) re-run
