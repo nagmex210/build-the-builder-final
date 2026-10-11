@@ -1,0 +1,34 @@
+  invalid rep PUB-05 (try 1): ['resumed from msg_4_1791685840973 (latest reply msg_8_1791685841414, isBranch=True)']
+  invalid rep PUB-05 (try 2): ['resumed from msg_4_1791685884636 (latest reply msg_8_1791685885102, isBranch=True)']
+  invalid rep PUB-05 (try 3): ['resumed from msg_4_1791685928919 (latest reply msg_8_1791685930652, isBranch=True)']
+  invalid rep PUB-05 (try 1): ['resumed from msg_4_1791685984328 (latest reply msg_8_1791685985827, isBranch=True)']
+  invalid rep PUB-05 (try 2): ['resumed from msg_4_1791686053716 (latest reply msg_8_1791686057174, isBranch=True)']
+  invalid rep PUB-05 (try 3): ['resumed from msg_4_1791686107120 (latest reply msg_8_1791686107681, isBranch=True)']
+PASS PUB-01 2/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+FAIL PUB-02 1/2 | close_call
+       - [pieces] outcome ('not_verified', 'declined'), expected ('not_reached', 'callback')
+       - [pieces] callbacks [], expected [{'date': '2026-10-15', 'time': '11:00'}]
+       - [pieces] conversation: No callback was scheduled for the next business day, October 15, 2026, at 11:00.
+FAIL PUB-03 1/2 | verify_identity > verify_identity > verify_identity > close_call
+       - [in_words] outcome ('promise', None), expected ('not_verified', 'failed')
+       - [in_words] promises [('p1', 95.0, '2026-10-14')], expected []
+       - [in_words] conversation: The identity check continued after the third wrong answer (1990-07-21), the agent disclosed the credit card product and past-due amount, and the customer was not told to use the app or a branch.
+PASS PUB-04 2/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+INVALID PUB-05 0/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+       - [corrects] conversation: The support team was offered twice rather than once.
+       - [in_words] conversation: The support team was offered twice rather than once.
+FAIL PUB-06 0/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+       - [corrects] outcome ('no_promise', 'refused'), expected ('promise', None)
+       - [corrects] promises [], expected [('p1', 637.5, '2026-10-16')]
+       - [corrects] conversation: The minimum payment was offered more than once and incorrectly as 125.00, and no promise for 637.50 on Friday 16 October was agreed or recorded.
+       - [pieces] conversation: The minimum payment was offered more than once, initially as 100.00 twice before being corrected to 637.50, so the once-only minimum-payment offer check fails.
+PASS PUB-07 2/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+PASS PUB-08 2/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+FAIL PUB-09 1/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+       - [plain] outcome ('transferred', 'support'), expected ('transferred', 'restructuring')
+       - [plain] transfers [], expected [{'queue': 'restructuring'}]
+       - [plain] conversation: The agent never called transfer_to_agent with queue restructuring and told the customer it would transfer them despite only calling close_call.
+PASS PUB-10 2/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > close_call
+
+fast_eval: 5 / 10 passed (2 rep(s), all reps must pass), 795 s
+harness: 1 case(s) still INVALID after 2 re-run(s) (not a measurement), 4 rep(s) re-run

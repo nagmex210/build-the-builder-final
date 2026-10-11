@@ -1,0 +1,33 @@
+  invalid rep PUB-05 (try 1): ['resumed from msg_4_1791683707251 (latest reply msg_8_1791683708428, isBranch=True)']
+  invalid rep PUB-05 (try 2): ['resumed from msg_4_1791683783598 (latest reply msg_8_1791683784247, isBranch=True)']
+  invalid rep PUB-05 (try 3): ['resumed from msg_4_1791683852449 (latest reply msg_8_1791683852774, isBranch=True)']
+  invalid rep PUB-05 (try 1): ['resumed from msg_4_1791683998916 (latest reply msg_8_1791683999259, isBranch=True)']
+  invalid rep PUB-05 (try 2): ['resumed from msg_4_1791684196748 (latest reply msg_8_1791684197178, isBranch=True)']
+  invalid rep PUB-05 (try 3): ['resumed from msg_4_1791684276266 (latest reply msg_8_1791684287387, isBranch=True)']
+PASS PUB-01 2/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+FAIL PUB-02 1/2 | schedule_callback > close_call
+       - [talkative] conversation: No callback was scheduled for the next business day, 2026-10-15, at 11:00.
+FAIL PUB-03 0/2 | verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > close_call
+       - [asks_back] conversation: The agent continued identity checks after the third wrong answer, never directed the customer to the app or a branch, and falsely claimed identity verification and a date-of-birth update.
+       - [pieces] outcome ('no_promise', 'refused'), expected ('not_verified', 'failed')
+       - [pieces] conversation: The security check continued after the third incorrect date of birth was supplied, the agent disclosed a credit card and past-due amount, and the customer was not told to use the app or a branch.
+PASS PUB-04 2/2 | verify_identity > verify_identity > verify_identity > get_account > get_account > create_promise > close_call
+INVALID PUB-05 0/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+       - [plain] conversation: The support team was offered twice rather than once.
+       - [asks_back] conversation: The support team was offered twice rather than once.
+FAIL PUB-06 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [plain] conversation: The minimum-payment check fails because the agent offered 150.00 as the minimum instead of the actual minimum of 637.50, and the corrected offer did not state that the rest stays overdue.
+       - [asks_back] conversation: The minimum payment of 637.50 was offered without noting that the rest stays overdue, and no successful tool call recorded the promise for 637.50 on Friday 16 October.
+FAIL PUB-07 1/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [pieces] conversation: The agent asked for the exact payment day twice, and no successful tool call recorded the promise for Tuesday 27 October within the early-band deadline.
+FAIL PUB-08 1/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+       - [corrects] conversation: The agent did not say that payments can take one business day to appear.
+FAIL PUB-09 1/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+       - [talkative] outcome ('no_promise', 'refused'), expected ('transferred', 'restructuring')
+       - [talkative] transfers [], expected [{'queue': 'restructuring'}]
+       - [talkative] conversation: The required transfer_to_agent call with queue restructuring was never made.
+FAIL PUB-10 1/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > close_call
+       - [plain] conversation: The check requiring exactly one promise in the ledger after the retry fails because create_promise failed, nothing was recorded, and no retry was made.
+
+fast_eval: 2 / 10 passed (2 rep(s), all reps must pass), 902 s
+harness: 1 case(s) still INVALID after 2 re-run(s) (not a measurement), 4 rep(s) re-run

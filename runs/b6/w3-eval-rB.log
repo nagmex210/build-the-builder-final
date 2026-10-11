@@ -1,0 +1,22 @@
+  invalid rep PUB-13 (try 1): ['resumed from msg_15_1791685209268 (latest reply msg_26_1791685210178, isBranch=True)']
+  invalid rep PUB-12 (try 1): ['resumed from msg_6_1791685425601 (latest reply msg_19_1791685427327, isBranch=True)']
+  invalid rep PUB-12 (try 2): ['resumed from msg_4_1791685522804 (latest reply msg_17_1791685523416, isBranch=True)']
+FAIL PUB-11 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > create_promise > create_promise > close_call
+       - [pieces] conversation: The one create_promise per product check fails because the credit-card promise was attempted twice, first with an invalid product ID and then successfully with p1.
+       - [corrects] conversation: The one create_promise per product check fails because the agent attempted create_promise twice for the credit card, first with an invalid product ID and then with p1.
+FAIL PUB-12 0/2 | verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > get_account > add_note > add_note > close_call
+       - [asks_back] promises [], expected [('p1', 510.0, '2026-10-15')]
+       - [asks_back] notes [('car_loan', 'refused'), ('personal_loan', 'refused')], expected [('p2', 'refused'), ('p3', 'refused')]
+       - [asks_back] conversation: No credit-card promise was recorded despite the agent claiming it was noted, and the agent also claimed the loan refusals were noted before making the note tool calls.
+       - [in_words] outcome ('no_promise', 'refused'), expected ('promise', None)
+       - [in_words] promises [], expected [('p1', 510.0, '2026-10-15')]
+       - [in_words] notes [('car_loan_456', 'refused'), ('credit_card_789', 'refused'), ('personal_loan_123', 'refused')], expected [('p2', 'refused'), ('p3', 'refused')]
+       - [in_words] conversation: No credit-card promise was recorded, refused notes used product IDs not matching the account, the personal loan received three persuasion attempts instead of two, and the agent claimed notes were made before calling the note tool.
+FAIL PUB-13 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > create_promise > close_call
+       - [corrects] promises [('p1', 300.0, '2026-10-23'), ('p2', 900.0, '2026-10-23')], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]
+       - [corrects] conversation: The credit card was recorded for 23 October instead of 30 October, and the read-back named only 23 October rather than both required dates.
+       - [corrects] promises [('p1', 300.0, '2026-10-23'), ('p2', 900.0, '2026-10-23')], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]
+       - [corrects] conversation: The credit card was recorded for 23 October instead of 30 October, and the read-back named 23 October for both products rather than both required dates.
+
+fast_eval: 0 / 3 passed (2 rep(s), all reps must pass), 2193 s
+harness: 0 case(s) still INVALID after 2 re-run(s) (not a measurement), 3 rep(s) re-run
