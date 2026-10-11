@@ -105,6 +105,7 @@ use run_in_background. Only stop after your report is committed.
 
 ## MERGER (you run in the main repo after each batch)
 
+0. Read `runs/merger_notes.md` (owner notes) and handle every note in it.
 1. Read the five reports and their diffs (`git diff main idea/<batch>-<N>`).
 2. Reject any change that hard-codes something from brief A/B (rule, value, name, date, outcome code). Say so in the journal.
 3. Combine the winners: start from the best-scoring branch, merge others whose ideas are independent and also
