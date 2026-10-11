@@ -1,0 +1,82 @@
+builder: slot=main-rB tools=/home/ubuntu/btb/repo/tools/openapi.json briefs=/home/ubuntu/btb/repo/btb/briefs_raw/brief-a-raw.md /home/ubuntu/btb/repo/btb/briefs_raw/brief-b-raw.md
+trace: /home/ubuntu/btb/repo/runs/traces/main-rB-20261011-073009.jsonl
+BUILD START 2026-10-11T07:30:09Z slot=main-rB
+clean slot: moved 6 old file(s) of this slot out of the kit to /tmp/btb-old-main-rB-9fai_4ha
+[model call 2026-10-11T07:30:39] gpt-6-astra (Azure, btb/llm.py): A1: list the brief's situations after the account lookup (router + specialist routes)
+[test] datecalc: generated date/amount code run locally on 5 dates and fake products -> ok (61 s)
+[test] A1 situations: refused, hardship, dispute, already_paid, restructuring, human
+[model] build agent: Claude Agent SDK, claude-opus-5-5, skill build-phone-agent, budget 12 min
+[model call 2026-10-11T07:31:10] gpt-6-astra (Azure, btb/llm.py): extract calendar/amount spec for code steps
+[model call 2026-10-11T07:31:13Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 1: tools Skill
+  [Skill] {'skill': 'build-phone-agent'}
+[model call 2026-10-11T07:31:14] gpt-6-astra (Azure, btb/llm.py): A3: extract the brief's mandatory sentences as fixed text
+[model call 2026-10-11T07:31:14Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 2: text
+[model call 2026-10-11T07:31:15Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 3: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat btb/briefs_raw/brief-a-raw.md btb/briefs_raw/brief-b-raw.md; cat .claude/skil
+    -> <persisted-output> Output too large (47.1KB). Full output saved to: /home/ubuntu/.claude/projects/-home-ubuntu-btb-repo/5e6c202a-c974-44df-bf53-82bf5a9f2b11/tool-results/b5q642aw8.txt Preview (first 2KB): ## 1. Internal email **From:** Mara Chen, Operations Manager, Freya Bank **To:** Vendor delivery team **Subject:** Early-stage calling — one-product handover Hi team, Here’s the material for the  ...
+[model call 2026-10-11T07:31:18Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 4: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; python3 -c "\nimport json;d=json.load(open(\'tools/openapi.json\'))\nfor p,v in d
+    -> /verify_identity post {"type": "object", "properties": {"customer_id": {"type": "string"}, "field": {"type": "string", "enum": ["date_of_birth", "phone_last4"]}, "answer": {"type": "string", "description": "For date_of_birth: the date as YYYY-MM-DD. Callers say dates in words, the agent converts. An unreadable value is rejected with ok=false and is not counted as a wrong answer. For phone_last4: f ...
+[model call 2026-10-11T07:31:20Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 5: text
+[model call 2026-10-11T07:31:21Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 6: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; f=/home/ubuntu/.claude/projects/-home-ubuntu-btb-repo/5e6c202a-c974-44df-bf53-82b
+    -> 1:## 1. Internal email 22:## 2. Policy extract 147:## 3. Memo 165:## 4. Code sheet / field values 268:## Policy extract 318:## Memo 338:## Code list / reference sheet 387:## Principle 396:## Stages (adapt to the brief) 418: │ → <exit specialist> tool-call transition per exit situation (see "Router + specialists") 435:## Router + specialists (A1) 468:## Exact routing patterns 492:## Tool rules in e ...
+[model call 2026-10-11T07:31:23Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 7: text
+[model call 2026-10-11T07:31:23Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 8: tools Read
+  [Read] {'file_path': '/home/ubuntu/btb/repo/btb/briefs_raw/brief-a-raw.md', 'offset': 20}
+[model call 2026-10-11T07:31:24Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 9: tools Read
+  [Read] {'file_path': '/home/ubuntu/btb/repo/btb/briefs_raw/brief-b-raw.md'}
+[model call 2026-10-11T07:31:25Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 10: text
+Now routing.md and example, docs quickly.
+[model call 2026-10-11T07:31:26Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 11: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat .claude/skills/build-phone-agent/routing.md; cat examples/base-agent.json | h
+    -> # Workflow structure and routing recipe A shape that works for any collections-style brief. Fill every rule, value, field name, enum, outcome and reason from THE BRIEF and THE TOOL API FILE you were given. Node names below are suggestions; stage contents come from the brief. ## Principle The agent model is small. It follows one short task well and many mixed tasks badly. So: - one conversation nod ...
+[model call 2026-10-11T07:31:28Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 12: text
+[model call 2026-10-11T07:31:29Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 13: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; python3 -c "\nimport json;d=json.load(open(\'examples/base-agent.json\'));print([
+    -> ['tools', 'global_nodes', 'initial_node', 'system_prompt', 'test_variables'] {'tools': [{'type': 'function', 'config': {'timeoutMs': 12000, 'maxRetries': 0, 'alwaysRunsAt': ['end_of_call']}, 'function': {'name': 'close_call', 'handler': '__function__:api_call', 'parameters': {'type': 'object', 'properties': {'url': {'type': 'string', 'default': 'https://freya-bank-mock.freyavoice.workers.dev/v1/cl ...
+[model call 2026-10-11T07:31:31Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 14: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; grep -n "pre_actions\\": \\[\\|api_call\\|response_mapping\\|end_call\\|terminal\
+    -> docs/workflow-format.md:73:| `api_request` | Runs an HTTP call on entry | usually not | `pre_actions`, node-level `response_mapping`, `transitions` | docs/workflow-format.md:75:| `end_call` | Ends the call | optional farewell | `terminal` | docs/workflow-format.md:103:| `response_mapping` | array | | For `pre_actions` nodes: maps the call result to variables. Node level | docs/workflow-format.md:1 ...
+[model call 2026-10-11T07:31:33Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 15: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; sed -n 613,650p docs/workflow-format.md; sed -n 730,770p docs/workflow-format.md'
+    -> An `end_call` node hangs up. It has a `terminal` object and no outgoing transitions. ```json { "name": "goodbye", "node_type": "end_call", "on_enter": { "type": "silent" }, "disable_inactivity_monitor": true, "transitions": [], "terminal": { "type": "function", "function": { "name": "closing_end", "handler": "__function__:end_call", "parameters": { "type": "object", "properties": { "message_mode": ...
+[model call 2026-10-11T07:31:37Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 16: text
+[model call 2026-10-11T07:32:46Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 17: tools Bash
+  [Bash] {'command': 'mkdir -p /home/ubuntu/btb/repo/out && cat > /home/ubuntu/btb/repo/out/main-rB.gen.py <<\'EOF\'\nimport json
+    -> 0 errors, 0 warnings []
+[model call 2026-10-11T07:32:47Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 18: text
+[model call 2026-10-11T07:32:48Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 19: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; python3 builder/save.py main-rB out/main-rB.workflow.json 2>&1 | tail -5'}
+    -> {"hardened_tools": ["schedule_callback", "transfer_to_agent", "close_call", "verify_identity", "transfer_to_agent", "close_call", "get_account", "close_call", "create_promise", "add_note", "close_call", "add_note", "close_call", "create_promise", "add_note", "transfer_to_agent", "close_call", "add_note", "close_call", "add_note", "close_call", "transfer_to_agent", "add_note", "close_call", "transf ...
+[model call 2026-10-11T07:32:52Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 20: text
+The first version is saved. Next I'm running one chat turn to check that the agent starts.
+[model call 2026-10-11T07:32:53Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 21: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; timeout 60 python3 -c "import freya,json; print(freya.api(\'POST\',\'/api/v2/chat
+    -> {'response': 'I am a digital assistant calling from Freya Bank, and we are recording this call. Am I speaking with Ms Lee?', 'callId': '508dab75-5761-4fae-8623-986780028cbc', 'messageId': 'msg_4_1791703974373'}
+[model call 2026-10-11T07:33:04Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 22: text
+[model call 2026-10-11T07:33:04Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 23: text
+I built the multi-product phone agent from briefs A and B and saved it as slot main-rB. It starts a call: one chat turn opened with the digital-assistant line, the recording notice and "Am I speaking with Ms Lee?". No other live test was run, and per your instructions no practice cases were run.
+
+- **Checks:** the lint and situations checks both came back with no problems.
+- **Code steps:** the start node and the `get_account` hook from `main-rB.calc.json` are in place unchanged. `{{date_facts}}` and the "never compute a date yourself" instruction are in every node that handles dates, and the negotiate node is told to offer exactly the `offer_instead` value. Both rules no code step computes (date-of-birth format, one common date past a product's deadline) are written into their nodes in the brief's words.
+- **Structure:** opening, identity, account load, router, negotiate and the six specialist nodes (refused, hardship, dispute, already_paid, restructuring, human) are built as routing.md describes. The memo values are applied: deadlines of 12 and 7 business days, up to 3 products, and one retry on a failed promise.
+- **Additions beyond the brief:**
+  - Brief A only allows a human request "before and after verification". The extracted situation covers only after, so I also put the human-transfer option into the opening and identity nodes.
+  - The briefs give no failure rule for `schedule_callback`, `verify_identity` or `transfer_to_agent`. For each I used "try once more, then tell the customer". A twice-failed callback closes as `not_reached` / `no_callback`, and a twice-failed identity check closes as `not_verified` / `failed`.
+- **Not done:** step 7, the rule-by-rule re-read of the brief against the workflow, was skipped because of the 12-minute limit.
+
+The generator is `out/main-rB.gen.py`.
+
+workflow_id: e99b473c-2df6-4d05-927d-5b0085543563, agent_id: 33aaaf4a-3519-46f4-8ef1-2aa95ec80014. The DATE FACTS and extracted situations match the brief.
+
+done: 15 turns, 113 s
+final save (build): {'workflow_id': 'e99b473c-2df6-4d05-927d-5b0085543563', 'agent_id': '33aaaf4a-3519-46f4-8ef1-2aa95ec80014', 'version': 30}; lint: 0 errors, 0 warnings
+buildcheck: 0 error(s), 0 warning(s)
+[model call 2026-10-11T07:33:31] gpt-6-astra (Azure, btb/llm.py): self-simulation: write personas + ledger checks from the brief
+self-test 1 (workspace 2): 0/0 personas failed a check (0 checks)
+buildcheck (shipped): 0 problem(s)
+[freya] slot main-rB: workflow_id=e99b473c-2df6-4d05-927d-5b0085543563 agent_id=33aaaf4a-3519-46f4-8ef1-2aa95ec80014 version=30 (published)
+[freya] exported: /home/ubuntu/btb/repo/submission/main-rB.workflow.json
+BUILD END 2026-10-11T07:33:34Z (205 s); trace scrubbed (0 secret(s) replaced): /home/ubuntu/btb/repo/runs/traces/main-rB-20261011-073009.jsonl
+{"workflow_id": "e99b473c-2df6-4d05-927d-5b0085543563", "agent_id": "33aaaf4a-3519-46f4-8ef1-2aa95ec80014"}

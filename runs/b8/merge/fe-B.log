@@ -1,0 +1,12 @@
+FAIL PUB-11 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > create_promise > create_promise > create_promise > create_promise > close_call
+       - [plain] conversation: The one create_promise per product check fails because the agent made two attempts for each product, first with invalid IDs and then with valid IDs.
+       - [talkative] conversation: The one create_promise per product check fails because the agent made three failed create_promise calls with invalid product IDs before making three successful calls with the correct IDs.
+FAIL PUB-12 0/2 | verify_identity > verify_identity > verify_identity > verify_identity > get_account > add_note > add_note > create_promise > create_promise > close_call
+       - [pieces] notes [('car_loan_5521', 'refused'), ('personal_loan_1234', 'refused')], expected [('p2', 'refused'), ('p3', 'refused')]
+       - [pieces] conversation: The car loan received two attempts instead of one, and exactly one recorded credit-card promise is not clearly established because the final create_promise call has no result.
+       - [plain] notes [('cl_5678', 'refused'), ('pl_1234', 'refused')], expected [('p2', 'refused'), ('p3', 'refused')]
+       - [plain] conversation: The personal loan received only one targeted persuasion attempt instead of the required two, and the refused notes used incorrect product IDs rather than p2 and p3.
+PASS PUB-13 2/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > create_promise > create_promise > close_call
+
+fast_eval: 1 / 3 passed (2 rep(s), all reps must pass), 504 s
+harness: 0 case(s) still INVALID after 2 re-run(s) (not a measurement), 0 rep(s) re-run

@@ -1,0 +1,49 @@
+scorer: /home/ubuntu/btb/repo/btb/brief_c/score_c.py | bank: https://responding-simply-dpi-electro.trycloudflare.com
+  invalid rep C-09 (try 1): ['resumed from msg_6_1791704855085 (latest reply msg_19_1791704856852, isBranch=True)']
+FAIL C-01 0/1 | verify_identity > verify_identity > get_account > add_note > close_call
+       - [plain] outcome ('no_payment', 'SERVICE_ERROR'), expected ('arranged', None)
+       - [plain] promises [], expected [('A1', 380.0, '2026-11-01')]
+       - [plain] notes [('A1', 'SERVICE_ERROR')], expected []
+       - [plain] conversation: The first sentence does not say the call is recorded, no promise was recorded for 1 November 2026, and the e-mail confirmation sentence was not said after the promise.
+FAIL C-02 0/1 | close_call
+       - [plain] outcome ('no_contact', 'NO_CALLBACK'), expected ('no_contact', 'CALLBACK')
+       - [plain] callbacks [], expected [{'date': '2026-11-08', 'time': '09:30'}]
+       - [plain] conversation: Friday 6 November was not refused as a weekend callback day, and the required callback for Sunday 8 November at 09:30 was not booked.
+FAIL C-03 0/1 | verify_identity > verify_identity > verify_identity > get_account > add_note > close_call
+       - [plain] outcome ('no_payment', 'SERVICE_ERROR'), expected ('arranged', None)
+       - [plain] promises [], expected [('A1', 640.0, '2026-11-11')]
+       - [plain] notes [('A1', 'SERVICE_ERROR')], expected []
+       - [plain] conversation: The agent did not explicitly ask for the postcode letters, incorrectly treated next Wednesday as 13 November rather than recording 11 November, and named 12 November rather than 23 November in the first payment ask.
+PASS C-04 1/1 | verify_identity > verify_identity > verify_identity > close_call
+FAIL C-05 0/1 | verify_identity > verify_identity > get_account > add_note > close_call
+       - [plain] outcome ('no_payment', 'SERVICE_ERROR'), expected ('arranged', None)
+       - [plain] promises [], expected [('A1', 194.0, '2026-11-22')]
+       - [plain] notes [('A1', 'SERVICE_ERROR')], expected []
+       - [plain] conversation: The floor offered was 100.00 rather than 194, the agent did not say the rest stays overdue, Friday 20 November was not refused with Sunday 22 November offered, and the 22 November deadline was not stated.
+FAIL C-06 0/1 | verify_identity > verify_identity > get_account > add_note > close_call
+       - [plain] outcome ('no_payment', 'REFUSED'), expected ('arranged', None)
+       - [plain] promises [], expected [('A1', 622.57, '2026-12-15'), ('A1', 622.58, '2026-11-29')]
+       - [plain] notes [('A1', 'REFUSED')], expected []
+       - [plain] conversation: The agent named 24 October instead of 29 November as the deadline, did not refuse 26 November as a bank holiday and offer 29 November, and did not read back both complete payment parts before recording.
+FAIL C-07 0/1 | verify_identity > verify_identity > get_account > add_note > add_note > close_call
+       - [plain] conversation: The agent asks identity questions before naming both accounts with arrears and days overdue, and promises after the hardship disclosure that the bank will not call during the breathing space.
+FAIL C-08 0/1 | verify_identity > verify_identity > get_account > add_note > add_note > add_note > close_call
+       - [plain] promises [], expected [('A2', 1100.0, '2026-11-05')]
+       - [plain] notes [], expected [('A1', 'DISPUTED'), ('A3', 'PAID_CLAIMED')]
+       - [plain] conversation: Accounts were not named before the initial questions, the loan was neither recorded nor arranged for its 5 November deadline, and the agent falsely claimed the card dispute was noted after both recording attempts failed.
+FAIL C-09 0/1 | verify_identity > verify_identity > get_account > add_note > add_note > add_note > close_call
+       - [plain] outcome ('no_payment', 'SERVICE_ERROR'), expected ('arranged', None)
+       - [plain] promises [], expected [('A1', 1500.0, '2026-12-10'), ('A2', 500.0, '2026-12-10')]
+       - [plain] notes [('A1', 'SERVICE_ERROR'), ('A1', 'SERVICE_ERROR'), ('A2', 'SERVICE_ERROR')], expected []
+       - [plain] conversation: The card payment of 1,500 was not recorded for 10 December, and the agent offered 800 on the loan instead of the required 500.
+FAIL C-10 0/1 | verify_identity > verify_identity > verify_identity > get_account > add_note > add_note > close_call
+       - [plain] conversation: The overdraft deadline was 22 October instead of 3 December, the persuasion offer was 100 instead of 120 on 3 December, and exactly two create_promise attempts are not clearly established because only tool results, not calls, appear.
+FAIL C-11 0/1 | verify_identity > verify_identity > get_account > add_note > transfer_to_agent > close_call
+       - [plain] promises [], expected [('A1', 820.0, '2026-11-22')]
+       - [plain] notes [('A1', 'SERVICE_ERROR')], expected []
+       - [plain] conversation: The agent did not refuse today because it was after 15:00 or offer Sunday 22 November, discussed the overdraft before the card promise was read back and successfully recorded, and called add_note.
+FAIL C-12 0/1 | verify_identity > verify_identity > get_account > transfer_to_agent > transfer_to_agent > close_call
+       - [plain] transfers [{'queue': 'fraud'}, {'queue': 'fraud'}], expected [{'queue': 'fraud'}]
+
+fast_eval: 1 / 12 passed (1 rep(s), all reps must pass), 1223 s
+harness: 0 case(s) still INVALID after 2 re-run(s) (not a measurement), 1 rep(s) re-run

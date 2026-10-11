@@ -1,0 +1,140 @@
+builder: slot=main-rB tools=/home/ubuntu/btb/repo/tools/openapi.json briefs=/home/ubuntu/btb/repo/btb/briefs_raw/brief-a-raw.md /home/ubuntu/btb/repo/btb/briefs_raw/brief-b-raw.md
+trace: /home/ubuntu/btb/repo/runs/traces/main-rB-20261011-072514.jsonl
+BUILD START 2026-10-11T07:25:14Z slot=main-rB
+clean slot: moved 9 old file(s) of this slot out of the kit to /tmp/btb-old-main-rB-aaczkg71
+[model call 2026-10-11T07:26:03] gpt-4.1-mini (Azure, btb/llm.py): A3: extract the brief's mandatory sentences as fixed text
+[model call 2026-10-11T07:26:07] gpt-4.1-mini (Azure, btb/llm.py): A1: list the brief's situations after the account lookup (router + specialist routes)
+[test] datecalc: generated date/amount code run locally on 5 dates and fake products -> ok (56 s)
+[test] A1 situations: hardship, dispute, already_paid, cannot_pay_refusal, payment_plan_request, human_request
+[model] build agent: Claude Agent SDK, claude-opus-5-5, skill build-phone-agent, budget 12 min
+[model call 2026-10-11T07:26:10] gpt-4.1-mini (Azure, btb/llm.py): extract calendar/amount spec for code steps
+[model call 2026-10-11T07:26:12Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 1: tools Skill
+  [Skill] {'skill': 'build-phone-agent'}
+[model call 2026-10-11T07:26:14Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 2: text
+[model call 2026-10-11T07:26:15Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 3: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat btb/briefs_raw/brief-a-raw.md btb/briefs_raw/brief-b-raw.md; cat .claude/skil
+    -> <persisted-output> Output too large (35.8KB). Full output saved to: /home/ubuntu/.claude/projects/-home-ubuntu-btb-repo/98b5a5e8-1be4-4a9f-a3fe-2982136a1d87/tool-results/bo37lwcim.txt Preview (first 2KB): ## 1. Internal email **From:** Mara Chen, Operations Manager, Freya Bank **To:** Vendor delivery team **Subject:** Early-stage calling — one-product handover Hi team, Here’s the material for the  ...
+[model call 2026-10-11T07:26:16Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 4: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; python3 -c "\nimport json;d=json.load(open(\'tools/openapi.json\'))\nfor p,v in d
+    -> post /verify_identity {"type": "object", "properties": {"customer_id": {"type": "string"}, "field": {"type": "string", "enum": ["date_of_birth", "phone_last4"]}, "answer": {"type": "string", "description": "For date_of_birth: the date as YYYY-MM-DD. Callers say dates in words, the agent converts. An unreadable value is rejected with ok=false and is not counted as a wrong answer. For phone_last4: f ...
+[model call 2026-10-11T07:26:18Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 5: text
+[model call 2026-10-11T07:26:19Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 6: tools Read
+  [Read] {'file_path': '/home/ubuntu/.claude/projects/-home-ubuntu-btb-repo/98b5a5e8-1be4-4a9f-a3fe-2982136a1d87/tool-results/bo3
+[model call 2026-10-11T07:26:22Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 7: text
+[model call 2026-10-11T07:26:24Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 8: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; python3 -c "\nimport json;d=json.load(open(\'out/main-rB.calc.json\'));print(d.ke
+    -> dict_keys(['ok', 'spec', 'unhandled_rules', 'code_node', 'account_tool', 'account_post_process_code', 'example_date_facts', 'example_product_facts']) {"name": "date_facts_setup", "node_type": "code", "passthrough": true, "passthrough_default_transition": "<NEXT NODE>", "on_enter": {"type": "silent"}, "pre_actions": [{"type": "function", "function": {"name": "code_exec", "handler": "__function__:co ...
+[model call 2026-10-11T07:26:29Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 9: text
+[model call 2026-10-11T07:26:30Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 10: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; grep -n -i -B2 -A30 "api_request" docs/workflow-format.md | head -90; grep -n "is
+    -> 71-|---|---|---|---| 72-| `conversation` | A dialogue step | yes | `task_message`, `tools`, `extraction_schema`, `transitions` | 73:| `api_request` | Runs an HTTP call on entry | usually not | `pre_actions`, node-level `response_mapping`, `transitions` | 74-| `code` | Runs a Python snippet on entry | usually not | `pre_actions` with a `code_exec` function, `transitions` | 75-| `end_call` | Ends th ...
+[model call 2026-10-11T07:26:32Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 11: text
+[model call 2026-10-11T07:26:32Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 12: text
+Writing the workflow generator now (Brief B, multi-product, router + specialists).
+[model call 2026-10-11T07:26:33Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 13: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; grep -n "response_mapping" -A12 docs/workflow-format.md docs/tools-and-code.md | 
+    -> docs/workflow-format.md:73:| `api_request` | Runs an HTTP call on entry | usually not | `pre_actions`, node-level `response_mapping`, `transitions` | docs/workflow-format.md-74-| `code` | Runs a Python snippet on entry | usually not | `pre_actions` with a `code_exec` function, `transitions` | docs/workflow-format.md-75-| `end_call` | Ends the call | optional farewell | `terminal` | docs/workflow-f ...
+[model call 2026-10-11T07:26:35Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 14: text
+[model call 2026-10-11T07:27:31Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 15: tools Bash
+  [Bash] {'command': 'mkdir -p /home/ubuntu/btb/repo/out && cat > /home/ubuntu/btb/repo/out/main-rB.gen.py <<\'EOF\'\nimport json
+    -> 0 errors, 0 warnings []
+[model call 2026-10-11T07:27:33Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 16: text
+[model call 2026-10-11T07:27:34Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 17: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; python3 -c "import json;d=json.load(open(\'examples/base-agent.json\'));print([k 
+    -> ['tools', 'global_nodes', 'initial_node', 'system_prompt', 'test_variables'] {'tools': 'list', 'global_nodes': 'dict', 'initial_node': 'identity', 'test_variables': 'dict'}
+[model call 2026-10-11T07:27:37Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 18: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; sed -i \'s/"global_nodes":\\[\\]}/"global_nodes":{},"tools":[]}/; s/wf={"name":"m
+    -> 0 errors, 0 warnings [] {"hardened_tools": ["schedule_callback", "transfer_to_agent", "close_call", "verify_identity", "transfer_to_agent", "close_call", "get_account", "close_call", "create_promise", "add_note", "close_call", "transfer_to_agent", "add_note", "close_call", "add_note", "close_call", "add_note", "close_call", "add_note", "close_call", "transfer_to_agent", "close_call", "transfer_to_ ...
+[model call 2026-10-11T07:27:42Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 19: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; timeout 60 python3 -c "import freya,json; print(str(freya.api(\'POST\',\'/api/v2/
+    -> {'response': "Hello, this is Freya Bank's digital assistant. This call is recorded. Am I speaking with Ms Lee?", 'callId': '5ed73533-109b-4a9c-92d5-8e625c908762', 'messageId': 'msg_4_1791703663488'}
+[model call 2026-10-11T07:27:51Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 20: text
+[model call 2026-10-11T07:27:51Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 21: text
+I built the workflow for Brief B with the Brief A rules it extends, saved it as slot main-rB, and one test chat turn opens with the correct greeting. I tested only that one turn and ran no practice cases.
+
+**workflow_id `e99b473c-2df6-4d05-927d-5b0085543563`, agent_id `33aaaf4a-3519-46f4-8ef1-2aa95ec80014`**
+
+- **Checks:** the linter and `builder/situations.py check` both report no problems.
+- **Structure:** the call starts with the `date_facts` code node, then goes opening → identity → router → negotiate, plus the six exit specialists, and every close goes to `hang_up`. The account post-process code is used verbatim on `get_account`.
+- **Account lookup:** `get_account` is a tool the router must call first, not a separate pre-action node as routing.md suggests. I chose this to save time. It works if the model calls it at once, but it is less certain than running the lookup automatically.
+- **Extracted situations differ from the brief, and the brief wins:**
+  - **Dispute, already paid and refusal:** the extraction says each one closes the call. Brief B (clauses 8–9) says to write a note for that product and carry on with the others. So these three nodes call `add_note` and go back to negotiate while other products are still open. They close only when none remain.
+  - **Hardship declined:** the extraction stops at close. These calls also write `add_note` with reason `hardship` per Brief B clause 8.
+  - **Transfers:** following clause 10, they add no notes.
+- **Failed promise:** I used the memo's limit of two failed `create_promise` calls per product, not the extract's three. After the second failure the agent notes that product as `service_error` and keeps the promises already recorded.
+- **Date rules:** `unhandled_rules` was empty, so there were no extra date rules to write into prompts.
+
+done: 13 turns, 101 s
+final save (build): {'workflow_id': 'e99b473c-2df6-4d05-927d-5b0085543563', 'agent_id': '33aaaf4a-3519-46f4-8ef1-2aa95ec80014', 'version': 27}; lint: 1 errors, 0 warnings
+buildcheck: 5 error(s), 0 warning(s): prompt text uses {{days_late}}, which no call variable, mapping, extraction or hook sets (the model sees it raw); prompt text uses {{last_name}}, which no call variable, mapping, extraction or hook sets (the model sees it raw); prompt text uses {{past_due}}, which no call variable, mapping, extraction or hook sets (the model sees it raw); prompt text uses {{product}}, which no call variable, mapping, extraction or hook sets (the model sees it raw); prompt text uses {{title}}, which no call variable, mapping, extraction or hook sets (the model sees it raw)
+[model call 2026-10-11T07:27:57Z] claude-opus-5-5 (Claude Agent SDK) buildcheck repair turn 1: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; grep -n -o \'.\\{150\\}{{\\(days_late\\|last_name\\|past_due\\|product\\|title\\)
+    -> <persisted-output> Output too large (257.5KB). Full output saved to: /home/ubuntu/.claude/projects/-home-ubuntu-btb-repo/9232b4aa-f128-4856-9bdc-2b8060f464e7/tool-results/bc5f9p0dg.txt Preview (first 2KB): 2:ompt": "You are Freya Bank's digital assistant on an outbound phone call. Speak English, one or two short sentences per turn. Address the customer as {{title}} {{last_name}}. Use the supplied  ...
+[model call 2026-10-11T07:27:59Z] claude-opus-5-5 (Claude Agent SDK) buildcheck repair turn 2: text
+[model call 2026-10-11T07:28:00Z] claude-opus-5-5 (Claude Agent SDK) buildcheck repair turn 3: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; grep -n "no call variable" -B40 builder/buildcheck.py | grep -n "def \\|mapping\\
+    -> 8:161- # a product id the model fills is resolved by harden's pre-hook (<tool>_args); a customer id cannot be 19:172- errs.append(f"{name}: writes {', '.join(prod_ids)} without the known-ids pre-hook (ids only from the lookup)") 21:174- errs.append("no reachable lookup tool records the ids it returns (known_ids post-hook): " + ", ".join(sorted(set(id_writes))) 24:177- def texts(o, key=""): 41:194: ...
+[model call 2026-10-11T07:28:03Z] claude-opus-5-5 (Claude Agent SDK) buildcheck repair turn 4: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; sed -n 176,195p builder/buildcheck.py; python3 -c "\nimport json;d=json.load(open
+    -> # unbound {{vars}} in prompt text def texts(o, key=""): if isinstance(o, dict): for k, v in o.items(): if k in ("parameters",) or k.endswith("_code") or k == "code": continue yield from texts(v, k) elif isinstance(o, list): for v in o: yield from texts(v, key) elif isinstance(o, str) and key in ("task_message", "text", "content", "system_prompt", "description", "message", "prompt"): yield o bad =  ...
+[model call 2026-10-11T07:28:05Z] claude-opus-5-5 (Claude Agent SDK) buildcheck repair turn 5: text
+[model call 2026-10-11T07:28:06Z] claude-opus-5-5 (Claude Agent SDK) buildcheck repair turn 6: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; grep -n "defined\\b\\|defined\\.\\|defined =\\|def _bound" -A3 builder/buildcheck
+    -> 79:def _defined(wf, code): 80- names = set((wf.get("test_variables") or {}).keys()) 81- def walk(o): 82- if isinstance(o, dict): -- 98:def _bound(root, defined, tool_fields): 99: return (root in defined or root in tool_fields or root.endswith(("_response", "_args", "_result")) 100- or root.startswith(("extractor", "vars", "call", "now", "today", "current", "system", "agent", "user"))) 101- 102- -- ...
+[model call 2026-10-11T07:28:08Z] claude-opus-5-5 (Claude Agent SDK) buildcheck repair turn 7: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; sed -n 79,97p builder/buildcheck.py; python3 -c "\nimport json\nfor f in [\'out/m
+    -> def _defined(wf, code): names = set((wf.get("test_variables") or {}).keys()) def walk(o): if isinstance(o, dict): for k in ("variable", "target"): if isinstance(o.get(k), str): names.add(o[k].split(".")[0]) if "name" in o and isinstance(o.get("name"), str) and ("type" in o or "enum" in o): names.add(o["name"]) # extraction schema entries for v in o.values(): walk(v) elif isinstance(o, list): for v ...
+[model call 2026-10-11T07:28:11Z] claude-opus-5-5 (Claude Agent SDK) buildcheck repair turn 8: text
+[model call 2026-10-11T07:28:11Z] claude-opus-5-5 (Claude Agent SDK) buildcheck repair turn 9: text
+The workflow has no `test_variables`, so the call variables are undefined. Next I'm checking how the account fields (product, past_due, days_late) are supposed to be filled.
+[model call 2026-10-11T07:28:12Z] claude-opus-5-5 (Claude Agent SDK) buildcheck repair turn 10: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; grep -n -i "variable\\|title\\|last_name\\|product\\|past due\\|days late" /home/
+    -> 6:**Subject:** Brief B — multi-product collections changes 10:This is the multi-product extension to Brief A, not a replacement for the whole call flow. Freya Bank is fictional. Every customer, debt and payment here is synthetic. 14:The main difference is that you need to tell the customer about **every late product, one sentence each, before asking for anything**. Ask whether they can pay all of  ...
+[model call 2026-10-11T07:28:16Z] claude-opus-5-5 (Claude Agent SDK) buildcheck repair turn 11: text
+[model call 2026-10-11T07:28:17Z] claude-opus-5-5 (Claude Agent SDK) buildcheck repair turn 12: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; grep -n -i "call variable\\|title\\|last_name\\|customer_id" btb/briefs_raw/brief
+    -> 13:Please use the title and last name when addressing the customer. Each call starts with only the variables in the sheet at the bottom; nothing else is known until the tools are called. Pass `customer_id` on every tool call. All date calculations must use the supplied `now`, not the real clock. 31:2. The agent shall ask: "Am I speaking with {title} {last_name}?". 171:| `customer_id` | `c_4f2a...` ...
+[model call 2026-10-11T07:28:20Z] claude-opus-5-5 (Claude Agent SDK) buildcheck repair turn 13: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; sed -n 165,180p btb/briefs_raw/brief-a-raw.md; grep -c "late payment on your {{pr
+    -> ## 4. Code sheet / field values ### CALL_START | Variable | Example / values | Meaning | |---|---|---| | `customer_id` | `c_4f2a...` | Pass to every tool call | | `first_name` | `Daniel` | Person to ask for — first name | | `last_name` | `Reyes` | Person to ask for — last name | | `title` | `Mr` or `Ms` | Address customer as title plus last name | | `now` | `2026-10-14T11:00` | Current date/time;  ...
+[model call 2026-10-11T07:28:23Z] claude-opus-5-5 (Claude Agent SDK) buildcheck repair turn 14: text
+[model call 2026-10-11T07:28:23Z] claude-opus-5-5 (Claude Agent SDK) buildcheck repair turn 15: text
+Fixing: add `test_variables` for the call-start variables, and reword the per-product disclosure line in the system prompt to use the get_account values.
+[model call 2026-10-11T07:28:23Z] claude-opus-5-5 (Claude Agent SDK) buildcheck repair turn 16: tools Read
+  [Read] {'file_path': '/home/ubuntu/btb/repo/out/main-rB.workflow.json', 'limit': 1}
+[model call 2026-10-11T07:28:24Z] claude-opus-5-5 (Claude Agent SDK) buildcheck repair turn 17: tools Grep
+  [Grep] {'pattern': '"I am calling from the collections team about a late payment on your \\{\\{product\\}\\}. The amount past d
+[model call 2026-10-11T07:28:27Z] claude-opus-5-5 (Claude Agent SDK) buildcheck repair turn 18: tools Edit
+  [Edit] {'replace_all': False, 'file_path': '/home/ubuntu/btb/repo/out/main-rB.workflow.json', 'old_string': '\\"I am calling fr
+[model call 2026-10-11T07:28:28Z] claude-opus-5-5 (Claude Agent SDK) buildcheck repair turn 19: tools Edit
+  [Edit] {'replace_all': False, 'file_path': '/home/ubuntu/btb/repo/out/main-rB.workflow.json', 'old_string': '{\n  "system_promp
+[model call 2026-10-11T07:28:30Z] claude-opus-5-5 (Claude Agent SDK) buildcheck repair turn 20: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; head -c 40 out/main-rB.workflow.json | od -c | head -3'}
+    -> 0000000 { \n " s y s t e m _ p r o m p 0000020 t " : " Y o u a r e F r e 0000040 y a B a n k '
+[model call 2026-10-11T07:28:33Z] claude-opus-5-5 (Claude Agent SDK) buildcheck repair turn 21: tools Edit
+  [Edit] {'replace_all': False, 'file_path': '/home/ubuntu/btb/repo/out/main-rB.workflow.json', 'old_string': '{\n "system_prompt
+[model call 2026-10-11T07:28:34Z] claude-opus-5-5 (Claude Agent SDK) buildcheck repair turn 22: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; python3 builder/buildcheck.py out/main-rB.workflow.json /home/ubuntu/btb/repo/too
+    -> ok json ok
+[model call 2026-10-11T07:28:40Z] claude-opus-5-5 (Claude Agent SDK) buildcheck repair turn 23: text
+[model call 2026-10-11T07:28:40Z] claude-opus-5-5 (Claude Agent SDK) buildcheck repair turn 24: text
+All five unbound-variable errors in `out/main-rB.workflow.json` are fixed. Buildcheck now prints `ok` with no errors, and the JSON loads.
+
+**`{{title}}` and `{{last_name}}`:** Brief A lists these as variables the call starts with, but the workflow never declared them. I added a top-level `test_variables` block holding all five starting variables from the brief (`customer_id`, `first_name`, `last_name`, `title`, `now`). The values are placeholders I made up for testing (Ms Ann Lee, `c_test`, 2026-10-14T11:00), the same ones `main-rB4.workflow.json` uses. On a real call, the values passed in with the call replace them.
+
+**`{{product}}`, `{{past_due}}` and `{{days_late}}`:** These only appeared in the system prompt's disclosure line. That line assumed a single product, but Brief B allows several products, each with its own amount and days late. So I didn't bind them to one value. Instead I reworded the line to use plain `<product>`, `<past_due>` and `<days_late>` slots, with an instruction to fill them from each product's `get_account` result, one sentence per late product. The script text is otherwise unchanged.
+
+A hook's code (around line 649 of the file) still holds a fixed copy of the old sentence with the `{{...}}` placeholders. I left it alone because you said not to touch hook code, and the check doesn't scan code. If that text ever reaches the caller, it will still contain the raw placeholders.
+
+Nothing else was changed, and nothing was saved to Freya.
+
+done: 16 turns, 46 s
+final save (buildcheck repair): {'workflow_id': 'e99b473c-2df6-4d05-927d-5b0085543563', 'agent_id': '33aaaf4a-3519-46f4-8ef1-2aa95ec80014', 'version': 28}; lint: 1 errors, 0 warnings
+buildcheck repair kept: 5 -> 0 error(s)
+[model call 2026-10-11T07:29:06] gpt-6-astra (Azure, btb/llm.py): self-simulation: write personas + ledger checks from the brief
+self-test 1 (workspace 2): 0/0 personas failed a check (0 checks)
+buildcheck (shipped): 0 problem(s)
+[freya] slot main-rB: workflow_id=e99b473c-2df6-4d05-927d-5b0085543563 agent_id=33aaaf4a-3519-46f4-8ef1-2aa95ec80014 version=28 (published)
+[freya] exported: /home/ubuntu/btb/repo/submission/main-rB.workflow.json
+BUILD END 2026-10-11T07:29:10Z (236 s); trace scrubbed (0 secret(s) replaced): /home/ubuntu/btb/repo/runs/traces/main-rB-20261011-072514.jsonl
+{"workflow_id": "e99b473c-2df6-4d05-927d-5b0085543563", "agent_id": "33aaaf4a-3519-46f4-8ef1-2aa95ec80014"}

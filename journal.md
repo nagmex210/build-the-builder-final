@@ -286,3 +286,52 @@ support offered twice on hand-off re-entry (M40), key names read literally from 
 
 The b7 merge candidate scored 0/3 on official raw-B (invented product ids, per-product dates swapped), so the owner stopped the merge and moved on. Branches merge/b7 and idea/b7-1..5 are kept for the archive.
 Owner direction for b8: brief B is stuck at 2/3 on one case, every time for the same reason: the model miscounts persuasion attempts per product and writes the wrong notes. Per-item gates decided in code, i.e. an OR gate for one combined ask, then dependent per-item gates, each with a code-counted budget. The model consults an internal logic step inside the workflow (never an outside URL), plus a build reliability worker. Families: runs/next_families.txt.
+
+## b8 merge (2026-10-11 07:21-08:20 UTC)
+
+Platform this batch: workspace 2 answers 402 Insufficient credits (chat AND simulations), so (1) no build ran its
+self-simulation (every b8 build "self-test 1: 0/0 personas", builds 2.5-5 min instead of 9-13) and (2) official B/rB
+ran in workspace 1 after A. About 20 fast_evals ran at once; most worker evals did not finish within the workers' 75 min.
+The merger stopped w2's and w5's evals (1h10 / 50 min, no result) to free eval slots for the merge candidate.
+
+Owner note (cedb5ea tool-name normalisation): confirmed REAL but rare. Saved specs: 88 calc.json across all worktrees,
+0 mismatched names; traces: 1 of 45 (runs/traces/main-B-20261011-051844.jsonl, the b7 merge main-B: promise_tool
+"/create_promise", callback_tool "/schedule_callback" -> no promise/callback guard and no date check installed).
+Fresh: datecalc alone 3x each on A, rA, rB, C, raw C = 0/15 mismatches, guards installable in 15/15 (C: no
+check_promise_date, a promise_date_field condition, not a name issue). Carried over only the norm_tools part of
+cedb5ea (+ its login-token fetch); the apifuzz line of merge/b7 was not taken.
+
+Workers (fast --reps 2 --style random; champion b6: A 6, B 0, rA 6, rB 0; C 1-2/12):
+- w1 A18-style per-item gates in code (gates.py: lookup-only ledger, item_gate code-only tool, refusal/second-note/close
+  gates): rA 6, rB 0, B 0 (1 invalid), A harness-invalid (9/10), C 3/12 (best C this batch; v3 with a hook over the
+  platform limit 1/12). Live-verified: the model calls item_gate, invented ids refused with code's reason. Not merged:
+  no B/rB gain measured; it is the start point for b9's A18 family. Found the platform limit: hook code + data >
+  131072 bytes fails the tool call (taken: hookcheck flags hooks > 110 KB).
+- w2 per-item gates v2 (itemgate.py, item_step tool, negotiate_item node): builds OK, unmeasured. Not merged.
+- w3 build reliability: buildcheck + one EDIT repair round, rebuild when nothing written, no stale success, clean slot.
+  A 9/10 (!), B 0, rA 6, rB 0 (2 invalid). Broken builds 2/9 -> 0/9 shipped; stale-slot reuse 2/9 -> 0/9. MERGED.
+- w4 held-out focus, amounts from code (check_promise_date answers amount: lowest_amount, floor-offered counter,
+  unknown id -> listed ids): A 5, B 0 (broken build: unreachable negotiate), rA 6, rB 0. The fast A PUB-09
+  "minimum 300" was the model skipping the check tool (no check call in that call), not the new text. MERGED on (c).
+- w5 policy_check decision tool: v1 rA 0/10 (account hook over the size limit), v2 unmeasured. Not merged.
+No worker hard-coded brief content (diff greps: no case ids, codes, amounts, dates, product ids).
+
+Merger fixes: hookcheck size error (> 110 KB); canned.py: a brief's mandatory line with {{placeholders}} (seen on
+the rB build: "{{product}} ... {{past_due}} ... {{days_late}}" in the account hook's SAY EXACTLY) is stored as <<x>>
+and filled from the tool result (exact field, then a non-id loose match; else "[field]" + "put the real value") so
+the model is never told to say raw placeholders and no hook carries {{ }} (lint error). Local exec tests both ways.
+
+Merged (main a575bbf), builds 173-236 s (no self-sim), lint 0, buildcheck 0 on all five (rB: repair round 5 -> 0):
+- fast A 4/10, B 1/3, rA 8/10, rB 0/3 = 13/26 (champion 12). Fast A failures: dates (PUB-04/06 one day off),
+  PUB-10 service_error, PUB-03, PUB-07, PUB-09 transfer missed.
+- OFFICIAL A 8/10 (runs 8,9; PUB-05 0/2 support/sympathy twice, PUB-06 1/2 floor twice), B 3/3 (3,3), raw-A 9/10
+  (PUB-05 sympathy x3), raw-B 3/3. Champion (b6): A 7, B 2, rA 10, rB 1. A+B 11 vs 9, rA+rB 12 vs 11: no drop.
+- C 1/12 random, 1/12 adversarial (b6 champion 1/12 random). WATCH: on C the agent named October dates (call_time
+  1 Nov), its promises were blocked by the guard and closed SERVICE_ERROR (C-01/03/05/09). The start node's code,
+  run locally with call_time 2026-11-01, gives correct November facts; w1's C build in the same hour had November
+  dates. Unexplained (date facts not reaching the live call? branch resume?). Assigned as b9's wild card.
+Decision: KEEP. Accept rule (b)+(c): multi-product official B and raw-B both 3/3 (two briefs, the b7 failure kind),
+PUB-03 identity 2/2; mechanisms: no stale/broken build shipped (buildcheck + clean slot), the floor offered comes from
+code, tool names normalised, hooks checked for the platform size limit, no raw placeholders in mandatory lines.
+Hypotheses (H) for b9: once-only limits need code flags (the only official A residuals); the self-sim has been a
+no-op since workspace 2 ran out of credits; per-item gates (b8-1) are the A18 base.

@@ -1,0 +1,18 @@
+PASS PUB-01 2/2 | verify_identity > verify_identity > get_account > create_promise > close_call
+PASS PUB-02 2/2 | schedule_callback > close_call
+FAIL PUB-03 0/2 | verify_identity > verify_identity > close_call
+       - [talkative] conversation: The check was ended without verifying the third answer, so termination after the third wrong answer is not clearly satisfied.
+       - [in_words] outcome ('promise', None), expected ('not_verified', 'failed')
+       - [in_words] promises [('p1', 95.0, '2026-10-16')], expected []
+       - [in_words] conversation: The security check continued after the third wrong answer (1990-07-21), the agent disclosed a credit card and the amount owed, and the customer was not told to use the app or a branch.
+PASS PUB-04 2/2 | verify_identity > verify_identity > get_account > create_promise > close_call
+PASS PUB-05 2/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+FAIL PUB-06 1/2 | verify_identity > verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [talkative] conversation: The minimum payment was offered twice rather than once: the agent repeated the 637.50 offer after the customer asked what she should pay.
+PASS PUB-07 2/2 | verify_identity > verify_identity > get_account > create_promise > close_call
+PASS PUB-08 2/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+PASS PUB-09 2/2 | verify_identity > verify_identity > get_account > transfer_to_agent > close_call
+PASS PUB-10 2/2 | verify_identity > verify_identity > get_account > create_promise > create_promise > close_call
+
+fast_eval: 8 / 10 passed (2 rep(s), all reps must pass), 1325 s
+harness: 0 case(s) still INVALID after 2 re-run(s) (not a measurement), 0 rep(s) re-run

@@ -1,0 +1,513 @@
+{
+ "workflow_id": "63f0e252-1681-4981-95d9-7bd18b847389",
+ "passed": 8,
+ "total": 10,
+ "invalid": 0,
+ "rows": [
+  {
+   "id": "PUB-01",
+   "style": "talkative",
+   "pass": true,
+   "failed": [],
+   "call_id": "88bf486d-a109-422c-a671-0c3514bd362f",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 6,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "88bf486d-a109-422c-a671-0c3514bd362f",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-02",
+   "style": null,
+   "pass": true,
+   "failed": [],
+   "call_id": "920905bc-db3e-4293-83eb-d17bca19fb78",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "schedule_callback",
+    "close_call"
+   ],
+   "turns": 3,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "920905bc-db3e-4293-83eb-d17bca19fb78",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-03",
+   "style": "talkative",
+   "pass": false,
+   "failed": [
+    "conversation: The check was ended without verifying the third answer, so termination after the third wrong answer is not clearly satisfied."
+   ],
+   "call_id": "0a53d00e-f058-4e54-a662-aa47e278fca6",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "close_call"
+   ],
+   "turns": 5,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "0a53d00e-f058-4e54-a662-aa47e278fca6",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-04",
+   "style": "corrects",
+   "pass": true,
+   "failed": [],
+   "call_id": "6d94e242-49f2-4dce-b0bd-e7aa2c41a86d",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 9,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "6d94e242-49f2-4dce-b0bd-e7aa2c41a86d",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-05",
+   "style": "pieces",
+   "pass": true,
+   "failed": [],
+   "call_id": "e3a7c27b-519a-445b-ab08-34ca13431edb",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 7,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "e3a7c27b-519a-445b-ab08-34ca13431edb",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-06",
+   "style": "talkative",
+   "pass": false,
+   "failed": [
+    "conversation: The minimum payment was offered twice rather than once: the agent repeated the 637.50 offer after the customer asked what she should pay."
+   ],
+   "call_id": "85fd1ba3-31ae-45cc-af2b-029ff4ab2bae",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 9,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "85fd1ba3-31ae-45cc-af2b-029ff4ab2bae",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-07",
+   "style": "asks_back",
+   "pass": true,
+   "failed": [],
+   "call_id": "bf9bcb7c-312a-4c29-ad39-ee4befca07b6",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 8,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "bf9bcb7c-312a-4c29-ad39-ee4befca07b6",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-08",
+   "style": "pieces",
+   "pass": true,
+   "failed": [],
+   "call_id": "09c36367-efa5-4e18-a461-e0a48d5de797",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 6,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "09c36367-efa5-4e18-a461-e0a48d5de797",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-09",
+   "style": "corrects",
+   "pass": true,
+   "failed": [],
+   "call_id": "0aa0e772-486b-48de-ac02-5cb5f272c6cd",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "transfer_to_agent",
+    "close_call"
+   ],
+   "turns": 5,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "0aa0e772-486b-48de-ac02-5cb5f272c6cd",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-10",
+   "style": "talkative",
+   "pass": true,
+   "failed": [],
+   "call_id": "dcb68729-6e77-4bf5-99b0-522ed1052eb6",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 7,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "dcb68729-6e77-4bf5-99b0-522ed1052eb6",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-01",
+   "style": "talkative",
+   "pass": true,
+   "failed": [],
+   "call_id": "b2332b86-2346-4c12-8088-cc9a2fe9476a",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 7,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "b2332b86-2346-4c12-8088-cc9a2fe9476a",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-02",
+   "style": "in_words",
+   "pass": true,
+   "failed": [],
+   "call_id": "9ebd435e-d5a7-4648-b3d2-0f55c6336255",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "schedule_callback",
+    "close_call"
+   ],
+   "turns": 3,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "9ebd435e-d5a7-4648-b3d2-0f55c6336255",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-03",
+   "style": "in_words",
+   "pass": false,
+   "failed": [
+    "outcome ('promise', None), expected ('not_verified', 'failed')",
+    "promises [('p1', 95.0, '2026-10-16')], expected []",
+    "conversation: The security check continued after the third wrong answer (1990-07-21), the agent disclosed a credit card and the amount owed, and the customer was not told to use the app or a branch."
+   ],
+   "call_id": "2828cbc2-0dce-41f1-9795-930e84a9f2ac",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 11,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "2828cbc2-0dce-41f1-9795-930e84a9f2ac",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-04",
+   "style": "pieces",
+   "pass": true,
+   "failed": [],
+   "call_id": "d29641d8-7afb-4709-9d52-531349996d9f",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 8,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "d29641d8-7afb-4709-9d52-531349996d9f",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-05",
+   "style": "in_words",
+   "pass": true,
+   "failed": [],
+   "call_id": "400816c7-5126-46a8-a897-164b40bf90b9",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 7,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "400816c7-5126-46a8-a897-164b40bf90b9",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-06",
+   "style": "pieces",
+   "pass": true,
+   "failed": [],
+   "call_id": "be2ca754-3a03-4ab0-8a48-3d5717c6df24",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 8,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "be2ca754-3a03-4ab0-8a48-3d5717c6df24",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-07",
+   "style": null,
+   "pass": true,
+   "failed": [],
+   "call_id": "f2278ada-bff0-468b-985d-399adfabd9b1",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 8,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "f2278ada-bff0-468b-985d-399adfabd9b1",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-08",
+   "style": "pieces",
+   "pass": true,
+   "failed": [],
+   "call_id": "fc4c7044-9248-4983-a82d-1dcd24396655",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 5,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "fc4c7044-9248-4983-a82d-1dcd24396655",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-09",
+   "style": "in_words",
+   "pass": true,
+   "failed": [],
+   "call_id": "48a7cbfb-ac2b-44c9-ad37-80316a38d3fc",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "transfer_to_agent",
+    "close_call"
+   ],
+   "turns": 7,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "48a7cbfb-ac2b-44c9-ad37-80316a38d3fc",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-10",
+   "style": "in_words",
+   "pass": true,
+   "failed": [],
+   "call_id": "3e08ff96-1224-4a79-936e-9c54502dbb89",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 7,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "3e08ff96-1224-4a79-936e-9c54502dbb89",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  }
+ ]
+}
