@@ -1,0 +1,184 @@
+{
+ "workflow_id": "4cbc6e50-8882-424c-b069-7090b541b5e4",
+ "passed": 1,
+ "total": 3,
+ "invalid": 0,
+ "rows": [
+  {
+   "id": "PUB-11",
+   "style": null,
+   "pass": true,
+   "failed": [],
+   "call_id": "8f009608-f1bd-4ae6-b2ae-d4128cf17587",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 7,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "8f009608-f1bd-4ae6-b2ae-d4128cf17587",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-12",
+   "style": "corrects",
+   "pass": true,
+   "failed": [],
+   "call_id": "28765290-6a2c-4109-a481-7ad470686fad",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "add_note",
+    "add_note",
+    "close_call"
+   ],
+   "turns": 12,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "28765290-6a2c-4109-a481-7ad470686fad",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-13",
+   "style": "talkative",
+   "pass": false,
+   "failed": [
+    "promises [('p2', 300.0, '2026-10-23')], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]",
+    "notes [('p1', 'refused')], expected []",
+    "conversation: The credit card was not recorded for 30 October, and the read-back did not name both 30 October and 23 October."
+   ],
+   "call_id": "8cf290ec-572d-44c3-a82d-7b2f620fb9ca",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "add_note",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 14,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "8cf290ec-572d-44c3-a82d-7b2f620fb9ca",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-11",
+   "style": "pieces",
+   "pass": true,
+   "failed": [],
+   "call_id": "6268d976-cdf9-4bc1-89db-61992e543cd7",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 7,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "6268d976-cdf9-4bc1-89db-61992e543cd7",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-12",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "conversation: The car loan received two persuasion attempts after the initial refusal, rather than the required one for the early band."
+   ],
+   "call_id": "3a733546-6bc8-46e3-ae48-ecc1097ccf7c",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "add_note",
+    "add_note",
+    "close_call"
+   ],
+   "turns": 13,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "3a733546-6bc8-46e3-ae48-ecc1097ccf7c",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-13",
+   "style": "asks_back",
+   "pass": true,
+   "failed": [],
+   "call_id": "da6f4a2e-4b13-486f-b5f7-89f414bc7111",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 12,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "da6f4a2e-4b13-486f-b5f7-89f414bc7111",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  }
+ ]
+}

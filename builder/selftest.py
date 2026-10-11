@@ -309,7 +309,7 @@ def _run_one(workflow_id, sc, lib):
     cu = sc["cust"]
     sess = session(cu["id"])
     persona = PERSONA.format(who=cu["name"], script=sc["script"], identity=json.dumps(cu["identity"]), products=json.dumps(cu["products"]))
-    hist, call_id, err, turns = [], None, None, []
+    hist, call_id, err, turns, ok_tools = [], None, None, [], []
     msg, t0 = "Hello?", time.time()
     try:
         for _ in range(MAX_TURNS):
@@ -318,6 +318,7 @@ def _run_one(workflow_id, sc, lib):
             agent = (r.get("response") or "").strip()
             turns += [("customer", msg), ("agent", agent)]
             led = ledger(sess["customer_id"])
+            ok_tools.append({c["tool"] for c in led.get("calls") or [] if not _failed(c)})
             if led.get("calls") and led["calls"][-1]["tool"] == "close_call":
                 break
             if msg.strip().lower().startswith("thank you, goodbye"):
@@ -347,7 +348,8 @@ def _run_one(workflow_id, sc, lib):
            "transcript": "\n".join(f"{w}: {t}" for w, t in turns)[-4000:]}
     if err and not (calls and calls[-1]["tool"] == "close_call"):
         return {**row, "harness_error": err, "failed": []}
-    failed = check_ledger(calls, sess.get("now") or cu["now"], sc.get("checks") or [], lib)
+    failed = check_ledger(calls, sess.get("now") or cu["now"], sc.get("checks") or [], lib) \
+        + check_gated([t for w, t in turns if w == "agent"], ok_tools)
     if hung and "close_call" not in row["tools"]:
         failed.append("the call was hung up (" + "; ".join(hung)[:160] + ") without close_call: no outcome was recorded")
     return {**row, "hang_up": hung, "failed": failed}
@@ -372,10 +374,31 @@ def hang_up_events(call_id):
     return out
 
 
+GATED = []   # the brief's self-conflict words (canned.json `gated_words`): said only after a tool's result
+
+
+def check_gated(agent_msgs, ok_tools):
+    """Deterministic check of the brief's self-conflicts: a word the brief allows only after a tool succeeds must not be
+    in any agent message before that success (the message of the turn in which the tool succeeded may say it)."""
+    from canned import gated_hits
+    bad = []
+    for i, m in enumerate(agent_msgs):
+        seen = ok_tools[i] if i < len(ok_tools) else set()
+        early = [g for g in GATED if g.get("tool") and "succ" in str(g.get("outcome", "success")).lower() and g["tool"] not in seen]
+        for w in gated_hits(m, early):
+            bad.append(f'agent said "{w}" in message {i} before the brief allows it ({next(g.get("rule", "") for g in early if g["word"] == w)[:120]}): "{m[:160]}"')
+    return bad
+
+
 def run_tests(slot, wf, scenarios, calc_file, timeout=CHAT_S + 120, reps=2):
     """Copy the workflow into workspace 2, play every persona `reps` times there in parallel, check the ledgers.
     The agent is stochastic: one play per persona made the keep/revert decision after the fix a coin flip."""
     lib = calc_lib(calc_file)
+    try:
+        f = KIT / "out" / f"{slot}.canned.json"
+        GATED[:] = [g for g in (json.loads(f.read_text()).get("gated_words") or []) if isinstance(g, dict) and g.get("word")] if f.exists() else []
+    except Exception:  # noqa: BLE001
+        GATED[:] = []
     scenarios = [s for s in scenarios for _ in range(reps)]
     with Workspace2(slot, wf) as (wid, where):
         if wid is None:
