@@ -150,7 +150,7 @@ try:
             vars['guard_block_' + _T] = '; '.join(_why)
             vars['guard_offer_' + _T] = ' and '.join(_off)
             config['url'] = noop_url(config.get('url'))
-        elif _df and _G.get('promise_date_field') and SPEC.get('promise_dates_min_gap_days'):
+        elif _df and SPEC.get('promise_dates_min_gap_days'):
             try:
                 _prev = json.loads(vars.get('guard_promised_dates') or '{}')
             except Exception:
@@ -216,12 +216,6 @@ try:
             _n = int(vars.get('tool_failures_' + _T) or 0)
             if _n > 0:
                 vars['tool_failures_' + _T] = _n - 1
-        except Exception:
-            pass
-        try:
-            _n = int(vars.get('tool_successes_' + _T) or 0)
-            if _n > 0:
-                vars['tool_successes_' + _T] = _n - 1          # the no-op answered 200: not a recorded success
         except Exception:
             pass
         if vars.get('last_tool_failed') == _T:

@@ -162,11 +162,10 @@ def _tool_names(node):
     return [n for n in names if n]
 
 
-def check(wf, spec, tool_defs=None):
+def check(wf, spec):
     """Deterministic coverage report: each exit situation has a node reachable from a conversation node, with its tools,
     and that node can reach an end_call node. Returns a list of problems (empty = covered)."""
     nodes = wf.get("nodes") or {}
-    tool_defs = tool_defs or {}
     problems = []
     ends = {k for k, n in nodes.items() if n.get("node_type") == "end_call"}
     targets = {k: {t.get("target_node") for t in (n.get("transitions") or [])} for k, n in nodes.items()}
@@ -202,8 +201,6 @@ def check(wf, spec, tool_defs=None):
         if not any(name in t for k, t in targets.items() if k != name):
             problems.append(f"situation '{e['name']}': node '{name}' has no incoming transition (router cannot reach it)")
         have = set(_tool_names(node))
-        if tool_defs:
-            have |= {tool_defs.get(t, t) for t in have}
         want = [re.split(r"[^A-Za-z0-9_]", str(t).strip())[0] for t in e.get("tools") or []]
         missing = [t for t in want if t and t not in have]
         if missing and have:

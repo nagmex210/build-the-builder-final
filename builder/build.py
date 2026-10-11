@@ -128,7 +128,7 @@ async def self_simulate(slot, tools, briefs, trace, wf_file, final_pass, options
         log(trace, event="budget", what="fix round stopped at its time budget")
     log(trace, event="fix", what="self-simulation fix round: Claude EDITs the workflow with the failed checks", seconds=round(time.time() - t))
     try:
-        wf2 = json.loads(wf_file.read_text())
+        json.loads(wf_file.read_text())
     except Exception:  # noqa: BLE001
         wf_file.write_text(best); final_pass("restore"); log(trace, event="ship", what="fix broke the JSON: restored the build")
         return
@@ -329,9 +329,9 @@ async def run(slot, tools, briefs):
                    "result has offer_instead, offer exactly that value. "
                    "If the brief's rule differs from these facts, follow the brief and mention it in your final line.")
     try:
-        sit_out, sit_err = sit_proc.communicate(timeout=180)
+        sit_err = sit_proc.communicate(timeout=180)[1]
     except subprocess.TimeoutExpired:
-        sit_proc.kill(); sit_out, sit_err = "", "timeout"
+        sit_proc.kill(); sit_err = "timeout"
     sys.path.insert(0, str(KIT / "builder"))
     import situations
     sit_spec = json.loads(sit_file.read_text()) if sit_file.exists() else None
@@ -404,7 +404,6 @@ async def run(slot, tools, briefs):
                 warns = warns + [f"API required-field check failed: {e}"]
             sit_spec = json.loads(sit_file.read_text()) if sit_file.exists() else None
             if sit_spec:
-                import situations
                 log(trace, event="test", what="A1: router/specialist coverage of the brief's situations (deterministic)",
                     round=tag, problems=situations.check(wf, sit_spec))
             with trace.open("a") as out:
@@ -472,12 +471,12 @@ async def run(slot, tools, briefs):
     print(json.dumps({"workflow_id": state["workflow_id"], "agent_id": state["agent_id"]}))
 
 
-def parse_args(argv=None):
+def parse_args():
     """Submission form: build.py <brief.md> <tool_api.json>. Also: build.py [--slot S] [--tools T] <brief.md>...
     A positional ending in .json is the tool API file; the slot defaults to the last brief's file name."""
     ap = argparse.ArgumentParser()
     ap.add_argument("--slot"); ap.add_argument("--tools"); ap.add_argument("paths", nargs="+")
-    a = ap.parse_args(argv)
+    a = ap.parse_args()
     jsons = [p for p in a.paths if p.lower().endswith(".json")]
     briefs = [p for p in a.paths if not p.lower().endswith(".json")]
     if len(jsons) > 1 or (jsons and a.tools):
