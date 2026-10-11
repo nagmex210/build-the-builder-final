@@ -263,12 +263,18 @@ def check_amount(_pid, _p, _as, vars):
         _fo = json.loads(vars.get('floor_offered') or '{}')
     except Exception:
         _fo = dict()
+    def _fa(x):
+        try:
+            x = float(x)
+            return str(int(round(x))) if abs(x - round(x)) < 0.005 else ('%.2f' % x)
+        except Exception:
+            return str(x)
     _seen = int(_fo.get(_pid) or 0) if isinstance(_fo, dict) else 0
     if _a is not None and _mx is not None and _a > _mx + 0.005:
-        return dict(ok=True, can_record=False, offer_amount=_mx, say='CANNOT BE RECORDED: ' + str(_a) + ' is more than the full amount owed on product ' + _pid +
-                    ' (' + str(_mx) + '). The most that can be recorded is ' + str(_mx) + '.')
+        return dict(ok=True, can_record=False, offer_amount=_mx, say='CANNOT BE RECORDED: ' + _fa(_a) + ' is more than the full amount owed on product ' + _pid +
+                    ' (' + _fa(_mx) + '). The most that can be recorded is ' + _fa(_mx) + '.')
     if _a is not None and _a > 0 and (_fl is None or _a >= _fl - 0.005):
-        return dict(ok=True, can_record=True, amount=_a, say='CAN BE RECORDED: ' + str(_a) + ' is an allowed amount for product ' + _pid +
+        return dict(ok=True, can_record=True, amount=_a, say='CAN BE RECORDED: ' + _fa(_a) + ' is an allowed amount for product ' + _pid +
                     '. Keep the customer\'s amount (do not offer a different figure).')
     if _fl is None:
         return dict(ok=True, can_record=None, say='Code has no lowest amount for product ' + _pid + ': follow the brief\'s rule for this product exactly; '
@@ -276,15 +282,15 @@ def check_amount(_pid, _p, _as, vars):
     if isinstance(_fo, dict):
         _fo[_pid] = _seen + 1
         vars['floor_offered'] = json.dumps(_fo)
-    _w = ('' if (_a is None or _a <= 0) else (str(_a) + ' is below the lowest amount that can be recorded. '))
+    _w = ('' if (_a is None or _a <= 0) else (_fa(_a) + ' is below the lowest amount that can be recorded. '))
     if _seen >= 1:
         return dict(ok=True, can_record=False, lowest_amount=_fl, floor_already_offered=_seen,
-                    say='CANNOT BE RECORDED: ' + _w + 'The lowest amount for product ' + _pid + ' (' + str(_fl) + ') was ALREADY offered in this call. '
+                    say='CANNOT BE RECORDED: ' + _w + 'The lowest amount for product ' + _pid + ' (' + _fa(_fl) + ') was ALREADY offered in this call. '
                     'Do not offer it again (unless the brief explicitly allows a repeat) and never offer any other figure: follow the brief\'s next step for a customer who cannot pay it '
                     '(e.g. the refusal note, a transfer or the hardship route, as the brief says).')
     return dict(ok=True, can_record=False, lowest_amount=_fl,
-                say=('CANNOT BE RECORDED: ' if _w else '') + _w + 'CODE COMPUTED THE LOWEST AMOUNT for product ' + _pid + ': ' + str(_fl) +
-                ' (the brief\'s floor, already rounded the brief\'s way). If the brief lets you offer a lower amount now, offer exactly ' + str(_fl) +
+                say=('CANNOT BE RECORDED: ' if _w else '') + _w + 'CODE COMPUTED THE LOWEST AMOUNT for product ' + _pid + ': ' + _fa(_fl) +
+                ' (the brief\'s floor, already rounded the brief\'s way). If the brief lets you offer a lower amount now, offer exactly ' + _fa(_fl) +
                 ' (never a smaller, round or other figure, never "any amount") and only as often as the brief allows.')
 try:
     _gb = config.get('body') if isinstance(config, dict) else None
@@ -406,12 +412,20 @@ def _add_check_tool(wf, promise, g, noop):
             node["task_message"] = (tm.rstrip() + "\nDATE CHECK IN CODE: whenever the customer names a payment day, call " + CHECK_NAME +
                                     " (product_id, date) BEFORE you answer, one product per message, and say what its result tells you: keep their date when it "
                                     "CAN BE RECORDED, otherwise offer exactly its offer_date. Never offer the deadline instead of a date "
-                                    "the check accepted.\nAMOUNT CHECK IN CODE: when the customer cannot pay the full amount of a product (or names a lower "
-                                    "figure), call " + CHECK_NAME + " (product_id, amount = their figure or 0) BEFORE you name any lower amount, and say what "
-                                    "its result tells you. The ONLY lower amount you may ever name is the result's lowest_amount; never invent a minimum, a "
-                                    "round figure or \"any amount\".")
+                                    "the check accepted.")
         added = True
+    for node in (wf.get("nodes") or {}).values():
+        names = [((t.get("function") or {}).get("name")) for t in node.get("tools") or []]
+        tm = node.get("task_message")
+        if CHECK_NAME in names and isinstance(tm, str) and AMOUNT_TEXT not in tm:
+            node["task_message"] = tm.rstrip() + "\n" + AMOUNT_TEXT
     return added
+
+
+AMOUNT_TEXT = ("AMOUNT CHECK IN CODE: when the customer cannot pay the full amount of a product (or names a lower figure), call " +
+               CHECK_NAME + " (product_id, amount = their figure or 0) BEFORE you name any lower amount, and say what its result tells "
+               "you. The ONLY lower amount you may ever name is the result's lowest_amount; never invent a minimum, a round figure or "
+               "\"any amount\".")
 
 
 def _snip(spec, body, tool=None, noop=""):
