@@ -76,6 +76,20 @@ ROUND_S = 420                                                      # one round o
 def log(trace, **ev):
     with trace.open("a") as out:
         out.write(json.dumps(ev, default=str) + "\n")
+    if ev.get("event") == "ship":       # every keep/restore decision of a test round goes to the printed trace too
+        print(f"[test] decision: {ev.get('what')}{' (' + str(ev['why']) + ')' if ev.get('why') else ''}", flush=True)
+
+
+def print_round(tag, r):
+    """The printed trace lists every self-test chat with its result, not only the count."""
+    print(f"[test] {tag} ({r['where']}, workflow {r.get('workflow_id') or '?'}; phone agent on Freya's model): "
+          f"{r['n']} valid chat(s), {r['n'] - r['n_failed']} passed every check, {r['n_failed']} failed "
+          f"({r['n_checks_failed']} checks), {len(r['rows']) - r['n']} not usable (platform)", flush=True)
+    for row in r["rows"]:
+        res = ("NOT USABLE: " + str(row["harness_error"])[:120]) if "harness_error" in row else \
+              ("PASS" if not row["failed"] else "FAIL: " + " | ".join(str(m)[:160] for m in row["failed"]))
+        print(f"  [test] persona '{row['title']}' (customer {row.get('customer')}, call {row.get('call_id') or '-'}, "
+              f"{row.get('turns', 0)} turns, tools {' > '.join(row.get('tools') or []) or 'none'}): {res}", flush=True)
 
 
 async def self_simulate(slot, tools, briefs, trace, wf_file, final_pass, options_base):
@@ -99,6 +113,7 @@ async def self_simulate(slot, tools, briefs, trace, wf_file, final_pass, options
     log(trace, event="test", what="self-simulation round 1: deterministic ledger checks", where=r1["where"], n=r1["n"],
         failed=r1["n_failed"], checks_failed=r1["n_checks_failed"], seconds=round(time.time() - t_start), rows=r1["rows"])
     print(f"self-test 1 ({r1['where']}): {r1['n_failed']}/{r1['n']} personas failed a check ({r1['n_checks_failed']} checks)", flush=True)
+    print_round("self-test 1: personas written from the brief, deterministic ledger checks", r1)
     (KIT / "out" / f"{slot}.selftest1.json").write_text(json.dumps({"personas": personas, **r1}, indent=1, default=str))
     r1_s = time.time() - t_start
     retest_s = min(ROUND_S, r1_s + 60)          # the re-test takes about as long as round 1 did (platform load)
@@ -142,10 +157,12 @@ async def self_simulate(slot, tools, briefs, trace, wf_file, final_pass, options
                                         max(120, min(ROUND_S, left())))
     except Exception as e:  # noqa: BLE001
         r2 = None; log(trace, event="test", what="self-simulation round 2", error=str(e)[:300])
+        print(f"self-test 2 failed to run: {str(e)[:300]}", flush=True)
     if r2:
         log(trace, event="test", what="self-simulation round 2: same personas after the fix", where=r2["where"], n=r2["n"],
             failed=r2["n_failed"], checks_failed=r2["n_checks_failed"], seconds=round(time.time() - t), rows=r2["rows"])
         print(f"self-test 2: {r2['n_failed']}/{r2['n']} personas failed a check ({r2['n_checks_failed']} checks)", flush=True)
+        print_round("self-test 2: same personas after the fix", r2)
     rate = lambda r: (r["n_failed"] / r["n"], r["n_checks_failed"] / r["n"])
     if r2 is None or r2["n"] < len(personas) or rate(r2) > rate(r1):
         (KIT / "out" / f"{slot}.workflow.rejected-fix.json").write_text(wf_file.read_text())
@@ -380,6 +397,7 @@ async def run(slot, tools, briefs):
             out.write(json.dumps({"event": "assumptions", "what": "brief self-conflicts and how both rules hold",
                                   "gated_words": cj.get("gated_words"), "conflicts": cj.get("conflicts"),
                                   "deterministic_check": cj.get("self_conflict_check")}) + "\n")
+    print(f"[test] A3 canned sentences: {'extracted' if old_canned.exists() else 'FAILED (' + (canned_err or '')[-160:].strip() + ')'}", flush=True)
     sys.path.insert(0, str(KIT)); sys.path.insert(0, str(KIT / "builder"))
 
     def final_pass(tag):
@@ -387,6 +405,7 @@ async def run(slot, tools, briefs):
             return None
         try:
             from lint_workflow import lint
+            import wfsummary
             from save import finish_and_save
             wf = json.loads(wf_file.read_text())
             names, saved = finish_and_save(slot, wf)
@@ -405,12 +424,16 @@ async def run(slot, tools, briefs):
             sit_spec = json.loads(sit_file.read_text()) if sit_file.exists() else None
             if sit_spec:
                 import situations
+                probs = situations.check(wf, sit_spec)
                 log(trace, event="test", what="A1: router/specialist coverage of the brief's situations (deterministic)",
-                    round=tag, problems=situations.check(wf, sit_spec))
+                    round=tag, problems=probs)
+                print(f"[test] A1 situation coverage ({tag}): {len(probs)} problem(s){': ' + '; '.join(map(str, probs))[:400] if probs else ''}", flush=True)
             with trace.open("a") as out:
                 out.write(json.dumps({"event": "harden+robust+save", "round": tag, "tools": names, "saved": saved}) + "\n")
                 out.write(json.dumps({"event": "test", "what": "structural lint of the saved workflow", "errors": errs, "warnings": warns}) + "\n")
-            print(f"final save ({tag}): {saved}; lint: {len(errs)} errors, {len(warns)} warnings", flush=True)
+            print(f"final save ({tag}): {saved}; lint: {len(errs)} errors, {len(warns)} warnings"
+                  f"{': ' + '; '.join(map(str, errs))[:400] if errs else ''}", flush=True)
+            print(f"[freya] saved workflow ({tag}): {wfsummary.summary(wf)}", flush=True)
             return saved
         except Exception as e:  # noqa: BLE001  keep whatever the agent saved
             print(f"final pass failed: {e}", flush=True)
@@ -461,8 +484,11 @@ async def run(slot, tools, briefs):
             sys.path.insert(0, str(KIT))
             import freya
             freya.export_workflow(state["workflow_id"], str(export))
-            json.loads(export.read_text())
-            print(f"[freya] exported: {export}", flush=True)
+            import wfsummary
+            got, shipped = wfsummary.summary(json.loads(export.read_text())), wfsummary.summary(json.loads(wf_file.read_text()))
+            print(f"[freya] exported: {export}: {got}", flush=True)
+            if got != shipped:
+                print(f"[freya] WARNING: the export differs from the shipped workflow file ({shipped})", flush=True)
         except Exception as e:  # noqa: BLE001
             print(f"[freya] EXPORT FAILED: {e}", flush=True)
     n = scrub_file(trace)
