@@ -402,3 +402,4 @@ Hypotheses (H) for the b10 merger / final rehearsal:
 b10 families: the owner's five (BUG HUNT pipeline, BUG HUNT workflow, SIMPLIFY, STABILITY, SUBMISSION CHECK) written
 verbatim to runs/next_families.txt; the owner note's families block is removed from merger_notes.md (handled), its b10
 merger instruction kept.
+WARNING for b10: the main-A/B/rA/rB/C slots on Freya hold the merge/b9 builds (not kept), not the champion's; rebuild main-* from main before any official or final run.
