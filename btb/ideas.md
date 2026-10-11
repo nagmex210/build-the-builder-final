@@ -128,3 +128,9 @@ evaluated by CODE inside the workflow (never an outside URL). The model only ask
   clause); a compiler emits the code step + the allowed-move text; a lint checks every gate input exists (tool
   field, ledger column, identity flag) and every brief rule maps to a gate (coverage).
 - Test: the brief's own stated examples run through the compiled gates (independent oracle, idea 4).
+- Gate-driven self-test (owner): the builder tests each gate three ways inside its 30 minutes. (1) Offline, in
+  seconds: run the compiled gates on the brief's own stated examples and on boundary inputs (attempt k vs k+1, the
+  deadline day vs the day after, both identity checks failing). (2) Self-simulation: one generated persona per gate
+  that hits its boundary (refuses exactly budget+1 times, gives a wrong identity answer twice, names a holiday,
+  asks to pay all at once), judged by ledger/tool-order checks computed from the gates. (3) The trace lists every
+  gate with its test results (gate coverage), so a reviewer sees what the builder checked.
