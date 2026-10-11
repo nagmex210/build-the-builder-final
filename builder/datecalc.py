@@ -470,6 +470,11 @@ def main():
         try:
             spec = chat_json([{"role": "user", "content": prompt}], tier="strong", purpose="extract calendar/amount spec for code steps",
                              max_tokens=9000, effort="medium")
+            try:                                  # tool names, not API paths ('/get_account'): every name match needs them
+                from guards import norm_tools
+                norm_tools(spec)
+            except Exception as e:  # noqa: BLE001
+                print("datecalc: tool-name error", e)
             node_code, hook_code = snippet(spec, NODE_CODE), snippet(spec, HOOK_CODE)
             probs, v = selftest(spec, node_code, hook_code)
             if not probs:

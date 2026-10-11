@@ -483,9 +483,28 @@ def find_noop(url):
     return found
 
 
+def tool_name(v):
+    """A tool name as the workflow has it: the extractor sometimes answers with the API path ('/get_account',
+    'POST /v1/create_promise'); b7 official B 0/3: no guard installed, the date check knew no product."""
+    if not isinstance(v, str) or not v.strip():
+        return v
+    return v.strip().split()[-1].rstrip("/").split("/")[-1]
+
+
+def norm_tools(spec):
+    if isinstance(spec, dict):
+        if spec.get("account_tool"):
+            spec["account_tool"] = tool_name(spec["account_tool"])
+        for k, v in list((spec.get("guards") or {}).items()) if isinstance(spec.get("guards"), dict) else []:
+            if k.endswith("_tool"):
+                spec["guards"][k] = tool_name(v)
+    return spec
+
+
 def install(wf, spec):
     if not isinstance(spec, dict) or not isinstance(spec.get("guards"), dict):
         return []
+    spec = norm_tools(json.loads(json.dumps(spec)))
     g = dict(spec["guards"])
     done = []
     for name, t in _tools(wf):

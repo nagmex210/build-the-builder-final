@@ -53,6 +53,17 @@ def tail_model_calls(trace, stop):
         stop.wait(1)
 
 
+# Claude login (M9): without it the build agent answers "Not logged in" in 0 s and the build silently shipped the slot's
+# previous workflow. Fetch the token the program documents when none is set; a login error below stops the build.
+if not (os.environ.get("CLAUDE_CODE_OAUTH_TOKEN") or os.environ.get("ANTHROPIC_API_KEY")):
+    try:
+        _tok = subprocess.run(["aws", "ssm", "get-parameter", "--region", "eu-central-1", "--name", "/video-iq/claude_token",
+                               "--with-decryption", "--query", "Parameter.Value", "--output", "text"],
+                              capture_output=True, text=True, timeout=30).stdout.strip()
+        if _tok:
+            os.environ["CLAUDE_CODE_OAUTH_TOKEN"] = _tok
+    except Exception:  # noqa: BLE001
+        pass
 BUDGET_S = int(os.environ.get("BUILD_AGENT_BUDGET_S", "720"))    # Claude build part; the whole run must stay < 30 min
 SELFTEST = os.environ.get("BUILD_SELFTEST", "1") != "0"
 SELFTEST_N = int(os.environ.get("BUILD_SELFTEST_N", "6"))
@@ -348,6 +359,10 @@ async def run(slot, tools, briefs):
         with trace.open("a") as out:
             out.write(json.dumps({"event": "budget", "what": "Claude build agent stopped at the time budget", "seconds": round(time.time() - t0)}) + "\n")
     except Exception as e:  # noqa: BLE001  an SDK/quota error must not skip the final pass on the last written file
+        if "not logged in" in str(e).lower() or "/login" in str(e).lower():
+            print(f"BUILD FAILED: the Claude build agent is not logged in ({str(e)[:200]}); set CLAUDE_CODE_OAUTH_TOKEN. "
+                  "Nothing was built (the slot's previous workflow is NOT shipped).", flush=True)
+            sys.exit(2)
         print(f"build agent failed: {str(e)[:300]}; finishing with the last written workflow file", flush=True)
         with trace.open("a") as out:
             out.write(json.dumps({"event": "agent failed", "error": str(e)[:300], "seconds": round(time.time() - t0)}) + "\n")
