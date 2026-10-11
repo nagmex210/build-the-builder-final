@@ -30,7 +30,9 @@ name default `final` -> traces/<name>.log, submission/<name>.workflow.json). Old
   openapi-c.json with servers set to a fake host, README.md, a fake flow.png): case.md/tools.json correct,
   servers -> `<BANK_URL>/v1` (probed). Turkish sample sentence -> Turkish.
 - pin_mock_url on an existing 23-tool workflow (fx2-A): 23/23 urls rewritten to the mock, lint 0 errors.
-- End-to-end `bash btb/submit.sh /tmp/FreyaBank-Test <BANK_URL> final-adapter-test` started 16:55Z (nohup,
-  log /tmp/fa_submit.out, traces/final-adapter-test.log); it was not finished at the 25-min limit of this task, so
-  export/lint of that run is NOT verified here. Note: that run started before the BTB_MOCK_URL_GIVEN fix, so its
-  mock-url assertion compares against the /v1 base and may flag the guards' no-op check tool (host + no-op path).
+- End-to-end `bash btb/submit.sh /tmp/FreyaBank-Test <BANK_URL> final-adapter-test` (nohup, started 16:55Z, log
+  /tmp/fa_submit.out + traces/final-adapter-test.log): the build agent built from case.md, final save (build) and
+  (fix) round: **lint 0 errors, 0 warnings**, `[test] mock url: 24/24 api_call urls start with <BANK_URL>/v1`
+  (guard no-op check tool included). Workflow e63c3f20-..., 14 steps, 8 tools.
+  `freya.export_workflow` of it run by hand at 17:05Z: exports OK, 14 nodes, 24/24 urls on the mock.
+  The submit run was still in its self-test at the 25-min task limit; its own SUMMARY block was not seen here.
