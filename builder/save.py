@@ -12,6 +12,7 @@ from harden import harden         # noqa: E402
 from robust import robustify      # noqa: E402
 from canned import apply as apply_canned  # noqa: E402
 from guards import install as install_guards  # noqa: E402
+from identity_gate import apply as apply_identity_gate  # noqa: E402
 
 
 def finish_and_save(slot, wf, canned=None):
@@ -26,6 +27,7 @@ def finish_and_save(slot, wf, canned=None):
         f = KIT / "out" / f"{slot}.canned.json"
         canned = json.loads(f.read_text()) if f.exists() else None
     names = names + apply_canned(wf, canned)    # after harden: the say_now hook reads harden's tool_outcome
+    names = names + apply_identity_gate(wf, canned)   # code-decided identity_state + failed terminal node (M4/M29)
     # Lock the shared slot file: two builds running in parallel (two briefs) must not overwrite each other's slot.
     with open(KIT / ".freya-agents.json.lock", "w") as lock:
         fcntl.flock(lock, fcntl.LOCK_EX)
