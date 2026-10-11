@@ -1,0 +1,291 @@
+{
+ "workflow_id": "e99b473c-2df6-4d05-927d-5b0085543563",
+ "passed": 0,
+ "total": 3,
+ "invalid": 1,
+ "rows": [
+  {
+   "id": "PUB-11",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "the call was not closed with close_call",
+    "conversation: The agent failed the single read-back and confirmation check by requesting separate product confirmations before the combined confirmation, and failed the one create_promise per product check by making repeated calls with invalid product IDs."
+   ],
+   "call_id": "459ce227-ac9e-4ca2-9284-ed0322c1be58",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise"
+   ],
+   "turns": 10,
+   "invalid": true,
+   "replays": [
+    "resumed from msg_18_1791688079353 (latest reply msg_21_1791688080169, isBranch=True)"
+   ],
+   "tries": [
+    {
+     "call_id": "614cd838-38a5-48a2-8bf5-87b1bf28213a",
+     "invalid": true,
+     "replays": [
+      "resumed from msg_18_1791687862758 (latest reply msg_21_1791687863853, isBranch=True)"
+     ]
+    },
+    {
+     "call_id": "ecca5f7b-a260-4545-ae4c-22d9fa151fbb",
+     "invalid": true,
+     "replays": [
+      "resumed from msg_18_1791687976749 (latest reply msg_21_1791687977504, isBranch=True)"
+     ]
+    },
+    {
+     "call_id": "459ce227-ac9e-4ca2-9284-ed0322c1be58",
+     "invalid": true,
+     "replays": [
+      "resumed from msg_18_1791688079353 (latest reply msg_21_1791688080169, isBranch=True)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "PUB-12",
+   "style": "corrects",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "notes [('cl_456', 'refused'), ('p2', 'refused'), ('p3', 'refused'), ('pl_123', 'refused'), ('pl_12345', 'refused')], expected [('p2', 'refused'), ('p3', 'refused')]",
+    "the call was not closed with close_call",
+    "conversation: The car loan received two persuasion attempts instead of one, and extra successful refused notes used unknown product IDs, so exactly one refused note per other product is not clearly satisfied."
+   ],
+   "call_id": "bc7986ae-d38f-4146-8783-3d94dad92dbc",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "add_note",
+    "create_promise",
+    "create_promise",
+    "add_note",
+    "add_note",
+    "add_note",
+    "add_note",
+    "create_promise"
+   ],
+   "turns": 12,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "01cde27c-15a0-428a-8d50-3229ed4c2182",
+     "invalid": true,
+     "replays": [
+      "resumed from msg_14_1791687850454 (latest reply msg_17_1791687851348, isBranch=True)"
+     ]
+    },
+    {
+     "call_id": "bc7986ae-d38f-4146-8783-3d94dad92dbc",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-13",
+   "style": "corrects",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [('p1', 300.0, '2026-10-23')], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]",
+    "notes [('cc_6604', 'service_error'), ('pl_1234', 'service_error')], expected []",
+    "the call was not closed with close_call",
+    "conversation: The credit card was recorded for 23 October rather than 30 October, the loan was never successfully recorded for 23 October, and the final read-back named 23 October for both products rather than both required dates."
+   ],
+   "call_id": "6db306d5-9c7a-4bc6-a3eb-34510f286ad0",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "add_note",
+    "add_note"
+   ],
+   "turns": 11,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "38f76d95-c278-4c0b-8733-946c91d3e304",
+     "invalid": true,
+     "replays": [
+      "resumed from msg_14_1791687857616 (latest reply msg_17_1791687858026, isBranch=True)"
+     ]
+    },
+    {
+     "call_id": "e940827c-2d94-479e-bc02-7b603a175147",
+     "invalid": true,
+     "replays": [
+      "resumed from msg_13_1791687970362 (latest reply msg_16_1791687970763, isBranch=True)"
+     ]
+    },
+    {
+     "call_id": "6db306d5-9c7a-4bc6-a3eb-34510f286ad0",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-11",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [('p1', 220.0, '2026-10-16')], expected [('p1', 220.0, '2026-10-16'), ('p2', 640.0, '2026-10-16'), ('p3', 75.0, '2026-10-16')]",
+    "the call was not closed with close_call",
+    "conversation: The one create_promise per product check failed: the credit card had repeated attempts, and neither loan had a successful create_promise using its valid product ID."
+   ],
+   "call_id": "9692da52-ba16-44ff-a07f-2725626766e3",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise"
+   ],
+   "turns": 12,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "1bfcd2ba-b38a-4b67-8910-0453d9a7f697",
+     "invalid": true,
+     "replays": [
+      "resumed from msg_18_1791687845891 (latest reply msg_21_1791687846432, isBranch=True)"
+     ]
+    },
+    {
+     "call_id": "ad3e4162-7859-4c13-88a3-875ca9cbf585",
+     "invalid": true,
+     "replays": [
+      "resumed from msg_18_1791687941860 (latest reply msg_21_1791687942124, isBranch=True)"
+     ]
+    },
+    {
+     "call_id": "9692da52-ba16-44ff-a07f-2725626766e3",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-12",
+   "style": "pieces",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "notes [('CL_67890', 'refused'), ('PL_12345', 'refused'), ('p2', 'refused'), ('p3', 'refused'), ('personal_loan_123', 'refused')], expected [('p2', 'refused'), ('p3', 'refused')]",
+    "the call was not closed with close_call",
+    "conversation: The refused-note check fails because multiple refused notes were successfully recorded for the personal and car loans, and the attempt-count check fails because the car loan received two persuasion attempts instead of one."
+   ],
+   "call_id": "dd445a3c-ce05-49a4-9b8b-f75c12fc885f",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "add_note",
+    "create_promise",
+    "create_promise",
+    "add_note",
+    "add_note",
+    "add_note",
+    "add_note",
+    "create_promise"
+   ],
+   "turns": 19,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "575ce0ab-8259-4be7-80a1-07d1ea600e10",
+     "invalid": true,
+     "replays": [
+      "resumed from msg_14_1791687877484 (latest reply msg_17_1791687877772, isBranch=True)"
+     ]
+    },
+    {
+     "call_id": "dd445a3c-ce05-49a4-9b8b-f75c12fc885f",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-13",
+   "style": "pieces",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]",
+    "notes [('CC6604', 'refused'), ('CC_6604', 'refused'), ('PL9901', 'refused'), ('PL_1234', 'refused'), ('cc_6604', 'refused'), ('pl_1234', 'refused'), ('pl_1234', 'refused'), ('pl_1234', 'refused'), ('pl_1234', 'refused'), ('pl_1234', 'refused'), ('pl_1234', 'refused'), ('pl_900', 'refused')], expected []",
+    "the call was not closed with close_call",
+    "conversation: The credit card was not recorded for 30 October 2026, the loan was not recorded for its 23 October 2026 deadline, and no read-back named both dates."
+   ],
+   "call_id": "88467f7e-d59e-4522-bdcf-7a9fc14458c6",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "add_note",
+    "add_note",
+    "add_note",
+    "add_note",
+    "add_note",
+    "add_note",
+    "add_note",
+    "add_note",
+    "add_note",
+    "add_note",
+    "add_note",
+    "add_note"
+   ],
+   "turns": 17,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "88467f7e-d59e-4522-bdcf-7a9fc14458c6",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  }
+ ]
+}

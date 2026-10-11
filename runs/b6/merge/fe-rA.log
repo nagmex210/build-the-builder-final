@@ -1,0 +1,23 @@
+  invalid rep PUB-04 (try 1): ['resumed from msg_208_1791688380397 (latest reply msg_212_1791688386475, isBranch=False)']
+FAIL PUB-01 1/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [in_words] conversation: The agent said 'collections' while the latest verify_identity result explicitly stated that identity was not verified.
+PASS PUB-02 2/2 | schedule_callback > close_call
+FAIL PUB-03 1/2 | verify_identity > verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [asks_back] outcome ('promise', None), expected ('not_verified', 'failed')
+       - [asks_back] promises [('p1', 95.0, '2026-10-16')], expected []
+       - [asks_back] conversation: The identity check continued after the third wrong answer (21 July 1990), the agent disclosed a credit card and an amount of 95, and the customer was not told to use the app or a branch.
+PASS PUB-04 2/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+PASS PUB-05 2/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+FAIL PUB-06 0/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+       - [pieces] outcome ('no_promise', 'refused'), expected ('promise', None)
+       - [pieces] promises [], expected [('p1', 637.5, '2026-10-16')]
+       - [pieces] conversation: The minimum payment was offered repeatedly and incorrectly as 150.00 rather than 637.50, and no promise for 637.50 on Friday 16 October was agreed or recorded.
+       - [corrects] conversation: The minimum payment of 637.50 was offered without noting that the rest stays overdue; that note accompanied only the incorrect 500.00 offer.
+PASS PUB-07 2/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+PASS PUB-08 2/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+FAIL PUB-09 1/2 | verify_identity > verify_identity > verify_identity > get_account > transfer_to_agent > close_call
+       - [pieces] conversation: The agent described a plan of its own by offering payment of 2100 by Friday, 2026-10-16.
+PASS PUB-10 2/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > close_call
+
+fast_eval: 6 / 10 passed (2 rep(s), all reps must pass), 1035 s
+harness: 0 case(s) still INVALID after 2 re-run(s) (not a measurement), 1 rep(s) re-run

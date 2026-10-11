@@ -1,0 +1,11 @@
+scorer: /home/ubuntu/btb/repo/btb/brief_c/score_c.py | bank: https://responding-simply-dpi-electro.trycloudflare.com
+  invalid rep C-05 (try 1): ['harness: chat turn timed out and no reply appeared']
+  invalid rep C-07 (try 1): ['resumed from msg_4_1791691026477 (latest reply msg_8_1791691026881, isBranch=True)']
+  invalid rep C-09 (try 1): ['harness: chat turn timed out and no reply appeared']
+  invalid rep C-07 (try 2): ['resumed from msg_4_1791691187724 (latest reply msg_8_1791691188787, isBranch=True)']
+  invalid rep C-05 (try 2): ['harness: chat turn timed out and no reply appeared']
+  invalid rep C-06 (try 1): ['resumed from msg_10_1791691368518 (latest reply msg_21_1791691369430, isBranch=True)']
+  invalid rep C-07 (try 3): ['resumed from msg_4_1791691363820 (latest reply msg_8_1791691367239, isBranch=True)']
+  invalid rep C-09 (try 2): ['harness: chat turn timed out and no reply appeared']
+  invalid rep C-06 (try 2): ['harness: chat turn timed out and no reply appeared']
+  invalid rep C-05 (try 3): ['harness: chat turn timed out and no reply appeared']

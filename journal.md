@@ -222,3 +222,62 @@ per-item count; overriding the platform's default agent_config removes the auto 
   failed 11/12 personas and the build still shipped. Build variance + a builder robustness gap (no required-field lint, no
   revert to the better self-sim version), not the identity_status line (it only adds a text field to the verify result,
   never touches request schemas). B on the 40b0d79 build: official 2/3. Assigned as part of b6 family 1. Kept HEAD.
+
+## b6 merge (merger, 2026-10-11 02:47-04:1x UTC)
+
+Workers (fast = fast_eval --reps 2 --style random; champion b5 fast A6 B0 rA3 (rejudged 6) rB1 = 10/26, 12 rejudged):
+- w1 tool-call robustness: idempotent writes in harden (identical re-send -> no-op path -> ALREADY RECORDED; bank
+  "already exists" after our own success read as recorded), hookcheck.py (dry-runs every hook; repairs the b5 official
+  B 0/3 root cause: inner-agent post-hooks referenced `response`, NameError on every call; the b5 journal's
+  customer_id diagnosis was wrong), apicheck.py (API-required fields). 8/26, measured BEFORE its own fix c2145da
+  (v1 deduped verify_identity and broke identity routing). MERGED (c2145da).
+- w2 A5 v2 settle_item tool: value path works live (M30 solved) but the model called it only for promises; B/rB 0/3.
+  NOT merged. A5 is now discarded twice: not to be assigned again.
+- w3 A1 v2 router + specialists (situations.apply: brief clause as each specialist's first rule, once per call,
+  silent hand-off, not-triage-only check): A 8/10 (best fast A), rA 5/10, B/rB 0. Hand-off re-entry (M40) open. MERGED.
+- w4 identity gate in structure (identity_gate.py: code decides identity_state/say_next per answer; identity_failed
+  terminal node; gate block; self-sim privacy lint): 11/26, PUB-03 2/2 fast on A. MERGED.
+- w5 WILD platform agent_config override (drop the built-in end_call tool + "use end_call after goodbye" prompt) +
+  brief-driven pre-close goodbye: 4/0/invalid/0 without a self-sim round; the kind it targets is official-only.
+  NOT merged this batch (unmeasurable on fast, no official slot left; the override alone is a candidate).
+No worker hard-coded brief A/B content (diffs grepped for case ids, outcome codes, dates, amounts, product ids).
+
+Merge = merge/b6: w4 + w1 + w3 (conflicts in build.py/save.py: both final-pass steps kept, identity gate before
+situations). Held-out C exposed two GENERALISATION bugs in the merged code (both fixed by the merger, both "read a
+key by A/B's name"):
+1. identity_gate read the per-answer flag as `verified` and the call-wide flag as verif+all. C's API answers
+   `passed` / `identity_confirmed`: every passed answer got "This answer is WRONG" -> the agent re-asked the same
+   question until the turn limit (C 1/12, 7 calls looping verify_identity). Fix 0584029: both flags found by shape
+   (pass/correct/match/valid/confirm/verif + all/identity/fully/complete), no verdict at all ("checking", follow the
+   bank's words) when the shape is unreadable; same rule in the self-sim privacy lint.
+2. w1's idempotent writes keyed on `*_id` request fields and `*_id` acknowledgement keys; C uses account_ref /
+   promise_ref, so an identical create_promise re-sent together with close_call reached the bank ("call already
+   closed"). Fix: *_id / *_ref, instalment numbers in the key (9523a1c). Local exec tests on both shapes.
+(H) the hidden briefs "change fields and allowed values": any hook that matches a key by name is a Sunday risk;
+assigned as b7's wild card.
+
+Measured (merged build, before the two C fixes; the fixes do not change A/B behaviour: same states on A's key shapes,
+tested):
+- fast A 6/10, B 0/3 (invented ids M7, per-item counts), rA 6/10, rB 0/3 => 12/26 (champion 10, 12 rejudged): tie.
+- OFFICIAL A 7/10 (runs 9,8; PUB-03 1/2 = simulator leakage: the simulated customer gave the CORRECT birth date on
+  the third try, identity really passed; PUB-05 support offered twice 1/2; PUB-06 floor offered twice 1/2),
+  B 2/3 (runs 2,3; PUB-12 1/2), raw-A 10/10 (champion 9/10), raw-B 1/3 (champion 2/3; both failures = model loops
+  "Thank you, <name>" after the customer's goodbye until the node turn limit, no close_call: M35, pre-existing kind).
+- SAME-SESSION CHAMPION (main rebuilt as champ-A, 398 s): official A 7/10 (runs 9,8), the same three cases 1/2.
+- Build time 551-765 s (A 747, B 765, rA 706, rB 569, C 551/835).
+- C (held-out): first build 1/12 random (identity loop, bug 1); after fix 1: 2/12 random, 2/12 adversarial (b5
+  champion 2 / 4); after fix 2: see results.tsv.
+- after fix 2 (9523a1c build, 528 s): C 1/12 random (1 case harness-invalid: chat turn timeouts), adversarial not
+  finished (platform chat timeouts on 4 cases, killed at the time limit). C is flat-to-down vs b5 (2/12, adv 4/12)
+  on 1-rep runs; C-01 still re-sends create_promise with close_call (the dedup did not fire live: unexplained, b7 wild
+  card checks it). Watch item, not a measured drop beyond 1-rep noise.
+
+Decision: KEEP (main = merge/b6). Official A+B = same-session champion (7+2 vs 7+2, identical per-run 9,8), rA+rB
+11 = 11 (10+1 vs 9+2): no drop. Accept rule (c) + (b): hookcheck removes a build defect class that zeroed official B
+in b5 (any hook that raises is repaired before save, on every brief); the identity verdict is code-decided per answer
+(fast PUB-03 2/2 on w4; the one official miss was simulator leakage); specialists carry the brief's own clause
+(best fast A); idempotent writes target C's duplicate-write kind. All four are brief-agnostic, and both C-only bugs
+they carried are fixed by shape rules.
+Left (b7 families): invented product ids (M7, ids_to_use still not in main), floor offered twice / invented floor
+(M27/M21: PUB-06 1/2 in every official A run), close loop to the node turn limit after goodbye (M35, official rB),
+support offered twice on hand-off re-entry (M40), key names read literally from A/B's API (Sunday risk).

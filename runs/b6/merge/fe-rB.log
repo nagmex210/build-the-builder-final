@@ -1,0 +1,40 @@
+  invalid rep PUB-11 (try 1): ['resumed from msg_18_1791687845891 (latest reply msg_21_1791687846432, isBranch=True)']
+  invalid rep PUB-12 (try 1): ['resumed from msg_14_1791687850454 (latest reply msg_17_1791687851348, isBranch=True)']
+  invalid rep PUB-13 (try 1): ['resumed from msg_14_1791687857616 (latest reply msg_17_1791687858026, isBranch=True)']
+  invalid rep PUB-11 (try 1): ['resumed from msg_18_1791687862758 (latest reply msg_21_1791687863853, isBranch=True)']
+  invalid rep PUB-12 (try 1): ['resumed from msg_14_1791687877484 (latest reply msg_17_1791687877772, isBranch=True)']
+  invalid rep PUB-11 (try 2): ['resumed from msg_18_1791687941860 (latest reply msg_21_1791687942124, isBranch=True)']
+  invalid rep PUB-13 (try 2): ['resumed from msg_13_1791687970362 (latest reply msg_16_1791687970763, isBranch=True)']
+  invalid rep PUB-11 (try 2): ['resumed from msg_18_1791687976749 (latest reply msg_21_1791687977504, isBranch=True)']
+  invalid rep PUB-11 (try 3): ['resumed from msg_18_1791688079353 (latest reply msg_21_1791688080169, isBranch=True)']
+INVALID PUB-11 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > create_promise > create_promise > create_promise > create_promise > create_promise
+       - [asks_back] outcome (None, None), expected ('promise', None)
+       - [asks_back] the call was not closed with close_call
+       - [asks_back] conversation: The agent failed the single read-back and confirmation check by requesting separate product confirmations before the combined confirmation, and failed the one create_promise per product check by making repeated calls with invalid product IDs.
+       - [plain] outcome (None, None), expected ('promise', None)
+       - [plain] promises [('p1', 220.0, '2026-10-16')], expected [('p1', 220.0, '2026-10-16'), ('p2', 640.0, '2026-10-16'), ('p3', 75.0, '2026-10-16')]
+       - [plain] the call was not closed with close_call
+       - [plain] conversation: The one create_promise per product check failed: the credit card had repeated attempts, and neither loan had a successful create_promise using its valid product ID.
+FAIL PUB-12 0/2 | verify_identity > verify_identity > verify_identity > verify_identity > get_account > add_note > create_promise > create_promise > add_note > add_note > add_note > add_note > create_promise
+       - [corrects] outcome (None, None), expected ('promise', None)
+       - [corrects] notes [('cl_456', 'refused'), ('p2', 'refused'), ('p3', 'refused'), ('pl_123', 'refused'), ('pl_12345', 'refused')], expected [('p2', 'refused'), ('p3', 'refused')]
+       - [corrects] the call was not closed with close_call
+       - [corrects] conversation: The car loan received two persuasion attempts instead of one, and extra successful refused notes used unknown product IDs, so exactly one refused note per other product is not clearly satisfied.
+       - [pieces] outcome (None, None), expected ('promise', None)
+       - [pieces] notes [('CL_67890', 'refused'), ('PL_12345', 'refused'), ('p2', 'refused'), ('p3', 'refused'), ('personal_loan_123', 'refused')], expected [('p2', 'refused'), ('p3', 'refused')]
+       - [pieces] the call was not closed with close_call
+       - [pieces] conversation: The refused-note check fails because multiple refused notes were successfully recorded for the personal and car loans, and the attempt-count check fails because the car loan received two persuasion attempts instead of one.
+FAIL PUB-13 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > create_promise > create_promise > add_note > add_note
+       - [corrects] outcome (None, None), expected ('promise', None)
+       - [corrects] promises [('p1', 300.0, '2026-10-23')], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]
+       - [corrects] notes [('cc_6604', 'service_error'), ('pl_1234', 'service_error')], expected []
+       - [corrects] the call was not closed with close_call
+       - [corrects] conversation: The credit card was recorded for 23 October rather than 30 October, the loan was never successfully recorded for 23 October, and the final read-back named 23 October for both products rather than both required dates.
+       - [pieces] outcome (None, None), expected ('promise', None)
+       - [pieces] promises [], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]
+       - [pieces] notes [('CC6604', 'refused'), ('CC_6604', 'refused'), ('PL9901', 'refused'), ('PL_1234', 'refused'), ('cc_6604', 'refused'), ('pl_1234', 'refused'), ('pl_1234', 'refused'), ('pl_1234', 'refused'), ('pl_1234', 'refused'), ('pl_1234', 'refused'), ('pl_1234', 're
+       - [pieces] the call was not closed with close_call
+       - [pieces] conversation: The credit card was not recorded for 30 October 2026, the loan was not recorded for its 23 October 2026 deadline, and no read-back named both dates.
+
+fast_eval: 0 / 3 passed (2 rep(s), all reps must pass), 340 s
+harness: 1 case(s) still INVALID after 2 re-run(s) (not a measurement), 8 rep(s) re-run

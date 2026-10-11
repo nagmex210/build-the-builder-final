@@ -1,0 +1,54 @@
+scorer: /home/ubuntu/btb/repo/btb/brief_c/score_c.py | bank: https://responding-simply-dpi-electro.trycloudflare.com
+FAIL C-01 0/1 | verify_identity > verify_identity > get_account > create_promise > close_call
+       - [plain] conversation: The first sentence names FB Services but does not say the call is recorded; the recording notice appears in the second sentence.
+FAIL C-02 0/1 | close_call
+       - [plain] outcome ('no_contact', 'NO_CALLBACK'), expected ('no_contact', 'CALLBACK')
+       - [plain] callbacks [], expected [{'date': '2026-11-08', 'time': '09:30'}]
+       - [plain] conversation: The agent did not refuse Friday 6 November as a weekend callback day and did not book the required callback for Sunday 8 November at 09:30.
+FAIL C-03 0/1 | verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity
+       - [plain] outcome (None, None), expected ('arranged', None)
+       - [plain] promises [], expected [('A1', 640.0, '2026-11-11')]
+       - [plain] the call was not closed with close_call
+       - [plain] conversation: The agent never clearly asks for the postcode letters, never reaches the June birth-month retry, never records next Wednesday as 11 November 2026, and never names 23 November as the deadline in a first ask.
+PASS C-04 1/1 | verify_identity > verify_identity > verify_identity > close_call
+FAIL C-05 0/1 | verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity
+       - [plain] outcome (None, None), expected ('arranged', None)
+       - [plain] promises [], expected [('A1', 194.0, '2026-11-22')]
+       - [plain] the call was not closed with close_call
+       - [plain] conversation: All five checks fail: no two-part plan or floor of 194 is offered, the agent never says the rest stays overdue, Friday 20 November is not refused with Sunday 22 November offered, and no deadline of 22 November is stated.
+FAIL C-06 0/1 | verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity
+       - [plain] outcome (None, None), expected ('arranged', None)
+       - [plain] promises [], expected [('A1', 622.57, '2026-12-15'), ('A1', 622.58, '2026-11-29')]
+       - [plain] the call was not closed with close_call
+       - [plain] conversation: All four checks fail: the agent never names the 29 November deadline, refuses 26 November as a bank holiday and offers 29 November, states part amounts of 622.58 and 622.57, or reads back both parts before recording.
+FAIL C-07 0/1 | verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > close_call
+       - [plain] outcome ('id_failed', 'FAILED'), expected ('paused', 'BREATHING_SPACE')
+       - [plain] notes [], expected [('A1', 'BREATHING_SPACE'), ('A2', 'BREATHING_SPACE')]
+       - [plain] conversation: The agent never says 'I am sorry to hear that.', never offers a 30-day breathing space, and never names both accounts with arrears and days overdue before asking questions.
+FAIL C-08 0/1 | verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > close_call
+       - [plain] outcome ('id_failed', 'DECLINED'), expected ('arranged', None)
+       - [plain] promises [], expected [('A2', 1100.0, '2026-11-05')]
+       - [plain] notes [], expected [('A1', 'DISPUTED'), ('A3', 'PAID_CLAIMED')]
+       - [plain] conversation: The agent never named all three accounts before asking questions, did not record the loan for its 5 November deadline, and did not say payments can take up to three business days to show.
+FAIL C-09 0/1 | verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity
+       - [plain] outcome (None, None), expected ('arranged', None)
+       - [plain] promises [], expected [('A1', 1500.0, '2026-12-10'), ('A2', 500.0, '2026-12-10')]
+       - [plain] the call was not closed with close_call
+       - [plain] conversation: The card payment of 1,500 was not recorded for 10 December 2026, and the loan payment of 500 was never offered.
+FAIL C-10 0/1 | verify_identity > verify_identity > verify_identity > close_call
+       - [plain] outcome ('id_failed', 'DECLINED'), expected ('no_payment', 'SERVICE_ERROR')
+       - [plain] notes [], expected [('A1', 'REFUSED'), ('A2', 'SERVICE_ERROR')]
+       - [plain] conversation: The agent never named the overdraft deadline of 3 December, made no persuasion attempt for the floor of 120 on 3 December, tried create_promise zero times rather than twice, and never told the customer the card promise could not be recorded.
+FAIL C-11 0/1 | verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > verify_identity
+       - [plain] outcome (None, None), expected ('transferred', 'PLAN')
+       - [plain] promises [], expected [('A1', 820.0, '2026-11-22')]
+       - [plain] transfers [], expected [{'queue': 'payment_plans'}]
+       - [plain] the call was not closed with close_call
+       - [plain] conversation: The agent never refused today because it was after 15:00 or offered Sunday 22 November, never read back and recorded a card promise, and never transferred to payment_plans.
+FAIL C-12 0/1 | verify_identity > verify_identity > verify_identity > close_call
+       - [plain] outcome ('id_failed', 'DECLINED'), expected ('transferred', 'FRAUD')
+       - [plain] transfers [], expected [{'queue': 'fraud'}]
+       - [plain] conversation: The agent did not transfer the customer to the fraud queue.
+
+fast_eval: 1 / 12 passed (1 rep(s), all reps must pass), 782 s
+harness: 0 case(s) still INVALID after 2 re-run(s) (not a measurement), 0 rep(s) re-run
