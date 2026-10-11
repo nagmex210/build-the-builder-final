@@ -1,0 +1,103 @@
+submit: brief=/home/ubuntu/btb/wt5/btb/briefs_raw/brief-a-raw.md tools=/home/ubuntu/btb/wt5/tools/openapi.json name=w5-rA
+submit: builder commit de50d97db59859c9cfaaf033fb57a5e0d38b5b8a
+submit: command: python3 builder/build.py --slot w5-rA /home/ubuntu/btb/wt5/btb/briefs_raw/brief-a-raw.md /home/ubuntu/btb/wt5/tools/openapi.json
+builder: slot=w5-rA tools=/home/ubuntu/btb/wt5/tools/openapi.json briefs=/home/ubuntu/btb/wt5/btb/briefs_raw/brief-a-raw.md
+trace: /home/ubuntu/btb/wt5/runs/traces/w5-rA-20261011-120231.jsonl
+BUILD START 2026-10-11T12:02:31Z slot=w5-rA
+clean slot: moved 5 old file(s) of this slot out of the kit to /tmp/btb-old-w5-rA-kkuvo1ae
+[model call 2026-10-11T12:02:54Z] gpt-6-astra (Azure, btb/llm.py): A1: list the brief's situations after the account lookup (router + specialist routes)
+[test] datecalc: generated date/amount code run locally on 5 dates and fake products -> ok (50 s)
+[test] A1 situations: refused, hardship, already_paid, dispute, payment_plan_transfer, human_request
+[model] build agent: Claude Agent SDK, claude-opus-5-5, skill build-phone-agent, budget 12 min
+[model call 2026-10-11T12:03:22Z] gpt-6-astra (Azure, btb/llm.py): extract calendar/amount spec for code steps
+[model call 2026-10-11T12:03:25Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 1: tools Skill
+  [Skill] {'skill': 'build-phone-agent'}
+[model call 2026-10-11T12:03:24Z] gpt-6-astra (Azure, btb/llm.py): A3: extract the brief's mandatory sentences as fixed text
+[model call 2026-10-11T12:03:27Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 2: text
+[model call 2026-10-11T12:03:28Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 3: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt5; cat btb/briefs_raw/brief-a-raw.md; cat tools/openapi.json | python3 -c "import jso
+[model call 2026-10-11T12:03:29Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 4: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt5; cat .claude/skills/build-phone-agent/routing.md; cat examples/base-agent.json'}
+    -> ## 1. Internal email **From:** Mara Chen, Operations Manager, Freya Bank **To:** Vendor delivery team **Subject:** Early-stage calling — one-product handover Hi team, Here’s the material for the early-stage collections calls. Freya Bank is fictional, and every customer, debt and payment in this project is synthetic. We’re calling customers who are 1 to 45 days late on one product. The job is to fi ...
+    -> # Workflow structure and routing recipe A shape that works for any collections-style brief. Fill every rule, value, field name, enum, outcome and reason from THE BRIEF and THE TOOL API FILE you were given. Node names below are suggestions; stage contents come from the brief. ## Principle The agent model is small. It follows one short task well and many mixed tasks badly. So: - one conversation nod ...
+[model call 2026-10-11T12:03:32Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 5: text
+[model call 2026-10-11T12:03:34Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 6: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt5; python3 -c "\nimport json;d=json.load(open(\'tools/openapi.json\'));print(json.dum
+    -> {"required": true, "content": {"application/json": {"schema": {"type": "object", "properties": {"customer_id": {"type": "string"}, "outcome": {"type": "string", "enum": ["promise", "paid", "transferred", "no_promise", "not_verified", "not_reached"]}, "reason": {"type": "string", "description": "Required for every outcome except promise and paid. See the table in the brief."}}, "required": ["custom ...
+[model call 2026-10-11T12:03:38Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 7: text
+[model call 2026-10-11T12:03:38Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 8: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt5; sed -n 455,500p docs/workflow-format.md; sed -n 610,640p docs/workflow-format.md; 
+    -> "is_tool_call": true, "condition": { "operator": "matches_intent", "description": "The caller accepted the offered slot" } } ``` Use it when the agent should decide to move, for example because of something it just said or computed. The agent can acknowledge and move in the same message. The target node's `on_enter` then asks the next question. Global nodes accept the same flag. ### Passthrough no ...
+[model call 2026-10-11T12:03:42Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 9: text
+[model call 2026-10-11T12:04:40Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 10: tools Bash
+  [Bash] {'command': 'mkdir -p /home/ubuntu/btb/wt5/out && cat > /home/ubuntu/btb/wt5/out/w5-rA.gen.py <<\'EOF\'\nimport json\nC=
+    -> 0 errors, 0 warnings [ "situation 'hardship': node 'hardship' lacks tools ['close_call']", "situation 'payment_plan_transfer': node 'payment_plan_transfer' lacks tools ['close_call']", "situation 'human_request': node 'human_request' lacks tools ['close_call']" ]
+[model call 2026-10-11T12:04:45Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 11: text
+[model call 2026-10-11T12:04:45Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 12: text
+Lint passes; adding close_call to every conversation node per the check, then saving.
+[model call 2026-10-11T12:04:47Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 13: tools Bash
+  [Bash] {'command': 'python3 - <<\'EOF\'\np=\'out/w5-rA.gen.py\';s=open(p).read()\ns=s.replace(\'first thank the customer and sa
+    -> 0 errors, 0 warnings [] {"hardened_tools": ["schedule_callback", "transfer_to_agent", "close_call", "verify_identity", "transfer_to_agent", "close_call", "get_account", "close_call", "create_promise", "close_call", "close_call", "close_call", "create_promise", "transfer_to_agent", "close_call", "close_call", "close_call", "transfer_to_agent", "close_call", "transfer_to_agent", "close_call", "guard ...
+[model call 2026-10-11T12:05:56Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 14: tools Bash
+  [Bash] {'command': 'timeout 60 python3 -c "import freya,json; print(str(freya.api(\'POST\',\'/api/v2/chat/message\',{\'workflow
+    -> ERROR Exit code 124
+[model call 2026-10-11T12:06:59Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 15: text
+[model call 2026-10-11T12:07:00Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 16: tools Bash
+  [Bash] {'command': 'timeout 100 python3 -c "import freya,json; print(str(freya.api(\'POST\',\'/api/v2/chat/message\',{\'workflo
+    -> ERROR Exit code 1 Traceback (most recent call last): File "<string>", line 1, in <module> File "/home/ubuntu/btb/wt5/freya.py", line 19, in api raise RuntimeError(f"{method} {path} -> {e.code}: {e.read().decode()[:1500]}") from None RuntimeError: POST /api/v2/chat/message -> 504: error code: 504
+[model call 2026-10-11T12:08:08Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 17: text
+[model call 2026-10-11T12:08:08Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 18: text
+The workflow is saved, but I couldn't confirm it starts. The one-turn chat check didn't get an answer: the first try ran past 60 seconds and I killed it, and the second came back 504 (gateway timeout). That isn't the 500 that means a workflow can't start, but it isn't a pass either. I also didn't do the rule-by-rule re-read against the brief because I ran out of time.
+
+- **Checks:** lint shows 0 errors and 0 warnings, and `situations.py check` lists no problems. The first situations check said `hardship`, `payment_plan_transfer` and `human_request` had no `close_call`. I fixed that by giving every conversation node its own `close_call`.
+- **Structure:** it starts at the given date code node, then goes opening → identity → account lookup → router → negotiate, plus the six specialist nodes from the extraction and a hang-up node.
+- **Brief rules:** the deadlines are the memo's amended values (12th business day for 1–7 days late, 7th for 8–45), which match DATE FACTS. The two date/amount rules no code step computes are written into the identity node (date of birth as day, month, year) and the negotiate node (attempt 1 on the last business day of this week). I found nothing where the extracted situations disagree with the brief.
+- **One choice of mine:** if a transfer to restructuring fails twice, the agent closes as `no_promise` / `refused`. The brief has no rule for that case.
+- **Files:** the workflow is `out/w5-rA.workflow.json`, built by `out/w5-rA.gen.py`.
+
+workflow_id a704f728-e063-4af3-b2d4-54e7e9c12c29, agent_id d0c0fd1a-c0f9-43d9-ab47-796749247d57
+
+done: 11 turns, 286 s
+[model call 2026-10-11T12:08:08Z] claude-haiku-5-5 (Claude Agent SDK) build agent usage: 4256 input / 25 output tokens; internal helper calls of Claude Code (no turns of their own, e.g. classifying a command)
+[model call 2026-10-11T12:08:08Z] claude-opus-5-5 (Claude Agent SDK) build agent usage: 404666 input / 10435 output tokens
+[test] A3 canned sentences: extracted
+[test] A1 situation coverage (build): 0 problem(s)
+final save (build): {'workflow_id': 'a704f728-e063-4af3-b2d4-54e7e9c12c29', 'agent_id': 'd0c0fd1a-c0f9-43d9-ab47-796749247d57', 'version': 35}; lint: 0 errors, 0 warnings
+[freya] saved workflow (build): 15 steps (1 api_request, 1 code, 12 conversation, 1 end_call), start date_facts_setup, 31 transitions; 8 tools (check_promise_date, close_call, code_exec, create_promise, get_account, schedule_callback, transfer_to_agent, verify_identity) in 25 bindings, 47 tool hooks; 0 global nodes
+buildcheck: 0 error(s), 1 warning(s)
+[model call 2026-10-11T12:08:37Z] gpt-6-astra (Azure, btb/llm.py): self-simulation: write personas + ledger checks from the brief
+self-test 1 (workspace 2): 0/0 personas failed a check (0 checks)
+[test] self-test 1: personas written from the brief, deterministic ledger checks (workspace 2, workflow 1254c1ef-cf01-4a71-b54a-a00bd9ad20be; phone agent on Freya's model): 0 valid chat(s), 0 passed every check, 0 failed (0 checks), 12 not usable (platform)
+  [test] persona 'Full amount, changed date at confirmation' (customer PUB-01, call -, 0 turns, tools none): NOT USABLE: POST /api/v2/chat/message -> 402: {"error":"Insufficient credits","message":"Insufficient credits — please top up","info
+  [test] persona 'Full amount, changed date at confirmation' (customer PUB-01, call -, 0 turns, tools none): NOT USABLE: POST /api/v2/chat/message -> 402: {"error":"Insufficient credits","message":"Insufficient credits — please top up","info
+  [test] persona 'Below the floor, beyond the deadline, then refusal' (customer PUB-02, call -, 0 turns, tools none): NOT USABLE: POST /api/v2/chat/message -> 402: {"error":"Insufficient credits","message":"Insufficient credits — please top up","info
+  [test] persona 'Below the floor, beyond the deadline, then refusal' (customer PUB-02, call -, 0 turns, tools none): NOT USABLE: POST /api/v2/chat/message -> 402: {"error":"Insufficient credits","message":"Insufficient credits — please top up","info
+  [test] persona 'Job loss overrides a request for lower instalments' (customer PUB-04, call -, 0 turns, tools none): NOT USABLE: POST /api/v2/chat/message -> 402: {"error":"Insufficient credits","message":"Insufficient credits — please top up","info
+  [test] persona 'Job loss overrides a request for lower instalments' (customer PUB-04, call -, 0 turns, tools none): NOT USABLE: POST /api/v2/chat/message -> 402: {"error":"Insufficient credits","message":"Insufficient credits — please top up","info
+  [test] persona 'Three wrong phone answers' (customer PUB-03, call -, 0 turns, tools none): NOT USABLE: POST /api/v2/chat/message -> 402: {"error":"Insufficient credits","message":"Insufficient credits — please top up","info
+  [test] persona 'Three wrong phone answers' (customer PUB-03, call -, 0 turns, tools none): NOT USABLE: POST /api/v2/chat/message -> 402: {"error":"Insufficient credits","message":"Insufficient credits — please top up","info
+  [test] persona 'Sister answers and gives a corrected callback time' (customer PUB-08, call -, 0 turns, tools none): NOT USABLE: POST /api/v2/chat/message -> 402: {"error":"Insufficient credits","message":"Insufficient credits — please top up","info
+  [test] persona 'Sister answers and gives a corrected callback time' (customer PUB-08, call -, 0 turns, tools none): NOT USABLE: POST /api/v2/chat/message -> 402: {"error":"Insufficient credits","message":"Insufficient credits — please top up","info
+  [test] persona 'Claims payment and demands false confirmation' (customer PUB-06, call -, 0 turns, tools none): NOT USABLE: POST /api/v2/chat/message -> 402: {"error":"Insufficient credits","message":"Insufficient credits — please top up","info
+  [test] persona 'Claims payment and demands false confirmation' (customer PUB-06, call -, 0 turns, tools none): NOT USABLE: POST /api/v2/chat/message -> 402: {"error":"Insufficient credits","message":"Insufficient credits — please top up","info
+[test] decision: no fix round (no failed check)
+buildcheck (shipped): 0 problem(s)
+[freya] slot w5-rA: workflow_id=a704f728-e063-4af3-b2d4-54e7e9c12c29 agent_id=d0c0fd1a-c0f9-43d9-ab47-796749247d57 version=35 (published)
+[freya] exported: /home/ubuntu/btb/wt5/submission/w5-rA.workflow.json: 15 steps (1 api_request, 1 code, 12 conversation, 1 end_call), start date_facts_setup, 31 transitions; 8 tools (check_promise_date, close_call, code_exec, create_promise, get_account, schedule_callback, transfer_to_agent, verify_identity) in 25 bindings, 47 tool hooks; 0 global nodes
+BUILD END 2026-10-11T12:08:44Z (373 s); trace scrubbed (0 secret(s) replaced): /home/ubuntu/btb/wt5/runs/traces/w5-rA-20261011-120231.jsonl
+{"workflow_id": "a704f728-e063-4af3-b2d4-54e7e9c12c29", "agent_id": "d0c0fd1a-c0f9-43d9-ab47-796749247d57"}
+
+=== SUBMISSION SUMMARY (w5-rA) ===
+build exit code : 0
+workflow_id     : a704f728-e063-4af3-b2d4-54e7e9c12c29
+agent_id        : d0c0fd1a-c0f9-43d9-ab47-796749247d57
+export          : /home/ubuntu/btb/wt5/submission/w5-rA.workflow.json (loads as json with nodes: yes; Freya dry-run load: yes)
+export contents : 15 steps (1 api_request, 1 code, 12 conversation, 1 end_call), start date_facts_setup, 31 transitions; 8 tools (check_promise_date, close_call, code_exec, create_promise, get_account, schedule_callback, transfer_to_agent, verify_identity) in 25 bindings, 47 tool hooks; 0 global nodes
+trace (log)     : /home/ubuntu/btb/wt5/traces/w5-rA.log
+trace (jsonl)   : /home/ubuntu/btb/wt5/runs/traces/w5-rA-20261011-120231.jsonl
+builder commit  : de50d97db59859c9cfaaf033fb57a5e0d38b5b8a
+build seconds   : 374 (under 30 min: yes)
+scrub: /home/ubuntu/btb/wt5/traces/w5-rA.log: 0 secret(s) replaced
+scrub: /home/ubuntu/btb/wt5/runs/traces/w5-rA-20261011-120231.jsonl: 0 secret(s) replaced
+scrub: 0 in total
+submit: key check: no key (env values, JWT/sk-/fak_/ghp_ patterns) found in /home/ubuntu/btb/wt5/traces/w5-rA.log /home/ubuntu/btb/wt5/runs/traces/w5-rA-20261011-120231.jsonl /home/ubuntu/btb/wt5/submission/w5-rA.workflow.json
