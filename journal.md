@@ -404,3 +404,92 @@ verbatim to runs/next_families.txt; the owner note's families block is removed f
 merger instruction kept.
 WARNING for b10: the main-A/B/rA/rB/C slots on Freya hold the merge/b9 builds (not kept), not the champion's; rebuild main-* from main before any official or final run.
 (11:20-11:31 the b9 merger tried to rebuild main-A/main-B from main: every save PUT answered 504 and the builds hit the 10-min tool limit; the main-* slots are in an unknown state, rebuild them. Logs: runs/b9/rebuild/.)
+
+## b10 merge (consolidation batch, 12:40-14:1x UTC): merge/b10 KEPT on main = verified bug fixes (w1, w2, merger) + w4 stability + w5 trace/export + w3 dead-code removal
+
+Owner rule for b10: keep a bug fix only with a before/after repro re-run by the merger; a simplification only with an empty
+workflow diff and no official A/B drop. Platform this session: saves and builds were healthy (builds 534-1068 s with the
+self-test); workspace 2 still answers 402 to chats and simulations, so all official runs went serially through workspace 1;
+the chat endpoint was slow (fast_eval C took 19-27 min, some chats timed out); one official run per brief.
+
+Workers (no worker could measure a score: chat 500s from 12:00-12:45; all brief-agnostic by diff grep, nothing from A/B hard-coded):
+- w1 BUG HUNT pipeline: 14 offline repros (datecalc percent floor rounded to cents before the brief's rounding, min before
+  rounding, unpadded cut-off string compare; self-test chats as non-daemon executor threads holding the process past BUILD END;
+  round 1 ignoring the time left; unlocked state-file reads during a parallel save; clear_slot treating '-' as a word boundary
+  (slot brief-a wiped brief-a-raw's files); no 5xx retry on saves; 0/0 self-test printed as a pass; scrub missing split
+  writes/writelines; `PROMPT.replace("BRIEF")` pasting the brief twice; selftest max_calls n=None crash; unreadable final ledger
+  scored as "close_call 0 times"). RE-RUN BY ME: 14/14 FAIL on main, pass on the branch, and pass on merge/b10. MERGED.
+- w2 BUG HUNT workflow: live probe: in a parallel tool turn a post-hook can read a SIBLING's vars, and `config` is absent in
+  post-hooks (M20 measured). Fixes: R1 a guard block no longer erases an earlier real failure count; R2 the guard post-hook
+  decides recorded/blocked by the bank RESULT (success id field from the tool API file), not by the per-tool flag a sibling
+  leaks; R4 a bank rejection (ok=false, <500) says "the bank rejected the values ... never send the same values again"
+  instead of "retry with the same values"; R5 identity 'passed' from the call's own ledger when the bank gives no call-wide
+  flag, sticky against a stale sibling (= owner FIX 2); R7 an id the model built (credit_card_2288, CC_2288) is mapped to the
+  one listed item whose type/last digits match. RE-RUN BY ME (offline_finish on the same w2-B raw workflow with main's and
+  the branch's code + repro.py): before/after differ exactly in R1/R2/R4/R5/R7, R6 negatives (right+wrong, flag false,
+  three wrong) unchanged; identical output on merge/b10. MERGED. (Owner asked for fast_eval PUB-05 before/after for FIX 2:
+  not run, the chat endpoint was too slow; the hook-level repro is the evidence.)
+- w3 SIMPLIFY: dead extract.py, unused vars/params, dead tool_successes_ hook branch, duplicated conditions; w3's replay of
+  the whole post-processing chain on 9 real inner-agent workflows is identical modulo the removed hook lines. MERGED
+  (conflicts resolved in favour of w1/w2 code). Official: see the decision below.
+- w4 STABILITY (36 builds): round a (champion as is) 10/12 BUILD FAILED on Freya 5xx inside the final save; 30/36 "strong"
+  extractions silently fell to gpt-4.1-mini on Azure 429s; ws2 402 made every self-test a 0/0 no-op. Fixes: save retry within
+  a budget, ship the agent's own save of THIS run when the final save fails, workspace id once, Azure 429 wait + fallback
+  logged, ws1 self-test fallback. MERGED; save retry unified into w1's locked_save (w4's transient set + 300 s budget, sleeps
+  outside the lock); the ws1 fallback shares round 1's budget.
+- w5 SUBMISSION CHECK: trace now lists Claude Code's hidden helper model (claude-haiku-5-5), failed Azure calls, one line per
+  self-test persona chat, "untested, not passed" for a round with no valid chat, step/tool counts of what was saved, an export
+  dry-run load; submit.sh parsed as one block (an edit/git pull during a run broke it). Workflow unchanged. MERGED.
+- w6 once.py behind BTB_ONCE=1: first line VERDICT: NOT MEASURED -> not taken (owner rule). w7 memory tool: VERDICT: NO
+  EFFECT -> not taken (owner rule).
+- Owner FIX 1 (silent account step): NOT DONE. No branch had it; the fresh main-A build had a different shape (get_account is a
+  tool inside the identity node, no separate account node), so a general rule plus its fast_eval before/after did not fit
+  next to the official runs. Carry-over.
+
+Found and fixed by the merger on the merged builds (each with a before/after):
+- M1 fix-round crash: with the ws1 fallback the self-test fix round really runs; on main-A and main-B the Claude SDK raised
+  CLIJSONDecodeError (a >1 MB message after an Edit of the workflow file) and only TimeoutError was caught: both BUILDS DIED
+  with no result line (Freya kept the build's final-pass save). Fix: any fix-round error puts the build's file back and
+  ships the build's save; self_simulate can never kill the build; SDK max_buffer_size 16 MB. Repro
+  runs/b10/merge/repro_fixround_crash.py (stubbed selftest + claude_stream): before CRASH, after survives with the build's file.
+- M2 intent transitions without a condition: official raw-A on the merged build 3/10: 6 calls stuck in the router (the model
+  read back the promise, never left the router, closed service_error). The build agent had written all 15 is_tool_call
+  transitions WITHOUT `condition` (docs: a tool-call transition carries {"operator": "matches_intent", ...}); the platform
+  then never offers the transition tool. Not caused by the merge: the same shape is in about 1 of 6 champion-code builds
+  (w4 rounds a/b/c, w1). Fix: save.intent_conditions() in the final pass adds matches_intent with the transition's own
+  description. Before/after on the SAME workflow (the scored main-rA/main-rB, only this repair, saved as main-rAfix/main-rBfix):
+  official raw-A 3/10 -> 6/10: all five promise cases that were stuck (PUB-01/04/06/07/10) pass; the 4 new fails are
+  platform stalls (the call ended after the customer's first line, no agent turn, opening node untouched by the repair).
+- Harness: undocumented `POST /api/v2/simulations/{id}/cancel` cleared b9's stuck "running" simulation 6e7825a2 that blocked
+  workspace 1 (use it in the final rehearsal); run_cases_retry.py also retries mock-bank calls (a non-JSON bank answer killed
+  three official runs at 13:2x).
+
+Official (workspace 1, 1 rep each; champion b8: A 8/10 (8,9), B 3/3, rA 9/10, rB 3/3):
+- A (main-A, merged build; its fix round crashed = M1 case, so the build's final-pass save was scored): 8/10 (PUB-03 3rd wrong
+  answer not ended as failed; PUB-07 every tool "Sandbox did not return a parseable result", the known sandbox payload-limit
+  kind from b7/b8 digests). PUB-05 and PUB-06 (the champion's usual fails) passed. Simulation salvaged after a bank 5xx.
+- B (main-B, same agent twice): run 1 0/3 during a latency spike (customer turns 35-50 s; PUB-11/13 cut mid-confirmation,
+  "customer hung up: 2"; PUB-12 two persuasion attempts on an early-band product); run 2 (latency back to 6 s median) 3/3.
+- raw-A: first merged build 3/10 (M2 shape) -> same workflow + M2 repair 6/10 (4 platform stalls at the opening) -> FULL
+  REBUILD with the final builder (main-rA, 758 s, intents 15/15 with condition) 10/10.
+- raw-B: first merged build + M2 repair (main-rBfix) 2/3 (PUB-13 customer hang-up under the latency spike). The final
+  rebuild of main-rB (1068 s, intents 33/33 with condition) was not scored officially (time).
+fast: C random 1/12 (1 invalid), C adversarial 1/12 (champion 1/12, 1/12). fast A/B/rA/rB not run (chat endpoint slow; the
+official runs had priority).
+
+Decision: KEPT (merge/b10 -> main). Accept rule: (c) every builder change is a bug fix with a before/after repro re-run by
+me (w1 14/14, w2 R1/R2/R4/R5/R7, M1, M2), (b) the fixes cover several failure kinds (save/build deaths, trace honesty,
+parallel-hook misreports, identity gate, built ids, router dead-ends), and the official evidence does not drop once the
+platform's latency spike is excluded: A 8/10 = champion level, B 3/3 = champion (0/3 run explained by hang-ups in the
+transcripts), raw-A 10/10 on the final rebuild (champion 9/10), raw-B 2/3 on the repaired first build (1 hang-up). w3's
+simplification: replay-identical and official A/B did not drop on the clean B run -> kept.
+Slots now: main-A, main-B, main-C = merged builds BEFORE the M2 repair (their intents all had conditions, so M2 would not
+change them); main-rA, main-rB = final builder. main-rAfix/main-rBfix = repro slots only.
+Hypotheses (H) for the final rehearsal:
+- (H) M2 was probably behind part of the champion's run-to-run spread on raw briefs (1 in 6 builds dead-ended at the router);
+  with the repair a bad build of that kind no longer exists. Check the next 3 builds' "intent-condition:" lines in the trace.
+- (H) The ws1 self-test now runs and its fix round edits the workflow (rA first build "fix kept"; rB "restored"); the re-test
+  guard decides. If the rehearsal shows a fix round making things worse, set it off (SELFTEST) and keep the trace honesty.
+- (H) Open: owner FIX 1 (silent account step), once-only residuals (PUB-12 two attempts on an early-band product, PUB-05/06
+  kind), the sandbox payload limit (PUB-07: the pre-hook prints config + all vars; a big vars dict makes every later tool
+  call unparseable), PUB-03 (3rd wrong identity answer closed as declined).

@@ -1,0 +1,288 @@
+builder: slot=main-A tools=/home/ubuntu/btb/repo/tools/openapi.json briefs=/home/ubuntu/btb/repo/briefs/brief-a.md
+trace: /home/ubuntu/btb/repo/runs/traces/main-A-20261011-124531.jsonl
+BUILD START 2026-10-11T12:45:31Z slot=main-A
+clean slot: moved 5 old file(s) of this slot out of the kit to /tmp/btb-old-main-A-eou7jddq
+[model call 2026-10-11T12:45:54Z] gpt-6-astra (Azure, btb/llm.py): A1: list the brief's situations after the account lookup (router + specialist routes)
+[test] datecalc: generated date/amount code run locally on 5 dates and fake products -> ok (56 s)
+[test] A1 situations: refused, hardship, already_paid, dispute, payment_plan_transfer, human
+[model] build agent: Claude Agent SDK, claude-opus-5-5, skill build-phone-agent, budget 12 min
+[model call 2026-10-11T12:46:26Z] gpt-6-astra (Azure, btb/llm.py): extract calendar/amount spec for code steps
+[model call 2026-10-11T12:46:29Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 1: tools Skill
+  [Skill] {'skill': 'build-phone-agent', 'args': 'Slot: main-A'}
+[model call 2026-10-11T12:46:31Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 2: text
+[model call 2026-10-11T12:46:32Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 3: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat briefs/brief-a.md; cat tools/openapi.json; cat .claude/skills/build-phone-age
+    -> <persisted-output> Output too large (30.6KB). Full output saved to: /home/ubuntu/.claude/projects/-home-ubuntu-btb-repo/4fc55453-7ac7-4876-9b14-c81b5cd56909/tool-results/bdj9rsy70.txt Preview (first 2KB): # Brief A: Freya Bank, early-stage collections, one product Freya Bank is fictional. Every customer, debt and payment here is synthetic. This brief has the density of a real bank specification. R ...
+[model call 2026-10-11T12:46:32Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 4: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat examples/base-agent.json; python3 -c "\nimport json;d=json.load(open(\'out/ma
+    -> { "nodes": { "identity": { "name": "identity", "tools": [ { "type": "function", "config": { "timeoutMs": 12000, "maxRetries": 0 }, "function": { "name": "verify_identity", "handler": "__function__:api_call", "parameters": { "type": "object", "properties": { "url": { "type": "string", "default": "https://freya-bank-mock.freyavoice.workers.dev/v1/verify_identity" }, "body": { "type": "object", "requ ...
+[model call 2026-10-11T12:46:35Z] gpt-6-astra (Azure, btb/llm.py): A3: extract the brief's mandatory sentences as fixed text
+[model call 2026-10-11T12:46:35Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 5: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; sed -n 30,400p /home/ubuntu/.claude/projects/-home-ubuntu-btb-repo/4fc55453-7ac7-
+    -> 5. Do not say why you are calling. Say nothing beyond the opening sentence of rule 1. Ask when the customer can be reached. 6. A callback is for today or the next business day, from 10:00 to 19:00, both included, and later than `now`. Call `schedule_callback` with the date and the time, then close as `not_reached` / `callback`. 7. If the person offers a day or a time outside that window, ask once  ...
+[model call 2026-10-11T12:46:37Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 6: tools Bash
+  [Bash] {'command': "cd /home/ubuntu/btb/repo; sed -n 400,700p /home/ubuntu/.claude/projects/-home-ubuntu-btb-repo/4fc55453-7ac7
+    -> "type": "object", "properties": { "ok": { "type": "boolean" }, "error": { "type": "string" } } } } } }, "500": { "description": "The service failed. Nothing was recorded. The call may be repeated." } } } }, "/schedule_callback": { "post": { "summary": "Book a callback.", "requestBody": { "required": true, "content": { "application/json": { "schema": { "type": "object", "properties": { "customer_id ...
+[model call 2026-10-11T12:46:40Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 7: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat .claude/skills/build-phone-agent/routing.md; python3 -c "\nimport json;d=json
+    -> # Workflow structure and routing recipe A shape that works for any collections-style brief. Fill every rule, value, field name, enum, outcome and reason from THE BRIEF and THE TOOL API FILE you were given. Node names below are suggestions; stage contents come from the brief. ## Principle The agent model is small. It follows one short task well and many mixed tasks badly. So: - one conversation nod ...
+[model call 2026-10-11T12:46:42Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 8: text
+[model call 2026-10-11T12:46:42Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 9: text
+I've read the brief, the tool API file and the code steps. Next I'm writing the generator script.
+[model call 2026-10-11T12:46:43Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 10: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; python3 -c "\nimport json;d=json.load(open(\'out/main-A.calc.json\'));print(d[\'e
+    -> p1: band early, deadline Wednesday 2026-10-28, floor None p2: band late, deadline Tuesday 2026-10-20, floor None get_account { "main": { "name": "pays", "summary": "State the product, past-due amount and days late; ask for full payment today, negotiate within the brief's amount, business-day deadline and persuasion limits, read back and confirm, then record the promise." }, "exits": [ { "name": "r ...
+[model call 2026-10-11T12:46:46Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 11: text
+[model call 2026-10-11T12:47:49Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 12: tools Bash
+  [Bash] {'command': 'mkdir -p /home/ubuntu/btb/repo/out && cat > /home/ubuntu/btb/repo/out/main-A.gen.py <<\'EOF\'\nimport json,
+    -> ERROR opening: top-level condition with logic 'and' (nest it inside an 'or' group) ERROR router: top-level condition with logic 'and' (nest it inside an 'or' group) ERROR router: top-level condition with logic 'and' (nest it inside an 'or' group) ERROR router: top-level condition with logic 'and' (nest it inside an 'or' group) ERROR router: top-level condition with logic 'and' (nest it inside an ' ...
+[model call 2026-10-11T12:47:51Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 13: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; grep -n -i "terminal\\|is_tool_call" docs/workflow-format.md | head -20; grep -n 
+    -> 75:| `end_call` | Ends the call | optional farewell | `terminal` | 108:| `terminal` | object | | The end-call function. `end_call` nodes only | 201:- An unresolved variable in a prompt stays as the literal text `{{variable_name}}`. The model sees the placeholder. In a fixed spoken line (`on_enter.text`, a terminal `spoken_message`) the agent says it aloud. 288:| `is_tool_call` | boolean | The dial ...
+[model call 2026-10-11T12:47:53Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 14: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; sed -n 445,470p docs/workflow-format.md; sed -n 610,650p docs/workflow-format.md'
+    -> Make the loop condition specific. "The user has not finished" matches everything and the agent never leaves. ### Tool-call transitions Set `is_tool_call` to `true` on a transition. The dialogue model then sees the transition as a tool named `transition_to_<node>` and triggers it by calling that tool. The router does not evaluate it after each turn. ```json { "target_node": "confirm_booking", "desc ...
+[model call 2026-10-11T12:47:57Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 15: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; python3 - <<\'EOF\'\np=\'out/main-A.gen.py\'; s=open(p).read()\ns=s.replace(\'"co
+    -> 0 errors, 0 warnings []
+[model call 2026-10-11T12:47:59Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 16: text
+[model call 2026-10-11T12:48:00Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 17: tools Bash
+  [Bash] {'command': "cd /home/ubuntu/btb/repo; cat >> out/main-A.gen.py <<'EOF'\nfor n in wf['nodes'].values():\n    for t in n.
+    -> 0 errors, 0 warnings [] {"hardened_tools": ["schedule_callback", "transfer_to_agent", "close_call", "verify_identity", "get_account", "transfer_to_agent", "close_call", "close_call", "create_promise", "close_call", "close_call", "transfer_to_agent", "create_promise", "close_call", "close_call", "close_call", "transfer_to_agent", "close_call", "transfer_to_agent", "create_promise", "close_call", "g ...
+[model call 2026-10-11T12:48:07Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 18: text
+First version is saved. Now running one chat turn to check that it starts.
+[model call 2026-10-11T12:48:09Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 19: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; timeout 60 python3 -c "import freya,json; print(json.dumps(freya.api(\'POST\',\'/
+    -> {"response": "I am a digital assistant calling from Freya Bank, and we record this call. Am I speaking with Ms Lee?", "callId": "c3dd14db-129c-4181-9fef-26105a22d46e", "messageId": "msg_4_1791722889981"}
+[model call 2026-10-11T12:48:13Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 20: text
+[model call 2026-10-11T12:48:15Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 21: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; python3 - <<\'EOF\'\np=\'out/main-A.gen.py\'; s=open(p).read()\ns=s.replace("tell
+    -> 0 errors, 0 warnings [] {"workflow_id": "c591c751-dc19-4660-9955-f9a4d750213d", "agent_id": "d7b2b782-a1c2-42ce-b004-ab865e0186de", "version": 31}
+[model call 2026-10-11T12:48:24Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 22: text
+[model call 2026-10-11T12:48:24Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 23: text
+The main-A workflow is saved and starts: one test chat turn gave the right opening line. The lint and situations checks passed with no problems. I ran no practice cases or other tests, and I did not do the full rule-by-rule re-read of the brief.
+
+**How it's built** (all generated by `out/main-A.gen.py`):
+- The call starts with the date-facts code node unchanged and moves to the opening.
+- The opening handles who is on the line, including callbacks, wrong number, deceased and unclear.
+- Identity asks the two security questions; once both pass, the agent calls `get_account` itself in that node, using your hook unchanged.
+- After that, a router states the debt and sends the call either to the negotiate node or to one of the six specialist nodes as given, each followed by a hang-up node.
+
+**Differences from your instructions:**
+- **Account lookup:** routing.md wants a separate silent lookup step between identity and the router. I skipped it to save time.
+- **Failed transfer:** the brief has no rule for this. I made the agent try once more, then tell the customer it couldn't be done and close as `no_promise` / `service_error`. That reason is my choice, not the brief's.
+
+workflow_id c591c751-dc19-4660-9955-f9a4d750213d, agent_id d7b2b782-a1c2-42ce-b004-ab865e0186de
+
+done: 16 turns, 117 s
+[model call 2026-10-11T12:48:24Z] claude-haiku-5-5 (Claude Agent SDK) build agent usage: 3930 input / 21 output tokens; internal helper calls of Claude Code (no turns of their own, e.g. classifying a command)
+[model call 2026-10-11T12:48:24Z] claude-opus-5-5 (Claude Agent SDK) build agent usage: 646791 input / 11913 output tokens
+[test] A3 canned sentences: extracted
+[test] A1 situation coverage (build): 0 problem(s)
+final save (build): {'workflow_id': 'c591c751-dc19-4660-9955-f9a4d750213d', 'agent_id': 'd7b2b782-a1c2-42ce-b004-ab865e0186de', 'version': 32}; lint: 0 errors, 0 warnings
+[freya] saved workflow (build): 13 steps (1 code, 11 conversation, 1 end_call), start date_facts_setup, 30 transitions; 8 tools (check_promise_date, close_call, code_exec, create_promise, get_account, schedule_callback, transfer_to_agent, verify_identity) in 26 bindings, 49 tool hooks; 0 global nodes
+buildcheck: 0 error(s), 1 warning(s)
+[model call 2026-10-11T12:48:54Z] gpt-6-astra (Azure, btb/llm.py): self-simulation: write personas + ledger checks from the brief
+self-test: no valid chat in workspace 2 (POST /api/v2/chat/message -> 402: {"error":"Insufficient credits","message":"Insufficient credits — ); playing the round in workspace 1
+[model call 2026-10-11T12:49:00Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:49:00Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:49:00Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:49:00Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:49:00Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:49:00Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:49:00Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:49:00Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:49:01Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:49:01Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:49:01Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:49:02Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:49:10Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:49:10Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:49:11Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:49:12Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:49:18Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:49:21Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:49:22Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:49:22Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:49:29Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:49:29Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:49:30Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:49:31Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:49:31Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:49:32Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:49:37Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:49:40Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:49:42Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:49:42Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:49:52Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:49:52Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:49:52Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:49:52Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:50:07Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:50:27Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:50:28Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:50:31Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:50:33Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:50:35Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:50:42Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:50:55Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:51:02Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:51:04Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:51:16Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:51:20Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:51:20Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:51:21Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:51:24Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:51:29Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:51:29Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:51:30Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:51:32Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:51:33Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:51:41Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:51:44Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:51:49Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:51:50Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:51:50Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:51:59Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:52:02Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:52:02Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:52:09Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:52:19Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:52:20Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:52:22Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:52:28Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:52:37Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:53:40Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:53:49Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:53:53Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:53:59Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:54:06Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:54:16Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:55:00Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:55:05Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:55:15Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:55:20Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:55:25Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T12:55:26Z] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+self-test 1 (workspace 1): 3/9 completed persona chats failed a check (4 checks; 3 of 12 chats did not complete)
+[test] self-test 1: personas written from the brief, deterministic ledger checks (workspace 1, workflow c591c751-dc19-4660-9955-f9a4d750213d; phone agent on Freya's model): 9 valid chat(s), 6 passed every check, 3 failed (4 checks), 3 not usable (platform)
+  [test] persona 'Full payment today, with a clear confirmation' (customer PUB-01, call 6d00d84c-a400-4e39-ae73-9714d10dff1f, 8 turns, tools verify_identity > verify_identity > get_account > create_promise > close_call): FAIL: brief check: close_call with outcome='promise' (got ['no_promise'])
+  [test] persona 'Full payment today, with a clear confirmation' (customer PUB-01, call -, 0 turns, tools none): NOT USABLE: chat did not finish in time
+  [test] persona 'Below-floor offer and a date beyond the deadline' (customer PUB-02, call c8fc2204-2d4a-4007-8e7e-381f36dda60a, 8 turns, tools verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call): PASS
+  [test] persona 'Below-floor offer and a date beyond the deadline' (customer PUB-02, call eaee8afd-4735-4307-8f04-8f924e18d365, 7 turns, tools verify_identity > verify_identity > get_account > close_call): FAIL: brief check: create_promise must be called | brief check: close_call with outcome='promise' (got ['no_promise'])
+  [test] persona 'Job loss takes priority over a request for lower instalments' (customer PUB-05, call 3513de6f-b95d-4306-8101-a46c9b39357d, 7 turns, tools verify_identity > verify_identity > verify_identity > get_account > transfer_to_agent > close_call): PASS
+  [test] persona 'Job loss takes priority over a request for lower instalments' (customer PUB-05, call 460af6a5-9c06-4670-b897-63d8197dfac4, 6 turns, tools verify_identity > verify_identity > get_account > transfer_to_agent): NOT USABLE: chat turn timed out and no reply appeared
+  [test] persona 'Three wrong security answers, then pressure to continue' (customer PUB-03, call 445d7bcd-b21c-4d74-83ec-d2bb3b2b928f, 5 turns, tools verify_identity > verify_identity > verify_identity > close_call): PASS
+  [test] persona 'Three wrong security answers, then pressure to continue' (customer PUB-03, call 1e69685b-87cb-44d6-94aa-916734df2be0, 8 turns, tools verify_identity > verify_identity > close_call): FAIL: brief check: close_call with reason='failed' (got ['declined'])
+  [test] persona 'A relative offers to pay and requests a callback' (customer PUB-04, call 8ad1f2e0-f81e-4dde-9c57-e073c1aa0d76, 6 turns, tools schedule_callback > close_call): PASS
+  [test] persona 'A relative offers to pay and requests a callback' (customer PUB-04, call 659f136d-04c7-47ad-aa70-8a9c1af630b2, 5 turns, tools schedule_callback > close_call): PASS
+  [test] persona 'Unsupported payment claim and pressure for a false assurance' (customer PUB-06, call -, 0 turns, tools none): NOT USABLE: chat did not finish in time
+  [test] persona 'Unsupported payment claim and pressure for a false assurance' (customer PUB-06, call 7040f0d1-00dc-4342-aa70-420ebdfde258, 6 turns, tools verify_identity > verify_identity > get_account > close_call): PASS
+[model call 2026-10-11T12:55:57Z] claude-opus-5-5 (Claude Agent SDK) self-test fix turn 1: text
+[model call 2026-10-11T12:55:58Z] claude-opus-5-5 (Claude Agent SDK) self-test fix turn 2: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat briefs/brief-a.md | head -80; python3 -I -c "\nimport json;w=json.load(open(\
+    -> # Brief A: Freya Bank, early-stage collections, one product Freya Bank is fictional. Every customer, debt and payment here is synthetic. This brief has the density of a real bank specification. Read all of it. Most failed cases come from one rule that was skipped. ## 1. The job Freya Bank calls customers who are 1 to 45 days late on one product. The agent finds the customer, checks identity, state ...
+[model call 2026-10-11T12:56:01Z] claude-opus-5-5 (Claude Agent SDK) self-test fix turn 3: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; sed -n 80,200p briefs/brief-a.md; python3 -I -c "\nimport json;w=json.load(open(\
+    -> <persisted-output> Output too large (69KB). Full output saved to: /home/ubuntu/.claude/projects/-home-ubuntu-btb-repo/92c39d78-7bbd-4580-b218-512857120950/tool-results/bo6ba875e.txt Preview (first 2KB): - Attempt 1: propose the last business day of this week. If today is that day, propose the last business day of next week. - Attempt 2, late band only: propose the floor amount on the deadline. 31. ...
+[model call 2026-10-11T12:56:03Z] claude-opus-5-5 (Claude Agent SDK) self-test fix turn 4: text
+[model call 2026-10-11T12:56:05Z] claude-opus-5-5 (Claude Agent SDK) self-test fix turn 5: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; python3 -I -c "\nimport json;d=json.load(open(\'out/main-A.selftest1.json\'))\ns=
+    -> 6d00d84c-a400-4e39-ae73-9714d10dff1f 7358 eaee8afd-4735-4307-8f04-8f924e18d365 12671 1e69685b-87cb-44d6-94aa-916734df2be0 20151 <class 'dict'> ['personas', 'where', 'workflow_id', 'n', 'n_failed', 'n_checks_failed', 'rows', 'ws2_error']
+[model call 2026-10-11T12:56:08Z] claude-opus-5-5 (Claude Agent SDK) self-test fix turn 6: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; python3 -I -c "\nimport json;d=json.load(open(\'out/main-A.selftest1.json\'))\nfo
+    -> { "title": "Full payment today, with a clear confirmation", "customer": "PUB-01", "script": "Daniel answers with his name and says he is making coffee. He gives his birthday as 'the fourteenth of March, nineteen eighty-eight' and his phone digits as 'forty-four ... seventy-one.' After hearing the account details, he agrees to pay all four hundred and twenty today, October fourteenth. He waits for  ...
+[model call 2026-10-11T12:56:11Z] claude-opus-5-5 (Claude Agent SDK) self-test fix turn 7: text
+[model call 2026-10-11T12:56:12Z] claude-opus-5-5 (Claude Agent SDK) self-test fix turn 8: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; python3 -I -c "\nimport json;w=json.load(open(\'out/main-A.workflow.json\'))\npri
+    -> ['tools', 'global_nodes', 'initial_node', 'system_prompt', 'test_variables'] == date_facts_setup code [{'target_node': 'opening', 'description': 'always', 'condition': {'operator': 'always'}}] keys ['name', 'node_type', 'passthrough', 'passthrough_default_transition', 'on_enter', 'pre_actions', 'transitions'] == opening conversation [{'target_node': 'hang_up', 'description': 'The call was closed', ...
+[model call 2026-10-11T12:56:15Z] claude-opus-5-5 (Claude Agent SDK) self-test fix turn 9: text
+[model call 2026-10-11T12:56:15Z] claude-opus-5-5 (Claude Agent SDK) self-test fix turn 10: text
+Reading the identity and negotiate prompts now; time is short.
+[model call 2026-10-11T12:56:16Z] claude-opus-5-5 (Claude Agent SDK) self-test fix turn 11: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; python3 -I -c "\nimport json;w=json.load(open(\'out/main-A.workflow.json\'))\nfor
+    -> <persisted-output> Output too large (385.4KB). Full output saved to: /home/ubuntu/.claude/projects/-home-ubuntu-btb-repo/92c39d78-7bbd-4580-b218-512857120950/tool-results/b99901qk0.txt Preview (first 2KB): ===== identity After every tool result, speak to the customer or call the next tool. Never end a turn with nothing. Call one tool per message. Never say goodbye yourself: when the call is done,  ...
+[model call 2026-10-11T12:56:19Z] claude-opus-5-5 (Claude Agent SDK) self-test fix turn 12: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; python3 -I -c "\nimport json;w=json.load(open(\'out/main-A.workflow.json\'))\nfor
+    -> ===== identity After every tool result, speak to the customer or call the next tool. Never end a turn with nothing. Call one tool per message. Never say goodbye yourself: when the call is done, thank the customer and call close_call; the system says the goodbye. After every tool result read `tool_outcome` first. If it starts with FAILED, nothing was recorded: never say it was recorded, booked or d ...
+[model call 2026-10-11T12:56:22Z] claude-opus-5-5 (Claude Agent SDK) self-test fix turn 13: text
+[model call 2026-10-11T12:56:23Z] claude-opus-5-5 (Claude Agent SDK) self-test fix turn 14: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; python3 -I -c "\nimport json;w=json.load(open(\'out/main-A.workflow.json\'))\nfor
+    -> (Bash completed with no output)
+[model call 2026-10-11T12:56:26Z] claude-opus-5-5 (Claude Agent SDK) self-test fix turn 15: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; python3 -I -c "\nimport json;w=json.load(open(\'out/main-A.workflow.json\'))\npri
+    -> <class 'list'> [] opening ['type', 'config', 'function', 'post_process_code', 'pre_process_code'] identity ['type', 'config', 'function', 'post_process_code', 'pre_process_code'] router ['type', 'config', 'function', 'post_process_code', 'pre_process_code'] negotiate ['type', 'config', 'function', 'post_process_code', 'pre_process_code'] refused ['type', 'config', 'function', 'post_process_code',  ...
+[model call 2026-10-11T12:56:29Z] claude-opus-5-5 (Claude Agent SDK) self-test fix turn 16: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; python3 -I -c "\nimport json;w=json.load(open(\'out/main-A.workflow.json\'))\nfor
+    -> ===== negotiate create_promise PRE: try: _o2, _c2 = chr(123) * 2, chr(125) * 2 _b0 = config.get('body') if isinstance(config, dict) else None if isinstance(_b0, dict): for _k0 in list(_b0.keys()): _x0 = _b0.get(_k0) if isinstance(_x0, str) and _o2 in _x0: _nm = _x0.replace(_o2, '').replace(_c2, '').strip() _cand = [vars.get('create_promise' + '_args.' + _k0), vars.get('create_promise' + '_args.' + ...
+[model call 2026-10-11T12:56:32Z] claude-opus-5-5 (Claude Agent SDK) self-test fix turn 17: text
+[model call 2026-10-11T12:56:34Z] claude-opus-5-5 (Claude Agent SDK) self-test fix turn 18: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; python3 -I -c "\nimport json,re;w=json.load(open(\'out/main-A.workflow.json\'))\n
+    -> 4791 config['url'] = _u[0] + '//' + _u[2] + '/health' | except Exception: | pass | | try: | b = config.get('body') | if isinstance(b, dict) and b.get('outcome') in ('promise', 'paid'): | b.pop('reason', None) | except Exception: | pass {"name": "close_call", "handler": "__function__:api_call", "description": "Call this to end the call, INSTEAD of saying goodbye: after it succeeds the system says t ...
+[model call 2026-10-11T12:56:40Z] claude-opus-5-5 (Claude Agent SDK) self-test fix turn 19: text
+[model call 2026-10-11T12:56:40Z] claude-opus-5-5 (Claude Agent SDK) self-test fix turn 20: text
+Diagnosing: Daniel's promise likely failed (customer said year 2023), Maria's call died in the router, Owen's repeated answer wasn't sent. Checking the router prompt.
+[model call 2026-10-11T12:56:41Z] claude-opus-5-5 (Claude Agent SDK) self-test fix turn 21: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; python3 -I -c "\nimport json;w=json.load(open(\'out/main-A.workflow.json\'))\nn=w
+    -> STAGE: stating the debt. Identity is verified and the account is loaded. Say that you are calling from the collections team about a late payment, name the product, state the past-due amount and how many days late it is, then ask: "Can you make this payment today?". Then route on the answer: anything about paying (yes, no, a date, an amount, too much, a refusal, a question) -> transition_to_negotia ...
+[model call 2026-10-11T12:56:48Z] claude-opus-5-5 (Claude Agent SDK) self-test fix turn 22: text
+[model call 2026-10-11T12:56:49Z] claude-opus-5-5 (Claude Agent SDK) self-test fix turn 23: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; python3 -I -c "\nimport json;w=json.load(open(\'out/main-A.workflow.json\'))\nt=[
+    -> Idempotent writes (M12): an identical re-send of a write that already SUCCEEDED in this call goes to the host's # no-op path (nothing reaches the bank) and the post-hook answers ALREADY RECORDED. Key = tool + the request's own # *_id fields (the product), value = the request's fields except free text. import json as _json vars['dup_hit_' + 'verify_identity'] = '' vars['write_req_' + 'verify_identi ...
+[model call 2026-10-11T12:56:54Z] claude-opus-5-5 (Claude Agent SDK) self-test fix turn 24: text
+[model call 2026-10-11T12:56:54Z] claude-opus-5-5 (Claude Agent SDK) self-test fix turn 25: text
+Applying prompt edits.
+[model call 2026-10-11T12:56:56Z] claude-opus-5-5 (Claude Agent SDK) self-test fix turn 26: tools Edit
+  [Edit] {'replace_all': False, 'file_path': '/home/ubuntu/btb/repo/out/main-A.workflow.json', 'old_string': 'Call verify_identit
+Fatal error in message reader: Failed to decode JSON: JSON message exceeded maximum buffer size of 1048576 bytes...
+Traceback (most recent call last):
+  File "/home/ubuntu/btb/repo/builder/build.py", line 584, in <module>
+    asyncio.run(run(slot, tools, briefs))
+  File "/home/ubuntu/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/lib/python3.11/asyncio/runners.py", line 190, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/lib/python3.11/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/lib/python3.11/asyncio/base_events.py", line 654, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/home/ubuntu/btb/repo/builder/build.py", line 500, in run
+    await self_simulate(slot, tools, briefs, trace, wf_file, final_pass, options)
+  File "/home/ubuntu/btb/repo/builder/build.py", line 162, in self_simulate
+    await asyncio.wait_for(claude_stream(prompt, options, trace, "self-test fix"), timeout=fix_s)
+  File "/home/ubuntu/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/lib/python3.11/asyncio/tasks.py", line 489, in wait_for
+    return fut.result()
+           ^^^^^^^^^^^^
+  File "/home/ubuntu/btb/repo/builder/build.py", line 246, in claude_stream
+    async for message in query(prompt=prompt, options=options):
+  File "/home/ubuntu/btb/venv/lib/python3.11/site-packages/claude_agent_sdk/query.py", line 129, in query
+    async for message in client.process_query(
+  File "/home/ubuntu/btb/venv/lib/python3.11/site-packages/claude_agent_sdk/_internal/client.py", line 56, in process_query
+    async for msg in inner:
+  File "/home/ubuntu/btb/venv/lib/python3.11/site-packages/claude_agent_sdk/_internal/client.py", line 204, in _process_query_inner
+    async for data in query.receive_messages():
+  File "/home/ubuntu/btb/venv/lib/python3.11/site-packages/claude_agent_sdk/_internal/query.py", line 1144, in receive_messages
+    raise exc
+  File "/home/ubuntu/btb/venv/lib/python3.11/site-packages/claude_agent_sdk/_internal/query.py", line 391, in _read_messages
+    async for message in self.transport.read_messages():
+  File "/home/ubuntu/btb/venv/lib/python3.11/site-packages/claude_agent_sdk/_internal/transport/subprocess_cli.py", line 1127, in _read_messages_impl
+    guard(framer.pending_len)
+  File "/home/ubuntu/btb/venv/lib/python3.11/site-packages/claude_agent_sdk/_internal/transport/subprocess_cli.py", line 1113, in guard
+    raise SDKJSONDecodeError(
+claude_agent_sdk._errors.CLIJSONDecodeError: Failed to decode JSON: JSON message exceeded maximum buffer size of 1048576 bytes...
+Exception ignored in: <function BaseSubprocessTransport.__del__ at 0x706dc9f92340>
+Traceback (most recent call last):
+  File "/home/ubuntu/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/lib/python3.11/asyncio/base_subprocess.py", line 126, in __del__
+    self.close()
+  File "/home/ubuntu/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/lib/python3.11/asyncio/base_subprocess.py", line 104, in close
+    proto.pipe.close()
+  File "/home/ubuntu/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/lib/python3.11/asyncio/unix_events.py", line 566, in close
+    self._close(None)
+  File "/home/ubuntu/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/lib/python3.11/asyncio/unix_events.py", line 590, in _close
+    self._loop.call_soon(self._call_connection_lost, exc)
+  File "/home/ubuntu/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/lib/python3.11/asyncio/base_events.py", line 762, in call_soon
+    self._check_closed()
+  File "/home/ubuntu/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/lib/python3.11/asyncio/base_events.py", line 520, in _check_closed
+    raise RuntimeError('Event loop is closed')
+RuntimeError: Event loop is closed

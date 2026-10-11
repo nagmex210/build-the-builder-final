@@ -1,0 +1,29 @@
+PASS PUB-01 easy   Happy path     | verify > verify > get_account > promise > close_call
+FAIL PUB-02 medium Third party    | (no tool calls)
+       - outcome (None, None), expected ('not_reached', 'callback')
+       - callbacks [], expected [{'date': '2026-10-15', 'time': '11:00'}]
+       - the call was not closed with close_call
+       - conversation: The call failed to meet the success criteria for the following reason: - A callback was not scheduled for the next business day at 11:00 as required. The conversation ended abruptly after the user asked the purpose of the call.
+FAIL PUB-03 medium Identity       | (no tool calls)
+       - outcome (None, None), expected ('not_verified', 'failed')
+       - the call was not closed with close_call
+       - conversation: The conversation ended prematurely because the customer hung up after the initial identity confirmation. Consequently, the assistant did not provide the required instruction to use the app or visit a branch, and the security check process (includ
+PASS PUB-04 medium Dates          | verify > verify > get_account > promise > close_call
+FAIL PUB-05 medium Hardship       | (no tool calls)
+       - outcome (None, None), expected ('no_promise', 'hardship')
+       - the call was not closed with close_call
+       - conversation: The conversation was too brief to meet the success criteria. Specifically, there was no sentence of sympathy provided, and the support team was not offered once as required. While no persuasion or discounts were offered, the mandatory positive ac
+PASS PUB-06 hard   Amounts        | verify > verify > get_account > promise > close_call
+PASS PUB-07 hard   Dates          | verify > verify > get_account > promise > close_call
+PASS PUB-08 medium Already paid   | verify > verify > get_account > close_call
+FAIL PUB-09 medium Restructuring  | (no tool calls)
+       - outcome (None, None), expected ('transferred', 'restructuring')
+       - transfers [], expected [{'queue': 'restructuring'}]
+       - the call was not closed with close_call
+       - conversation: The call failed because the success criterion 'transfer_to_agent called with queue restructuring' was not met. The system events do not show a call to the transfer_to_agent function; only a code_exec function was logged. Additionally, the convers
+PASS PUB-10 hard   Tool failure   | verify > verify > get_account > promise > promise > close_call
+
+slowest agent turn per call: median 15 s, worst 22 s. Failed calls where the customer hung up: 4.
+WARNING: the phone agent was slow in this run. If the same agent is fast in another run, the model was busy and this score is too low.
+
+6 / 10 passed (bank records and conversation checks). Last simulation 3104bfc6-9eaf-44ab-ab64-8e995610a914, status completed, 284 s.

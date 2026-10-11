@@ -1,0 +1,31 @@
+PASS PUB-01 easy   Happy path     | verify > verify > get_account > promise > close_call
+Traceback (most recent call last):
+  File "/home/ubuntu/btb/repo/btb/run_cases_retry.py", line 19, in <module>
+    runpy.run_path(sys.argv[0], run_name="__main__")
+  File "<frozen runpy>", line 291, in run_path
+  File "<frozen runpy>", line 98, in _run_module_code
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/ubuntu/btb/repo/tools/run_cases.py", line 121, in <module>
+    if __name__ == "__main__": main()
+                               ^^^^^^
+  File "/home/ubuntu/btb/repo/tools/run_cases.py", line 67, in main
+    rows, sim_id, it_id, status, took, med = run_once(a.agent_id, cases, ids)
+                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/btb/repo/tools/run_cases.py", line 93, in run_once
+    led = http("/v1/practice/ledger/" + sessions[c["id"]]["customer_id"])
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/btb/repo/tools/score.py", line 15, in http
+    except urllib.error.HTTPError as e: return json.load(e)
+                                               ^^^^^^^^^^^^
+  File "/home/ubuntu/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/lib/python3.11/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+           ^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/lib/python3.11/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/lib/python3.11/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/lib/python3.11/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
