@@ -1,0 +1,20 @@
+  invalid rep PUB-11 (try 1): ['resumed from msg_4_1791702061094 (latest reply msg_19_1791702063528, isBranch=True)']
+FAIL PUB-11 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > create_promise > create_promise > close_call
+       - [in_words] conversation: The one create_promise per product check fails because the agent made four create_promise calls for three products, including a failed credit-card attempt followed by a retry.
+       - [corrects] conversation: The one create_promise per product check fails because the agent made six create_promise calls, including three failed attempts with invalid product IDs, rather than one call per product.
+FAIL PUB-12 0/2 | verify_identity > verify_identity > verify_identity > verify_identity > get_account > get_account > add_note > add_note > close_call
+       - [plain] promises [], expected [('p1', 510.0, '2026-10-15')]
+       - [plain] notes [('PL-12345', 'refused'), ('car_loan_123', 'refused')], expected [('p2', 'refused'), ('p3', 'refused')]
+       - [plain] conversation: No credit-card promise was recorded, the refused notes used product IDs other than p2 and p3, and the car loan received no persuasion attempt after the initial refusal.
+       - [asks_back] promises [], expected [('p1', 510.0, '2026-10-15')]
+       - [asks_back] notes [('PL_12345', 'refused'), ('cl_456', 'refused'), ('pl_123', 'refused')], expected [('p2', 'refused'), ('p3', 'refused')]
+       - [asks_back] conversation: The date of birth was asked twice, no credit-card promise was recorded, the personal loan received two refused notes instead of one using incorrect product IDs, and the agent made extra payment attempts beyond the required two for the personal lo
+FAIL PUB-13 0/2 | verify_identity > verify_identity > verify_identity > get_account > get_account > close_call
+       - [asks_back] outcome ('not_verified', 'failed'), expected ('promise', None)
+       - [asks_back] promises [], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]
+       - [asks_back] conversation: Neither the credit card payment for 30 October nor the loan payment for its 23 October deadline was recorded, and no read-back named both dates.
+       - [plain] promises [('p1', 300.0, '2026-11-02'), ('p2', 900.0, '2026-10-23')], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]
+       - [plain] conversation: The credit card was recorded for 2 November rather than 30 October, the read-back did not name 30 October, and the agent claimed to have noted the credit-card promise before any recording tool call succeeded.
+
+fast_eval: 0 / 3 passed (2 rep(s), all reps must pass), 1922 s
+harness: 0 case(s) still INVALID after 2 re-run(s) (not a measurement), 1 rep(s) re-run

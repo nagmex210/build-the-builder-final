@@ -1,0 +1,30 @@
+  invalid rep PUB-11 (try 1): ['harness: POST /api/v2/chat/message -> 404: {"success":false,"data":{"message":"Agent service error","result":{"error":"Agent service error"}}}']
+  invalid rep PUB-13 (try 1): ['harness: POST /api/v2/chat/message -> 404: {"success":false,"data":{"message":"Agent service error","result":{"error":"Agent service error"}}}']
+  invalid rep PUB-11 (try 1): ['resumed from msg_4_1791701747932 (latest reply msg_7_1791701749365, isBranch=True)']
+FAIL PUB-11 0/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+       - [talkative] outcome ('no_promise', 'service_error'), expected ('promise', None)
+       - [talkative] promises [], expected [('p1', 220.0, '2026-10-16'), ('p2', 640.0, '2026-10-16'), ('p3', 75.0, '2026-10-16')]
+       - [talkative] conversation: The agent did not provide one consolidated read-back and confirmation for all three products and made no create_promise call for any product.
+       - [talkative] outcome ('no_promise', 'service_error'), expected ('promise', None)
+       - [talkative] promises [], expected [('p1', 220.0, '2026-10-16'), ('p2', 640.0, '2026-10-16'), ('p3', 75.0, '2026-10-16')]
+       - [talkative] conversation: There was no consolidated read-back and confirmation for all three products, and no create_promise call was made for any product.
+FAIL PUB-12 0/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+       - [corrects] outcome ('no_promise', 'service_error'), expected ('promise', None)
+       - [corrects] promises [], expected [('p1', 510.0, '2026-10-15')]
+       - [corrects] notes [], expected [('p2', 'refused'), ('p3', 'refused')]
+       - [corrects] conversation: The phone question was not asked again, no credit-card promise was recorded, neither other product received a refused note, and the required two personal-loan attempts were not completed.
+       - [plain] outcome (None, None), expected ('promise', None)
+       - [plain] promises [], expected [('p1', 510.0, '2026-10-15')]
+       - [plain] notes [], expected [('p2', 'refused'), ('p3', 'refused')]
+       - [plain] the call was not closed with close_call
+       - [plain] conversation: No credit-card promise was recorded, no refused notes were recorded for either loan, and the required two personal-loan attempts and one car-loan attempt were not completed.
+FAIL PUB-13 0/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+       - [asks_back] outcome ('transferred', 'restructuring'), expected ('promise', None)
+       - [asks_back] promises [], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]
+       - [asks_back] conversation: Neither the credit card payment on 30 October nor the loan payment on its 23 October deadline was recorded, and no read-back named both dates.
+       - [asks_back] outcome ('transferred', 'support'), expected ('promise', None)
+       - [asks_back] promises [], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]
+       - [asks_back] conversation: Neither the credit card payment for 30 October nor the loan payment for its 23 October deadline was recorded, and the read-back did not name both dates.
+
+fast_eval: 0 / 3 passed (2 rep(s), all reps must pass), 1640 s
+harness: 0 case(s) still INVALID after 2 re-run(s) (not a measurement), 3 rep(s) re-run

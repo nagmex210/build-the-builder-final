@@ -1,0 +1,1 @@
+  invalid rep PUB-09 (try 1): ['harness: POST /api/v2/chat/message -> 404: {"success":false,"data":{"message":"Agent service error","result":{"error":"Agent service error"}}}']

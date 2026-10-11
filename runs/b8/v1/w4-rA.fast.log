@@ -1,0 +1,31 @@
+  invalid rep PUB-05 (try 1): ['resumed from msg_4_1791699070752 (latest reply msg_8_1791699072491, isBranch=True)']
+  invalid rep PUB-05 (try 2): ['resumed from msg_4_1791699112438 (latest reply msg_8_1791699113390, isBranch=True)']
+  invalid rep PUB-05 (try 3): ['resumed from msg_4_1791699158310 (latest reply msg_8_1791699159327, isBranch=True)']
+  invalid rep PUB-05 (try 1): ['resumed from msg_4_1791699191809 (latest reply msg_8_1791699192230, isBranch=True)']
+  invalid rep PUB-05 (try 2): ['resumed from msg_4_1791699240161 (latest reply msg_8_1791699240640, isBranch=True)']
+FAIL PUB-01 1/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [in_words] conversation: The required text-message sentence was not said after the promise.
+PASS PUB-02 2/2 | schedule_callback > close_call
+FAIL PUB-03 1/2 | verify_identity > verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [in_words] outcome ('promise', None), expected ('not_verified', 'failed')
+       - [in_words] promises [('p1', 95.0, '2026-10-14')], expected []
+       - [in_words] conversation: The security check continued after the third wrong answer (1990-07-21), the agent disclosed a credit card and an amount of 95, and the customer was not told to use the app or a branch.
+PASS PUB-04 2/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+INVALID PUB-05 1/2 | verify_identity > verify_identity > get_account > close_call
+       - [in_words] conversation: The support team was offered twice rather than once.
+FAIL PUB-06 1/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [talkative] conversation: The minimum payment was offered twice rather than once, although the first offer noted that the rest would stay overdue.
+FAIL PUB-07 1/2 | verify_identity > verify_identity > get_account > create_promise > close_call
+       - [asks_back] conversation: The promise for Tuesday 27 October was never recorded through a successful tool call, so the promise-recorded check fails.
+FAIL PUB-08 1/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+       - [pieces] conversation: The agent did not say that payments can take one business day to appear.
+FAIL PUB-09 1/2 | verify_identity > verify_identity > verify_identity > get_account > transfer_to_agent > close_call
+       - [talkative] outcome ('promise', None), expected ('transferred', 'restructuring')
+       - [talkative] promises [('p1', 700.0, '2026-10-23')], expected []
+       - [talkative] transfers [], expected [{'queue': 'restructuring'}]
+       - [talkative] conversation: The agent never called transfer_to_agent with queue restructuring, described its own reduced-payment arrangement, and called create_promise rather than leaving no promise recorded.
+FAIL PUB-10 1/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > close_call
+       - [corrects] conversation: The check requiring exactly one promise in the ledger after the retry is not clearly satisfied because create_promise has no tool result confirming success or ledger state.
+
+fast_eval: 2 / 10 passed (2 rep(s), all reps must pass), 307 s
+harness: 1 case(s) still INVALID after 2 re-run(s) (not a measurement), 4 rep(s) re-run
