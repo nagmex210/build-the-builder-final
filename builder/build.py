@@ -105,15 +105,23 @@ async def self_simulate(slot, tools, briefs, trace, wf_file, final_pass, options
     except Exception as e:  # noqa: BLE001
         log(trace, event="test", what="self-simulation round 1", error=str(e)[:300]); print(f"self-test skipped: {e}", flush=True)
         return
+    n_play = len(r1["rows"]) or len(personas)
+    errs = sorted({str(r.get("harness_error"))[:120] for r in r1["rows"] if r.get("harness_error")})
     log(trace, event="test", what="self-simulation round 1: deterministic ledger checks", where=r1["where"], n=r1["n"],
-        failed=r1["n_failed"], checks_failed=r1["n_checks_failed"], seconds=round(time.time() - t_start), rows=r1["rows"])
-    print(f"self-test 1 ({r1['where']}): {r1['n_failed']}/{r1['n']} personas failed a check ({r1['n_checks_failed']} checks)", flush=True)
+        played=n_play, failed=r1["n_failed"], checks_failed=r1["n_checks_failed"], seconds=round(time.time() - t_start), rows=r1["rows"],
+        **({"result": f"SELF-TEST DID NOT RUN: 0 of {n_play} chats completed"} if not r1["n"] else {}))
+    if not r1["n"]:   # 0/0 used to print like a pass (b8: workspace 2 answered 402 to every chat)
+        print(f"self-test 1 ({r1['where']}): SELF-TEST DID NOT RUN: 0 of {n_play} persona chats completed"
+              f"{' (' + '; '.join(errs[:2]) + ')' if errs else ''}", flush=True)
+    else:
+        print(f"self-test 1 ({r1['where']}): {r1['n_failed']}/{r1['n']} completed persona chats failed a check "
+              f"({r1['n_checks_failed']} checks; {n_play - r1['n']} of {n_play} chats did not complete)", flush=True)
     (KIT / "out" / f"{slot}.selftest1.json").write_text(json.dumps({"personas": personas, **r1}, indent=1, default=str))
     r1_s = time.time() - t_start
     retest_s = min(ROUND_S, r1_s + 60)          # the re-test takes about as long as round 1 did (platform load)
     if not r1["n_failed"] or r1["n"] < len(personas) or left() < retest_s + 90:
-        log(trace, event="ship", what="no fix round", why="no failed check" if not r1["n_failed"] else
-            ("too few valid chats" if r1["n"] < len(personas) else "no time left"))
+        log(trace, event="ship", what="no fix round", why="self-test did not run (no chat completed)" if not r1["n"] else
+            ("too few valid chats" if r1["n"] < len(personas) else ("no failed check" if not r1["n_failed"] else "no time left")))
         return
     best = wf_file.read_text()
     fails = selftest.failure_text(r1)
