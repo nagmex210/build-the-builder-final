@@ -1,0 +1,127 @@
+builder: slot=w4-B-c1 tools=/home/ubuntu/btb/wt4/tools/openapi.json briefs=/home/ubuntu/btb/wt4/briefs/brief-a.md /home/ubuntu/btb/wt4/briefs/brief-b.md
+trace: /home/ubuntu/btb/wt4/runs/traces/w4-B-c1-20261011-120540.jsonl
+BUILD START 2026-10-11T12:05:40Z slot=w4-B-c1
+[model call 2026-10-11T12:06:12] gpt-6-astra (Azure, btb/llm.py): A1: list the brief's situations after the account lookup (router + specialist routes)
+[model call 2026-10-11T12:06:40] gpt-6-astra (Azure, btb/llm.py): A3: extract the brief's mandatory sentences as fixed text
+[test] datecalc: generated date/amount code run locally on 5 dates and fake products -> ok (141 s)
+[test] A1 situations: refused, hardship, dispute, already_paid, restructuring, human
+[model] build agent: Claude Agent SDK, claude-opus-5-5, skill build-phone-agent, budget 12 min
+[model call 2026-10-11T12:08:01] gpt-6-astra (Azure, btb/llm.py): extract calendar/amount spec for code steps
+[model call 2026-10-11T12:08:03Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 1: tools Skill
+  [Skill] {'skill': 'build-phone-agent', 'args': 'Slot: w4-B-c1'}
+[model call 2026-10-11T12:08:05Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 2: text
+[model call 2026-10-11T12:08:06Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 3: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; cat briefs/brief-a.md briefs/brief-b.md; cat .claude/skills/build-phone-agent/rout
+    -> # Brief A: Freya Bank, early-stage collections, one product Freya Bank is fictional. Every customer, debt and payment here is synthetic. This brief has the density of a real bank specification. Read all of it. Most failed cases come from one rule that was skipped. ## 1. The job Freya Bank calls customers who are 1 to 45 days late on one product. The agent finds the customer, checks identity, state ...
+[model call 2026-10-11T12:08:07Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 4: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; python3 -c "\nimport json;d=json.load(open(\'tools/openapi.json\'))\nfor p,v in d[
+    -> post /verify_identity None {"type": "object", "properties": {"customer_id": {"type": "string"}, "field": {"type": "string", "enum": ["date_of_birth", "phone_last4"]}, "answer": {"type": "string", "description": "For date_of_birth: the date as YYYY-MM-DD. Callers say dates in words, the agent converts. An unreadable value is rejected with ok=false and is not counted as a wrong answer. For phone_las ...
+[model call 2026-10-11T12:08:09Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 5: text
+[model call 2026-10-11T12:08:10Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 6: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; python3 -c "\nimport json;d=json.load(open(\'out/w4-B-c1.calc.json\'))\nprint(d.ke
+    -> dict_keys(['ok', 'spec', 'unhandled_rules', 'code_node', 'account_tool', 'account_post_process_code', 'example_date_facts', 'example_product_facts']) == ok 4 true == spec 15335 { "now_variable": "now", "weekend_days": [ 5, 6 ], "holidays": [ "2026-10-26", "2026-11-11", "2026-11-26", "2026-12-25", "2027-01-01" ], "account_tool": "get_account", "products_key": "products", "product_id_field": "produc ...
+[model call 2026-10-11T12:08:13Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 7: text
+[model call 2026-10-11T12:08:13Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 8: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; sed -n 610,660p docs/workflow-format.md; sed -n 720,800p docs/workflow-format.md; 
+    -> ## End-call nodes An `end_call` node hangs up. It has a `terminal` object and no outgoing transitions. ```json { "name": "goodbye", "node_type": "end_call", "on_enter": { "type": "silent" }, "disable_inactivity_monitor": true, "transitions": [], "terminal": { "type": "function", "function": { "name": "closing_end", "handler": "__function__:end_call", "parameters": { "type": "object", "properties": ...
+[model call 2026-10-11T12:08:15Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 9: text
+[model call 2026-10-11T12:08:17Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 10: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; sed -n 50,60p docs/tools-and-code.md; sed -n 370,392p docs/tools-and-code.md; grep
+    -> | `function.description` | Read by the dialogue model when the tool is in `tools`. Ignored in `pre_actions` | | `function.parameters` | JSON-schema object. `properties` holds the parameters | | `config.timeoutMs` | Timeout of one attempt, in milliseconds | | `config.maxRetries` | Tool-level retries of a failed call | | `config.interruptible` | `false` makes the tool run in the background. See "Bac ...
+[model call 2026-10-11T12:08:21Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 11: text
+[model call 2026-10-11T12:08:21Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 12: text
+Reading done; now writing the generator for the workflow (code start node → opening → identity → load_account → router → negotiate + 6 specialists).
+[model call 2026-10-11T12:09:28Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 13: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; cat > out/w4-B-c1.gen.py <<\'EOF\'\nimport json\ncalc=json.load(open(\'out/w4-B-c1
+    -> 0 errors, 0 warnings []
+[model call 2026-10-11T12:09:30Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 14: text
+[model call 2026-10-11T12:09:31Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 15: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; python3 -c "import json;d=json.load(open(\'examples/base-agent.json\'));print([k f
+    -> ['tools', 'global_nodes', 'initial_node', 'system_prompt', 'test_variables'] w = api("POST", "/api/v2/workflow", {"name": name, "workflow": workflow})["workflow"] ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ File "/home/ubuntu/btb/wt4/freya.py", line 19, in api raise RuntimeError(f"{method} {path} -> {e.code}: {e.read().decode()[:1500]}") from None RuntimeError: POST /api/ ...
+[model call 2026-10-11T12:09:35Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 16: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; sed -i \'s/^wf={"name":"w4-B-c1",/wf={/\' out/w4-B-c1.gen.py; python3 out/w4-B-c1.
+    -> 0 errors, 0 warnings [] {"hardened_tools": ["schedule_callback", "transfer_to_agent", "close_call", "verify_identity", "transfer_to_agent", "close_call", "get_account", "close_call", "create_promise", "add_note", "close_call", "add_note", "close_call", "transfer_to_agent", "create_promise", "add_note", "close_call", "add_note", "close_call", "add_note", "close_call", "transfer_to_agent", "close_ca ...
+[model call 2026-10-11T12:09:39Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 17: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; timeout 60 python3 -c "import freya,json; print(str(freya.api(\'POST\',\'/api/v2/c
+    -> ERROR Exit code 124
+[model call 2026-10-11T12:10:42Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 18: text
+[model call 2026-10-11T12:10:43Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 19: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; timeout 100 python3 -c "import freya,json; print(str(freya.api(\'POST\',\'/api/v2/
+    -> ERROR Exit code 1 Traceback (most recent call last): File "<string>", line 1, in <module> File "/home/ubuntu/btb/wt4/freya.py", line 19, in api raise RuntimeError(f"{method} {path} -> {e.code}: {e.read().decode()[:1500]}") from None RuntimeError: POST /api/v2/chat/message -> 504: error code: 504
+[model call 2026-10-11T12:11:49Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 20: text
+[model call 2026-10-11T12:11:49Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 21: text
+I built and saved the workflow, but I couldn't confirm it starts a call. The one live chat test came back with a 504 (gateway timeout) on the second try, and the first try got no answer within 60 seconds. A 504 isn't the 500 that would mean the workflow is broken, so it may just be the platform being slow, but nothing has run end to end yet. The rule-by-rule re-read of the brief against the workflow (step 7) also didn't happen because time ran out.
+
+- **Checks:** the lint step and `situations.py check` both passed with no problems.
+- **How it runs:** the call starts in the date-facts code node, then opening, then identity. After identity, `get_account` runs (with the account hook from the calc file) and goes to a router that states every late product. From there it goes to `negotiate` or one of the six specialist nodes: `refused`, `hardship`, `dispute`, `already_paid`, `restructuring` and `human`. Each node closes the call through `close_call` and then hangs up.
+- **Rules no code computes:** I wrote both into the node that applies them. The date-of-birth format rule is in identity, and the "one date for everything" rule is in negotiate.
+- **Brief vs. extracted situations:** I found no differences, so I didn't override any of them.
+- **Files:** the workflow is `out/w4-B-c1.workflow.json`, built by `out/w4-B-c1.gen.py`.
+
+workflow_id 0eae5293-9324-4bc8-9e79-bd681a83fdb8, agent_id fb08ab6b-eac8-4f7f-99af-788764cdfc6d
+
+done: 13 turns, 228 s
+final save (build): {'workflow_id': '0eae5293-9324-4bc8-9e79-bd681a83fdb8', 'agent_id': 'fb08ab6b-eac8-4f7f-99af-788764cdfc6d', 'version': 2}; lint: 0 errors, 0 warnings
+buildcheck: 2 error(s), 0 warning(s): prompt text uses {{last_name}}, which no call variable, mapping, extraction or hook sets (the model sees it raw); prompt text uses {{title}}, which no call variable, mapping, extraction or hook sets (the model sees it raw)
+[model call 2026-10-11T12:12:01Z] claude-opus-5-5 (Claude Agent SDK) buildcheck repair turn 1: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; grep -n -o \'.\\{200\\}{{\\(last_name\\|title\\)}}.\\{100\\}\' out/w4-B-c1.workflo
+    -> 3:t:\n- Opening (spoken automatically at the start; never repeat or rephrase it, never add to it): \"I am a digital assistant calling from Freya Bank, and we are recording this call. Am I speaking with {{title}} {{last_name}}?\"\n- The person asks whether the agent is a robot or an AI: \"I am Freya Bank's digi 48:vice_error.\nYou are Freya Bank's digital assistant. The opening line was already sai ...
+[model call 2026-10-11T12:12:02Z] claude-opus-5-5 (Claude Agent SDK) buildcheck repair turn 2: text
+Brief says these are call variables. Let me see how call variables are declared.
+[model call 2026-10-11T12:12:03Z] claude-opus-5-5 (Claude Agent SDK) buildcheck repair turn 3: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; sed -n 10,22p briefs/brief-a.md; python3 -c "\nimport json;d=json.load(open(\'out/
+    -> ## 2. Call variables Every call starts with these. Nothing else is known before the tools are called. | Variable | Example | Meaning | |---|---|---| | `customer_id` | `c_4f2a...` | Pass it to every tool call. | | `first_name`, `last_name` | `Daniel`, `Reyes` | The person to ask for. | | `title` | `Mr` or `Ms` | Address the customer as title plus last name. | | `now` | `2026-10-14T11:00` | The curr ...
+[model call 2026-10-11T12:12:04Z] claude-opus-5-5 (Claude Agent SDK) buildcheck repair turn 4: text
+So how does the checker know call variables? Check buildcheck.
+[model call 2026-10-11T12:12:05Z] claude-opus-5-5 (Claude Agent SDK) buildcheck repair turn 5: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; grep -n -i \'call var\\|CALL_VARS\\|customer_id\\|first_name\' builder/buildcheck.
+    -> 5:Seen: the same builder commit sometimes builds a broken agent (b5: the inner agent dropped customer_id from every body, 11: customer-like id's variable is bound (call variable, mapping/extraction, hook-set variable or a model-filled field); 194: errs.append(f"prompt text uses {{{{{b}}}}}, which no call variable, mapping, extraction or hook sets (the model sees it raw)")
+[model call 2026-10-11T12:12:07Z] claude-opus-5-5 (Claude Agent SDK) buildcheck repair turn 6: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; sed -n 150,195p builder/buildcheck.py'}
+    -> if not isinstance(leaf, dict) or leaf.get("type") == "object": continue d = leaf.get("default") if d is None: errs.append(f"{name}: body field {fld!r} has no default (the platform drops it from the request)") continue if ID_FIELD.search(fld): m = TPL.search(str(d)) if not m: errs.append(f"{name}: id field {fld!r} is the literal {str(d)[:40]!r}, not a {{{{variable}}}} bound to the lookup") elif not ...
+[model call 2026-10-11T12:12:08Z] claude-opus-5-5 (Claude Agent SDK) buildcheck repair turn 7: tools Bash
+  [Bash] {'command': "cd /home/ubuntu/btb/wt4; grep -n 'defined\\b\\|CALL_VARS\\|def _bound' builder/buildcheck.py | head -20"}
+    -> 79:def _defined(wf, code): 98:def _bound(root, defined, tool_fields): 99: return (root in defined or root in tool_fields or root.endswith(("_response", "_args", "_result")) 130: defined = _defined(wf, code) 160: elif not _bound(m.group(1), defined, model_fields) and CUSTOMER.search(fld): 191: if not _bound(m.group(1), defined, model_fields):
+[model call 2026-10-11T12:12:10Z] claude-opus-5-5 (Claude Agent SDK) buildcheck repair turn 8: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; sed -n 75,100p builder/buildcheck.py; sed -n 125,132p builder/buildcheck.py'}
+    -> walk(wf) return "\n".join(parts) def _defined(wf, code): names = set((wf.get("test_variables") or {}).keys()) def walk(o): if isinstance(o, dict): for k in ("variable", "target"): if isinstance(o.get(k), str): names.add(o[k].split(".")[0]) if "name" in o and isinstance(o.get("name"), str) and ("type" in o or "enum" in o): names.add(o["name"]) # extraction schema entries for v in o.values(): walk(v ...
+[model call 2026-10-11T12:12:12Z] claude-opus-5-5 (Claude Agent SDK) buildcheck repair turn 9: text
+[model call 2026-10-11T12:12:12Z] claude-opus-5-5 (Claude Agent SDK) buildcheck repair turn 10: text
+These are genuine call variables per brief §2; the workflow just lacks a `test_variables` declaration. I'll add it.
+[model call 2026-10-11T12:12:13Z] claude-opus-5-5 (Claude Agent SDK) buildcheck repair turn 11: tools Bash
+  [Bash] {'command': "cd /home/ubuntu/btb/wt4; head -c 300 out/w4-B-c1.workflow.json; echo; grep -n -B2 -A8 'test_variables' docs
+    -> { "initial_node": "date_facts_setup", "system_prompt": "You are Freya Bank's digital assistant on a phone call. Address the customer as {{title}} {{last_name}}. Speak English, one or two short sentences per turn. Current date and time: {{now}} (never use the real clock). Customer id: {{customer_id docs/api.md-99-``` docs/api.md-100- docs/api.md:101:The body replaces the whole definition. A top-lev ...
+[model call 2026-10-11T12:12:14Z] claude-opus-5-5 (Claude Agent SDK) buildcheck repair turn 12: tools Read
+  [Read] {'file_path': '/home/ubuntu/btb/wt4/out/w4-B-c1.workflow.json', 'limit': 2}
+[model call 2026-10-11T12:12:15Z] claude-opus-5-5 (Claude Agent SDK) buildcheck repair turn 13: tools Edit
+  [Edit] {'replace_all': False, 'file_path': '/home/ubuntu/btb/wt4/out/w4-B-c1.workflow.json', 'old_string': '{\n "initial_node":
+[model call 2026-10-11T12:12:17Z] claude-opus-5-5 (Claude Agent SDK) buildcheck repair turn 14: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; python3 builder/buildcheck.py out/w4-B-c1.workflow.json tools/openapi.json; python
+    -> ok json ok
+[model call 2026-10-11T12:12:22Z] claude-opus-5-5 (Claude Agent SDK) buildcheck repair turn 15: text
+[model call 2026-10-11T12:12:22Z] claude-opus-5-5 (Claude Agent SDK) buildcheck repair turn 16: text
+Both errors are fixed: buildcheck now prints `ok` with no ERROR, and the JSON loads.
+
+**Cause:** `{{title}}` and `{{last_name}}` are real call variables. Brief A section 2 lists `customer_id`, `first_name`, `last_name`, `title` and `now`, and the opening line in the brief says "Am I speaking with {title} {last_name}?". But the workflow never declared them anywhere the checker could see. The checker treats the top-level `test_variables` block (the default values for call variables) as the list of declared call variables, and this workflow had no such block.
+
+**Fix:** with Edit, I added one top-level line to `out/w4-B-c1.workflow.json`, with the example values from the brief:
+```json
+"test_variables": {"customer_id": "c_test", "first_name": "Daniel", "last_name": "Reyes", "title": "Mr", "now": "2026-10-14T11:00"}
+```
+I left the prompts as they are, because asking for the customer by title and last name is what the brief requires.
+
+Nothing else changed: no prompts, nodes, transitions, the start code node or any pre/post-process code. Nothing was saved to Freya.
+
+The values in that block are test defaults. They are only used when a call doesn't pass its own `title` and `last_name`, so a real call still uses the actual customer's details.
+
+done: 11 turns, 23 s
+final save (buildcheck repair): {'workflow_id': '0eae5293-9324-4bc8-9e79-bd681a83fdb8', 'agent_id': 'fb08ab6b-eac8-4f7f-99af-788764cdfc6d', 'version': 3}; lint: 0 errors, 0 warnings
+buildcheck repair kept: 2 -> 0 error(s)
+[model call 2026-10-11T12:12:52] gpt-6-astra (Azure, btb/llm.py): self-simulation: write personas + ledger checks from the brief
+self-test: no valid chat in workspace 2 (POST /api/v2/chat/message -> 402: {"error":"Insufficient credits","message":"Insufficient credits — ); playing the round in workspace 1
+self-test 1 (workspace 1): 0/0 personas failed a check (0 checks)
+buildcheck (shipped): 0 problem(s)
+[freya] slot w4-B-c1: workflow_id=0eae5293-9324-4bc8-9e79-bd681a83fdb8 agent_id=fb08ab6b-eac8-4f7f-99af-788764cdfc6d version=3 (published)
+[freya] exported: /home/ubuntu/btb/wt4/submission/w4-B-c1.workflow.json
+BUILD END 2026-10-11T12:17:54Z (863 s); trace scrubbed (0 secret(s) replaced): /home/ubuntu/btb/wt4/runs/traces/w4-B-c1-20261011-120540.jsonl
+{"workflow_id": "0eae5293-9324-4bc8-9e79-bd681a83fdb8", "agent_id": "fb08ab6b-eac8-4f7f-99af-788764cdfc6d"}

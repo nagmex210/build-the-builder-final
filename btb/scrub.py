@@ -48,10 +48,24 @@ class Redacting:
     """A text stream that scrubs everything written to it. Line-buffered writes (print) keep keys in one piece."""
 
     def __init__(self, stream):
-        self._s = stream
+        self._s, self._pend = stream, ""
 
     def write(self, s):
-        return self._s.write(scrub(s)[0])
+        # Whole lines only: a key written in two pieces (two write() calls) is scrubbed once it is complete.
+        self._pend += s
+        if "\n" in self._pend:
+            out, self._pend = self._pend.rsplit("\n", 1)
+            self._s.write(scrub(out + "\n")[0])
+        return len(s)
+
+    def writelines(self, lines):
+        for s in lines:
+            self.write(s)
+
+    def flush(self):
+        if self._pend:
+            self._s.write(scrub(self._pend)[0]); self._pend = ""
+        return self._s.flush()
 
     def __getattr__(self, name):
         return getattr(self._s, name)

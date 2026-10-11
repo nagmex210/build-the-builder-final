@@ -1,0 +1,18 @@
+PASS PUB-01 | verify_identity > verify_identity > get_account > create_promise > close_call | call 15eb19fa-f136-4d75-8b67-bd250ccef664
+PASS PUB-02 | schedule_callback > close_call | call bb8442f4-1f09-4149-a3da-e0f28e1214bc
+FAIL PUB-03 | verify_identity > verify_identity > close_call | call 74849720-1b81-435e-9c9b-cefd4aa9913b
+       - outcome ('not_verified', 'declined'), expected ('not_verified', 'failed')
+       - conversation: The assistant failed to satisfy two of the success criteria. First, the security check did not end after the third wrong answer; although the 'close_call' system event was triggered after the third incorrect date of birth (Message 7), the assista
+PASS PUB-04 | verify_identity > verify_identity > get_account > create_promise > close_call | call ad9a3a78-5ed4-4ae8-8624-e990150e5a05
+PASS PUB-05 | verify_identity > verify_identity > get_account > close_call | call 213f90ff-5324-4843-bfa1-2b74c3f3315f
+PASS PUB-06 | verify_identity > verify_identity > get_account > create_promise > close_call | call 041b45fd-1357-402d-a949-b66387674606
+FAIL PUB-07 | verify_identity > verify_identity > get_account | call bf6bb1d5-985f-474b-8fe6-7b0c2fd52467
+       - outcome (None, None), expected ('promise', None)
+       - promises [], expected [('p1', 540.0, '2026-10-27')]
+       - the call was not closed with close_call
+       - conversation: The agent failed to meet the final success criterion because the promise was not successfully recorded due to repeated technical errors in the system events. Although the agent followed the script by asking for an exact day (Message 8), correctly
+PASS PUB-08 | verify_identity > verify_identity > get_account > close_call | call 1195ceb0-50c8-4471-a930-323d7ef1c73f
+PASS PUB-09 | verify_identity > verify_identity > get_account > transfer_to_agent > close_call | call f30001b0-a46b-4d53-8707-c9c7f96befc8
+PASS PUB-10 | verify_identity > verify_identity > get_account > create_promise > create_promise > close_call | call 8a03c8b6-5ed2-4591-8688-88d9510efa93
+
+8 / 10 passed (salvaged simulation 6f7bc971-dbcd-4b9b-b4f8-5e67ab99ee3f, status completed)

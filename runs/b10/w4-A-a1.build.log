@@ -1,0 +1,73 @@
+builder: slot=w4-A-a1 tools=/home/ubuntu/btb/wt4/tools/openapi.json briefs=/home/ubuntu/btb/wt4/briefs/brief-a.md
+trace: /home/ubuntu/btb/wt4/runs/traces/w4-A-a1-20261011-113256.jsonl
+BUILD START 2026-10-11T11:32:56Z slot=w4-A-a1
+[model call 2026-10-11T11:33:30] gpt-6-luna (Azure, btb/llm.py): A1: list the brief's situations after the account lookup (router + specialist routes)
+[model call 2026-10-11T11:33:43] gpt-4.1-mini (Azure, btb/llm.py): A3: extract the brief's mandatory sentences as fixed text
+[test] datecalc: generated date/amount code run locally on 5 dates and fake products -> ok (54 s)
+[test] A1 situations: hardship, cannot_pay_refusal, already_paid, dispute, payment_plan_transfer, human_transfer
+[model] build agent: Claude Agent SDK, claude-opus-5-5, skill build-phone-agent, budget 12 min
+[model call 2026-10-11T11:33:49] gpt-4.1-mini (Azure, btb/llm.py): extract calendar/amount spec for code steps
+[model call 2026-10-11T11:33:55Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 1: tools Skill
+  [Skill] {'skill': 'build-phone-agent'}
+[model call 2026-10-11T11:33:57Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 2: text
+[model call 2026-10-11T11:33:58Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 3: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; cat briefs/brief-a.md; cat tools/openapi.json | head -c 9000; echo; ls out/ | grep
+    -> # Brief A: Freya Bank, early-stage collections, one product Freya Bank is fictional. Every customer, debt and payment here is synthetic. This brief has the density of a real bank specification. Read all of it. Most failed cases come from one rule that was skipped. ## 1. The job Freya Bank calls customers who are 1 to 45 days late on one product. The agent finds the customer, checks identity, state ...
+[model call 2026-10-11T11:33:58Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 4: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; cat .claude/skills/build-phone-agent/routing.md; cat examples/base-agent.json'}
+    -> # Workflow structure and routing recipe A shape that works for any collections-style brief. Fill every rule, value, field name, enum, outcome and reason from THE BRIEF and THE TOOL API FILE you were given. Node names below are suggestions; stage contents come from the brief. ## Principle The agent model is small. It follows one short task well and many mixed tasks badly. So: - one conversation nod ...
+[model call 2026-10-11T11:34:00Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 5: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; python3 -c "\nimport json;d=json.load(open(\'out/w4-A-a1.calc.json\'));print(list(
+    -> ['ok', 'spec', 'unhandled_rules', 'code_node', 'account_tool', 'account_post_process_code', 'example_date_facts', 'example_product_facts'] { "ok": true, "spec": { "now_variable": "now", "weekend_days": [ 5, 6 ], "holidays": [ "2026-10-26", "2026-11-11", "2026-11-26", "2026-12-25", "2027-01-01" ], "account_tool": "get_account", "products_key": "products", "product_id_field": "product_id", "type_fie ...
+[model call 2026-10-11T11:34:03Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 6: text
+[model call 2026-10-11T11:34:04Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 7: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; python3 -c "\nimport json;d=json.load(open(\'out/w4-A-a1.calc.json\'));print(d[\'u
+    -> [] get_account TODAY: Friday 2026-10-23 (a business day) Tomorrow: Saturday 2026-10-24 Next business day after today: Tuesday 2026-10-27 Last business day of this week: Friday 2026-10-23 <- that is TODAY Last business day of next week: Friday 2026-10-30 Last business day of this month: Friday 2026-10-30 DEADLINE for band "early" (days_late 1 to 7): Thursday 2026-11-12 = 12 business days after toda ...
+[model call 2026-10-11T11:34:07Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 8: text
+[model call 2026-10-11T11:34:08Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 9: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; grep -n -A40 "api_request" docs/workflow-format.md | head -80; python3 -c "\nimpor
+    -> 73:| `api_request` | Runs an HTTP call on entry | usually not | `pre_actions`, node-level `response_mapping`, `transitions` | 74-| `code` | Runs a Python snippet on entry | usually not | `pre_actions` with a `code_exec` function, `transitions` | 75-| `end_call` | Ends the call | optional farewell | `terminal` | 76- 77-Other node types exist: `transfer_call`, `integration`, `knowledge_base`, `resch ...
+[model call 2026-10-11T11:34:10Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 10: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; sed -n 464,500p docs/workflow-format.md; grep -n -B3 -A30 \'"api_request"\' docs/t
+    -> A node with `"passthrough": true` routes right after its entry actions. It does not wait for the user. `api_request` and `code` nodes are normally passthrough nodes. - Set `passthrough_default_transition` to the next node. - End `transitions` with an `always` transition. A passthrough node with no matching transition deadlocks. - Set `on_enter` to `{"type": "silent"}`, or to a short fixed line tha ...
+[model call 2026-10-11T11:34:13Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 11: text
+[model call 2026-10-11T11:34:13Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 12: text
+I've read the brief, the tool API file and the docs. Now I'm writing the generator, which builds the workflow.
+[model call 2026-10-11T11:35:15Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 13: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; cat > out/w4-A-a1.gen.py <<\'EOF\'\nimport json\nB="https://freya-bank-mock.freyav
+    -> 0 errors, 0 warnings []
+[model call 2026-10-11T11:35:17Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 14: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; python3 builder/save.py w4-A-a1 out/w4-A-a1.workflow.json 2>&1 | tail -5'}
+    -> {"hardened_tools": ["schedule_callback", "transfer_to_agent", "close_call", "verify_identity", "transfer_to_agent", "close_call", "get_account", "close_call", "create_promise", "close_call", "create_promise", "transfer_to_agent", "close_call", "close_call", "close_call", "close_call", "transfer_to_agent", "close_call", "transfer_to_agent", "close_call", "guard:schedule_callback", "guard:get_accoun ...
+[model call 2026-10-11T11:36:12Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 15: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; timeout 90 python3 -c "import freya,json; print(str(freya.api(\'POST\',\'/api/v2/c
+    -> ERROR Exit code 1 Traceback (most recent call last): File "<string>", line 1, in <module> File "/home/ubuntu/btb/wt4/freya.py", line 19, in api raise RuntimeError(f"{method} {path} -> {e.code}: {e.read().decode()[:1500]}") from None RuntimeError: POST /api/v2/chat/message -> 504: error code: 504
+[model call 2026-10-11T11:37:14Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 16: text
+[model call 2026-10-11T11:37:15Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 17: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; timeout 90 python3 -c "import freya,json; print(str(freya.api(\'POST\',\'/api/v2/c
+    -> ERROR Exit code 1 Traceback (most recent call last): File "<string>", line 1, in <module> File "/home/ubuntu/btb/wt4/freya.py", line 19, in api raise RuntimeError(f"{method} {path} -> {e.code}: {e.read().decode()[:1500]}") from None RuntimeError: POST /api/v2/chat/message -> 504: error code: 504
+[model call 2026-10-11T11:38:23Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 18: text
+[model call 2026-10-11T11:38:23Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 19: text
+I built and saved the workflow, but I could not confirm it starts a call. The one-turn chat check returned a 504 gateway timeout twice. That is not the 500 that would mean the workflow is broken, but the start is still untested. No practice cases were run.
+
+The lint check and the situations check both found no problems, and the save went through. It is the full shape from routing.md:
+
+- **Flow:** your date-facts code node as the start node, then the opening, identity checks and a silent account lookup.
+- **Account hook:** your hook code is set verbatim on `get_account`.
+- **Router and negotiation:** a router states the debt and asks "Can you make this payment today?". All the promise rules live in a separate negotiation node.
+- **Specialists:** the six situations each have their own node, every node closes through `close_call` to the hang-up node, and DATE FACTS is in every node that deals with dates.
+
+There were no extra date or amount rules to write in by hand: the list of rules not computed in code was empty.
+
+I changed the trigger for `cannot_pay_refusal`, and the brief backs this. The brief (rules 30–31) says a flat refusal uses up a persuasion attempt and the call closes only once all attempts are used. So the negotiation node now makes the attempts itself, and the call moves to `cannot_pay_refusal` only when the attempts are used up and the customer still refuses, or says twice they don't want to talk. The extracted version would have sent the first refusal straight there.
+
+The generator is `out/w4-A-a1.gen.py` and the workflow is `out/w4-A-a1.workflow.json`.
+
+workflow_id: 600730d7-b826-42f2-8c1a-765545444e2a, agent_id: 839992a3-3526-4d41-a824-4ba47fa1c7b2 (start check untested because of the 504; `cannot_pay_refusal` now triggers only after all persuasion attempts, per brief rules 30–31)
+
+done: 13 turns, 270 s
+final pass failed: GET /api/v2/workspaces -> 504: error code: 504
+
+BUILD FAILED: nothing was saved in this run; the slot's last agent is a previous build's
+BUILD END 2026-10-11T11:44:15Z (679 s); trace scrubbed (0 secret(s) replaced): /home/ubuntu/btb/wt4/runs/traces/w4-A-a1-20261011-113256.jsonl
+builder finished without saving a workflow for slot w4-A-a1

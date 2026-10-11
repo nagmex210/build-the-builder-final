@@ -1,0 +1,91 @@
+builder: slot=w2-B tools=/home/ubuntu/btb/wt2/tools/openapi.json briefs=/home/ubuntu/btb/wt2/briefs/brief-a.md /home/ubuntu/btb/wt2/briefs/brief-b.md
+trace: /home/ubuntu/btb/wt2/runs/traces/w2-B-20261011-115934.jsonl
+BUILD START 2026-10-11T11:59:34Z slot=w2-B
+clean slot: moved 5 old file(s) of this slot out of the kit to /tmp/btb-old-w2-B-nrjnah7v
+[model call 2026-10-11T12:00:08] gpt-6-astra (Azure, btb/llm.py): A1: list the brief's situations after the account lookup (router + specialist routes)
+[test] datecalc: generated date/amount code run locally on 5 dates and fake products -> ok (72 s)
+[test] A1 situations: refused, hardship, dispute, already_paid, restructuring, human
+[model] build agent: Claude Agent SDK, claude-opus-5-5, skill build-phone-agent, budget 12 min
+[model call 2026-10-11T12:00:46] gpt-6-astra (Azure, btb/llm.py): extract calendar/amount spec for code steps
+[model call 2026-10-11T12:00:49Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 1: tools Skill
+  [Skill] {'skill': 'build-phone-agent'}
+[model call 2026-10-11T12:00:50Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 2: text
+[model call 2026-10-11T12:00:51Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 3: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; cat briefs/brief-a.md briefs/brief-b.md; cat .claude/skills/build-phone-agent/rout
+    -> # Brief A: Freya Bank, early-stage collections, one product Freya Bank is fictional. Every customer, debt and payment here is synthetic. This brief has the density of a real bank specification. Read all of it. Most failed cases come from one rule that was skipped. ## 1. The job Freya Bank calls customers who are 1 to 45 days late on one product. The agent finds the customer, checks identity, state ...
+[model call 2026-10-11T12:00:52Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 4: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; python3 -c "\nimport json;d=json.load(open(\'out/w2-B.calc.json\'));print(list(d.k
+    -> ['ok', 'spec', 'unhandled_rules', 'code_node', 'account_tool', 'account_post_process_code', 'example_date_facts', 'example_product_facts'] get_account [ "Send a date of birth as `YYYY-MM-DD`, whatever way the customer said it. The service rejects anything it cannot read as a date. Read a date given only as numbers as day, then month, then year.", "If the customer names one date for everything and  ...
+[model call 2026-10-11T12:00:53] gpt-6-astra (Azure, btb/llm.py): A3: extract the brief's mandatory sentences as fixed text
+[model call 2026-10-11T12:00:54Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 5: text
+[model call 2026-10-11T12:00:56Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 6: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; python3 -c "\nimport json;d=json.load(open(\'tools/openapi.json\'))\nfor p,v in d[
+    -> /verify_identity {"type": "object", "properties": {"customer_id": {"type": "string"}, "field": {"type": "string", "enum": ["date_of_birth", "phone_last4"]}, "answer": {"type": "string", "description": "For date_of_birth: the date as YYYY-MM-DD. Callers say dates in words, the agent converts. An unreadable value is rejected with ok=false and is not counted as a wrong answer. For phone_last4: four d ...
+[model call 2026-10-11T12:00:57Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 7: text
+[model call 2026-10-11T12:00:58Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 8: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; sed -n 449,462p docs/workflow-format.md; sed -n 728,812p docs/workflow-format.md; 
+    -> Set `is_tool_call` to `true` on a transition. The dialogue model then sees the transition as a tool named `transition_to_<node>` and triggers it by calling that tool. The router does not evaluate it after each turn. ```json { "target_node": "confirm_booking", "description": "The caller accepted the offered slot", "is_tool_call": true, "condition": { "operator": "matches_intent", "description": "Th ...
+[model call 2026-10-11T12:01:00Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 9: text
+[model call 2026-10-11T12:01:00Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 10: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; python3 -c "\nimport json;d=json.load(open(\'examples/base-agent.json\'));print({k
+    -> {'nodes': 'dict', 'tools': 'list', 'global_nodes': 'dict', 'initial_node': 'identity', 'system_prompt': '', 'test_variables': 'dict'} __pycache__ apicheck.py build.py buildcheck.py canned.py datecalc.py extract.py guards.py harden.py hookcheck.py identity_gate.py lint_workflow.py robust.py robustness.md save.py selftest.py situations.py
+[model call 2026-10-11T12:01:01Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 11: text
+Writing the generator script now (time-boxed), then lint, check situations and save.
+[model call 2026-10-11T12:02:02Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 12: tools Write
+  [Write] {'file_path': '/home/ubuntu/btb/wt2/out/w2-B.gen.py', 'content': 'import json\ncalc = json.load(open(\'out/w2-B.calc.jso
+[model call 2026-10-11T12:02:04Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 13: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; python3 out/w2-B.gen.py && python3 builder/lint_workflow.py out/w2-B.workflow.json
+    -> 0 errors, 0 warnings []
+[model call 2026-10-11T12:02:05Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 14: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; python3 builder/save.py w2-B out/w2-B.workflow.json 2>&1 | tail -6'}
+    -> {"hardened_tools": ["schedule_callback", "transfer_to_agent", "close_call", "verify_identity", "transfer_to_agent", "close_call", "get_account", "close_call", "create_promise", "add_note", "close_call", "add_note", "close_call", "create_promise", "transfer_to_agent", "add_note", "close_call", "add_note", "close_call", "add_note", "close_call", "transfer_to_agent", "close_call", "transfer_to_agent" ...
+[model call 2026-10-11T12:02:25Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 15: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; timeout 60 python3 -c "import freya,json; print(str(freya.api(\'POST\',\'/api/v2/c
+    -> ERROR Exit code 1 Traceback (most recent call last): File "<string>", line 1, in <module> File "/home/ubuntu/btb/wt2/freya.py", line 19, in api raise RuntimeError(f"{method} {path} -> {e.code}: {e.read().decode()[:1500]}") from None RuntimeError: POST /api/v2/chat/message -> 503: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"25b86062-572e-4193-9155-00bbfd19cffa"}}}
+[model call 2026-10-11T12:02:27Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 16: text
+[model call 2026-10-11T12:02:28Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 17: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; sleep 3; timeout 60 python3 -c "import freya,json; print(str(freya.api(\'POST\',\'
+    -> ERROR Exit code 1 Traceback (most recent call last): File "<string>", line 1, in <module> File "/home/ubuntu/btb/wt2/freya.py", line 19, in api raise RuntimeError(f"{method} {path} -> {e.code}: {e.read().decode()[:1500]}") from None RuntimeError: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"aae7a476-daa4-462a-94da-1f2c48aa53a9"}}}
+[model call 2026-10-11T12:02:35Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 18: text
+[model call 2026-10-11T12:02:35Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 19: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; grep -n -A12 \'"extraction_schema": \\[\' docs/workflow-format.md | head -30'}
+    -> 534: "extraction_schema": [ 535- { 536- "name": "order_number", 537- "type": "string", 538- "description": "The order number the caller reads out", 539- "validation_pattern": "^[0-9]{8}$", 540- "max_retries": 2, 541- "min_confidence": 0.8 542- }, 543- { 544- "name": "request_type", 545- "type": "string", 546- "enum_values": ["status", "cancel", "change_address", "other"], -- 591: "extraction_schem ...
+[model call 2026-10-11T12:02:36Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 20: text
+Fixing the start error (wrong extraction key `enum` → `enum_values`), then re-saving.
+[model call 2026-10-11T12:02:39Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 21: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; sed -i \'s/"type": "string", "enum": \\["customer", "other_person", "unknown"\\], 
+    -> ERROR Exit code 1 0 errors, 0 warnings [] RuntimeError: PUT /api/v2/workflow/4f8a3d12-421f-4165-b57f-c8bdfa2327ec -> 503: {"success":false,"data":{"message":"API key validation is temporarily unavailable. Retry shortly.","result":null}} Traceback (most recent call last): File "<string>", line 1, in <module> File "/home/ubuntu/btb/wt2/freya.py", line 19, in api raise RuntimeError(f"{method} {path} -> {e. ...
+[model call 2026-10-11T12:03:06Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 22: text
+The platform is having an outage (503 on key validation), so I'll retry the save once.
+[model call 2026-10-11T12:03:07Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 23: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; sleep 10; python3 builder/save.py w2-B out/w2-B.workflow.json 2>&1 | tail -1; time
+    -> ERROR Exit code 1 RuntimeError: PUT /api/v2/workflow/4f8a3d12-421f-4165-b57f-c8bdfa2327ec -> 503: {"success":false,"data":{"message":"API key validation is temporarily unavailable. Retry shortly.","result":null}} Traceback (most recent call last): File "<string>", line 1, in <module> File "/home/ubuntu/btb/wt2/freya.py", line 19, in api raise RuntimeError(f"{method} {path} -> {e.code}: {e.read().decode( ...
+[model call 2026-10-11T12:04:18Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 24: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt2; sleep 20; python3 builder/save.py w2-B out/w2-B.workflow.json 2>&1 | tail -1; time
+    -> ERROR Exit code 124 {"workflow_id": "4f8a3d12-421f-4165-b57f-c8bdfa2327ec", "agent_id": "0ff14fe6-34a6-4040-8894-d0d0f47637eb", "version": 29}
+[model call 2026-10-11T12:07:19Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 25: text
+[model call 2026-10-11T12:07:19Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 26: text
+I saved the workflow as version 29, but I couldn't confirm that it starts a call. The only chat check that got a reply (on version 28) returned a 500, which means the workflow could not start. My fix is in version 29: in the opening node's "who is on the line" variable I had used the key `enum` instead of `enum_values`. I'm not sure that was what caused the 500. The platform was also returning 503 errors (API key validation unavailable) at the time. The one chat check on version 29 got no reply within 60 seconds, and I stopped there because of the time limit. Send one test chat turn to version 29 before relying on it.
+
+I didn't do the final step of re-reading the brief rule by rule against the workflow. No live conversation beyond the start check was run.
+
+What was built, in `out/w2-B.workflow.json` (made by `out/w2-B.gen.py`):
+- **Start:** the date-facts code node, unedited, leading to the opening.
+- **Main stages:** opening (who is on the line, callbacks, wrong number, deceased) → identity → account lookup with the account hook copied in exactly as given → router (states every late product) → negotiate.
+- **Exit nodes:** one each for refused, hardship, dispute, already_paid, restructuring and human, all ending at hang_up.
+- **Brief rules no code computes:** the date-of-birth format rule is in the identity node. The rule for one date named for every product is in the negotiate node.
+- **Checks:** the lint and the situations check found no problems. I found no conflict between the brief and the date facts or the extracted situations.
+
+workflow_id 4f8a3d12-421f-4165-b57f-c8bdfa2327ec, agent_id 0ff14fe6-34a6-4040-8894-d0d0f47637eb
+
+done: 17 turns, 392 s
+final save (build): {'workflow_id': '4f8a3d12-421f-4165-b57f-c8bdfa2327ec', 'agent_id': '0ff14fe6-34a6-4040-8894-d0d0f47637eb', 'version': 30}; lint: 0 errors, 0 warnings
+buildcheck: 0 error(s), 0 warning(s)
+[model call 2026-10-11T12:07:55] gpt-6-astra (Azure, btb/llm.py): self-simulation: write personas + ledger checks from the brief
+self-test 1 (workspace 2): 0/0 personas failed a check (0 checks)
+buildcheck (shipped): 0 problem(s)
+[freya] slot w2-B: workflow_id=4f8a3d12-421f-4165-b57f-c8bdfa2327ec agent_id=0ff14fe6-34a6-4040-8894-d0d0f47637eb version=30 (published)
+[freya] exported: /home/ubuntu/btb/wt2/submission/w2-B.workflow.json
+BUILD END 2026-10-11T12:08:01Z (506 s); trace scrubbed (0 secret(s) replaced): /home/ubuntu/btb/wt2/runs/traces/w2-B-20261011-115934.jsonl
+{"workflow_id": "4f8a3d12-421f-4165-b57f-c8bdfa2327ec", "agent_id": "0ff14fe6-34a6-4040-8894-d0d0f47637eb"}
+BUILD_SECONDS 508

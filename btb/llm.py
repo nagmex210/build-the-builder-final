@@ -15,6 +15,7 @@ CHAINS = {
     "strong": ["gpt-6-astra", "gpt-6-luna", "gpt-4.1-mini"],
     "fast": ["gpt-4.1-mini", "gpt-6-luna", "gpt-6-astra"],
 }
+RATE_WAIT_S = int(os.environ.get("BTB_LLM_RATE_WAIT_S", "90"))   # per model, on 429, before falling back
 REASONING = {"gpt-6-astra", "gpt-6-luna", "gpt-5-mini"}
 _KEY = None
 
@@ -35,18 +36,23 @@ def trace(event: dict):
     p = os.environ.get("BTB_TRACE")
     if p:
         with open(p, "a") as f:
-            f.write(json.dumps({"at": time.strftime("%Y-%m-%dT%H:%M:%S"), **event}) + "\n")
+            f.write(json.dumps({"at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), **event}) + "\n")
 
 
 def chat(messages, tier="strong", purpose="", max_tokens=4000, temperature=0.7, effort="medium"):
     last = None
-    for model in CHAINS[tier]:
+    for i, model in enumerate(CHAINS[tier]):
+        if last:      # the previous model failed: that call is in the trace too, with why we fell back
+            trace({"model": CHAINS[tier][i - 1], "purpose": f"{purpose} [FAILED: {last[:120]}; falling back to {model}]"})
         body = {"model": model, "messages": messages}
         if model in REASONING:
             body.update(max_completion_tokens=max_tokens + 8000, reasoning_effort=effort)
         else:
             body.update(max_tokens=max_tokens, temperature=temperature)
-        for attempt in range(3):
+        waited = 0
+        for attempt in range(8):
+            if attempt >= 3 and not (last or "").startswith(f"{model} 429"):
+                break
             try:
                 req = urllib.request.Request(URL, data=json.dumps(body).encode(), method="POST",
                                              headers={"api-key": _key(), "content-type": "application/json"})
@@ -59,13 +65,26 @@ def chat(messages, tier="strong", purpose="", max_tokens=4000, temperature=0.7, 
                 return text
             except urllib.error.HTTPError as e:
                 last = f"{model} {e.code}: {e.read().decode()[:300]}"
-                if e.code in (429, 500, 502, 503, 504):
+                if e.code == 429 and waited < RATE_WAIT_S:
+                    # Build stability (b10 w4): 12 builds at once got 429s and, after 18 s of retries, 30 of 36 "strong"
+                    # extractions silently ran on the fallback model. A rate limit clears within a minute: wait for it
+                    # (Retry-After when given) before stepping down the chain.
+                    try:
+                        pause = float(e.headers.get("retry-after") or 0)
+                    except (TypeError, ValueError):
+                        pause = 0
+                    pause = min(max(pause, 5 + 5 * attempt), 30)
+                    waited += pause
+                    time.sleep(pause)
+                    continue
+                if e.code in (500, 502, 503, 504):
                     time.sleep(2 + 4 * attempt)
                     continue
                 break
             except Exception as e:  # noqa: BLE001
                 last = f"{model}: {e}"
                 time.sleep(2)
+    trace({"model": CHAINS[tier][-1], "purpose": f"{purpose} [FAILED: {(last or '')[:120]}; no model left]"})
     raise RuntimeError(f"all models failed: {last}")
 
 

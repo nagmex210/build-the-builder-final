@@ -1,0 +1,12 @@
+PASS PUB-11 medium Multi-product  | verify > verify > get_account > promise > promise > promise > close_call
+PASS PUB-12 hard   Multi-product  | verify > verify > verify > get_account > add_note > add_note > promise > close_call
+FAIL PUB-13 hard   Multi-product  | verify > verify > get_account
+       - outcome (None, None), expected ('promise', None)
+       - promises [], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]
+       - the call was not closed with close_call
+       - conversation: The assistant failed to meet the success criteria because the conversation ended prematurely after the customer's request in Message 7. 1) Neither the credit card nor the personal loan payments were recorded via system tools. 2) There was no reco
+
+slowest agent turn per call: median 34 s, worst 36 s. Failed calls where the customer hung up: 1.
+WARNING: the phone agent was slow in this run. If the same agent is fast in another run, the model was busy and this score is too low.
+
+2 / 3 passed (bank records and conversation checks). Last simulation 60c2a70e-8aaa-4897-935e-9195c4e88c7a, status completed, 370 s.

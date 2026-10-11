@@ -1,0 +1,1 @@
+  invalid rep PUB-02 (try 1): ['harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"2453a88c-2740-4f3c-a405-7889e1832131"}}}']

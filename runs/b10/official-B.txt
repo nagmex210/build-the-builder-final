@@ -1,0 +1,17 @@
+FAIL PUB-11 medium Multi-product  | verify > verify > get_account
+       - outcome (None, None), expected ('promise', None)
+       - promises [], expected [('p1', 220.0, '2026-10-16'), ('p2', 640.0, '2026-10-16'), ('p3', 75.0, '2026-10-16')]
+       - the call was not closed with close_call
+       - conversation: The assistant failed to meet the success criteria because it did not execute the required tool calls. While the assistant correctly stated all three products (credit card, personal loan, and car loan) before the initial ask in Message 6, and prov
+FAIL PUB-12 hard   Multi-product  | verify > verify > verify > get_account > add_note > add_note > promise > close_call
+       - conversation: The assistant failed to meet the success criteria because it made two payment attempts on the car loan (early band) instead of the required single attempt. All other criteria were met: the date of birth was asked once, the phone number was asked 
+FAIL PUB-13 hard   Multi-product  | verify > verify > get_account
+       - outcome (None, None), expected ('promise', None)
+       - promises [], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]
+       - the call was not closed with close_call
+       - conversation: The assistant failed to meet the success criteria because no payment promises were recorded in the system, and no read-back was performed. Furthermore, the assistant incorrectly agreed to the October 30th date for both payments in [Message 8], ev
+
+slowest agent turn per call: median 37 s, worst 41 s. Failed calls where the customer hung up: 2.
+WARNING: the phone agent was slow in this run. If the same agent is fast in another run, the model was busy and this score is too low.
+
+0 / 3 passed (bank records and conversation checks). Last simulation 018a46c5-ab2c-4c36-9020-a660f5379f12, status completed, 277 s.

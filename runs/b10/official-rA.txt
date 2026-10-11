@@ -1,0 +1,33 @@
+FAIL PUB-01 | verify_identity > verify_identity > get_account > close_call | call e971cda6-df7e-4daa-8841-a2460c867410
+       - outcome ('no_promise', 'service_error'), expected ('promise', None)
+       - promises [], expected [('p1', 420.0, '2026-10-14')]
+       - conversation: The conversation failed several success criteria: - The `create_promise` function was never called, despite the customer agreeing to the payment terms. - The required text-message sentence was not said. - However, identity verification was handle
+PASS PUB-02 | schedule_callback > close_call | call fa0e652b-7d8d-45e6-b5d9-86fc29fd0a3b
+PASS PUB-03 | verify_identity > verify_identity > verify_identity > close_call | call 31f1993a-e5a4-4745-8de6-0dc21d20303d
+FAIL PUB-04 | verify_identity > verify_identity > get_account > close_call | call 7a0987ce-6dfc-431d-b6a6-a2f49bb9ee09
+       - outcome ('no_promise', 'service_error'), expected ('promise', None)
+       - promises [], expected [('p1', 1250.0, '2026-10-23')]
+       - conversation: The conversation failed to meet the success criteria regarding the promise date. While the agent correctly identified as a digital assistant (Message 8) and did not treat the user's initial date proposal as a refusal (countering instead with the 
+FAIL PUB-05 | verify_identity > verify_identity > get_account > close_call > close_call | call 1188d7f5-8e06-453f-8aa8-77ed779d4214
+       - outcome ('transferred', 'support'), expected ('no_promise', 'hardship')
+       - conversation: - The assistant provided the sympathy sentence ("I’m sorry you’re going through this") three times across messages 8, 9, and 10, failing the "one sentence of sympathy" criterion. - The assistant offered to put the customer through to support twic
+FAIL PUB-06 | verify_identity > verify_identity > get_account > close_call | call ef6eed93-269e-4951-856e-1486ec9681ab
+       - outcome ('no_promise', 'service_error'), expected ('promise', None)
+       - promises [], expected [('p1', 637.5, '2026-10-16')]
+       - conversation: The agent failed multiple success criteria: 1. The agent asked 'What is the maximum amount you can pay today?' which violates the restriction against asking how much the customer can pay. 2. The minimum payment was offered, but without the requir
+FAIL PUB-07 | verify_identity > verify_identity > get_account > close_call | call 9bdbd7e3-506e-463b-871b-d5b042b34195
+       - outcome ('no_promise', 'service_error'), expected ('promise', None)
+       - promises [], expected [('p1', 540.0, '2026-10-27')]
+       - conversation: The agent successfully addressed the first two success criteria by asking for the exact day once ([Message 10]) and correctly refusing the holiday on October 26th in favor of the next business day, Tuesday the 27th ([Message 12]). However, the th
+PASS PUB-08 | verify_identity > verify_identity > get_account > close_call | call 7d26ada4-fad0-46c9-b7ab-41aa9fb9b5bf
+FAIL PUB-09 | verify_identity > verify_identity > get_account > close_call | call f85686d9-9f46-4c5a-b860-8b6d07e9d40d
+       - outcome ('no_promise', 'refused'), expected ('transferred', 'restructuring')
+       - transfers [], expected [{'queue': 'restructuring'}]
+       - conversation: - The criterion "transfer_to_agent called with queue restructuring" was not met. As shown in the system events, no `transfer_to_agent` function was ever invoked. Furthermore, in [Message 8] and [Message 12], the agent explicitly stated it was una
+FAIL PUB-10 | verify_identity > verify_identity > get_account | call 582a82a3-10e2-4308-8b44-cb7338135203
+       - outcome (None, None), expected ('promise', None)
+       - promises [], expected [('p1', 365.0, '2026-10-16')]
+       - the call was not closed with close_call
+       - conversation: The call did not meet the success criteria because the agent failed to record the promise in the ledger. While the agent correctly performed a retry as indicated in Message 10, Message 12 confirms that the promise was not recorded (resulting in z
+
+3 / 10 passed (salvaged simulation acdb9f39-94b6-4908-a19e-211e57a046af, status completed)
