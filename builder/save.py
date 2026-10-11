@@ -43,8 +43,24 @@ def save_with_retry(slot, wf, state_file, budget_s=None):
     return locked_save(slot, wf, state_file, budget_s=budget_s)
 
 
+def intent_conditions(wf):
+    """A tool-call transition (is_tool_call) without a condition: the platform never offers its transition tool, so the
+    node can never leave by intent (b10 merge: official raw-A 3/10, 6 calls stuck in the router reading back a promise
+    it could not record; 1 in 6 builds of the champion's code had this shape). docs/workflow-format.md: a tool-call
+    transition carries {"operator": "matches_intent", "description": ...}. Use the transition's own description."""
+    fixed = []
+    g = wf.get("global_nodes") or {}
+    nodes = list((wf.get("nodes") or {}).items()) + (list(g.items()) if isinstance(g, dict) else [])
+    for name, node in nodes:
+        for t in (node.get("transitions") or []) if isinstance(node, dict) else []:
+            if isinstance(t, dict) and t.get("is_tool_call") and not t.get("condition"):
+                t["condition"] = {"operator": "matches_intent", "description": t.get("description") or f"go to {t.get('target_node')}"}
+                fixed.append(f"{name}->{t.get('target_node')}")
+    return fixed
+
+
 def finish_and_save(slot, wf, canned=None):
-    names = []
+    names = ["intent-condition:" + f for f in intent_conditions(wf)]
     api = os.environ.get("BTB_TOOLS_API")
     if api and pathlib.Path(api).exists():          # the build agent can drop a required field (b5: customer_id everywhere)
         from apicheck import repair
