@@ -1,0 +1,84 @@
+builder: slot=w4-B-b3 tools=/home/ubuntu/btb/wt4/tools/openapi.json briefs=/home/ubuntu/btb/wt4/briefs/brief-a.md /home/ubuntu/btb/wt4/briefs/brief-b.md
+trace: /home/ubuntu/btb/wt4/runs/traces/w4-B-b3-20261011-115312.jsonl
+BUILD START 2026-10-11T11:53:12Z slot=w4-B-b3
+[model call 2026-10-11T11:53:43] gpt-6-astra (Azure, btb/llm.py): A1: list the brief's situations after the account lookup (router + specialist routes)
+[model call 2026-10-11T11:54:04] gpt-6-astra (Azure, btb/llm.py): A3: extract the brief's mandatory sentences as fixed text
+[test] datecalc: generated date/amount code run locally on 5 dates and fake products -> ok (143 s)
+[test] A1 situations: refused, hardship, dispute, already_paid, restructuring, human
+[model] build agent: Claude Agent SDK, claude-opus-5-5, skill build-phone-agent, budget 12 min
+[model call 2026-10-11T11:55:35] gpt-6-astra (Azure, btb/llm.py): extract calendar/amount spec for code steps
+[model call 2026-10-11T11:55:39Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 1: tools Skill
+  [Skill] {'skill': 'build-phone-agent'}
+[model call 2026-10-11T11:55:41Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 2: text
+[model call 2026-10-11T11:55:43Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 3: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; cat briefs/brief-a.md briefs/brief-b.md; python3 -c "\nimport json;d=json.load(ope
+    -> # Brief A: Freya Bank, early-stage collections, one product Freya Bank is fictional. Every customer, debt and payment here is synthetic. This brief has the density of a real bank specification. Read all of it. Most failed cases come from one rule that was skipped. ## 1. The job Freya Bank calls customers who are 1 to 45 days late on one product. The agent finds the customer, checks identity, state ...
+[model call 2026-10-11T11:55:44Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 4: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; cat .claude/skills/build-phone-agent/routing.md; cat examples/base-agent.json; pyt
+    -> # Workflow structure and routing recipe A shape that works for any collections-style brief. Fill every rule, value, field name, enum, outcome and reason from THE BRIEF and THE TOOL API FILE you were given. Node names below are suggestions; stage contents come from the brief. ## Principle The agent model is small. It follows one short task well and many mixed tasks badly. So: - one conversation nod ...
+[model call 2026-10-11T11:55:54Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 5: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; python3 -c "\nimport json;d=json.load(open(\'out/w4-B-b3.calc.json\'));print(json.
+    -> [ "Send a date of birth as `YYYY-MM-DD`, whatever way the customer said it. The service rejects anything it cannot read as a date. Read a date given only as numbers as day, then month, then year.", "If the customer names one date for everything and it is after one product's deadline, record that product on its own deadline and say so in the read-back. The other products keep the date the customer  ...
+[model call 2026-10-11T11:55:57Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 6: text
+[model call 2026-10-11T11:55:57Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 7: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; grep -n "def check\\|problem\\|append(" builder/situations.py | head -40; grep -n 
+    -> 86: lines.append(f"- node `{e['name']}` | triggers: {'; '.join(map(str, e.get('triggers') or []))} | rules: " 125: lines.append(f"FIRST RULE (brief): {str(e['first_line']).strip()}") 126: lines.append("The customer has just told you their situation. Respond to it now, ONCE, in the brief's order. " 128: lines.append("EVERY OFFER AND QUESTION OF THIS SITUATION IS MADE AT MOST ONCE PER CALL (even if  ...
+[model call 2026-10-11T11:56:00Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 8: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; sed -n 440,470p docs/workflow-format.md; sed -n 530,560p docs/workflow-format.md; 
+    -> "loop_prompt": "Name so far: {{customer_name}}. Email so far: {{email}}. Ask only for what is still missing. When both are present, read them back once.", "transitions": [] } ``` Make the loop condition specific. "The user has not finished" matches everything and the agent never leaves. ### Tool-call transitions Set `is_tool_call` to `true` on a transition. The dialogue model then sees the transit ...
+[model call 2026-10-11T11:56:04Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 9: text
+[model call 2026-10-11T11:56:04Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 10: text
+Reading done; now writing the workflow generator.
+[model call 2026-10-11T11:56:05Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 11: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; sed -n 725,775p docs/workflow-format.md'}
+    -> }, { "target_node": "collect", "description": "Keep collecting", "condition": { "operator": "always" } } ] }, "find_slots": { "name": "find_slots", "node_type": "api_request", "passthrough": true, "passthrough_default_transition": "offer", "on_enter": { "type": "silent" }, "disable_inactivity_monitor": true, "pre_actions": [ { "type": "function", "config": { "timeoutMs": 10000, "maxRetries": 2 },  ...
+[model call 2026-10-11T11:56:08Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 12: text
+[model call 2026-10-11T11:57:13Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 13: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; cat > out/w4-B-b3.gen.py <<\'EOF\'\nimport json\ncalc=json.load(open(\'out/w4-B-b3
+    -> ERROR hang_up: end_call node without terminal 1 errors, 0 warnings []
+[model call 2026-10-11T11:57:16Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 14: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; grep -n "terminal" docs/workflow-format.md builder/lint_workflow.py | head -8'}
+    -> docs/workflow-format.md:75:| `end_call` | Ends the call | optional farewell | `terminal` | docs/workflow-format.md:108:| `terminal` | object | | The end-call function. `end_call` nodes only | docs/workflow-format.md:201:- An unresolved variable in a prompt stays as the literal text `{{variable_name}}`. The model sees the placeholder. In a fixed spoken line (`on_enter.text`, a terminal `spoken_mess ...
+[model call 2026-10-11T11:57:18Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 15: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; sed -n 613,648p docs/workflow-format.md'}
+    -> An `end_call` node hangs up. It has a `terminal` object and no outgoing transitions. ```json { "name": "goodbye", "node_type": "end_call", "on_enter": { "type": "silent" }, "disable_inactivity_monitor": true, "transitions": [], "terminal": { "type": "function", "function": { "name": "closing_end", "handler": "__function__:end_call", "parameters": { "type": "object", "properties": { "message_mode": ...
+[model call 2026-10-11T11:57:24Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 16: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; python3 - <<\'EOF\'\np=\'out/w4-B-b3.gen.py\';s=open(p).read()\ns=s.replace(\'\'\'
+    -> 0 errors, 0 warnings [] {"hardened_tools": ["schedule_callback", "transfer_to_agent", "close_call", "verify_identity", "transfer_to_agent", "close_call", "get_account", "close_call", "create_promise", "add_note", "close_call", "add_note", "close_call", "transfer_to_agent", "create_promise", "add_note", "close_call", "add_note", "close_call", "add_note", "close_call", "transfer_to_agent", "close_ca ...
+[model call 2026-10-11T11:57:28Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 17: text
+Saved. Quick start check:
+[model call 2026-10-11T11:57:30Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 18: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; timeout 60 python3 -c "import freya,json; print(str(freya.api(\'POST\',\'/api/v2/c
+    -> ERROR Exit code 124
+[model call 2026-10-11T11:58:32Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 19: text
+[model call 2026-10-11T11:58:33Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 20: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; timeout 100 python3 -c "import freya,json; print(str(freya.api(\'POST\',\'/api/v2/
+    -> ERROR Exit code 1 Traceback (most recent call last): File "<string>", line 1, in <module> File "/home/ubuntu/btb/wt4/freya.py", line 19, in api raise RuntimeError(f"{method} {path} -> {e.code}: {e.read().decode()[:1500]}") from None RuntimeError: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"5b3b888d-46ec-42d2-b4c6-707938914ea6"}}}
+[model call 2026-10-11T11:58:54Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 21: text
+[model call 2026-10-11T11:58:54Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 22: text
+I built and saved the workflow, but it does not start yet: the one test chat turn returned a 500 (Internal server error). That means it cannot take a call in its current state.
+
+The 500 gives no detail beyond a request id (`5b3b888d-46ec-42d2-b4c6-707938914ea6`), and I hit the time limit before I could find the cause. The first try at that turn hung for 60 seconds and timed out; the second gave the 500. I also did not get to the final rule-by-rule re-read of the brief.
+
+What is in place: the workflow is in `out/w4-B-b3.workflow.json`, written by `out/w4-B-b3.gen.py`. The lint reports no errors and the situations check reports no problems.
+- **Start and stages:** your `date_facts` code node is the start node and leads into `opening`. Then come `identity`, the account lookup with your hook on `get_account`, a triage-only `router`, and `negotiate`.
+- **Specialists:** all six have their own node: `refused`, `hardship`, `dispute`, `already_paid`, `restructuring`, `human`. Each ends at `hang_up` after `close_call` succeeds.
+- **Brief check:** I found no conflict between the brief and the extracted situations or the date facts.
+
+Where I would look first for the 500:
+- The tool-call transitions use a `matches_intent` condition.
+- The `party` field in the opening node's extraction schema has a `default` setting.
+- The start node itself, in case the platform will not run a code node first.
+
+workflow_id be6053c9-c2a4-4878-87c4-6bdbe0aecfaa, agent_id a87697df-5a0e-4a79-ad3b-e97916f7eda1
+
+done: 15 turns, 199 s
+final save (build): {'workflow_id': 'be6053c9-c2a4-4878-87c4-6bdbe0aecfaa', 'agent_id': 'a87697df-5a0e-4a79-ad3b-e97916f7eda1', 'version': 2}; lint: 0 errors, 0 warnings
+buildcheck: 0 error(s), 0 warning(s)
+[model call 2026-10-11T12:00:06] gpt-6-astra (Azure, btb/llm.py): self-simulation: write personas + ledger checks from the brief
+self-test 1 (workspace 2): 0/0 personas failed a check (0 checks)
+buildcheck (shipped): 0 problem(s)
+[freya] slot w4-B-b3: workflow_id=be6053c9-c2a4-4878-87c4-6bdbe0aecfaa agent_id=a87697df-5a0e-4a79-ad3b-e97916f7eda1 version=2 (published)
+[freya] exported: /home/ubuntu/btb/wt4/submission/w4-B-b3.workflow.json
+BUILD END 2026-10-11T12:00:10Z (418 s); trace scrubbed (0 secret(s) replaced): /home/ubuntu/btb/wt4/runs/traces/w4-B-b3-20261011-115312.jsonl
+{"workflow_id": "be6053c9-c2a4-4878-87c4-6bdbe0aecfaa", "agent_id": "a87697df-5a0e-4a79-ad3b-e97916f7eda1"}

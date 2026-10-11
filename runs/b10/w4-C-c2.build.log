@@ -1,0 +1,69 @@
+builder: slot=w4-C-c2 tools=/home/ubuntu/btb/wt4/btb/brief_c/openapi-c.json briefs=/home/ubuntu/btb/wt4/btb/brief_c/brief-c.md
+trace: /home/ubuntu/btb/wt4/runs/traces/w4-C-c2-20261011-120556.jsonl
+BUILD START 2026-10-11T12:05:56Z slot=w4-C-c2
+[model call 2026-10-11T12:06:26] gpt-6-astra (Azure, btb/llm.py): A1: list the brief's situations after the account lookup (router + specialist routes)
+[test] datecalc: generated date/amount code run locally on 5 dates and fake products -> ok (62 s)
+[test] A1 situations: refused, over_limit, hardship, dispute, already_paid, transfer
+[model] build agent: Claude Agent SDK, claude-opus-5-5, skill build-phone-agent, budget 12 min
+[model call 2026-10-11T12:06:58] gpt-6-astra (Azure, btb/llm.py): extract calendar/amount spec for code steps
+[model call 2026-10-11T12:07:02Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 1: tools Skill
+  [Skill] {'skill': 'build-phone-agent'}
+[model call 2026-10-11T12:07:04Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 2: text
+[model call 2026-10-11T12:07:06Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 3: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; cat btb/brief_c/brief-c.md; python3 -c "\nimport json;d=json.load(open(\'btb/brief
+    -> # Brief C: Freya Bank Gulf, arrears calls, one to three accounts Freya Bank is fictional. Every customer, debt and payment here is synthetic. This is a full specification. Every rule matters: most failed calls come from one rule that was skipped. ## 1. The job Freya Bank Gulf calls customers who are behind on one to three accounts (credit card, personal loan, overdraft). The agent makes sure it sp ...
+[model call 2026-10-11T12:07:06Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 4: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; cat .claude/skills/build-phone-agent/routing.md; cat examples/base-agent.json'}
+    -> # Workflow structure and routing recipe A shape that works for any collections-style brief. Fill every rule, value, field name, enum, outcome and reason from THE BRIEF and THE TOOL API FILE you were given. Node names below are suggestions; stage contents come from the brief. ## Principle The agent model is small. It follows one short task well and many mixed tasks badly. So: - one conversation nod ...
+[model call 2026-10-11T12:07:09] gpt-6-astra (Azure, btb/llm.py): A3: extract the brief's mandatory sentences as fixed text
+[model call 2026-10-11T12:07:10Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 5: text
+[model call 2026-10-11T12:07:11Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 6: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; grep -n -i -A12 "api_request\\|response_mapping" docs/workflow-format.md | head -8
+    -> 73:| `api_request` | Runs an HTTP call on entry | usually not | `pre_actions`, node-level `response_mapping`, `transitions` | 74-| `code` | Runs a Python snippet on entry | usually not | `pre_actions` with a `code_exec` function, `transitions` | 75-| `end_call` | Ends the call | optional farewell | `terminal` | 76- 77-Other node types exist: `transfer_call`, `integration`, `knowledge_base`, `resch ...
+[model call 2026-10-11T12:07:16Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 7: text
+[model call 2026-10-11T12:07:17Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 8: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; grep -n -B2 -A30 \'"node_type": "api_request"\' docs/*.md | head -60; python3 -c "
+    -> docs/tools-and-code.md-174-{ docs/tools-and-code.md-175- "name": "fetch_order", docs/tools-and-code.md:176: "node_type": "api_request", docs/tools-and-code.md-177- "passthrough": true, docs/tools-and-code.md-178- "passthrough_default_transition": "present", docs/tools-and-code.md-179- "on_enter": { "type": "silent" }, docs/tools-and-code.md-180- "pre_actions": [ docs/tools-and-code.md-181- { docs/ ...
+[model call 2026-10-11T12:07:20Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 9: text
+[model call 2026-10-11T12:08:27Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 10: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; mkdir -p out; cat > out/w4-C-c2.gen.py <<\'EOF\'\nimport json\napi=json.load(open(
+    -> ERROR hang_up: end_call node without terminal 1 errors, 0 warnings []
+[model call 2026-10-11T12:08:30Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 11: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; grep -n -B3 -A25 \'"terminal"\' docs/workflow-format.md | head -50'}
+    -> 619- "on_enter": { "type": "silent" }, 620- "disable_inactivity_monitor": true, 621- "transitions": [], 622: "terminal": { 623- "type": "function", 624- "function": { 625- "name": "closing_end", 626- "handler": "__function__:end_call", 627- "parameters": { 628- "type": "object", 629- "properties": { 630- "message_mode": { "type": "string", "default": "custom" }, 631- "spoken_message": { "type": "s ...
+[model call 2026-10-11T12:08:32Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 12: text
+[model call 2026-10-11T12:08:32Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 13: text
+Fixing the end node, then saving.
+[model call 2026-10-11T12:08:35Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 14: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; python3 - <<\'EOF\'\np=\'out/w4-C-c2.gen.py\';s=open(p).read()\ns=s.replace(\'\'\'
+    -> 0 errors, 0 warnings [] {"hardened_tools": ["schedule_callback", "close_call", "verify_identity", "close_call", "get_account", "add_note", "close_call", "add_note", "close_call", "add_note", "create_promise", "close_call", "add_note", "close_call", "add_note", "close_call", "transfer_to_agent", "close_call", "close_call", "create_promise", "add_note", "close_call", "guard:schedule_callback", "guar ...
+[model call 2026-10-11T12:08:40Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 15: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; timeout 90 python3 -c "import freya,json; print(str(freya.api(\'POST\',\'/api/v2/c
+    -> ERROR Exit code 1 Traceback (most recent call last): File "<string>", line 1, in <module> File "/home/ubuntu/btb/wt4/freya.py", line 19, in api raise RuntimeError(f"{method} {path} -> {e.code}: {e.read().decode()[:1500]}") from None RuntimeError: POST /api/v2/chat/message -> 504: error code: 504
+[model call 2026-10-11T12:09:42Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 16: text
+[model call 2026-10-11T12:09:43Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 17: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; timeout 90 python3 -c "import freya,json; print(str(freya.api(\'POST\',\'/api/v2/c
+    -> ERROR Exit code 1 Traceback (most recent call last): File "<string>", line 1, in <module> File "/home/ubuntu/btb/wt4/freya.py", line 19, in api raise RuntimeError(f"{method} {path} -> {e.code}: {e.read().decode()[:1500]}") from None RuntimeError: POST /api/v2/chat/message -> 504: error code: 504
+[model call 2026-10-11T12:10:50Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 18: text
+[model call 2026-10-11T12:10:50Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 19: text
+I built the workflow and saved it as slot w4-C-c2, but I couldn't confirm a live call starts. Both one-turn chat tests timed out with a 504 from the gateway, not the 500 that would mean a broken workflow. The lint check shows 0 errors and the situations check found no problems.
+
+The call goes: the date code node first, then opening (third party, callback, wrong number, deceased, unclear), then identity (postcode, then month of birth), then the account lookup with the date hook. After that a router states the debt and passes to negotiate. It can also hand off to the six exit nodes you listed, and every closing node goes to a silent hang-up.
+
+The brief's text differs from the extracted facts in two places:
+- **Arrears of 1,000.00 or more:** the brief caps the deadline at 7 calendar days, but the code's deadline per band ignores the amount. I told the negotiate node to apply the 7-day rule from the calendar, so the model works out that date itself rather than reading it from the facts.
+- **Hardship:** the brief says only that an account the customer won't pay is noted HARDSHIP. It doesn't say what happens to the other accounts. I let that node take a promise the customer offers themselves, with no persuasion and no offers of its own.
+
+workflow_id 511bf699-4ae9-4057-ab10-b53797405c47, agent_id 1f9893e4-5487-4cdc-aa2d-c520b604bfda
+
+done: 12 turns, 231 s
+final save (build): {'workflow_id': '511bf699-4ae9-4057-ab10-b53797405c47', 'agent_id': '1f9893e4-5487-4cdc-aa2d-c520b604bfda', 'version': 2}; lint: 0 errors, 0 warnings
+buildcheck: 0 error(s), 0 warning(s)
+[model call 2026-10-11T12:11:20] gpt-6-astra (Azure, btb/llm.py): self-simulation: write personas + ledger checks from the brief
+self-test: no valid chat in workspace 2 (POST /api/v2/chat/message -> 402: {"error":"Insufficient credits","message":"Insufficient credits — ); playing the round in workspace 1
+self-test 1 (workspace 1): 0/0 personas failed a check (0 checks)
+buildcheck (shipped): 0 problem(s)
+[freya] slot w4-C-c2: workflow_id=511bf699-4ae9-4057-ab10-b53797405c47 agent_id=1f9893e4-5487-4cdc-aa2d-c520b604bfda version=2 (published)
+[freya] exported: /home/ubuntu/btb/wt4/submission/w4-C-c2.workflow.json
+BUILD END 2026-10-11T12:18:27Z (896 s); trace scrubbed (0 secret(s) replaced): /home/ubuntu/btb/wt4/runs/traces/w4-C-c2-20261011-120556.jsonl
+{"workflow_id": "511bf699-4ae9-4057-ab10-b53797405c47", "agent_id": "1f9893e4-5487-4cdc-aa2d-c520b604bfda"}

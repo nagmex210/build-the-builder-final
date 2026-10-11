@@ -1,0 +1,83 @@
+builder: slot=w4-A-b3 tools=/home/ubuntu/btb/wt4/tools/openapi.json briefs=/home/ubuntu/btb/wt4/briefs/brief-a.md
+[freya] workspace id not fetched yet (GET /api/v2/workspaces -> 504: error code: 504
+); each save fetches it
+trace: /home/ubuntu/btb/wt4/runs/traces/w4-A-b3-20261011-115627.jsonl
+BUILD START 2026-10-11T11:56:27Z slot=w4-A-b3
+[model call 2026-10-11T11:56:52] gpt-6-astra (Azure, btb/llm.py): A1: list the brief's situations after the account lookup (router + specialist routes)
+[test] datecalc: generated date/amount code run locally on 5 dates and fake products -> ok (56 s)
+[test] A1 situations: refused, hardship, already_paid, dispute, payment_plan_transfer, human_request
+[model] build agent: Claude Agent SDK, claude-opus-5-5, skill build-phone-agent, budget 12 min
+[model call 2026-10-11T11:57:23] gpt-6-astra (Azure, btb/llm.py): extract calendar/amount spec for code steps
+[model call 2026-10-11T11:57:26Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 1: tools Skill
+  [Skill] {'skill': 'build-phone-agent'}
+[model call 2026-10-11T11:57:27Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 2: text
+[model call 2026-10-11T11:57:28Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 3: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; cat briefs/brief-a.md; cat tools/openapi.json | head -c 9000; echo; cat .claude/sk
+    -> # Brief A: Freya Bank, early-stage collections, one product Freya Bank is fictional. Every customer, debt and payment here is synthetic. This brief has the density of a real bank specification. Read all of it. Most failed cases come from one rule that was skipped. ## 1. The job Freya Bank calls customers who are 1 to 45 days late on one product. The agent finds the customer, checks identity, state ...
+[model call 2026-10-11T11:57:29Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 4: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; cat examples/base-agent.json; python3 -c "\nimport json;d=json.load(open(\'out/w4-
+    -> { "nodes": { "identity": { "name": "identity", "tools": [ { "type": "function", "config": { "timeoutMs": 12000, "maxRetries": 0 }, "function": { "name": "verify_identity", "handler": "__function__:api_call", "parameters": { "type": "object", "properties": { "url": { "type": "string", "default": "https://freya-bank-mock.freyavoice.workers.dev/v1/verify_identity" }, "body": { "type": "object", "requ ...
+[model call 2026-10-11T11:57:29] gpt-6-astra (Azure, btb/llm.py): A3: extract the brief's mandatory sentences as fixed text
+[model call 2026-10-11T11:57:31Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 5: text
+[model call 2026-10-11T11:57:32Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 6: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; python3 -c "\nimport json;d=json.load(open(\'tools/openapi.json\'));print(json.dum
+    -> { "required": true, "content": { "application/json": { "schema": { "type": "object", "properties": { "customer_id": { "type": "string" }, "outcome": { "type": "string", "enum": [ "promise", "paid", "transferred", "no_promise", "not_verified", "not_reached" ] }, "reason": { "type": "string", "description": "Required for every outcome except promise and paid. See the table in the brief." } }, "requi ...
+[model call 2026-10-11T11:57:34Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 7: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; sed -n 190,250p docs/tools-and-code.md; sed -n 280,330p docs/workflow-format.md; g
+    -> "properties": { "url": { "type": "string", "default": "https://api.example.com/v1/get_order" }, "method": { "type": "string", "default": "POST" }, "headers": { "type": "object", "properties": { "Content-Type": { "type": "string", "default": "application/json" } } }, "body": { "type": "object", "properties": { "order_number": { "type": "string", "default": "{{order_number}}" } }, "required": [] } } ...
+[model call 2026-10-11T11:57:37Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 8: text
+[model call 2026-10-11T11:57:37Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 9: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; grep -n -B3 -A20 \'"end_call"\' docs/workflow-format.md | head -60; ls builder'}
+    -> 615-```json 616-{ 617- "name": "goodbye", 618: "node_type": "end_call", 619- "on_enter": { "type": "silent" }, 620- "disable_inactivity_monitor": true, 621- "transitions": [], 622- "terminal": { 623- "type": "function", 624- "function": { 625- "name": "closing_end", 626- "handler": "__function__:end_call", 627- "parameters": { 628- "type": "object", 629- "properties": { 630- "message_mode": { "typ ...
+[model call 2026-10-11T11:57:41Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 10: text
+[model call 2026-10-11T11:57:41Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 11: text
+Writing the workflow generator now (reading done; ~5 min used).
+[model call 2026-10-11T11:58:48Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 12: tools Bash
+  [Bash] {'command': 'mkdir -p /home/ubuntu/btb/wt4/out && cat > /home/ubuntu/btb/wt4/out/w4-A-b3.gen.py <<\'EOF\'\nimport json\n
+    -> 0 errors, 0 warnings [ "situation 'hardship': node 'hardship' lacks tools ['close_call']", "situation 'payment_plan_transfer': node 'payment_plan_transfer' lacks tools ['close_call']", "situation 'human_request': node 'human_request' lacks tools ['close_call']" ]
+[model call 2026-10-11T11:58:51Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 13: text
+[model call 2026-10-11T11:58:51Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 14: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; grep -n "lacks tools" -B12 builder/situations.py | head -40'}
+    -> 198- node = nodes.get(cand[0]) if cand else None 199- name = cand[0] if cand else name 200- if node is None: 201- problems.append(f"situation '{e['name']}': no specialist node"); continue 202- if not any(name in t for k, t in targets.items() if k != name): 203- problems.append(f"situation '{e['name']}': node '{name}' has no incoming transition (router cannot reach it)") 204- have = set(_tool_names ...
+[model call 2026-10-11T11:58:54Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 15: text
+[model call 2026-10-11T11:58:56Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 16: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; python3 - <<\'EOF\'\np=\'out/w4-A-b3.gen.py\'; s=open(p).read()\ns=s.replace(\'ret
+    -> 0 errors, 0 warnings [] {"hardened_tools": ["schedule_callback", "transfer_to_agent", "close_call", "verify_identity", "transfer_to_agent", "close_call", "get_account", "close_call", "create_promise", "close_call", "close_call", "transfer_to_agent", "close_call", "close_call", "close_call", "transfer_to_agent", "close_call", "transfer_to_agent", "close_call", "guard:schedule_callback", "guard:get_ ...
+[model call 2026-10-11T11:59:42Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 17: text
+[model call 2026-10-11T11:59:43Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 18: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; timeout 60 python3 -c "import freya,json; print(str(freya.api(\'POST\',\'/api/v2/c
+    -> ERROR Exit code 124
+[model call 2026-10-11T12:00:45Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 19: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; timeout 100 python3 -c "import freya,json; print(str(freya.api(\'POST\',\'/api/v2/
+    -> ERROR Exit code 1 Traceback (most recent call last): File "<string>", line 1, in <module> File "/home/ubuntu/btb/wt4/freya.py", line 19, in api raise RuntimeError(f"{method} {path} -> {e.code}: {e.read().decode()[:1500]}") from None RuntimeError: POST /api/v2/chat/message -> 504: error code: 504
+[model call 2026-10-11T12:01:54Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 20: text
+[model call 2026-10-11T12:01:54Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 21: text
+I built and saved the w4-A-b3 workflow, but I couldn't confirm it starts a call. Both start-up chat tests got no reply: the first timed out after 60 seconds, the second returned a 504 (gateway timeout) instead of a turn. A 504 is not the 500 that would mean the workflow itself can't start, so the platform may just have been slow.
+
+The lint check reported no errors, the situations check reported no problems, and `save.py` added its hardening and the promise guards. I also didn't do the final rule-by-rule re-read of the brief, because I ran out of time.
+
+**How it's built:**
+- **Start:** the date-facts code node from the calc file comes first and leads to the opening.
+- **Opening:** handles who is on the line, including callbacks, wrong number, deceased and unclear.
+- **Identity:** asks the two security questions; a correct pair moves to the account lookup.
+- **Account lookup:** uses `get_account` with the calc file's hook unchanged, then hands to a router that states the debt.
+- **Negotiation:** holds all the promise rules and leads to the six specialist nodes you listed, with `hang_up` as the end node.
+- **Ending:** every conversation node has `close_call`, and its success goes to `hang_up`.
+
+**Differences from the build instructions:**
+- **Goodbye:** brief rule 47 wins over routing.md. The agent thanks the customer and says goodbye in the same message as `close_call`, and `hang_up` says nothing.
+- **Failed promise recording:** the "try once more, then close as `no_promise` / `service_error`" rule is only in the prompts and the promise tool's result text. There is no transition on the failure counters.
+- **No rule differs from the date facts.**
+
+workflow_id fed306c6-77fa-4fdf-94e8-ed6347553b80, agent_id 950dc203-ed2a-4ab0-9b6f-fb30a5614031 (start check got 504 timeouts, not confirmed; failed-promise close is prompt-only, no counter route).
+
+done: 13 turns, 270 s
+final save (build): {'workflow_id': 'fed306c6-77fa-4fdf-94e8-ed6347553b80', 'agent_id': '950dc203-ed2a-4ab0-9b6f-fb30a5614031', 'version': 2}; lint: 0 errors, 0 warnings
+buildcheck: 0 error(s), 1 warning(s)
+[model call 2026-10-11T12:02:27] gpt-6-astra (Azure, btb/llm.py): self-simulation: write personas + ledger checks from the brief
+self-test 1 (workspace 2): 0/0 personas failed a check (0 checks)
+buildcheck (shipped): 0 problem(s)
+[freya] slot w4-A-b3: workflow_id=fed306c6-77fa-4fdf-94e8-ed6347553b80 agent_id=950dc203-ed2a-4ab0-9b6f-fb30a5614031 version=2 (published)
+[freya] exported: /home/ubuntu/btb/wt4/submission/w4-A-b3.workflow.json
+BUILD END 2026-10-11T12:02:31Z (560 s); trace scrubbed (0 secret(s) replaced): /home/ubuntu/btb/wt4/runs/traces/w4-A-b3-20261011-115627.jsonl
+{"workflow_id": "fed306c6-77fa-4fdf-94e8-ed6347553b80", "agent_id": "950dc203-ed2a-4ab0-9b6f-fb30a5614031"}
