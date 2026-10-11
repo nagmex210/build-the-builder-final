@@ -1,4 +1,4 @@
-# Build the Builder
+# Build the Builder Hackathon
 
 **Kit version 3** (10 October 2026). The file `VERSION` holds the number. When we update the kit, the number goes up and the changes are listed here.
 
