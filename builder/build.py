@@ -218,13 +218,14 @@ async def build_check(slot, tools, briefs, trace, wf_file, final_pass, options_b
 
 
 async def claude_stream(prompt, options, trace, label="build agent"):
-    turn, bash_ids = 0, set()
+    turn, bash_ids, seen_models = 0, set(), set()
     with trace.open("a") as out:
         async for message in query(prompt=prompt, options=options):
             out.write(json.dumps({"type": type(message).__name__, **dataclasses.asdict(message)}, default=str) + "\n")
             out.flush()
             if isinstance(message, AssistantMessage):
                 turn += 1
+                seen_models.add(message.model)
                 uses = [b.name for b in message.content if isinstance(b, ToolUseBlock)]
                 print(f"[model call {now()}] {message.model} (Claude Agent SDK) {label} turn {turn}: "
                       f"{'tools ' + ', '.join(uses) if uses else 'text'}", flush=True)
@@ -241,7 +242,15 @@ async def claude_stream(prompt, options, trace, label="build agent"):
                         res = " ".join((res or "").split())
                         print(f"    -> {'ERROR ' if block.is_error else ''}{res[:400]}{' ...' if len(res) > 400 else ''}", flush=True)
             elif isinstance(message, ResultMessage):
-                print(f"\ndone: {message.num_turns} turns, {message.duration_ms / 1000:.0f} s", flush=True)
+                print(f"\ndone: {message.num_turns} turns, {message.duration_ms / 1000:.0f} s"
+                      f"{'' if message.subtype == 'success' else ' (' + str(message.subtype) + ')'}", flush=True)
+                # Claude Code also calls models that never appear as turns (a small model for its own helper tasks):
+                # the SDK reports them only here, per model, so the trace lists them from this summary.
+                for m, u in (getattr(message, "model_usage", None) or {}).items():
+                    u = u if isinstance(u, dict) else {}
+                    print(f"[model call {now()}] {m} (Claude Agent SDK) {label} usage: {u.get('inputTokens', 0) + u.get('cacheReadInputTokens', 0) + u.get('cacheCreationInputTokens', 0)} "
+                          f"input / {u.get('outputTokens', 0)} output tokens"
+                          f"{'' if m in seen_models else '; internal helper calls of Claude Code (no turns of their own, e.g. classifying a command)'}", flush=True)
 
 
 def clear_slot(slot):
