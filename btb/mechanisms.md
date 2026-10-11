@@ -2,118 +2,132 @@
 
 General rules only: no case ids, names, brief values or scenario details. Evidence is in runs/analyst/<batch>.md
 (b7: `git show merge/b7:runs/analyst/b7.md`) and fix/cases:runs/mechanisms.md.
-Last update: after batch b9 workers + the b8 merge (2026-10-11 ~09:45 UTC). Champion = b8 merge a575bbf.
+Last update: after batch b10 workers + the b9 merge (2026-10-11 ~12:50 UTC). Champion = b8 merge a575bbf (b9 not kept).
 
-## 0. Read first (b9)
+## 0. Read first (b10)
 
-- **Fast (chat) evals do not run the workflow's INITIAL node** (b9-5, M59). The official simulation does. So every
-  chat measurement (fast_eval A/B/raw, all of brief C, the chat self-test) ran WITHOUT the start code node: no
-  `{{date_facts}}` until a tool result carries them. b8 merge: fast A 4/10 vs official 8/10, fast rB 0/3 vs
-  official 3/3. Fast date failures before b9-5 are partly harness; never rank a date change on fast evals without M59 fixed.
-- **Official residuals of the champion are hardship once-only + the turn before routing** (M60): the customer states
-  hardship before the account is loaded or before the router has routed; sympathy is said there, then again in the
-  specialist, and a payment ask comes in between. Official A 0/2, rA 0/1 on that kind; floor offered twice 1/2.
-- **Identity can stick with both answers passed** (M61): the code state waits for the bank's call-wide flag; when the
-  flag is missing the call stays in identity and the model INVENTS account content (seen official rA, fast A).
-- b9 measured almost nothing: about 30 fast_evals ran at once and none finished in 55 min (platform 500/502/503/504,
-  branch resumes). Judge b9 mechanisms by their offline/live repro evidence, not by scores.
+- **b10 measured nothing** (chat 500/502/504, 503 key validation, ws2 402): every b10 branch rests on offline repros,
+  replays and build logs. Judge b10 mechanisms by that evidence, not by scores.
+- **Build robustness is the top Sunday risk** (M67): under platform load the champion builder FAILED 10/12 builds on a
+  single save 5xx (with ~13 of 30 min left) and silently ran 30/36 strong extractions on the small fallback model.
+- **Fast (chat) evals skip the INITIAL node** (M59). The b9-5 re-run of the start chain on the opening's exits works on
+  chat (date facts present from identity on), but tools used INSIDE the opening still have none (M64).
+- **Official residuals of the champion**: once-only repeated in the next turn (M62), hardship before routing (M60),
+  the last identity answer not sent to verify (M65), the bank's call-wide flag missing (M61). A visible said-list in
+  context did NOT stop a repeat (b10-7 probe): once-only needs graph structure or a code gate.
+- **Parallel tool calls, measured live** (b10-2 probe): a post-hook can read a SIBLING call's pre-hook vars, and
+  `config` is absent in post-hooks. Any per-tool flag carried pre -> post may belong to another call (M66).
 
 ## 1. Failure kinds (running counts, primary kind per failing run, platform-dead runs excluded)
 
-| kind | b1-b6 | b7 | b8 | b9 (b8 merge fast + w1 rA; 53 fails) | total | at fault |
-|---|---|---|---|---|---|---|
-| dates: deadline as TARGET; date resolved by the model (stale year, wrong weekday, one day off) | ~81 | ~20 | 5 | 7 (most on chat without date facts, M59) | ~113 | builder (+harness M59) |
-| amounts: invented "minimum" / floor restated | ~54 | ~19 | 3 | 3 (floor said again with no tool call, M62) | ~79 | builder |
-| tool order / duplicates (invented ids then a second write; re-sent writes; repeated transfer) | ~80 | ~6 | 7 | 9 (fast B: every fail had display ids built by the model) | ~102 | builder |
-| per-item attempts / outcome counted wrong | ~47 | ~8 | 6 | 4 | ~65 | builder |
-| multi-product binding (one date for all, item never written, call-wide cap lost) | ~47 | ~8 | 4 | 10 (6 on C) | ~69 | builder |
-| identity gate (no stop at 0 left; stuck after both passed; account invented in identity) | ~37 | ~16 | 5 | 4 + official rA 1 | ~63 | builder |
-| wrong route (own plan instead of transfer; hardship stated before the router) | ~28 | ~8 | 7 | 3 + official A 2 | ~48 | builder |
-| "once only" broken (floor twice; sympathy/support twice) | ~25 | ~1 | 3 | 2 + official 3 | ~34 | builder |
-| mandatory wording / honesty ("recorded" after NOT RECORDED) | ~33 | ~13 | 1 | 2 (own gate bug, fixed) | ~49 | builder |
-| build defect shipped (hook raises / does not compile; field dropped; size; unbound {{var}}) | 1 off. | 2 off. | 2 br. | 1 branch (b9-4 v2 check hook did not compile, lint saw it, build saved) | | builder |
-| harness: fast judge misses what IS in the transcript; persona leaks; start node skipped on chat | ~102 | ~18 | 4 | 8 + M59 | ~132 | harness |
-| platform: timeouts / branch-resume / 402 / 5xx / DNS of the C bank tunnel | heavy | 8 | 16 | 3 + all b9 evals | - | platform |
+| kind | b1-b8 | b9 (53 fails) | b10 (b9 merge fast rA + w1-B; 13) | total | at fault |
+|---|---|---|---|---|---|
+| dates: deadline as TARGET; date resolved by the model (stale year, wrong weekday, one day off) | ~106 | 7 | 2 (stale callback year re-sent 4x in the opening M64; "tomorrow" read as past) | ~115 | builder (+harness M59) |
+| amounts: invented "minimum" / floor restated | ~76 | 3 | 0 | ~79 | builder |
+| tool order / duplicates (built ids then a 2nd write; re-sent writes; repeated transfer) | ~93 | 9 | 1 (built ids, M7) | ~103 | builder |
+| per-item attempts / outcome counted wrong | ~61 | 4 | 0 | ~65 | builder |
+| multi-product binding (one date for all, item never written, call-wide cap lost) | ~59 | 10 | 1 | ~70 | builder |
+| identity gate (no stop at 0 left; stuck after pass; account invented; last answer unverified) | ~58 | 5 | 2 (M65; parallel re-sent verify M5) + official A 1 | ~66 | builder |
+| wrong route (own plan instead of transfer; hardship stated before the router) | ~43 | 5 | 0 | ~48 | builder |
+| "once only" broken (floor twice; sympathy/support twice) | ~29 | 5 | 3 + official A 2 | ~39 | builder |
+| mandatory wording / honesty | ~47 | 2 | 1 + official A 1 (judge: "recorded" in the opening's call-recording line) | ~51 | builder/judge |
+| build defect shipped / build failed | 3 off. + br. | 1 br. | champion 10/12 FAILED under load (w4); 30/36 extractions on fallback | | builder |
+| harness: fast judge misses what IS there; persona leaks or self-corrects; start node skipped on chat | ~124 | 8 | 3 | ~135 | harness |
+| platform: timeouts / branch-resume / 402 / 5xx / DNS | heavy | all b9 evals | all b10 evals | - | platform |
 
 ## 2. General mechanisms (each holds for ANY collections brief)
 
 Values and dates
 M1/M2. Show only this customer's facts; compute dates/amounts in code, one labelled line per product; a guard on the
     write blocks a wrong value with reason + right value (2xx ok=false), but too late for "offered once" (M27).
-M3. Every date/amount rule reaches code or is listed "not computed, apply yourself"; a schema with no slot drops it
-    silently (call-wide caps, stage order M34).
-M27. The value to OFFER comes from code (date check / amount check: "keep the customer's day", the one sentence);
-    invented minimums vanished where the check was called. Residuals: a figure named WITHOUT calling the check;
-    the model overriding a "keep the customer's date" answer (fast rB); callback days still have no code path.
+    Rounding order: the brief's rounding first, then the minimum; parse times, never compare "H:MM" strings (b10-1).
+M3. Every date/amount rule reaches code or is listed "not computed, apply yourself"; a schema with no slot drops it.
+M27. The value to OFFER comes from code (date/amount check: "keep the customer's day", one sentence). Residuals: a
+    figure named WITHOUT calling the check; the model overriding "keep the customer's date"; callback dates.
+M64. A refusal that LISTS the allowed values is not enough: the model said the right year aloud and re-sent the stale
+    year in four writes. Every date guard must return ONE computed value to copy (as the promise date check does), and
+    the pre-hook may repair a date whose month-day matches exactly one allowed day (date analogue of M7). Tools
+    reachable in the opening (third party -> callback) have no date facts on chat even with the start chain re-run.
 M50. Calendar semantics (weekend days, holidays, cut-off, "next <weekday>") are brief rules: spec fields + trace line.
 M28. A customer's own date or amount is never a refusal; the deadline is an upper bound, never a target.
 
 Identity and privacy
 M4/M29. Identity terminal state is decided by code and routed by structure (identity_state + say_next per state).
 M61. The code state must be computable from the call's OWN ledger (required questions passed in this call) when the
-    bank's call-wide flag is missing or stale; waiting on the bank flag alone left a fully verified call in the
-    identity node, and a node with no lookup tool then INVENTED account details (product, balance, due date) when
-    the customer pressed. Any node where account talk can come up needs either the lookup or a hard "no data" path.
-M5. One answer, one check; never re-send. Two verify calls in one turn: the route can fire on a stale sibling (M20).
+    bank's call-wide flag is missing, and "passed" must be sticky: a stale parallel sibling result (flag false) landed
+    last and its "NOT verified" text made the judge fail a correctly routed call. Any node where account talk can come
+    up needs either the lookup or a hard "no data" path (else the model INVENTS account details).
+M65. With one attempt left, the model does not send the next answer to verify (asks again, "go on") and a later right
+    answer passes: the "stop after N wrong" rule is broken by an uncounted attempt. The model must send EVERY answer;
+    the identity say_next on the last attempt must say "send the next answer to the check, whatever it is". Open.
+M5. One answer, one check; never re-send a passed question (seen in 3 of 5 fast transcripts, in parallel with the next
+    question). A pre-hook could answer a passed field with a no-op instead of a bank call. Open.
 M18. Before identity passes no account content, including the opening's purpose words (M33).
 
 Tool calls and state
 M7. Ids are copied from a listed line, never built. Answering an unknown id with the real list makes the model retry,
-    but the retry is a SECOND write for that item (judge: one call per item): repair the id in the write PRE-hook to
-    the one listed row it can only mean (type + card/account ending), refuse only when ambiguous.
-M12/M20/M32. Parallel tool calls: order not guaranteed, sibling hooks miss each other's writes: one variable per item.
-M37/M44. Writes are idempotent; a "do not send again" answer does not stop re-sends on courtesy turns. After the last
-    write (and after a transfer) route to a node WITHOUT write tools (presence gating, b9-3 gating.py).
+    but the retry is a SECOND write for the item: repair the id in the write PRE-hook to the one listed row it can only
+    mean (type / last digits / initials), send unchanged when ambiguous (b10-2 R7).
+M12/M20/M66. Parallel tool calls: order not guaranteed; a post-hook can read a sibling's pre vars; no `config` in post.
+    So one variable per item, and a post-hook decides from the RESULT (the bank's success id field present = really
+    recorded; a bare no-op 2xx = blocked), never from a per-tool flag (b10-2 R2).
+M68. A bank REJECTION (2xx/4xx ok=false) and an OUTAGE (5xx/timeout) need different texts: "resend the same values" on a
+    rejection invites a duplicate write; a guard block must not erase an earlier real failure count (b10-2 R1/R4).
+M37/M44. Writes are idempotent; after the last write (and after a transfer) route to a node WITHOUT write tools.
 M19/M8/M11. Routes out of a guarded tool test its ok field only; a block is 2xx ok=false with its own reason.
-M30/M38/M56. Per-item values come from explicit tool arguments. An optional gate tool is called late or fed a
-    model-made label (a counteroffer sent as "declined"): the model passes WHAT was said, code classifies; counts come
-    from CONFIRMED writes only (counting the in-flight write refused a legitimate retry after a service error and
-    the model then said "recorded"); block the write/close of an item whose budget state disagrees.
-M54. A failed account lookup must route to a service-error/close path, never into negotiation.
+M30/M38/M56. Per-item values from explicit tool arguments; the model passes WHAT was said, code classifies; counts
+    from CONFIRMED writes only; block the write/close of an item whose budget state disagrees.
+M54. A failed account lookup must route to a service-error/close path, never into negotiation (still no route on main).
 M23. Multi-product: bind amount, date, id per item; call-wide caps and an agreed common date need code slots.
 
 Once-only and the turn before routing
 M13/M21. Per-item counters and call-wide "once only" flags live in code and are shown each turn.
-M62. A once-only line is repeated in the NEXT turn of the same node with no tool call (floor restated on "what should
-    I pay?", support offered again after a reply): a tool-side counter never sees it. Fix in the graph: the entry turn
-    and the following turns are different nodes (talk -> after), the after-node states "already said: never again",
-    and a call-wide said-list set by code is shown in every later node (b9-4 once.py, unmeasured).
-M60. The turn between identity pass and routing (account-loading node that speaks, router) has no hardship/transfer
-    exit: the customer's first hardship statement is answered there (sympathy #1, then a payment ask), and the
-    specialist repeats it. Load the account silently (api/code node, no spoken turn) and give the router the
-    situation exits on the FIRST statement; the hand-off is silent (M40).
+M62. A once-only line is repeated in the NEXT turn of the same node with no tool call ("you tell me" -> floor again;
+    support offered again after a reply). A tool-side counter never sees it, and a context line "USED UP" was ignored
+    (b10-7, n=1). Fix in the graph: entry turn and later turns are different nodes (talk -> after), the after-node says
+    "already said: never again" (b9-4/b10-6 once.py, unmeasured).
+M60. The turn between identity pass and routing has no hardship/transfer exit: sympathy #1 is said there, a payment ask
+    follows, the specialist repeats it. Load the account silently, give the router the situation exits on the FIRST
+    statement; the hand-off is silent (M40).
 
 Routes, hand-offs, closing
-M22. A required exit (cannot pay the floor / plan request -> transfer) needs triggers + a transition in EVERY node where
-    it can come up; fast A: a "something more manageable" request was negotiated, never transferred.
+M22. A required exit (cannot pay the floor / plan request -> transfer) needs triggers + a transition in EVERY node.
 M31/M40/M46/M48. Router + specialists: silent structural hand-off; every tool-call transition has a condition; a router
     seeing account content without write tools fakes writes; a router with only a failure exit loops.
 M26/M35. The goodbye belongs to the platform after close succeeded; a looping node hits max turns with no close.
 M6/M24/M10/M14/M15/M16/M33/M34. Close is last (code); mandatory lines in the tool result verbatim; reworded mandatory
-    text keeps content and position; stage order is a brief rule.
+    text keeps content and position; stage order is a brief rule. A strict judge reads "recorded" in a call-recording
+    notice as a premature claim: keep that word out of the opening.
 
 Build and measurement robustness
-M9/M57/M58. A run that saved nothing FAILS; clear the slot before a build; deterministic post-build checks (unbound
-    {{var}}, reachability) + one EDIT round (on main since b8). Gap: a hook that does not COMPILE is a lint error
-    but buildcheck does not fail/repair it (b9-4 shipped 3 such builds): wire hook lint errors into the repair round.
-M53. Platform caps one hook's code + data at 131072 bytes; over it every call of that tool errors. Put spec/library
-    only in the hooks that use them (b9-1: gate data only in write/close/transfer hooks, largest 55 KB).
-M59. The chat endpoint skips the INITIAL node's pre_actions; a code node entered later does run. Anything the start
-    chain computes (today, date facts, ledgers) is absent on chat. Re-run the start chain on the opening's exits
-    (b9-5 livevars.py, idempotent) and check one live chat after save. Until then fast evals mis-measure dates.
-M55. The self-test runs on chat too: workspace 2 answers 402 (no credits) -> fall back to workspace 1 with true counts
-    in the trace (b9-2: 6/6 chats in ws1, build 18 min); with M59 unfixed the self-test also runs without date facts.
+M9/M57/M58. A run that saved nothing FAILS; clear the slot before a build (slot match must not treat '-' as a word
+    boundary: a slot clears its prefix-sibling's files, b10-1); deterministic post-build checks + one EDIT round. Gap:
+    a hook that does not COMPILE is a lint error but buildcheck does not fail/repair it.
+M67. Platform calls in the build need retry with backoff within the budget (save PUT/POST, workspace GET, export GET);
+    a build whose final save fails but whose agent saved in THIS run ships that save with a warning; a 429 from the
+    model provider waits (Retry-After) before falling back, and every fallback is logged. Without this the extraction
+    model silently drops a tier under load and the brief's exits vary between builds (3-4/6 common vs 6/6).
+M55/M69. The self-test runs on chat: ws2 answers 402 -> ws1 fallback. A self-test with 0 completed chats must say
+    "DID NOT RUN / untested", never "0/0 failed" (it was read as a pass in every b8-b10 trace); round 1 must respect
+    the time left; stuck chat threads must not hold the process past BUILD END; an unreadable final ledger is a
+    harness error, not an agent failure.
+M70. The submitted trace must list every model call (including the coding agent's hidden helper model and failed
+    provider calls) and every self-test chat with its result; the run script must be parsed before it runs (an edit or
+    pull mid-run broke a running submission) (b10-5).
+M53. One hook's code + data is capped at 131072 bytes; put spec/library only in the hooks that use them.
+M59. The chat endpoint skips the INITIAL node's pre_actions; a code node entered later does run. Re-run the start chain
+    on the opening's exits (b9-5 livevars, seen working on chat) and keep date-dependent tools out of the opening.
 M45/M47/M49/M51. Dry-run hooks at save; raise SDK buffer; finalizers strip their own blocks; API keys by shape.
 M17/M25/M52. LLM mistake counts / best-of-N cannot pick builds; remaining failures are structural.
-M63. Gates as data (b9-1 gategraph: AND/OR/XOR/AT_MOST/AT_LEAST/CHAIN over code atoms, linted, boundary-tested
-    offline, soft except per-item write caps): an extracted gate must be droppable when the guarded action cannot
-    raise the counted quantity, else it blocks a transfer the brief demands; fail-open on unknown atoms.
+M63. Gates as data (b9-1 gategraph): an extracted gate must be droppable when the guarded action cannot raise the
+    counted quantity; fail-open on unknown atoms.
 
 ## 3. What carries the calls that pass (keep intact)
 
 - Structural routing on tool-result fields (identity -> account on the all-verified field; close -> end on ok).
 - Account loaded by a code/api path; products, band, deadline, floor, date facts in the account result.
-- Code answers the model can copy: date/amount check, guard NOT RECORDED + right value, identity say_next.
+- Code answers the model can copy: date/amount check ("CODE COMPUTED THE DATE TO OFFER"), guard NOT RECORDED + right
+  value, identity say_next.
 - Short decision chains; hardship: one sympathy sentence, one support offer, close; multi-product: all items before
   the first ask, one combined read-back.
 
@@ -121,25 +135,27 @@ M63. Gates as data (b9-1 gategraph: AND/OR/XOR/AT_MOST/AT_LEAST/CHAIN over code 
 
 | failure kind still on main | branch / commit with the fix | status |
 |---|---|---|
-| start node skipped on chat (M59): fast evals and C without date facts | idea/b9-5 381aa28 + b300c7d livevars.py | being merged (merge/b9 b1efc99); live repro before/after on the held-out brief |
-| self-test 0 chats (M55) | idea/b9-2 8e97261..dfc5b06 | being merged (merge/b9 e29bb78); +15 min build time |
-| invented display ids -> second write per item (M7) | idea/b7-1 e9dfe52 + cca104a (pre-hook repair); idea/b8-1 6738f0d / b9-1 gates.py (display id -> ledger row) | not on main; fast B/rB every fail |
-| once-only repeated next turn (M62), official A residual | idea/b9-4 932daa9 once.py (use 932daa9+) | unmeasured; B/rB v2 builds broken, do not score them |
-| hardship before routing (M60) | none (b9-4 does not cover the router's sentence) | open, official A 0/2 |
-| identity stuck when bank flag missing (M61) | none | open, official rA 1 |
-| re-sent writes, writes after transfer/close, 2nd note per item (M37/M44) | idea/b9-3 6267143 gating.py (presence gating, BTB_GATING=0 to disable) | unmeasured; offline idempotent, lint 0 on 5 builds |
-| per-item attempts (M56) | idea/b9-1 89465e8 (gate graph, confirmed-write counts) | rA v1 4/10 fast (own bugs, fixed after); v2 unmeasured |
-| hook compile error not repaired (M58 gap) | none | open |
-| lookup failure into negotiation (M54); callback date by the model (M27); calendar semantics (M50) | none | open |
+| build FAILS on one save 5xx; silent model downgrade (M67) | idea/b10-4 4d2c7b7 (save_with_retry, own-save shipping, 429 wait) or idea/b10-1 53bd5f9 (locked_save 5xx retry) | 24/24 builds shipped (w4 rounds b/c); pick ONE save retry |
+| self-test 0 chats read as pass; round-1 overrun; stuck threads (M69) | idea/b10-1 326efe7/1c56716/b733945; b10-4 b168809 + fd8fbb2 (ws1 fallback); b10-5 76a2e78 | repros; three overlapping "DID NOT RUN" fixes: take one |
+| trace gaps, submit.sh mid-run edit (M70) | idea/b10-5 a52a3a0, de50d97, acda4c8 | before/after submit.sh runs on C + raw A |
+| datecalc rounding order / unpadded cut-off; brief pasted twice; scrub split writes; clear_slot prefix | idea/b10-1 b733945, 731c934 | repros; 0 diffs on 24 900 random floors |
+| parallel post-hook trusts a sibling's flag; block erases a failure; rejection says "resend" (M66/M68) | idea/b10-2 b405f88, ea7a079 | repro on real hook code + live probe |
+| identity stuck when bank flag missing; stale sibling overwrites passed (M61) | idea/b10-2 618bf51 | repro (a)/(b) + negatives unchanged |
+| built display ids -> second write per item (M7) | idea/b10-2 0e43e54 (minimal b7-1 port) | repro; fast B/rB every fail in b9 |
+| start node skipped on chat (M59) | idea/b9-5 381aa28 + b300c7d livevars | in merge/b9 (not kept, cause of its drop not livevars) |
+| once-only repeated next turn (M62) | idea/b10-6 68df7c2 (once.py, BTB_ONCE=1, default off) | 4 builds saved, 0 evals; memory tool b10-7 NO EFFECT |
+| dead code | idea/b10-3 ab15884 | replay identical modulo removed snippets; conflicts with b10-2 hook text |
+| re-sent writes, writes after transfer/close (M37/M44); per-item attempts (M56) | idea/b9-3 gating.py; idea/b9-1 gategraph | unmeasured |
+| hardship before routing (M60); last identity answer unverified (M65); re-sent passed verify (M5); callback date to copy (M64); lookup failure route (M54); hook compile error not repaired (M58) | none | open |
 
 ## 5. Variance sources (pass in one run, fail in another)
 
-- a value or label left to the model (floor, date, item id, refusal vs counteroffer): M2/M7/M23/M27/M56;
-- parallel tool calls and optional tools called late: M12/M20/M38/M56;
-- WHERE the customer first says it: before routing (M60) vs inside the specialist;
+- a value or label left to the model (floor, date, item id, refusal vs counteroffer): M2/M7/M23/M27/M56/M64;
+- parallel tool calls (sibling vars, stale result last) and optional tools called late: M12/M20/M38/M56/M66;
+- WHERE the customer first says it: before routing (M60) vs inside the specialist; in the opening (no date facts, M64);
 - the bank mock: call-wide identity flag present in one run, missing in another (M61);
-- the simulated customer: "you tell me" -> floor restated; fast personas leak identity data;
-- the harness: chat skips the start node (M59: fast date cases fail that pass officially); fast judge misses ~10%;
-  fast B is a lower bound (b8 merge fast B 1/3, rB 0/3 vs official 3/3, 3/3);
-- the BUILD: stale slot (M57), static defects (M58), hook size (M53), self-sim off (M55);
-- platform: 402/5xx, branch-resume; >20 parallel fast_evals = nothing finishes (b8, b9).
+- the simulated customer: "you tell me" -> floor restated; fast personas leak identity data or self-correct answers;
+- the harness: chat skips the start node (M59); fast judge misses ~10% (a recorded write read as missing);
+- the judge: wording near a mandatory word ("this call is recorded") read as a premature claim;
+- the BUILD: stale slot (M57), static defects (M58), hook size (M53), self-sim off (M55), extraction model tier (M67);
+- platform: 402/5xx, branch-resume; >20 parallel fast_evals = nothing finishes (b8, b9, b10).
