@@ -12,7 +12,7 @@
 3. Both are executed locally on several `now` values and fake products; a crash fails the step.
 Outputs: out/<slot>.calc.json (spec + snippets + ready code node).
 """
-import argparse, datetime, json, pathlib, sys
+import argparse, datetime, json, pathlib, re, sys
 
 KIT = pathlib.Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(KIT / "btb"))
@@ -466,12 +466,98 @@ def rule_tests(spec, code):
     return probs
 
 
+CLASSIFY = """You read a call-center case (brief, documents) and its tool API file. Return JSON only:
+{
+ "collections": <true ONLY if the call is about collecting an overdue debt and the tools can record a payment promise; else false>,
+ "now_variable": "<call variable holding the current date/time, or empty>",
+ "weekend_days": [<weekday numbers that are never business days, Monday=0 ... Sunday=6; [] if the documents say nothing>],
+ "holidays": ["YYYY-MM-DD", ...],
+ "date_rules": [ {"rule": "<one date rule the documents state, in their words: e.g. options offered as weekdays/weeks,
+                   a next date computed from today, a due date relative to another date, a cut-off time>",
+                  "where": "<the stage/step that applies it>"} ]   // [] if there are none
+}
+TOOL API:
+{tools}
+
+DOCUMENTS:
+{briefs}
+"""
+
+GENERIC_NODE_CODE = r'''
+import datetime, json
+SPEC = json.loads(bytes.fromhex(SPEC_HEX).decode())
+WD = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+try:
+    raw = str(vars.get(SPEC.get('now_variable') or 'now') or '')
+    t = datetime.date.fromisoformat(raw[:10]) if len(raw) >= 10 else datetime.date.today()
+    hol = set(str(h)[:10] for h in (SPEC.get('holidays') or []))
+    wk = set(int(x) for x in (SPEC.get('weekend_days') or []))
+    L = ['TODAY: ' + t.isoformat() + ' (' + WD[t.weekday()] + ')', 'CALENDAR (date, weekday, business day?):']
+    for i in range(0, 43):
+        d = t + datetime.timedelta(days=i)
+        bd = d.weekday() not in wk and d.isoformat() not in hol
+        L.append('  ' + d.isoformat() + ' ' + WD[d.weekday()] + (' business day' if bd else ' NOT a business day'))
+    rules = [str(r.get('rule')) for r in (SPEC.get('date_rules') or []) if isinstance(r, dict) and r.get('rule')]
+    if rules:
+        L.append('DATE RULES OF THE DOCUMENTS (apply with the calendar above, never compute a date yourself):')
+        L += ['  - ' + r for r in rules]
+    vars['date_facts'] = '\n'.join(L)
+    vars['today_iso'] = t.isoformat()
+    vars['date_facts_state'] = 'known'
+except Exception as e:
+    vars['date_facts'] = 'Date facts unavailable (' + str(e)[:80] + '). Work from the documents.'
+    vars['date_facts_state'] = 'unknown'
+'''
+
+
+def generic(a, briefs, chat_json):
+    """Non-collections case: no bands/floors/promise guards. Extract the documents' own date rules (if any) and give a
+    plain calendar code node. Never fails the build: any error -> ok False with generic True."""
+    out = KIT / "out" / f"{a.slot}.calc.json"
+    out.parent.mkdir(exist_ok=True)
+    try:
+        spec = chat_json([{"role": "user", "content": CLASSIFY.replace("{tools}", pathlib.Path(a.tools).read_text()).replace("{briefs}", briefs)}],
+                         tier="strong", purpose="classify case + extract its date rules", max_tokens=4000, effort="low")
+    except Exception as e:  # noqa: BLE001
+        print(f"datecalc: classify failed ({type(e).__name__}: {e}); treated as collections")
+        return False
+    if not isinstance(spec, dict) or spec.get("collections") is not False:
+        return False
+    if re.search(r"promise|payment.?arrangement|ptp", pathlib.Path(a.tools).read_text(), re.I):
+        print("datecalc: classifier said non-collections, but the tool API records payment promises: kept as collections")
+        return False
+    rules = [r for r in spec.get("date_rules") or [] if isinstance(r, dict) and r.get("rule")]
+    res = {"ok": False, "generic": True, "spec": spec, "date_rules": rules}
+    if rules:
+        code = "SPEC_HEX = '" + json.dumps(spec).encode().hex() + "'\n" + GENERIC_NODE_CODE
+        v = {"now": "2026-10-14T11:00", spec.get("now_variable") or "now": "2026-10-14T11:00"}
+        try:
+            exec(code, {"vars": v})
+            assert v.get("date_facts_state") == "known", v.get("date_facts")
+            res["code_node"] = {
+                "name": "date_facts_setup", "node_type": "code", "passthrough": True,
+                "passthrough_default_transition": "<NEXT NODE>", "on_enter": {"type": "silent"},
+                "pre_actions": [{"type": "function", "function": {"name": "code_exec", "handler": "__function__:code_exec",
+                                 "parameters": {"type": "object", "properties": {"code": {"type": "string", "default": code},
+                                                                                  "timeout_ms": {"type": "number", "default": 10000}}}}}],
+                "transitions": [{"target_node": "<NEXT NODE>", "description": "always", "condition": {"operator": "always"}}]}
+            res["example_date_facts"] = v["date_facts"]
+        except Exception as e:  # noqa: BLE001
+            res["code_error"] = f"{type(e).__name__}: {e}"
+    out.write_text(json.dumps(res, indent=1, ensure_ascii=False))
+    print(f"datecalc: not a collections case -> no bands/floors/guards; {len(rules)} date rule(s) of the documents"
+          f"{'; generic calendar code node' if res.get('code_node') else ''}")
+    return True
+
+
 def main():
     from llm import chat_json
     ap = argparse.ArgumentParser()
     ap.add_argument("--slot", required=True); ap.add_argument("--tools", default="tools/openapi.json"); ap.add_argument("briefs", nargs="+")
     a = ap.parse_args()
     briefs = "\n\n".join(f"=== {b} ===\n" + pathlib.Path(b).read_text() for b in a.briefs)
+    if generic(a, briefs, chat_json):
+        return
     prompt = EXTRACT.replace("{tools}", pathlib.Path(a.tools).read_text()).replace("{briefs}", briefs)
     spec, probs = None, ["not run"]
     for attempt in range(2):

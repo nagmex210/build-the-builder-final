@@ -131,7 +131,7 @@ try:
             _allk = [k for k in _d.keys() if 'verif' in str(k).lower() and 'all' in str(k).lower()]
             if _allk and str(_d.get(_allk[0])).lower() in ('false', '0', 'none', ''):
                 _d['identity_status'] = ('NOT VERIFIED YET (' + str(_allk[0]) + ' is false). You know nothing about '
-                                         'the account: never mention any amount, product, debt or account status. '
+                                         'the account: never mention any amount, product or account detail. '
                                          'Follow the brief\'s identity rule: ask the next security question (a '
                                          'question answered wrongly is asked again if the brief allows), or end '
                                          'the check when no attempts are left.')

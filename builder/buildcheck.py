@@ -198,7 +198,9 @@ def problems(wf, api=None, selftest=None):
             if all(r.get("failed") for r in rows):
                 errs.append(f"CATASTROPHIC self-simulation: all {len(rows)} valid persona chats failed a ledger check")
             calls = [str(c if isinstance(c, str) else (c.get("name") or c.get("tool") or "")) for r in rows for c in r.get("tools") or []]
-            if not any(c and not c.startswith(("get_", "verify", "check_")) for c in calls):
+            generic = __import__("os").environ.get("BTB_COLLECTIONS") == "0"
+            # a non-collections case may be read-only in most branches (an inquiry): no write is not catastrophic there
+            if not generic and not any(c and not c.startswith(("get_", "list_", "verify", "check_", "code_exec")) for c in calls):
                 errs.append(f"CATASTROPHIC self-simulation: no write tool was called in any of {len(rows)} persona chats")
     return errs, warns
 

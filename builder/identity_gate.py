@@ -12,6 +12,7 @@ apply(wf, canned) (called by builder/save.py's final pass, after harden and cann
 - an IDENTITY GATE block in every node before identity passes (the first conversation node and the identity nodes):
   until the state is passed the agent knows nothing about any account (no amount, product, debt or status).
 """
+import os
 import copy, json, re
 
 MARK = "## IDENTITY GATE"
@@ -178,6 +179,11 @@ def apply(wf, canned=None):
     tool = _find_identity_tool(wf)
     nodes = wf.get("nodes") or {}
     if not tool or not nodes:
+        return done
+    # Precondition: an identity tool AND security questions. In a non-collections case (BTB_COLLECTIONS=0, set by the
+    # builder from the case classification) a verify/second-factor tool alone is not enough: the tool's API must
+    # list the questions it checks; otherwise this gate (its failed-identity close) would inject the wrong flow.
+    if os.environ.get("BTB_COLLECTIONS") == "0" and not _required(wf, tool):
         return done
     ref = _referral(canned)
     close = _close_tool(wf, canned)

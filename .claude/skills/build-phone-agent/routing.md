@@ -1,7 +1,19 @@
 # Workflow structure and routing recipe
 
-A shape that works for any collections-style brief. Fill every rule, value, field name, enum, outcome and reason
-from THE BRIEF and THE TOOL API FILE you were given. Node names below are suggestions; stage contents come from the brief.
+FIRST decide which kind of case you have.
+- COLLECTIONS case (the brief is about collecting an overdue debt: identity questions, a promise-to-pay tool, payment
+  floors/deadlines): the "Stages" skeleton below is a proven GUIDELINE. Fill every rule, value, field name, enum,
+  outcome and reason from THE BRIEF and THE TOOL API FILE you were given.
+- ANY OTHER case (inbound inquiry, service request, ...): do NOT use the collections skeleton, its stage names, its
+  promise/floor/persuasion/note/callback ideas or its sentences. Follow the CASE'S OWN FLOW: its flow drawing (open any
+  image/mermaid/diagram file of the case) and documents. One conversation node per stage THE DOCUMENTS name, in their
+  order; silent api_request nodes for lookups the documents do without asking; routes on tool results and extracted
+  variables (lists empty/one/many, a choice made, a check passed/failed, a hand-off requested); every branch of the
+  drawing reachable; the documents' ending (hand-off / return to the menu or supervisor / end) as the end of each path.
+  Keep the generic rules: tool-call honesty (below), ids only from tool results, and every mandatory sentence of the
+  documents VERBATIM in the case language (never translated, never paraphrased). If the case has no close tool, the
+  call ends at an `end_call` node (or the documents' hand-off tool/node) reached by a deterministic transition.
+Node names below are suggestions; stage contents come from the brief.
 
 ## Principle
 
@@ -12,7 +24,7 @@ The agent model is small. It follows one short task well and many mixed tasks ba
 - every node that can close the call has the close tool, and a transition on the close tool's success sends the
   call to an `end_call` node. Nothing else hangs up.
 
-## Stages (adapt to the brief)
+## Stages (COLLECTIONS cases only; adapt to the brief)
 
 ```text
 opening (conversation)          who is on the line; third-party branch (callback / wrong number / deceased / unclear)
@@ -51,7 +63,7 @@ hang_up (end_call)              message_mode "custom", spoken_message = the good
                                 the goodbye after the close tool succeeded; the model never says goodbye itself.
 ```
 
-## Router + specialists (A1)
+## Router + specialists (A1) (only when the build prompt lists situations)
 
 After the account is loaded, the ROUTER only triages: it states the debt and decides which situation the call is in.
 The main path (the customer pays / negotiates) is its own node `negotiate` with all the promise rules. Every situation

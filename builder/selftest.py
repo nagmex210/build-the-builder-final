@@ -103,7 +103,133 @@ def customers(cases_file):
             for c in json.load(open(cases_file))]
 
 
+GENERIC_WRITER = """You write test callers for a phone agent built from the CASE DOCUMENTS below (any call type: an inbound
+inquiry, a service request, ...). Write {n} personas that together cover the documents' most important and most
+error-prone branches: the main path, every choice/list branch the documents draw (none / one / several items, the
+caller picks by each way the documents allow), each offer accepted and declined, a request for a human, and one
+caller who asks something the agent must not do. Use the documents' OWN test customers / example scenarios and their
+call variables (exact variable names and values from the documents; e.g. a customer number and `now`); if the
+documents give none, invent plausible values for the call variables they name.
+The script is in the third person, short, concrete; the caller speaks the case language ({lang}).
+CHECKS: 0-4 machine-checkable facts about the agent's tool calls that the DOCUMENTS clearly require for this persona,
+only in these forms, with tool names from the TOOL API:
+  {{"must_call": "<tool>"}}  {{"must_not_call": "<tool>"}}  {{"before": "<tool A>", "after": "<tool B>"}}  {{"max_calls": "<tool>", "n": <k>}}
+
+CASE DOCUMENTS:
+{brief}
+
+TOOL API (summary):
+{tools}
+
+Answer JSON only: {{"personas": [{{"title": "...", "variables": {{...}}, "script": "...", "checks": [...]}}]}}"""
+
+GENERIC_PERSONA = """You are a caller on the phone. Play this script: {script}
+Talk like a real person on the phone: short sentences, one thing at a time. Speak {lang}.
+When the call is over, say the goodbye of your language. Reply with what you say only."""
+
+
+def _ok_checks(checks, names):
+    ok = []
+    for c in checks or []:
+        if not isinstance(c, dict):
+            continue
+        ts = [c.get(k) for k in ("must_call", "must_not_call", "tool", "before", "after", "max_calls") if c.get(k)]
+        if "max_calls" in c and not isinstance(c.get("n", 1), int):
+            continue
+        if ts and all(t in names for t in ts) and (("tool" not in c) or ("arg" in c and "equals" in c)):
+            ok.append(c)
+    return ok
+
+
+def write_personas_generic(briefs_text, tools_path, n):
+    """Non-collections case: personas from the case's own documents (its test customers / example scenarios)."""
+    lang = os.environ.get("BTB_LANGUAGE") or "the documents' language"
+    d = chat_json([{"role": "user", "content": GENERIC_WRITER.format(n=n, lang=lang, brief=briefs_text[:60000], tools=tool_summary(tools_path))}],
+                  tier="strong", purpose="self-simulation: personas + tool-call checks from the case documents", effort="low", max_tokens=6000)
+    names, out = tool_names(tools_path), []
+    for i, s in enumerate((d or {}).get("personas") or []):
+        if not isinstance(s, dict) or not s.get("script"):
+            continue
+        v = {str(k): str(x) for k, x in (s.get("variables") or {}).items()} if isinstance(s.get("variables"), dict) else {}
+        out.append({"title": str(s.get("title") or f"persona {i + 1}"), "customer": f"doc-{i + 1}", "script": s["script"],
+                    "checks": _ok_checks(s.get("checks"), names), "generic": True,
+                    "cust": {"id": f"doc-{i + 1}", "name": "caller", "now": v.get("now"), "variables": v}})
+    return out[:n]
+
+
+def call_tools(call_id):
+    """Tool names the agent called, read from the Freya call (best effort; None = not readable)."""
+    try:
+        msgs = freya.get_call(call_id).get("messages") or []
+    except Exception:  # noqa: BLE001
+        return None
+    out = []
+    for m in msgs:
+        for key in ("tool_name", "function_name", "name"):
+            if m.get(key) and m.get("role") in ("tool", "function", "tool_call", "assistant"):
+                out.append(str(m[key])); break
+        else:
+            for tc in m.get("tool_calls") or []:
+                nm = (tc.get("function") or {}).get("name") or tc.get("name")
+                if nm:
+                    out.append(str(nm))
+    return out
+
+
+def _run_one_generic(workflow_id, sc):
+    """No practice bank behind a new case: chat with the documents' call variables, check the agent's own tool calls."""
+    v = dict(sc["cust"].get("variables") or {})
+    v.setdefault("now", time.strftime("%Y-%m-%dT%H:%M"))
+    lang = os.environ.get("BTB_LANGUAGE") or "the language the agent speaks"
+    persona = GENERIC_PERSONA.format(script=sc["script"], lang=lang)
+    hist, call_id, err, turns, t0, msg = [], None, None, [], time.time(), "Hello?"
+    try:
+        for _ in range(MAX_TURNS):
+            r = chat_turn(workflow_id, msg, v, call_id)
+            call_id = r.get("callId") or call_id
+            agent = (r.get("response") or "").strip()
+            turns += [("customer", msg), ("agent", agent)]
+            if r.get("callEnded") or r.get("ended") or time.time() - t0 > CHAT_S:
+                break
+            hist += [{"role": "user", "content": agent or "(silence)"}]
+            msg = chat([{"role": "system", "content": persona}] + hist, tier="fast", purpose="self-simulation: persona turn",
+                       max_tokens=150, temperature=0.6)
+            hist += [{"role": "assistant", "content": msg}]
+            if "goodbye" in msg.lower() and len(turns) > 6:
+                r = chat_turn(workflow_id, msg, v, call_id); turns += [("customer", msg), ("agent", (r.get("response") or "").strip())]
+                break
+    except Exception as e:  # noqa: BLE001
+        err = str(e)[:200]
+    tools = call_tools(call_id) if call_id else None
+    if call_id:
+        try:
+            freya.api("POST", "/api/v2/chat/end", {"callId": call_id})
+        except Exception:  # noqa: BLE001
+            pass
+    row = {"title": sc["title"], "customer": sc["cust"]["id"], "script": sc["script"], "checks": sc.get("checks"),
+           "tools": tools or [], "call_id": call_id, "turns": len(turns) // 2,
+           "transcript": "\n".join(f"{w}: {t}" for w, t in turns)[-4000:]}
+    if err and len(turns) < 4:
+        return {**row, "harness_error": err, "failed": []}
+    failed = []
+    if any(w == "agent" and not t for w, t in turns[:-2]):
+        failed.append("the agent gave an empty reply in the middle of the call")
+    if tools is not None:
+        for c in sc.get("checks") or []:
+            if c.get("must_call") and c["must_call"] not in tools:
+                failed.append(f"{c['must_call']} was never called")
+            if c.get("must_not_call") and c["must_not_call"] in tools:
+                failed.append(f"{c['must_not_call']} was called but must not be")
+            if c.get("max_calls") and tools.count(c["max_calls"]) > int(c.get("n", 1)):
+                failed.append(f"{c['max_calls']} called {tools.count(c['max_calls'])} times (max {c.get('n')})")
+            if c.get("before") and c.get("after") and c["after"] in tools and (c["before"] not in tools or tools.index(c["before"]) > tools.index(c["after"])):
+                failed.append(f"{c['after']} was called before {c['before']}")
+    return {**row, "failed": failed}
+
+
 def write_personas(briefs_text, tools_path, cases_file, n):
+    if os.environ.get("BTB_COLLECTIONS") == "0":
+        return write_personas_generic(briefs_text, tools_path, n)
     cust = customers(cases_file)
     d = chat_json([{"role": "user", "content": WRITER.format(n=n, customers=json.dumps(cust, indent=0), brief=briefs_text,
                                                              tools=tool_summary(tools_path))}],
@@ -307,6 +433,8 @@ def run_one(workflow_id, sc, lib):
 
 
 def _run_one(workflow_id, sc, lib):
+    if sc.get("generic"):
+        return _run_one_generic(workflow_id, sc)
     cu = sc["cust"]
     sess = session(cu["id"])
     persona = PERSONA.format(who=cu["name"], script=sc["script"], identity=json.dumps(cu["identity"]), products=json.dumps(cu["products"]))

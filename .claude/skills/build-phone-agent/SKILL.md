@@ -5,6 +5,9 @@ description: Build a Freya phone agent from a bank's brief, test it on the pract
 
 # Build a phone agent from a brief
 
+The brief may be any call type (collections, inbound inquiry, service request, ...) in any language. Never assume debt
+collection unless the documents are about it.
+
 Work from the kit folder. Use only what the brief and the tool API file say. Do not copy rules from another brief.
 
 ## Steps
@@ -14,18 +17,20 @@ Work from the kit folder. Use only what the brief and the tool API file say. Do 
 3. Read `.claude/skills/build-phone-agent/routing.md`: the node-per-stage structure and the exact routing patterns to use.
    Read `examples/base-agent.json`. It is a small working agent with two steps. Use it as the pattern for the JSON, not as the answer.
 4. Write the workflow to `out/<slot>.workflow.json`. `<slot>` is the slot you were given.
-   - Follow routing.md: one conversation node per stage (opening, identity, negotiation), a passthrough account
-     lookup + code node between identity and negotiation, a close tool in every stage that can close, and a
-     transition on the close tool's result to an `end_call` node.
+   - Follow routing.md. Collections case: one conversation node per stage (opening, identity, negotiation), a
+     passthrough account lookup + code node between identity and negotiation, a close tool in every stage that can
+     close, and a transition on the close tool's result to an `end_call` node. Any other case: the stages, order and
+     endings of the case's own flow drawing and documents (no collections stages, no collections sentences).
    - Move to the next step on a tool result or an extracted enum variable, not on `matches_intent`.
    - Take every tool field and allowed value from the tool API file you were given.
    - Every `api_call` body leaf needs a `default`: model-filled fields use `"default": "{{<field name>}}"` (a leaf without `default` is dropped from the request).
+   - Every sentence the documents say the agent must say: copy it verbatim, in the case language.
    - Leave `agent_config` out.
    - Run `python3 builder/lint_workflow.py out/<slot>.workflow.json` and fix every ERROR before saving.
 5. Save it: `python3 builder/save.py <slot> out/<slot>.workflow.json`
    It first hardens every `api_call` tool (see "Tool failures and honesty" below), then prints `workflow_id` and
    `agent_id`. The same slot updates the same workflow. Always save with this command, never with `freya` directly.
-6. Check it starts: one chat turn, `python3 -c "import freya,json; print(freya.api('POST','/api/v2/chat/message',{'workflowId':'<workflow_id>','message':'Hello?','customerVariables':{'customer_id':'c_test','first_name':'Ann','last_name':'Lee','title':'Ms','now':'2026-10-14T11:00'}}))"`. A 500 means the workflow cannot start a call: fix and save again.
+6. Check it starts: one chat turn, `python3 -c "import freya,json; print(freya.api('POST','/api/v2/chat/message',{'workflowId':'<workflow_id>','message':'Hello?','customerVariables':{'customer_id':'c_test','first_name':'Ann','last_name':'Lee','title':'Ms','now':'2026-10-14T11:00'}}))"`. (use the customer variables the documents name, e.g. a customer number and `now`, with test values from the documents). A 500 means the workflow cannot start a call: fix and save again.
 7. Re-read the brief rule by rule against your workflow and fix every rule that is not enforced. Do this once.
 8. Finish with one line: the `workflow_id` and the `agent_id`.
 

@@ -24,7 +24,8 @@ KIT = pathlib.Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(KIT / "btb"))
 MARK = "## FIXED SENTENCES"
 
-PROMPT = """You read a bank's brief for an outbound phone agent (it may be a clean spec or raw bank material: mails, a policy
+PROMPT = """You read a company's brief for a phone agent (any call type: outbound collections, an inbound inquiry, a service
+request, ...; it may be a clean spec or raw bank material: mails, a policy
 extract, a memo that overrides it, a code list; a later memo or override beats the base policy). Tool API file below.
 
 Extract every sentence the agent is REQUIRED to say, as fixed text. Return JSON only:
@@ -60,11 +61,12 @@ keep the required meaning, but never use a gated word, in exactly that form, in 
 one). Empty lists if there are none.
 Rules for `lines` (at most 10):
 - include only (a) sentences the brief quotes word for word, and (b) fixed statements the brief requires in a fixed
-  situation ("say that ..."): e.g. after a recorded promise, the customer died, a payment already made, a scam question,
-  the identity check finally failed, a write failed for the last allowed time. NOT questions or negotiation steps
+  situation ("say that ..."): e.g. after a write succeeded, before a hand-off to a human, when a lookup finds nothing,
+  a check finally failed, a write failed for the last allowed time (in a collections brief also: a recorded promise,
+  the customer died, a payment already made). NOT questions or negotiation steps
   (asking for a date, offering an amount, read-backs): the agent phrases those itself.
 - `tool`/`outcome`: set them ONLY if the sentence is due after EVERY result of that tool with that outcome (for example
-  every successful promise-recording call). If it depends on a count, a hint, or which question passed (the second
+  every successful call of a write tool). If it depends on a count, a hint, or which question passed (the second
   failure, a swapped-date hint, the last allowed attempt), leave both empty.
 - Do not include the opening or goodbye in `lines`. Do not invent rules. Keep each text short and natural for a phone
   call. Never put amounts, dates or product details that vary per call into a text unless as a {{var}} from the list.
@@ -89,7 +91,7 @@ def extract(slot, tools, briefs, variables=("customer_id", "first_name", "last_n
     from llm import chat_json
     brief = "\n\n".join(f"===== {b} =====\n" + pathlib.Path(b).read_text() for b in briefs)
     tool_txt = pathlib.Path(tools).read_text()[:30000]
-    prompt = fill_prompt(PROMPT.replace("VARS", ", ".join(variables)), tool_txt, brief)
+    prompt = fill_prompt(PROMPT.replace("VARS", ", ".join(variables) + " or a call variable the brief itself names"), tool_txt, brief)
     if os.environ.get("BTB_LANGUAGE"):   # spoken texts in the case's language; quotes stay verbatim
         prompt += (f"\nLANGUAGE: the agent speaks {os.environ['BTB_LANGUAGE']}: every text (opening, lines, goodbye) is in "
                    f"{os.environ['BTB_LANGUAGE']}; a quoted sentence is copied verbatim in its original language, never translated.")
@@ -218,6 +220,13 @@ def default_goodbye():
 def _close_tool_name(wf, canned):
     names = {(t.get("function") or {}).get("name") for t in _all_tools(wf)}
     want = _clean((canned or {}).get("close_tool"))
+    if os.environ.get("BTB_COLLECTIONS") == "0":
+        # Non-collections case: only a tool that really ends the call is the close tool (never a transfer / hand-off,
+        # which the extractor may name); with none, the case's own end node ends the call and nothing is rewritten.
+        ends = lambda n: bool(re.search(r"close|end_?call|hang_?up|finish|terminate", str(n).lower())) and "transfer" not in str(n).lower()
+        if want in names and ends(want):
+            return want
+        return next((n for n in sorted(n for n in names if n) if ends(n)), None)
     if want in names:
         return want
     return next((n for n in sorted(n for n in names if n) if "close" in n), None)
@@ -325,7 +334,8 @@ def apply(wf, canned):
         if _clean(l.get("tool")) and "succ" in str(l.get("outcome")).lower():
             by_tool.setdefault(_clean(l["tool"]), []).append(("success", _clean(l["text"])))
     goodbye, close_tool = _clean(canned.get("goodbye")), _clean(canned.get("close_tool"))
-    close_tool = _close_tool_name(wf, canned) or close_tool
+    real_close = _close_tool_name(wf, canned)
+    close_tool = real_close or close_tool
     for t in _all_tools(wf):
         fn = t.get("function") or {}
         name = fn.get("name")
@@ -340,7 +350,9 @@ def apply(wf, canned):
             block.append(f'- Opening (spoken automatically at the start; never repeat or rephrase it, never add to it): "{opening}"')
         for l in lines:
             block.append(f'- {_clean(l.get("when")).rstrip(".")}: "{_clean(l["text"])}"')
-        if goodbye:
+        if goodbye and not real_close:   # no tool ends the call: the documents' closing sentence is the agent's own
+            block.append(f'- Closing sentence, at the end of the call as the documents say: "{goodbye}"')
+        elif goodbye:
             block.append(f'- Goodbye: NOT yours. The system says it automatically after {close_tool or "the close tool"} succeeds; never say any goodbye yourself.')
         for g in canned.get("gated_words") or []:
             if isinstance(g, dict) and _clean(g.get("word")):

@@ -148,7 +148,7 @@ async def self_simulate(slot, tools, briefs, trace, wf_file, final_pass, options
     options = dataclasses.replace(options_base, skills=None, allowed_tools=["Read", "Edit", "Grep", "Bash"], max_turns=60)
     prompt = (f"You fix a Freya phone-agent workflow after a self-simulation. The workflow file is out/{slot}.workflow.json. "
               f"Brief files: {' '.join(briefs)}. Tool API file: {tools}. Docs: docs/. Test personas written from the brief talked to it; "
-              f"the record (scripts, transcripts) is out/{slot}.selftest1.json. These DETERMINISTIC checks on the bank's ledger failed (each persona was played twice):\n{fails}\n\n"
+              f"the record (scripts, transcripts) is out/{slot}.selftest1.json. These DETERMINISTIC checks (tool calls / ledger) failed (each persona was played twice):\n{fails}\n\n"
               "A tool result with ok=false is the bank refusing the call: fix what made the agent send it (for example an id that "
               "is not in the account tool's result, a call after the call was closed, a missing required field). "
               "First decide for each failure whether the BRIEF really requires the check for that customer's behaviour (a persona check "
@@ -376,9 +376,26 @@ async def run(slot, tools, briefs):
     calc = subprocess.run([sys.executable, str(KIT / "builder" / "datecalc.py"), "--slot", slot, "--tools", tools, *briefs],
                           cwd=KIT, capture_output=True, text=True, env={**os.environ, "BTB_TRACE": str(trace)})
     calc_file = KIT / "out" / f"{slot}.calc.json"
-    calc_ok = calc_file.exists() and json.loads(calc_file.read_text()).get("ok")
-    print(f"[test] datecalc: generated date/amount code run locally on 5 dates and fake products -> "
-          f"{'ok' if calc_ok else 'FAILED (build continues without code steps)'} ({time.time() - t_calc:.0f} s)", flush=True)
+    try:
+        calc_json = json.loads(calc_file.read_text()) if calc_file.exists() else {}
+    except Exception:  # noqa: BLE001
+        calc_json = {}
+    calc_ok = calc_json.get("ok")
+    calc_generic = calc_json.get("generic")
+    os.environ["BTB_COLLECTIONS"] = "0" if calc_generic else "1"   # gates the collections-only final-pass steps
+    print(f"[test] datecalc: " + (f"not a collections case: {len(calc_json.get('date_rules') or [])} date rule(s) of the documents"
+          f"{', calendar code node' if calc_json.get('code_node') else ''}" if calc_generic else
+          "generated date/amount code run locally on 5 dates and fake products -> "
+          f"{'ok' if calc_ok else 'FAILED (build continues without code steps)'}") + f" ({time.time() - t_calc:.0f} s)", flush=True)
+    if calc_generic and calc_json.get("code_node"):
+        prompt += (f" DATE FACTS (tested code, optional): {calc_file} holds a `code_node` that writes `date_facts` (today, a "
+                   "6-week calendar with weekdays and business days, and the documents' own date rules). If the case needs "
+                   "dates (offered weeks/days, next dates, due dates), put it in as a silent code node before the first node "
+                   "that needs dates (set its two '<NEXT NODE>' fields), do not edit its code, and put {{date_facts}} in that "
+                   "node's task_message with: 'Never compute a date yourself; look it up in DATE FACTS.'")
+    elif calc_generic and calc_json.get("date_rules"):
+        prompt += (" DATE RULES of the documents (write each into the node that applies it): "
+                   + "; ".join(str(r.get("rule")) for r in calc_json["date_rules"]))
     with trace.open("a") as out:
         out.write(json.dumps({"event": "test", "what": "datecalc: extract calendar/amount spec, generate code node + account hook, "
                               "run both locally on 5 dates and fake products", "ok": bool(calc_ok),
@@ -411,12 +428,16 @@ async def run(slot, tools, briefs):
         sit_proc.kill(); sit_err = "timeout"
     sys.path.insert(0, str(KIT / "builder"))
     import situations
+    if calc_generic and sit_file.exists():   # router/specialists are the collections recipe: not for other call types
+        sit_file.replace(sit_file.with_suffix(".skipped.json"))
+        print("[test] A1 situations: skipped (not a collections case: the case's own flow decides the stages)", flush=True)
     sit_spec = json.loads(sit_file.read_text()) if sit_file.exists() else None
     log(trace, event="test", what="A1: brief's situations after the account lookup extracted (router + specialist routes)",
         ok=bool(sit_spec), exits=[{"name": e["name"], "triggers": e.get("triggers"), "tools": e.get("tools"), "close": e.get("close"),
                                    "first_line": e.get("first_line"), "once_only": e.get("once_only"), "promise": e.get("promise_allowed")}
                                   for e in (sit_spec or {}).get("exits", [])], error=(sit_err or "")[-300:])
-    print(f"[test] A1 situations: {', '.join(e['name'] for e in (sit_spec or {}).get('exits', [])) or 'none (extraction failed)'}", flush=True)
+    if not calc_generic:
+        print(f"[test] A1 situations: {', '.join(e['name'] for e in (sit_spec or {}).get('exits', [])) or 'none (extraction failed)'}", flush=True)
     if sit_spec and sit_spec.get("exits"):
         prompt += ("\n\n" + situations.prompt_block(sit_spec) + "\nBefore every save run `python3 builder/situations.py check "
                    f"out/{slot}.workflow.json out/{slot}.situations.json` and fix each problem it lists (or, if the brief "
