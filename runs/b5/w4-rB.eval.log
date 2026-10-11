@@ -1,0 +1,14 @@
+  invalid rep PUB-12 (try 1): ['harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"12824312-b8d7-4017-a7e4-26e1eab3454d"}}}']
+FAIL PUB-11 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > create_promise > create_promise > create_promise > close_call
+       - [corrects] promises [('p2', 640.0, '2026-10-16'), ('p3', 75.0, '2026-10-16')], expected [('p1', 220.0, '2026-10-16'), ('p2', 640.0, '2026-10-16'), ('p3', 75.0, '2026-10-16')]
+       - [corrects] conversation: The one-create_promise-per-product check fails: multiple attempts were made for the loans, and the credit card promise failed with an unknown product_id and was never successfully recorded.
+       - [corrects] conversation: The one create_promise per product check failed: the agent made two attempts for each product, first with an unknown product ID and then with the correct ID.
+FAIL PUB-12 0/2 | verify_identity > verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > add_note > add_note > close_call
+       - [plain] conversation: The car loan received two persuasion attempts (140 dollars and then 50 dollars), but the early-band check requires exactly one.
+       - [in_words] conversation: No credit-card promise was successfully recorded, neither other product received a refused note, and the car loan had two persuasion attempts instead of one.
+FAIL PUB-13 1/2 | verify_identity > verify_identity > get_account > create_promise > create_promise > create_promise > create_promise > close_call
+       - [in_words] promises [('p1', 300.0, '2026-11-02'), ('p2', 900.0, '2026-10-23')], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]
+       - [in_words] conversation: The credit card was recorded for 2 November instead of 30 October, and the read-back named 2 November and 23 October rather than the required 30 October and 23 October.
+
+fast_eval: 0 / 3 passed (2 rep(s), all reps must pass), 2058 s
+harness: 0 case(s) still INVALID after 2 re-run(s) (not a measurement), 1 rep(s) re-run

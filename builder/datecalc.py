@@ -36,20 +36,58 @@ Extract ONLY what is needed to compute dates and amounts in code. Return JSON on
     "deadline_count": <integer N>,
     "deadline_unit": "business_days" | "calendar_days",
     "deadline_counts_today": <true if today counts as day 1, normally false: "the Nth business day after today">,
+    "if_not_business_day": "none" | "back" | "forward",  // the brief's rule when the counted day is not a business day:
+                          // "back" = moves to the last business day before it, "forward" = the next business day after it
     "attempts": <number of persuasion attempts in this band, or null>}
  ],
  "floors": [ // the minimum acceptable promise amount, per product type
    {"product_types": [<types, empty = all>], "field": "<product field holding the floor, or empty>",
     "percent_of_field": "<field the floor is a percentage of, or empty>", "percent": <number or null>,
-    "fixed": <number or null>, "min_amount": <number or null>, "note": "<the rule in a few words>"}
+    "fixed": <number or null>, "min_amount": <number or null>,
+    "round": "none" | "up" | "down" | "nearest",       // how the brief rounds the computed floor
+    "round_to": <the unit it rounds to, e.g. 1 for a whole unit, 0.01 for cents; null if no rounding rule>,
+    "note": "<the rule in a few words>"}
  ],
+ "promise_cutoff_time": "<HH:MM: from this time of day on, a promise for TODAY is no longer possible (earliest is the next
+                         business day); empty if the brief has no such rule>",
+ "promise_min_days_ahead": <earliest promise date = this many days after today (0 = today allowed); null if no rule>,
+ "promise_min_days_unit": "business_days" | "calendar_days",
+ "promise_dates_min_gap_days": <minimum calendar days between two dates promised in one call (e.g. two parts of a plan); null if no rule>,
  "callback": {"business_days_ahead": <0 = today only, 1 = today or next business day, ...; null if no rule>,
               "from": "HH:MM or empty", "to": "HH:MM or empty", "must_be_after_now": <true/false>},
  "next_weekday_rule": "following_week" | "nearest_upcoming" | "unspecified",   // what "next Friday" means
- "this_weekday_rule": "current_week" | "nearest_upcoming" | "unspecified"      // what "this Friday" means
+ "this_weekday_rule": "current_week" | "nearest_upcoming" | "unspecified",     // what "this Friday" means
+ "guards": {  // fields of the write tools, so code can check a value before it is recorded
+   "promise_tool": "<tool that records a payment promise, or empty>",
+   "promise_product_field": "<its body field holding the product id>",
+   "promise_amount_field": "<its body field holding the amount>",
+   "promise_date_field": "<its body field holding the promise date>",
+   "max_amount_field": "<product field holding the full amount owed (a promise above it is invalid), or empty>",
+   "promise_date_business_day": <true if the brief says a promise date must be a business day>,
+   "promise_date_not_before_today": <true if the brief says a promise date must be today or later>,
+   "promise_date_not_after_deadline": <true if the brief says a promise date must not be after the deadline>,
+   "promise_amount_at_least_floor": <true if the brief says an amount below the floor cannot be recorded>,
+   "promise_non_business_day_offer": "next" | "previous" | "none",  // what the brief says to offer when the customer names a
+                     // weekend/holiday: the next business day, the previous one, or no rule ("none")
+   "callback_tool": "<tool that books a callback, or empty>",
+   "callback_date_field": "<its body field holding the date>",
+   "callback_time_field": "<its body field holding the time HH:MM, or empty>"
+ },
+ "rule_coverage": [  // EVERY rule of the brief about dates, times, deadlines, callbacks, amounts, floors, limits, rounding,
+                     // gaps or counts (after memo overrides), one entry each. Never drop a rule because no key fits it.
+   {"rule": "<the rule, quoted from the brief>",
+    "computes": "date" | "time" | "amount" | "count" | "none",  // the value this rule makes the agent CALCULATE; "none" if it
+                     // only says what to ask, say, offer or do with values that are already known or computed
+    "encoded_as": "<the key(s) above that compute that value COMPLETELY, or UNHANDLED if none can (or only part of it).
+                   Besides the keys, the code also computes: today, tomorrow, the next business day, the last business day
+                   of this week / next week / this month, the this/next <weekday> table, and a calendar with the next
+                   business day for every day: name that anchor if the rule uses one>"}
+ ]
 }
 
-Use exact field names from the tool API file. Use exact values from the brief. Do not invent rules that are not there.
+Use exact field names from the tool API file. Use exact values from the brief. Do not invent rules that are not there:
+every optional rule key stays at its "none"/null/empty value unless the brief states that rule. A rule the keys cannot
+express is never forced into a wrong key and never left out: list it in rule_coverage as UNHANDLED.
 
 TOOL API FILE:
 {tools}
@@ -112,8 +150,51 @@ def band_for(p):
             continue
         return b
     return None
-def deadline_of(b, today):
+def prev_bd(d, include=False):
+    d = d if include else d - datetime.timedelta(days=1)
+    for _ in range(60):
+        if is_bd(d):
+            return d
+        d = d - datetime.timedelta(days=1)
+    return d
+def raw_deadline_of(b, today):
     return add_units(today, b.get('deadline_count'), b.get('deadline_unit'), bool(b.get('deadline_counts_today')))
+def deadline_of(b, today):
+    d = raw_deadline_of(b, today)
+    r = str(b.get('if_not_business_day') or 'none').lower()
+    if r == 'back' and not is_bd(d):
+        return prev_bd(d)
+    if r == 'forward' and not is_bd(d):
+        return next_bd(d)
+    return d
+def round_amt(amt, r):
+    mode = str(r.get('round') or 'none').lower()
+    unit = num(r.get('round_to'))
+    if mode not in ('up', 'down', 'nearest') or not unit or unit <= 0:
+        return amt
+    import math
+    q = amt / unit
+    q = round(q, 6)
+    q = math.ceil(q) if mode == 'up' else (math.floor(q) if mode == 'down' else math.floor(q + 0.5))
+    return round(q * unit, 2)
+def hm_of(now):
+    s = str(now or '')
+    return s[11:16] if len(s) >= 16 and s[13] == ':' else ''
+def earliest_promise(now):
+    t = today_of(now)
+    n = SPEC.get('promise_min_days_ahead')
+    e = t
+    if n is not None and int(n) > 0:
+        e = add_units(t, int(n), SPEC.get('promise_min_days_unit') or 'calendar_days')
+    co = str(SPEC.get('promise_cutoff_time') or '')[:5]
+    hm = hm_of(now)
+    if co and hm and e == t and hm >= co:
+        e = next_bd(t)
+    return e
+def unhandled_rules():
+    return [str(r.get('rule')) for r in (SPEC.get('rule_coverage') or [])
+            if isinstance(r, dict) and 'UNHANDLED' in str(r.get('encoded_as') or '').upper()
+            and str(r.get('computes') or '').lower() in ('date', 'time', 'amount')]   # counts (asks, attempts) stay with the conversation rules
 def floor_for(p):
     tf = SPEC.get('type_field') or ''
     for r in SPEC.get('floors') or []:
@@ -131,7 +212,7 @@ def floor_for(p):
             continue
         if r.get('min_amount') is not None:
             amt = max(amt, float(r['min_amount']))
-        return amt
+        return round_amt(amt, r)
     return None
 def build_facts(now, only_bands=None):
     t = today_of(now)
@@ -165,9 +246,21 @@ def build_facts(now, only_bands=None):
             cond.append(str(SPEC.get('band_field')) + ' ' + str(b.get('min')) + ' to ' + str(b.get('max')))
         if only_bands is not None and str(b.get('name')) not in only_bands:
             continue                         # after the account loads: only this customer's own bands
+        raw = raw_deadline_of(b, t)
+        moved = '' if raw == dl else (' (' + str(b.get('deadline_count')) + ' ' + str(b.get('deadline_unit')).replace('_', ' ') +
+                                      ' after today is ' + fmt(raw) + ', not a business day, so the deadline moves ' +
+                                      ('back' if dl < raw else 'forward') + ' to ' + fmt(dl) + ')')
         L.append('DEADLINE for band "' + str(b.get('name')) + '" (' + ', '.join(cond) + '): ' + fmt(dl) +
-                 ' = ' + str(b.get('deadline_count')) + ' ' + str(b.get('deadline_unit')).replace('_', ' ') + ' after today' +
+                 (' = ' + str(b.get('deadline_count')) + ' ' + str(b.get('deadline_unit')).replace('_', ' ') + ' after today' if not moved else moved) +
                  ('' if b.get('attempts') is None else '; persuasion attempts: ' + str(b.get('attempts'))))
+    ep = earliest_promise(now)
+    if ep != t or SPEC.get('promise_cutoff_time'):
+        co = str(SPEC.get('promise_cutoff_time') or '')[:5]
+        L.append('EARLIEST PROMISE DATE: ' + fmt(ep) + ('  <- today is NOT possible' if ep != t else '  (today is still possible)') +
+                 ((' (a promise for today only before ' + co + '; now is ' + (hm_of(now) or '?') + ')') if co else ''))
+    if SPEC.get('promise_dates_min_gap_days') is not None:
+        L.append('GAP: two dates promised in this call must be at least ' + str(SPEC.get('promise_dates_min_gap_days')) +
+                 ' calendar days apart (count it in CALENDAR).')
     cb = SPEC.get('callback') or {}
     if cb.get('business_days_ahead') is not None:
         days = [t]
@@ -192,6 +285,11 @@ def build_facts(now, only_bands=None):
         if nr not in ('following_week', 'nearest_upcoming'):
             s += ', nearest upcoming = ' + upcoming.isoformat()
         L.append(s)
+    un = unhandled_rules()
+    if un:
+        L.append('RULES NOT COMPUTED IN CODE (no code step covers them; apply each one yourself, exactly as the brief says):')
+        for r in un:
+            L.append('  - ' + r)
     horizon = max(dls or [t + datetime.timedelta(days=14)]) + datetime.timedelta(days=3)
     L.append('CALENDAR (look a date up here; never compute dates yourself):')
     d = t
@@ -310,7 +408,54 @@ def selftest(spec, node_code, hook_code):
         if "deadline" not in p:
             probs.append(f"hook gave no deadline for {p}")
     v["date_facts"] = last.get("date_facts")
+    probs += rule_tests(spec, node_code)
     return probs, v
+
+
+def rule_tests(spec, code):
+    """Local tests of the extra rule kinds (deadline roll, floor rounding, cut-off, minimum gaps): each rule the spec
+    switches on must change the computed value the way it says, on many days. Returns a list of problems."""
+    g = {"vars": {}}
+    exec(code.split("\ntry:\n    t, f = build_facts")[0], g)      # the LIB part only
+    probs = []
+    start = datetime.date.today()
+    for b in spec.get("bands") or []:
+        r = str(b.get("if_not_business_day") or "none").lower()
+        for k in range(21):
+            t = start + datetime.timedelta(days=k)
+            raw, dl = g["raw_deadline_of"](b, t), g["deadline_of"](b, t)
+            ok = {"back": dl <= raw and g["is_bd"](dl) and all(not g["is_bd"](raw - datetime.timedelta(days=i)) for i in range((raw - dl).days)),
+                  "forward": dl >= raw and g["is_bd"](dl)}.get(r, dl == raw)
+            if not ok:
+                probs.append(f"deadline roll '{r}' wrong for band {b.get('name')} today {t}: raw {raw}, got {dl}")
+                break
+    for fr in spec.get("floors") or []:
+        mode, unit = str(fr.get("round") or "none").lower(), fr.get("round_to")
+        if mode in ("up", "down", "nearest") and unit:
+            for x in (100.0, 100.3, 387.5, 12.01):
+                y = g["round_amt"](x, fr)
+                q = y / float(unit)
+                if abs(q - round(q)) > 1e-6 or (mode == "up" and y < x - 1e-9) or (mode == "down" and y > x + 1e-9) or abs(y - x) >= float(unit) + 1e-9:
+                    probs.append(f"floor rounding '{mode}' to {unit} wrong: {x} -> {y}")
+                    break
+    co = str(spec.get("promise_cutoff_time") or "")[:5]
+    if co:
+        for k in range(7):
+            t = start + datetime.timedelta(days=k)
+            before = g["earliest_promise"](t.isoformat() + "T00:01")
+            after = g["earliest_promise"](t.isoformat() + "T" + co)
+            if after <= t or after < before:
+                probs.append(f"cut-off {co} not applied on {t}: earliest before {before}, from cut-off on {after}")
+                break
+    n = spec.get("promise_min_days_ahead")
+    if n:
+        e = g["earliest_promise"](start.isoformat() + "T00:01")
+        if (e - start).days < int(n):
+            probs.append(f"promise_min_days_ahead {n} not applied: earliest {e}")
+    for r in spec.get("rule_coverage") or []:
+        if not isinstance(r, dict) or not r.get("rule"):
+            probs.append(f"rule_coverage entry without a rule: {r}")
+    return probs
 
 
 def main():
@@ -324,7 +469,7 @@ def main():
     for attempt in range(2):
         try:
             spec = chat_json([{"role": "user", "content": prompt}], tier="strong", purpose="extract calendar/amount spec for code steps",
-                             max_tokens=4000, effort="medium")
+                             max_tokens=9000, effort="medium")
             node_code, hook_code = snippet(spec, NODE_CODE), snippet(spec, HOOK_CODE)
             probs, v = selftest(spec, node_code, hook_code)
             if not probs:
@@ -345,11 +490,15 @@ def main():
                                                                           "timeout_ms": {"type": "number", "default": 10000}}}}}],
         "transitions": [{"target_node": "<NEXT NODE>", "description": "always", "condition": {"operator": "always"}}],
     }
-    out.write_text(json.dumps({"ok": True, "spec": spec, "code_node": node, "account_tool": spec.get("account_tool"),
+    unhandled = [str(r.get("rule")) for r in spec.get("rule_coverage") or []
+                 if isinstance(r, dict) and "UNHANDLED" in str(r.get("encoded_as") or "").upper()
+                 and str(r.get("computes") or "").lower() in ("date", "time", "amount")]
+    out.write_text(json.dumps({"ok": True, "spec": spec, "unhandled_rules": unhandled, "code_node": node, "account_tool": spec.get("account_tool"),
                                "account_post_process_code": hook_code, "example_date_facts": v.get("date_facts"),
                                "example_product_facts": v.get("product_facts")}, indent=1))
     print(f"datecalc: ok -> {out}")
-    print(json.dumps(spec, indent=1))
+    print(json.dumps({k: v for k, v in spec.items() if k != "rule_coverage"}, indent=1))
+    print(f"datecalc: rule coverage {len(spec.get('rule_coverage') or [])} rules; NOT computed in code (in DATE FACTS for the model): {unhandled}")
 
 
 if __name__ == "__main__":
