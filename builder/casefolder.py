@@ -326,7 +326,7 @@ def prepare(folder, mock_url, slot):
         if contract_txt is None:
             raise SystemExit(f"case folder {folder}: no service contract (OpenAPI json/yaml or a contract text) found")
         print(f"case: service contract {contract_txt.name} is not OpenAPI JSON: converting it (Azure)", flush=True)
-        cached = out / "tools.json"
+        cached = KIT / "runs" / "case" / slot / "tools.json"
         if os.environ.get("BTB_REUSE_PREP") == "1" and cached.exists():
             print(f"case: reusing the converted contract of the previous run ({cached})", flush=True)
             api = json.loads(cached.read_text())
