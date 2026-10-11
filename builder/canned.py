@@ -18,7 +18,7 @@
      no outcome was recorded (seen on official runs). Close -> hang-up routes test ok only, never success_count (M19);
    - all lines -> a FIXED SENTENCES block in `system_prompt` (seen in every node), with when each is due.
 """
-import argparse, json, pathlib, re, sys
+import argparse, json, os, pathlib, re, sys
 
 KIT = pathlib.Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(KIT / "btb"))
@@ -90,6 +90,9 @@ def extract(slot, tools, briefs, variables=("customer_id", "first_name", "last_n
     brief = "\n\n".join(f"===== {b} =====\n" + pathlib.Path(b).read_text() for b in briefs)
     tool_txt = pathlib.Path(tools).read_text()[:30000]
     prompt = fill_prompt(PROMPT.replace("VARS", ", ".join(variables)), tool_txt, brief)
+    if os.environ.get("BTB_LANGUAGE"):   # spoken texts in the case's language; quotes stay verbatim
+        prompt += (f"\nLANGUAGE: the agent speaks {os.environ['BTB_LANGUAGE']}: every text (opening, lines, goodbye) is in "
+                   f"{os.environ['BTB_LANGUAGE']}; a quoted sentence is copied verbatim in its original language, never translated.")
     spec = chat_json([{"role": "user", "content": prompt}], tier="strong", purpose="A3: extract the brief's mandatory sentences as fixed text",
                      max_tokens=3000, effort="medium")
     spec = resolve_conflicts(spec)
@@ -203,6 +206,15 @@ def _clean(s):
 DEFAULT_GOODBYE = "Thank you for your time. Goodbye."
 
 
+def default_goodbye():
+    """The platform's spoken goodbye when the brief gives none: in the case's language (BTB_LANGUAGE)."""
+    try:
+        from casefolder import GOODBYES
+        return GOODBYES.get(os.environ.get("BTB_LANGUAGE") or "English", DEFAULT_GOODBYE)
+    except ImportError:
+        return DEFAULT_GOODBYE
+
+
 def _close_tool_name(wf, canned):
     names = {(t.get("function") or {}).get("name") for t in _all_tools(wf)}
     want = _clean((canned or {}).get("close_tool"))
@@ -245,7 +257,7 @@ def close_structure(wf, canned=None):
     if not close:
         return []
     done = []
-    goodbye = _clean((canned or {}).get("goodbye")) or DEFAULT_GOODBYE
+    goodbye = _clean((canned or {}).get("goodbye")) or default_goodbye()
     ends = {k for k, n in nodes.items() if n.get("node_type") == "end_call"}
     close_ends = set()
     for k, n in nodes.items():

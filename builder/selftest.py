@@ -333,7 +333,7 @@ def _run_one(workflow_id, sc, lib):
                 err = f"chat stopped at the {CHAT_S} s limit after {len(turns) // 2} turns (platform load)"
                 break
             hist += [{"role": "user", "content": agent or "(silence)"}]
-            msg = chat([{"role": "system", "content": persona}] + hist, tier="fast", purpose="self-simulation: persona turn",
+            msg = chat([{"role": "system", "content": persona + _lang_note()}] + hist, tier="fast", purpose="self-simulation: persona turn",
                        max_tokens=150, temperature=0.6)
             hist += [{"role": "assistant", "content": msg}]
     except Exception as e:  # noqa: BLE001
@@ -488,3 +488,8 @@ if __name__ == "__main__":
     print(json.dumps({k: res[k] for k in ("where", "n", "n_failed", "n_checks_failed")}))
     if a.out:
         json.dump({"personas": sc, **res}, open(a.out, "w"), indent=1, default=str)
+
+
+def _lang_note():
+    lang = os.environ.get("BTB_LANGUAGE")
+    return f"\nSpeak {lang} (the agent's language)." if lang and lang != "English" else ""

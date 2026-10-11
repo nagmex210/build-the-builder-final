@@ -5,7 +5,7 @@
   talk is not an action category.
 Idempotent.
 """
-import pathlib, re
+import os, pathlib, re
 
 INTENT_GUARD = ("Only an explicit statement in the customer's own words counts. A question back (for example whether a "
                 "date or amount could be different, why, or what happens if), small talk, hesitation or thinking aloud is "
@@ -20,6 +20,13 @@ def robustify(wf):
     if ROBUST.splitlines()[0] not in sp:
         wf["system_prompt"] = (sp.rstrip() + "\n\n" + ROBUST).strip()
         changed = True
+    lang = os.environ.get("BTB_LANGUAGE")
+    if lang and lang != "English":
+        line = (f"LANGUAGE: speak {lang} only. The quoted examples above are English illustrations: say their meaning "
+                f"in {lang} (never English). Sentences quoted from the bank's documents are said verbatim.")
+        if line not in wf["system_prompt"]:
+            wf["system_prompt"] = wf["system_prompt"].rstrip() + "\n" + line
+            changed = True
     for node in (wf.get("nodes") or {}).values():
         # A conversation node with a silent on_enter says nothing when entered and waits for the user: the customer's
         # turn that routed there gets no reply (seen b2 merge: identity node silent, every chat turn timed out).

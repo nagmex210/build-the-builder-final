@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # One submission run: build -> export -> scrub -> summary. Works from any cwd.
 #
+#   bash btb/submit.sh <case_folder> <mock_url> [name]     (final format; name default: final)
 #   bash btb/submit.sh <brief.md> <tool_api.json> [name]
 #
 # name (default: the brief's file name) is the slot on Freya, so two runs on different briefs in parallel use
@@ -13,10 +14,18 @@ set -uo pipefail
 # submission fail with a syntax error after the build (seen b10). The whole body is one block, parsed before it starts.
 {
 KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-[ $# -ge 2 ] || { echo "usage: bash btb/submit.sh <brief.md> <tool_api.json> [name]" >&2; exit 2; }
-BRIEF="$(realpath "$1")"; TOOLS="$(realpath "$2")"
-NAME="${3:-$(basename "${BRIEF%.*}")}"
-[ -f "$BRIEF" ] && [ -f "$TOOLS" ] || { echo "brief or tool API file not found" >&2; exit 2; }
+[ $# -ge 2 ] || { echo "usage: bash btb/submit.sh <case_folder> <mock_url> [name]  |  <brief.md> <tool_api.json> [name]" >&2; exit 2; }
+if [ -d "$1" ]; then
+  # final format: python3 builder/build.py {case_folder} {mock_url}; name default: final
+  CASE="$(realpath "$1")"; MOCK="$2"; NAME="${3:-final}"
+  case "$MOCK" in http://*|https://*) ;; *) echo "mock_url must be an http(s) URL" >&2; exit 2;; esac
+  BUILD_ARGS=(--slot "$NAME" "$CASE" "$MOCK"); BRIEF="$CASE"; TOOLS="(from the case folder) mock=$MOCK"
+else
+  BRIEF="$(realpath "$1")"; TOOLS="$(realpath "$2")"
+  NAME="${3:-$(basename "${BRIEF%.*}")}"
+  [ -f "$BRIEF" ] && [ -f "$TOOLS" ] || { echo "brief or tool API file not found" >&2; exit 2; }
+  BUILD_ARGS=(--slot "$NAME" "$BRIEF" "$TOOLS")
+fi
 
 # Keys: use the environment, else the box's Parameter Store (same names as the workers' run scripts).
 ssm() { aws ssm get-parameter --region eu-central-1 --name "$1" --with-decryption --query Parameter.Value --output text; }
@@ -39,9 +48,9 @@ T0=$(date +%s)
 {
   echo "submit: brief=$BRIEF tools=$TOOLS name=$NAME"
   echo "submit: builder commit $COMMIT$(git -C "$KIT" diff --quiet HEAD 2>/dev/null || echo ' (+ uncommitted changes)')"
-  echo "submit: command: python3 builder/build.py --slot $NAME $BRIEF $TOOLS"
+  echo "submit: command: python3 builder/build.py ${BUILD_ARGS[*]}"
 } | tee "$LOG"
-"$PY" -u "$KIT/builder/build.py" --slot "$NAME" "$BRIEF" "$TOOLS" 2>&1 | tee -a "$LOG"
+"$PY" -u "$KIT/builder/build.py" "${BUILD_ARGS[@]}" 2>&1 | tee -a "$LOG"
 RC=${PIPESTATUS[0]}
 T1=$(date +%s); SECS=$((T1 - T0))
 

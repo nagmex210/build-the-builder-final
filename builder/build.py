@@ -13,7 +13,7 @@ customer-speech block, lint) and one last save. Then a self-simulation (builder/
 written from the brief play against the saved workflow in Freya workspace 2, judged only by deterministic ledger /
 tool-order / date-amount checks; one fix round as an EDIT with the exact failed checks; re-test; ship the better one.
 """
-import argparse, asyncio, dataclasses, json, os, pathlib, subprocess, sys, threading, time
+import argparse, asyncio, dataclasses, json, os, pathlib, re, subprocess, sys, threading, time
 
 from claude_agent_sdk import (AssistantMessage, ClaudeAgentOptions, ResultMessage, TextBlock, ToolResultBlock, ToolUseBlock,
                               UserMessage, query)
@@ -347,6 +347,13 @@ async def run(slot, tools, briefs):
               f"Time limit: you have {BUDGET_S // 60} minutes in total, then you are stopped. Save a complete first version "
               f"early (within about 10 minutes), then improve and re-save. Build from the brief: never start from an earlier "
               f"workflow or generator script (if you write a generator, name it out/{slot}.gen.py). Live chat tests: a few turns only, no waiting loops.")
+    if os.environ.get("BTB_LANGUAGE"):
+        sys.path.insert(0, str(KIT / "builder"))
+        import casefolder
+        prompt += " " + casefolder.language_instruction(os.environ["BTB_LANGUAGE"])
+    if os.environ.get("BTB_MOCK_URL"):
+        prompt += (f" BANK SERVICES URL: every api_call tool's url must start with {os.environ['BTB_MOCK_URL']} (the mock of the "
+                   "bank's services, servers[0].url of the tool API file) followed by the operation's path; never another host.")
     # Every build starts from no workflow file: the inner Claude would otherwise edit the previous build's file and keep
     # its old hook blocks (harden/robust do not replace a block they already find), and a failed Claude run would ship it.
     old_wf = KIT / "out" / f"{slot}.workflow.json"
@@ -461,6 +468,12 @@ async def run(slot, tools, briefs):
             names, saved = finish_and_save(slot, wf)
             wf_file.write_text(json.dumps(wf, indent=1))
             errs, warns = lint(wf)
+            mock = os.environ.get("BTB_MOCK_URL_GIVEN") or os.environ.get("BTB_MOCK_URL")
+            if mock:
+                from save import api_urls
+                bad = [f"{n}: {u}" for n, u in api_urls(wf) if not (u == mock or u.startswith(mock + "/"))]
+                errs = errs + [f"api_call url not on the mock url {mock}: {b}" for b in bad]
+                print(f"[test] mock url ({tag}): {len(api_urls(wf)) - len(bad)}/{len(api_urls(wf))} api_call urls start with {mock}", flush=True)
             try:
                 from hookcheck import errors as hook_errors
                 errs = errs + hook_errors(wf)
@@ -568,13 +581,33 @@ async def run(slot, tools, briefs):
 
 
 def parse_args():
-    """Submission form: build.py <brief.md> <tool_api.json>. Also: build.py [--slot S] [--tools T] <brief.md>...
-    A positional ending in .json is the tool API file; the slot defaults to the last brief's file name."""
+    """Final form: build.py <case_folder> [<mock_url>]. Submission form: build.py <brief.md> <tool_api.json>.
+    Also: build.py [--slot S] [--tools T] <brief.md>... A positional ending in .json is the tool API file; the slot
+    defaults to the case folder's or the last brief's name. A positional that is a URL is the mock URL."""
     ap = argparse.ArgumentParser()
-    ap.add_argument("--slot"); ap.add_argument("--tools"); ap.add_argument("paths", nargs="+")
+    ap.add_argument("--slot"); ap.add_argument("--tools"); ap.add_argument("--mock-url"); ap.add_argument("paths", nargs="+")
     a = ap.parse_args()
-    jsons = [p for p in a.paths if p.lower().endswith(".json")]
-    briefs = [p for p in a.paths if not p.lower().endswith(".json")]
+    urls = [p for p in a.paths if re.match(r"^https?://", p)]
+    paths = [p for p in a.paths if p not in urls]
+    mock_url = (a.mock_url or (urls[0] if urls else "")).rstrip("/") or None
+    if mock_url:
+        os.environ["BTB_MOCK_URL_GIVEN"] = mock_url    # the final pass asserts every api_call url starts with it
+    if paths and pathlib.Path(paths[0]).is_dir():
+        sys.path.insert(0, str(KIT / "builder"))
+        import casefolder
+        folder = pathlib.Path(paths[0]).resolve()
+        slot = a.slot or re.sub(r"[^A-Za-z0-9_-]+", "-", folder.name).strip("-") or "final"
+        brief, tools, lang = casefolder.prepare(folder, mock_url, slot)
+        if a.tools:     # an explicit contract wins; it gets the mock server too
+            api = casefolder.set_server(json.loads(pathlib.Path(a.tools).read_text()), mock_url)
+            pathlib.Path(tools).write_text(json.dumps(api, indent=1, ensure_ascii=False))
+        print(f"case folder: {folder} -> brief {brief}, tool API {tools}, language {lang}, mock url {mock_url}", flush=True)
+        os.environ["BTB_LANGUAGE"] = lang
+        if mock_url:   # the resolved base (the mock URL, plus the contract's path prefix if the mock needs it)
+            os.environ["BTB_MOCK_URL"] = json.loads(pathlib.Path(tools).read_text())["servers"][0]["url"].rstrip("/")
+        return slot, tools, [brief]
+    jsons = [p for p in paths if p.lower().endswith(".json")]
+    briefs = [p for p in paths if not p.lower().endswith(".json")]
     if len(jsons) > 1 or (jsons and a.tools):
         ap.error("give exactly one tool API file (a .json positional or --tools)")
     if not briefs:
@@ -586,6 +619,18 @@ def parse_args():
     # Absolute paths: the build agent and datecalc run with cwd=KIT, the caller may not.
     tools, briefs = str(pathlib.Path(tools).resolve()), [str(pathlib.Path(b).resolve()) for b in briefs]
     slot = a.slot or pathlib.Path(briefs[-1]).stem
+    if mock_url:
+        sys.path.insert(0, str(KIT / "builder"))
+        import casefolder
+        t2 = KIT / "runs" / "case" / slot / "tools.json"
+        t2.parent.mkdir(parents=True, exist_ok=True)
+        t2.write_text(json.dumps(casefolder.set_server(json.loads(pathlib.Path(tools).read_text()), mock_url), indent=1, ensure_ascii=False))
+        tools = str(t2)
+        os.environ["BTB_MOCK_URL"] = json.loads(t2.read_text())["servers"][0]["url"].rstrip("/")
+    if not os.environ.get("BTB_LANGUAGE"):
+        sys.path.insert(0, str(KIT / "builder"))
+        import casefolder
+        os.environ["BTB_LANGUAGE"] = casefolder.detect_language("\n".join(pathlib.Path(b).read_text(errors="replace") for b in briefs))
     return slot, tools, briefs
 
 

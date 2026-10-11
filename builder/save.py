@@ -59,8 +59,66 @@ def intent_conditions(wf):
     return fixed
 
 
+def api_tools(wf):
+    for node in (wf.get("nodes") or {}).values():
+        for key in ("tools", "pre_actions"):
+            for t in node.get(key) or []:
+                yield t
+    for t in wf.get("tools") or []:
+        yield t
+
+
+def api_urls(wf):
+    """(tool name, url default) of every api_call tool of the workflow."""
+    out = []
+    for t in api_tools(wf):
+        fn = t.get("function") or {}
+        if fn.get("handler") == "__function__:api_call":
+            u = (((fn.get("parameters") or {}).get("properties") or {}).get("url") or {})
+            out.append((fn.get("name"), str(u.get("default") or "")))
+    return out
+
+
+def pin_mock_url(wf, mock_url=None):
+    """Final format: every api_call tool calls the mock of the bank's services (BTB_MOCK_URL). A url on another base
+    (the contract's original server, a placeholder) keeps its operation path and gets the mock base. Returns fixes."""
+    import urllib.parse as up
+    mock_url = (mock_url or os.environ.get("BTB_MOCK_URL") or "").rstrip("/")
+    if not mock_url:
+        return []
+    mp = up.urlparse(mock_url).path.rstrip("/")
+    orig = ""
+    try:
+        orig = up.urlparse(json.loads(pathlib.Path(os.environ.get("BTB_TOOLS_API") or "").read_text())
+                           .get("info", {}).get("x-original-server") or "").path.rstrip("/")
+    except Exception:  # noqa: BLE001
+        pass
+    fixed = []
+    for t in api_tools(wf):
+        fn = t.get("function") or {}
+        if fn.get("handler") != "__function__:api_call":
+            continue
+        u = ((fn.get("parameters") or {}).get("properties") or {}).get("url")
+        if not isinstance(u, dict):
+            continue
+        cur = str(u.get("default") or "")
+        given = (os.environ.get("BTB_MOCK_URL_GIVEN") or mock_url).rstrip("/")
+        if any(cur == b or cur.startswith(b + "/") for b in (mock_url, given)):
+            continue          # on the mock (a guard's no-op path on the mock host included)
+        pu = up.urlparse(cur)
+        path = pu.path if pu.scheme else ("/" + cur.lstrip("/"))
+        for pre in (mp, orig):
+            if pre and path.startswith(pre + "/"):
+                path = path[len(pre):]
+                break
+        u["default"] = mock_url + path + (("?" + pu.query) if pu.query else "")
+        fixed.append(f"{fn.get('name')}: {cur} -> {u['default']}")
+    return fixed
+
+
 def finish_and_save(slot, wf, canned=None):
     names = ["intent-condition:" + f for f in intent_conditions(wf)]
+    names += ["mock-url:" + f for f in pin_mock_url(wf)]
     api = os.environ.get("BTB_TOOLS_API")
     if api and pathlib.Path(api).exists():          # the build agent can drop a required field (b5: customer_id everywhere)
         from apicheck import repair
@@ -82,6 +140,7 @@ def finish_and_save(slot, wf, canned=None):
     sit = KIT / "out" / f"{slot}.situations.json"   # A1: specialist first lines / once-only / silent hand-off
     if sit.exists():
         names = names + apply_situations(wf, json.loads(sit.read_text()))
+    names += ["mock-url:" + f for f in pin_mock_url(wf)]   # tools added by the passes above too
     # Lock the shared slot file: two builds running in parallel (two briefs) must not overwrite each other's slot.
     state = locked_save(slot, wf, KIT / ".freya-agents.json")
     return names, state
