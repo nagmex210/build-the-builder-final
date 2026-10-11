@@ -147,12 +147,52 @@ def contract_from_text(path):
     prompt = ("Convert this service contract of a bank (the tool API a phone agent calls) into one OpenAPI 3.0 JSON "
               "document: every operation with its method, path, operationId, summary/description (keep the contract's "
               "own explanations, any language), requestBody schema with required fields and descriptions, and "
-              "response schemas. Keep names exactly as in the contract. Answer with the JSON only.\n\nCONTRACT ("
+              "response schemas. Keep names exactly as in the contract. servers[0].url is the contract's base address "
+              "INCLUDING its path (e.g. https://host/some/v1/); paths are relative to it, exactly as the contract names "
+              "them. The requestBody schema must contain EVERY field of the contract's example request for that "
+              "operation, nested exactly as in the example (e.g. an envelope object holding the service fields), with "
+              "the example values as `example`. Leave out authentication/token endpoints: the phone agent never calls "
+              "them (auth is not part of the tool). Answer with the JSON only.\n\nCONTRACT ("
               + path.name + "):\n" + path.read_text(errors="replace"))
-    txt = chat([{"role": "user", "content": prompt}], purpose="case folder: service contract -> OpenAPI JSON", max_tokens=16000)
-    txt = txt if isinstance(txt, str) else str(txt)
-    m = re.search(r"\{.*\}", txt, re.S)
-    return json.loads(m.group(0))
+    api = None
+    for attempt in range(3):
+        txt = chat([{"role": "user", "content": prompt}], purpose="case folder: service contract -> OpenAPI JSON"
+                   + (f" (repair {attempt})" if attempt else ""), max_tokens=24000)
+        txt = txt if isinstance(txt, str) else str(txt)
+        m = re.search(r"\{.*\}", txt, re.S)
+        try:
+            api = json.loads(m.group(0))
+        except Exception:  # noqa: BLE001
+            continue
+        drop_auth(api)
+        empty = [f"{meth.upper()} {pth}" for pth, ops in (api.get("paths") or {}).items() if isinstance(ops, dict)
+                 for meth, op in ops.items() if isinstance(op, dict) and not _body_fields(op)]
+        if not empty:
+            break
+        print(f"case: converted contract has operations without request fields: {empty}; asking again", flush=True)
+        prompt += ("\n\nYOUR PREVIOUS ANSWER left these operations without any requestBody fields: " + ", ".join(empty)
+                   + ". Every operation's example request in the contract has fields: include them all.")
+    return api
+
+
+def _body_fields(op):
+    """All property names in an operation's JSON request body schema (nested)."""
+    sch = (((op.get("requestBody") or {}).get("content") or {}).get("application/json") or {}).get("schema") or {}
+    out, stack = [], [sch]
+    while stack:
+        x = stack.pop()
+        if isinstance(x, dict):
+            out += list((x.get("properties") or {}).keys())
+            stack += list((x.get("properties") or {}).values()) + [x.get("items")]
+    return out
+
+
+def drop_auth(api):
+    """The phone agent never calls an auth/token endpoint: remove it from the tools (it is gateway plumbing)."""
+    for pth in list((api.get("paths") or {})):
+        if re.search(r"oauth|/token\b|/auth\b|/login\b", pth, re.I):
+            api["paths"].pop(pth)
+    return api
 
 
 def _status(url):
@@ -174,12 +214,15 @@ def resolve_base(api, mock_url):
     mock_url = mock_url.rstrip("/")
     old = ((api.get("servers") or [{}])[0] or {}).get("url") or ""
     op = up.urlparse(old).path.rstrip("/")
-    paths = list(api.get("paths") or {})
+    paths = [p for p in (api.get("paths") or {}) if not re.search(r"oauth|/token\b|/auth\b|/login\b", p, re.I)]
     if op and not up.urlparse(mock_url).path.strip("/") and paths:
-        first = "/" + paths[0].split("{")[0].strip("/")
-        a, b = _status(mock_url + first), _status(mock_url + op + first)
-        if a == 404 and b not in (None, 404):
-            print(f"case: {mock_url}{first} answers 404, {mock_url}{op}{first} answers {b}: tools use {mock_url}{op}", flush=True)
+        root = with_base = 0                       # majority over up to 4 operations, so one odd path cannot decide
+        for pth in paths[:4]:
+            first = "/" + pth.split("{")[0].strip("/")
+            a, b = _status(mock_url + first), _status(mock_url + op + first)
+            root += a not in (None, 404); with_base += b not in (None, 404)
+        if with_base > root:
+            print(f"case: the mock answers under {op} ({with_base} of {min(4, len(paths))} operations): tools use {mock_url}{op}", flush=True)
             return mock_url + op
     return mock_url
 
