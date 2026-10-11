@@ -293,7 +293,7 @@ def check_amount(_pid, _p, _as, vars):
                 ' (the brief\'s floor, already rounded the brief\'s way). If the brief lets you offer a lower amount now, offer exactly ' + _fa(_fl) +
                 ' (never a smaller, round or other figure, never "any amount") and only as often as the brief allows. '
                 'Your offer of it COUNTS AS the offer of the lowest amount for this product: after you named it once, never offer or suggest '
-                'it again (also not when the customer hesitates or asks what you suggest); ask for their yes or no, and if it is no, '
+                'it again (also not when the customer hesitates or asks what you suggest) unless the brief explicitly allows a repeat; ask for their yes or no, and if it is no, '
                 'follow the brief\'s next step.')
 try:
     _gb = config.get('body') if isinstance(config, dict) else None
