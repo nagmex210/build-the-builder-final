@@ -119,6 +119,8 @@ def write_personas(briefs_text, tools_path, cases_file, n):
                 if not isinstance(c, dict):
                     continue
                 ts = [c.get(k) for k in ("must_call", "must_not_call", "tool", "before", "after", "max_calls") if c.get(k)]
+                if "max_calls" in c and not isinstance(c.get("n", 1), int):   # n=None crashed check_ledger (persona dropped)
+                    continue
                 if ts and all(t in names for t in ts) and (("tool" not in c) or ("arg" in c and "equals" in c)):
                     ok.append(c)
             out.append({**s, "checks": ok, "cust": by[s["customer"]]})
@@ -282,7 +284,7 @@ def ledger(cid):
             return http("/v1/practice/ledger/" + cid)
         except Exception:  # noqa: BLE001
             time.sleep(2 + 2 * attempt)
-    return {}
+    return None   # unreadable: a harness error, not an agent with no calls (was {} -> "close_call called 0 times")
 
 
 def session(case_id):
@@ -317,7 +319,7 @@ def _run_one(workflow_id, sc, lib):
             call_id = r.get("callId") or call_id
             agent = (r.get("response") or "").strip()
             turns += [("customer", msg), ("agent", agent)]
-            led = ledger(sess["customer_id"])
+            led = ledger(sess["customer_id"]) or {}
             ok_tools.append({c["tool"] for c in led.get("calls") or [] if not _failed(c)})
             id_passed.append(any(c["tool"] == "verify_identity" and isinstance(c.get("result"), dict)
                                  and any(any(w in str(k).lower() for w in ("verif", "pass", "correct", "match", "valid", "confirm", "success"))
@@ -338,7 +340,7 @@ def _run_one(workflow_id, sc, lib):
     except Exception as e:  # noqa: BLE001
         err = str(e)[:200]
     if call_id:
-        now_calls = ledger(sess["customer_id"]).get("calls") or []
+        now_calls = (ledger(sess["customer_id"]) or {}).get("calls") or []
         if not now_calls or now_calls[-1]["tool"] != "close_call":
             time.sleep(4)                                   # let the platform save a hang-up that came without close
     hung = hang_up_events(call_id) if call_id else []      # read before our own chat/end adds its event
@@ -347,11 +349,14 @@ def _run_one(workflow_id, sc, lib):
             freya.api("POST", "/api/v2/chat/end", {"callId": call_id})
         except Exception:  # noqa: BLE001
             pass
-    calls = ledger(sess["customer_id"]).get("calls", [])
+    led = ledger(sess["customer_id"])
+    if led is None:
+        err = err or "the bank ledger could not be read after the chat"
+    calls = (led or {}).get("calls", [])
     row = {"title": sc["title"], "customer": cu["id"], "script": sc["script"], "checks": sc.get("checks"),
            "tools": [c["tool"] for c in calls], "call_id": call_id, "turns": len(turns) // 2,
            "transcript": "\n".join(f"{w}: {t}" for w, t in turns)[-4000:]}
-    if err and not (calls and calls[-1]["tool"] == "close_call"):
+    if (err and not (calls and calls[-1]["tool"] == "close_call")) or led is None:
         return {**row, "harness_error": err, "failed": []}
     failed = check_ledger(calls, sess.get("now") or cu["now"], sc.get("checks") or [], lib) \
         + check_gated([t for w, t in turns if w == "agent"], ok_tools) \

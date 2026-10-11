@@ -60,10 +60,11 @@ BRIEF
 
 
 def extract(slot, tools, briefs):
+    from canned import fill_prompt
     from llm import chat_json
     brief = "\n\n".join(f"===== {b} =====\n" + pathlib.Path(b).read_text() for b in briefs)
     tool_txt = pathlib.Path(tools).read_text()[:30000]
-    spec = chat_json([{"role": "user", "content": PROMPT.replace("TOOLS", tool_txt).replace("BRIEF", brief)}], tier="strong",
+    spec = chat_json([{"role": "user", "content": fill_prompt(PROMPT, tool_txt, brief)}], tier="strong",
                      purpose="A1: list the brief's situations after the account lookup (router + specialist routes)",
                      max_tokens=4000, effort="medium")
     exits = [e for e in (spec.get("exits") or []) if isinstance(e, dict) and e.get("name")]
