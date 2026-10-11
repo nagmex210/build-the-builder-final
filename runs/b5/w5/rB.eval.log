@@ -1,0 +1,37 @@
+  invalid rep PUB-11 (try 1): ['resumed from msg_15_1791675512955 (latest reply msg_18_1791675513167, isBranch=True)']
+  invalid rep PUB-13 (try 1): ['resumed from msg_11_1791675511890 (latest reply msg_14_1791675512436, isBranch=True)']
+  invalid rep PUB-11 (try 2): ['resumed from msg_15_1791675603255 (latest reply msg_18_1791675603550, isBranch=True)']
+  invalid rep PUB-13 (try 2): ['resumed from msg_10_1791675607312 (latest reply msg_13_1791675607510, isBranch=True)']
+  invalid rep PUB-11 (try 3): ['resumed from msg_15_1791675678092 (latest reply msg_18_1791675678348, isBranch=True)']
+  invalid rep PUB-13 (try 3): ['resumed from msg_10_1791675686327 (latest reply msg_13_1791675686573, isBranch=True)']
+  invalid rep PUB-12 (try 1): ['resumed from msg_13_1791675764627 (latest reply msg_17_1791675765223, isBranch=True)']
+  invalid rep PUB-13 (try 1): ['resumed from msg_11_1791675791764 (latest reply msg_14_1791675792174, isBranch=True)']
+  invalid rep PUB-13 (try 2): ['resumed from msg_11_1791675844652 (latest reply msg_14_1791675844921, isBranch=True)']
+  invalid rep PUB-13 (try 3): ['resumed from msg_11_1791675903387 (latest reply msg_14_1791675903757, isBranch=True)']
+  invalid rep PUB-11 (try 1): ['resumed from msg_15_1791675986441 (latest reply msg_19_1791675986737, isBranch=True)']
+  invalid rep PUB-11 (try 2): ['resumed from msg_15_1791676064582 (latest reply msg_18_1791676065772, isBranch=True)']
+INVALID PUB-11 0/2 | verify_identity > verify_identity > get_account > create_promise > create_promise > create_promise > create_promise > create_promise > create_promise
+       - [plain] outcome (None, None), expected ('promise', None)
+       - [plain] the call was not closed with close_call
+       - [plain] conversation: The one create_promise per product check failed because the agent called create_promise twice for each of the three products.
+       - [in_words] outcome (None, None), expected ('promise', None)
+       - [in_words] the call was not closed with close_call
+FAIL PUB-12 0/2 | verify_identity > verify_identity > verify_identity > verify_identity > get_account > create_promise > add_note > add_note > create_promise > add_note > add_note
+       - [in_words] outcome (None, None), expected ('promise', None)
+       - [in_words] notes [('p2', 'refused'), ('p2', 'refused'), ('p3', 'refused'), ('p3', 'refused')], expected [('p2', 'refused'), ('p3', 'refused')]
+       - [in_words] the call was not closed with close_call
+       - [in_words] conversation: The call records two refused notes for each loan instead of one and makes two car-loan persuasion attempts instead of one.
+       - [plain] outcome (None, None), expected ('promise', None)
+       - [plain] notes [('p2', 'refused'), ('p2', 'refused'), ('p3', 'refused'), ('p3', 'refused')], expected [('p2', 'refused'), ('p3', 'refused')]
+       - [plain] the call was not closed with close_call
+       - [plain] conversation: The agent recorded two refused notes for each non-card product instead of one and made two car-loan persuasion attempts instead of the required one.
+INVALID PUB-13 0/2 | verify_identity > verify_identity > get_account > create_promise > create_promise
+       - [corrects] outcome (None, None), expected ('promise', None)
+       - [corrects] the call was not closed with close_call
+       - [corrects] outcome (None, None), expected ('promise', None)
+       - [corrects] promises [('p1', 300.0, '2026-11-02'), ('p2', 900.0, '2026-10-23')], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]
+       - [corrects] the call was not closed with close_call
+       - [corrects] conversation: The credit card was recorded for 2 November rather than the required 30 October, and the read-back named 2 November and 23 October rather than both required dates.
+
+fast_eval: 0 / 3 passed (2 rep(s), all reps must pass), 790 s
+harness: 2 case(s) still INVALID after 2 re-run(s) (not a measurement), 9 rep(s) re-run

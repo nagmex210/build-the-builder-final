@@ -1,0 +1,276 @@
+{
+ "workflow_id": "95563f1d-fbd7-487a-9388-c490cb5e27bd",
+ "passed": 0,
+ "total": 3,
+ "invalid": 2,
+ "rows": [
+  {
+   "id": "PUB-11",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "the call was not closed with close_call",
+    "conversation: The one create_promise per product check failed because the agent called create_promise twice for each of the three products."
+   ],
+   "call_id": "a6f8dbb3-14f2-4bd0-a3cc-5ffeb2ac2ecf",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise"
+   ],
+   "turns": 11,
+   "invalid": true,
+   "replays": [
+    "resumed from msg_15_1791675678092 (latest reply msg_18_1791675678348, isBranch=True)"
+   ],
+   "tries": [
+    {
+     "call_id": "9d51fb19-6159-4d88-bd71-04c77b7e9ce9",
+     "invalid": true,
+     "replays": [
+      "resumed from msg_15_1791675512955 (latest reply msg_18_1791675513167, isBranch=True)"
+     ]
+    },
+    {
+     "call_id": "a1d89a71-f455-400b-8cc2-7bd8e1d48824",
+     "invalid": true,
+     "replays": [
+      "resumed from msg_15_1791675603255 (latest reply msg_18_1791675603550, isBranch=True)"
+     ]
+    },
+    {
+     "call_id": "a6f8dbb3-14f2-4bd0-a3cc-5ffeb2ac2ecf",
+     "invalid": true,
+     "replays": [
+      "resumed from msg_15_1791675678092 (latest reply msg_18_1791675678348, isBranch=True)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "PUB-12",
+   "style": "in_words",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "notes [('p2', 'refused'), ('p2', 'refused'), ('p3', 'refused'), ('p3', 'refused')], expected [('p2', 'refused'), ('p3', 'refused')]",
+    "the call was not closed with close_call",
+    "conversation: The call records two refused notes for each loan instead of one and makes two car-loan persuasion attempts instead of one."
+   ],
+   "call_id": "469340c8-ff3d-4351-9d05-1b15646cc42e",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "add_note",
+    "add_note",
+    "create_promise",
+    "add_note",
+    "add_note"
+   ],
+   "turns": 12,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "469340c8-ff3d-4351-9d05-1b15646cc42e",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-13",
+   "style": "corrects",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "the call was not closed with close_call"
+   ],
+   "call_id": "0440b46a-8792-43ca-8fe1-4ad091a35216",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise"
+   ],
+   "turns": 12,
+   "invalid": true,
+   "replays": [
+    "resumed from msg_11_1791675903387 (latest reply msg_14_1791675903757, isBranch=True)"
+   ],
+   "tries": [
+    {
+     "call_id": "5d39f09c-2bb3-49f5-8c2e-64041c5ee1e6",
+     "invalid": true,
+     "replays": [
+      "resumed from msg_11_1791675791764 (latest reply msg_14_1791675792174, isBranch=True)"
+     ]
+    },
+    {
+     "call_id": "2dcd81be-3d90-4fb4-a97b-c19f7f181a5a",
+     "invalid": true,
+     "replays": [
+      "resumed from msg_11_1791675844652 (latest reply msg_14_1791675844921, isBranch=True)"
+     ]
+    },
+    {
+     "call_id": "0440b46a-8792-43ca-8fe1-4ad091a35216",
+     "invalid": true,
+     "replays": [
+      "resumed from msg_11_1791675903387 (latest reply msg_14_1791675903757, isBranch=True)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "PUB-11",
+   "style": "in_words",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "the call was not closed with close_call"
+   ],
+   "call_id": "5b6636ea-6f6e-4a3f-8a8c-86a3b2ab1967",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise"
+   ],
+   "turns": 10,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "7c2c84b6-7ae4-41aa-83d6-49530026df89",
+     "invalid": true,
+     "replays": [
+      "resumed from msg_15_1791675986441 (latest reply msg_19_1791675986737, isBranch=True)"
+     ]
+    },
+    {
+     "call_id": "1493aeb6-ed96-4226-a38c-a62c14818fba",
+     "invalid": true,
+     "replays": [
+      "resumed from msg_15_1791676064582 (latest reply msg_18_1791676065772, isBranch=True)"
+     ]
+    },
+    {
+     "call_id": "5b6636ea-6f6e-4a3f-8a8c-86a3b2ab1967",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-12",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "notes [('p2', 'refused'), ('p2', 'refused'), ('p3', 'refused'), ('p3', 'refused')], expected [('p2', 'refused'), ('p3', 'refused')]",
+    "the call was not closed with close_call",
+    "conversation: The agent recorded two refused notes for each non-card product instead of one and made two car-loan persuasion attempts instead of the required one."
+   ],
+   "call_id": "6739adf8-f88c-4e07-9ac4-b21bb377e61a",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "add_note",
+    "add_note",
+    "add_note",
+    "create_promise",
+    "add_note"
+   ],
+   "turns": 12,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "eb38dda1-8f08-43c2-9c2f-336ba44aa654",
+     "invalid": true,
+     "replays": [
+      "resumed from msg_13_1791675764627 (latest reply msg_17_1791675765223, isBranch=True)"
+     ]
+    },
+    {
+     "call_id": "6739adf8-f88c-4e07-9ac4-b21bb377e61a",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-13",
+   "style": "corrects",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [('p1', 300.0, '2026-11-02'), ('p2', 900.0, '2026-10-23')], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]",
+    "the call was not closed with close_call",
+    "conversation: The credit card was recorded for 2 November rather than the required 30 October, and the read-back named 2 November and 23 October rather than both required dates."
+   ],
+   "call_id": "e8de189c-3b85-47c5-9235-e628624d4522",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise"
+   ],
+   "turns": 11,
+   "invalid": true,
+   "replays": [
+    "resumed from msg_10_1791675686327 (latest reply msg_13_1791675686573, isBranch=True)"
+   ],
+   "tries": [
+    {
+     "call_id": "1b4a5ea3-af6d-4a51-88f2-a2dd4f36b2ec",
+     "invalid": true,
+     "replays": [
+      "resumed from msg_11_1791675511890 (latest reply msg_14_1791675512436, isBranch=True)"
+     ]
+    },
+    {
+     "call_id": "c48d28e5-0ebc-450e-ae32-8aa635a1b238",
+     "invalid": true,
+     "replays": [
+      "resumed from msg_10_1791675607312 (latest reply msg_13_1791675607510, isBranch=True)"
+     ]
+    },
+    {
+     "call_id": "e8de189c-3b85-47c5-9235-e628624d4522",
+     "invalid": true,
+     "replays": [
+      "resumed from msg_10_1791675686327 (latest reply msg_13_1791675686573, isBranch=True)"
+     ]
+    }
+   ]
+  }
+ ]
+}

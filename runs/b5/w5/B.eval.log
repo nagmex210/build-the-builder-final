@@ -1,0 +1,10 @@
+PASS PUB-11 2/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > create_promise > close_call
+FAIL PUB-12 1/2 | verify_identity > verify_identity > verify_identity > verify_identity > get_account > create_promise > add_note > add_note > close_call
+       - [asks_back] conversation: The car loan received two persuasion attempts after the initial refusal, rather than the required one for the early band.
+FAIL PUB-13 1/2 | verify_identity > verify_identity > verify_identity > get_account > add_note > create_promise > close_call
+       - [talkative] promises [('p2', 300.0, '2026-10-23')], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]
+       - [talkative] notes [('p1', 'refused')], expected []
+       - [talkative] conversation: The credit card was not recorded for 30 October, and the read-back did not name both 30 October and 23 October.
+
+fast_eval: 1 / 3 passed (2 rep(s), all reps must pass), 2494 s
+harness: 0 case(s) still INVALID after 2 re-run(s) (not a measurement), 0 rep(s) re-run

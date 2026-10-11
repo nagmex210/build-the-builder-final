@@ -1,0 +1,35 @@
+PASS PUB-01 2/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+PASS PUB-02 2/2 | schedule_callback > close_call
+FAIL PUB-03 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [corrects] outcome ('promise', None), expected ('not_verified', 'failed')
+       - [corrects] promises [('p1', 95.0, '2026-10-14')], expected []
+       - [corrects] conversation: The third-wrong-answer termination check is not demonstrated, the agent disclosed both the credit card product and the amount past due, and the customer was not told to use the app or a branch.
+       - [in_words] outcome ('no_promise', 'refused'), expected ('not_verified', 'failed')
+       - [in_words] conversation: The security check was not clearly ended after the third wrong answer, and the agent disclosed both the £1,250 amount and the credit card product.
+FAIL PUB-04 1/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [corrects] outcome ('no_promise', 'refused'), expected ('promise', None)
+       - [corrects] promises [], expected [('p1', 1250.0, '2026-10-23')]
+       - [corrects] conversation: The agent treats the customer's own proposed payment date as a refusal, moving to the reduced payment after only one subsequent refusal of the October 23 deadline.
+PASS PUB-05 2/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+FAIL PUB-06 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [corrects] promises [('p1', 150.0, '2026-10-16')], expected [('p1', 637.5, '2026-10-16')]
+       - [corrects] conversation: The minimum payment was offered twice and incorrectly stated as 150.00 instead of 637.50, and the recorded promise for Friday 16 October was for 150.00 rather than 637.50.
+       - [pieces] promises [('p1', 115.0, '2026-10-16')], expected [('p1', 637.5, '2026-10-16')]
+       - [pieces] conversation: The agent offered an incorrect minimum payment of 115.00 instead of 637.50 and submitted a promise for 115.00, not the required 637.50 on Friday 16 October.
+FAIL PUB-07 0/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+       - [plain] outcome ('no_promise', 'refused'), expected ('promise', None)
+       - [plain] promises [], expected [('p1', 540.0, '2026-10-27')]
+       - [plain] conversation: The agent rejected October 26 but did not offer the next business day, Tuesday October 27, and no promise was recorded for October 27 within the early-band deadline.
+       - [talkative] promises [('p1', 540.0, '2026-11-02')], expected [('p1', 540.0, '2026-10-27')]
+       - [talkative] conversation: The agent did not offer Tuesday 27 October as the next business day after 26 October and recorded the promise for Monday 2 November instead of Tuesday 27 October.
+FAIL PUB-08 1/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+       - [asks_back] conversation: The agent did not say that payments can take one business day to appear.
+FAIL PUB-09 1/2 | verify_identity > verify_identity > verify_identity > get_account > transfer_to_agent > close_call
+       - [plain] outcome ('no_promise', 'refused'), expected ('transferred', 'restructuring')
+       - [plain] transfers [], expected [{'queue': 'restructuring'}]
+       - [plain] conversation: The required transfer_to_agent call with queue restructuring was never made.
+FAIL PUB-10 1/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > close_call
+       - [corrects] promises [('p1', 365.0, '2026-10-23')], expected [('p1', 365.0, '2026-10-16')]
+
+fast_eval: 3 / 10 passed (2 rep(s), all reps must pass), 1549 s
+harness: 0 case(s) still INVALID after 2 re-run(s) (not a measurement), 0 rep(s) re-run
