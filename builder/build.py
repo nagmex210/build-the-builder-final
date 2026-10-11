@@ -404,6 +404,12 @@ async def run(slot, tools, briefs):
             log(trace, event="test", what="buildcheck after self-simulation (round-1 record: catastrophic failure?)", errors=errs)
             print(f"buildcheck (shipped): {len(errs)} problem(s){': ' + '; '.join(errs) if errs else ''}", flush=True)
     state = json.loads((KIT / ".freya-agents.json").read_text()).get(slot) if (KIT / ".freya-agents.json").exists() else None
+    if state and not saved:
+        # Build reliability (seen b8): the agent failed, nothing was saved in THIS run, and the slot's state still named the
+        # previous build's agent, which was then printed as this build's result. A build that saved nothing fails loudly.
+        print("BUILD FAILED: nothing was saved in this run; the slot's last agent is a previous build's", flush=True)
+        log(trace, event="stale", what="no workflow saved in this run: not reporting the previous build's agent", previous=state)
+        state = None
     with trace.open("a") as out:
         out.write(json.dumps({"event": "end", "at": time.strftime("%Y-%m-%dT%H:%M:%S%z"), "seconds": round(time.time() - t0),
                               "created": state}) + "\n")

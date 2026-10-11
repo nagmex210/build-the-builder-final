@@ -3,45 +3,51 @@
  "lines": [
   {
    "text": "I am Freya Bank's digital assistant.",
-   "when": "The customer asks whether the caller is a robot or an AI.",
+   "when": "The person asks whether the agent is a robot or an AI.",
    "tool": "",
    "outcome": ""
   },
   {
    "text": "I am sorry for your loss.",
-   "when": "Someone says the customer has died; also suitable when the customer mentions a death in the family.",
+   "when": "Someone reports that the customer has died, or the customer mentions a death in the family.",
    "tool": "",
    "outcome": ""
   },
   {
    "text": "Please use the mobile app or visit a branch.",
-   "when": "Identity verification ends after three wrong answers in total.",
+   "when": "The identity check ends after three wrong answers.",
    "tool": "",
    "outcome": ""
   },
   {
-   "text": "These security questions protect your account.",
+   "text": "These questions protect your account.",
    "when": "The customer first declines a security question or asks what the call is about instead of answering; explain only once.",
    "tool": "",
    "outcome": ""
   },
   {
-   "text": "You can change your promise in the mobile app.",
-   "when": "After a promise has been recorded, the customer asks to change or cancel it.",
+   "text": "I am sorry you are going through this.",
+   "when": "The customer mentions illness or job loss.",
    "tool": "",
    "outcome": ""
   },
   {
-   "text": "Your promise is recorded. You will receive a text message confirming this promise.",
-   "when": "A payment promise is successfully recorded.",
-   "tool": "create_promise",
-   "outcome": "success"
+   "text": "You can change your promise in the mobile app.",
+   "when": "The customer asks to change or cancel a promise already successfully recorded during this call.",
+   "tool": "",
+   "outcome": ""
   },
   {
    "text": "I could not record your promise.",
    "when": "The second and final create_promise attempt fails.",
    "tool": "",
    "outcome": ""
+  },
+  {
+   "text": "You will receive a text message confirming this promise.",
+   "when": "A payment promise has been successfully recorded.",
+   "tool": "create_promise",
+   "outcome": "success"
   },
   {
    "text": "Payments can take one business day to appear.",
@@ -51,13 +57,7 @@
   },
   {
    "text": "You can verify this call by phoning Freya Bank's customer service number.",
-   "when": "The customer asks whether the call is a scam.",
-   "tool": "",
-   "outcome": ""
-  },
-  {
-   "text": "I do not have that information.",
-   "when": "The customer asks a question that cannot be answered from the tools.",
+   "when": "The person asks whether the call is a scam.",
    "tool": "",
    "outcome": ""
   }
@@ -69,7 +69,7 @@
    "word": "recorded",
    "tool": "create_promise",
    "outcome": "success",
-   "rule": "Say the promise is recorded only after create_promise returns ok: true."
+   "rule": "Say the promise is recorded only after `create_promise` returns `ok: true`."
   },
   {
    "word": "collections",
@@ -110,54 +110,54 @@
  ],
  "conflicts": [
   {
-   "rules": "Rule 1: say \"the call is recorded\"; rule 27: below the floor, \"say it cannot be recorded\"; rule 37: \"Say the promise is recorded only after create_promise returns ok: true.\"",
-   "literal_reading": "A word-level gate on \"recorded\" would prohibit that word in the opening and in a below-floor rejection, before any promise succeeds.",
-   "resolution": "Use \"we record this call\" in the opening and \"I cannot record that amount\" for a below-floor rejection. Reserve \"recorded\" for after a successful create_promise result."
+   "rules": "Rule 1: \"the call is recorded\"; rule 37: \"Say the promise is recorded only after `create_promise` returns `ok: true`\".",
+   "literal_reading": "A word-level interpretation of rule 37 gates \"recorded\", although the opening must communicate recording before any promise exists.",
+   "resolution": "Use the active recording notice \"we record this call\" in the opening, preserving the notice without using \"recorded\"."
   },
   {
-   "rules": "Rule 5: \"Say nothing beyond the opening sentence of rule 1\" and \"Ask when the customer can be reached\"; rule 2 requires the named-customer question; rule 7 requires a possible callback retry; rule 9 requires \"I am sorry for your loss.\"; rule 47 requires thanks and goodbye.",
-   "literal_reading": "An absolute prohibition on any speech beyond the first sentence forbids the questions, condolence and closing that other rules require.",
-   "resolution": "No wording satisfies an absolute silence requirement and mandatory additional speech literally. The workable interpretation limits rule 5 to disclosures about the purpose or account, while allowing the expressly required operational speech; this needs clarification if absolute literal compliance is required."
+   "rules": "Rule 5: \"Say nothing beyond the opening sentence of rule 1\" and \"Ask when the customer can be reached\"; rule 9: \"I am sorry for your loss.\"; rule 47: \"Thank the customer and say goodbye\".",
+   "literal_reading": "An absolute ban on everything beyond the first sentence prohibits the callback question, condolence and closing.",
+   "resolution": "No wording satisfies all these rules under that absolute reading. The operational interpretation is to prohibit additional disclosure about the reason for calling while permitting the expressly required callback question, condolence and goodbye; this requires a scope clarification rather than a literal reconciliation."
+  },
+  {
+   "rules": "Rule 5: \"Ask when the customer can be reached\"; rule 9: \"ask nothing else\" when the customer has died.",
+   "literal_reading": "A deceased customer's representative is someone else answering, so the general callback question conflicts with the prohibition on further questions.",
+   "resolution": "Apply rule 9 as the specific deceased-customer branch: give the quoted condolence, ask no callback question and close."
   },
   {
    "rules": "Rule 11: \"Ask two security questions\"; rule 12: \"A wrong answer may be asked again\"; rule 13 requires a month-as-a-word retry.",
-   "literal_reading": "If \"two\" counts utterances rather than distinct security fields, any retry exceeds the limit.",
-   "resolution": "Use exactly two distinct security questions, date of birth followed by phone digits. Retries repeat or clarify one of those questions rather than introduce another security question."
+   "literal_reading": "If two means two total utterances, any retry exceeds the limit.",
+   "resolution": "Use exactly two distinct security questions, in the prescribed order. Repetitions and clarification of an answer do not introduce a third security question."
   },
   {
-   "rules": "Rule 12: \"Three wrong answers in total end the check\"; rule 13: \"That retry does not count as a wrong answer.\"",
-   "literal_reading": "A swapped day and month could be counted as an incorrect answer under the general rule but excluded under the hint rule.",
-   "resolution": "Treat the day_month_swapped hint as a clarification event, not a counted wrong answer. End verification after three counted wrong answers."
+   "rules": "Rules 26 and 27: offer the floor \"once\"; rule 26: \"Attempt 2 may name the floor again\"; rule 30 specifies floor-based persuasion attempts; rule 31: \"Do not repeat an offer the customer already refused\".",
+   "literal_reading": "The floor can appear in an initial offer and later persuasion, apparently violating both the once-only limit and the prohibition on repeating refused offers.",
+   "resolution": "Make the initial floor concession only once. Treat a subsequent offer as an amount-and-date pair, not merely an amount: a permitted persuasion attempt may name the same floor with a different eligible date, but must not repeat an already refused pair. If no distinct permitted pair remains, stop."
   },
   {
-   "rules": "Rules 26 and 27: offer the floor \"once\"; rule 26: \"Attempt 2 may name the floor again\"; rule 30 permits the floor in attempt 1 and requires it in attempt 2.",
-   "literal_reading": "A global one-time limit on mentioning or offering the floor conflicts with later persuasion attempts using the floor.",
-   "resolution": "Count the initial amount-adjustment offer separately from dated persuasion offers. Offer the floor once in the amount-adjustment step; later offers may use the same amount with a different date, within the applicable persuasion limit."
+   "rules": "Rule 19: a promise date must be \"today or later\"; rule 20: for a weekend or holiday \"not after the deadline, offer the next business day\".",
+   "literal_reading": "A past weekend or holiday satisfies \"not after the deadline\", but its next business day may also be in the past.",
+   "resolution": "The rule 20 suggestion cannot itself become a promise unless it also satisfies rule 19. For a past suggestion, obtain a new eligible date before confirmation or recording."
   },
   {
-   "rules": "Rule 30: \"Attempt 2, late band only: propose the floor amount on the deadline\"; rule 31: \"Do not repeat an offer the customer already refused.\"",
-   "literal_reading": "If the customer has already refused the floor on the deadline, the prescribed second attempt repeats that exact offer.",
-   "resolution": "Normally distinguish offers by both amount and date. If the exact floor-and-deadline offer was already refused, no second offer can satisfy both instructions literally; the brief needs clarification for that case."
+   "rules": "Rule 24: \"The agent proposes every amount\"; rule 27: \"If the customer proposes an amount ... accept it\".",
+   "literal_reading": "An exclusive reading of who may propose amounts forbids the customer-originated amounts that rule 27 explicitly accepts.",
+   "resolution": "Never solicit an open-ended amount. When the customer volunteers an eligible amount, adopt and propose that amount in the agent's confirmation before seeking agreement."
   },
   {
-   "rules": "Rule 24: \"The agent proposes every amount\"; rule 27: \"If the customer proposes an amount ... accept it\"; rule 29: \"A date or an amount the customer proposes is never a refusal.\"",
-   "literal_reading": "An exclusive right for the agent to originate every amount would conflict with accepting customer-originated amounts.",
-   "resolution": "The agent must initiate amount offers rather than ask an open-ended affordability question. Customers may volunteer amounts, which the agent evaluates and then proposes for confirmation if permitted."
+   "rules": "Rule 2 requires the named-customer question; rule 28 says \"First ask: 'Can you make this payment today?'\".",
+   "literal_reading": "Both questions could be interpreted as the first question of the call.",
+   "resolution": "The named-customer question is first in the call. The quoted paying-today question is first in the payment-promise stage, after identity verification and account disclosure."
   },
   {
-   "rules": "Rule 2 requires \"Am I speaking with {title} {last_name}?\"; rule 11 puts security questions before account discussion; rule 28 says \"First ask: Can you make this payment today?\".",
-   "literal_reading": "Reading \"First ask\" as the first question of the entire call conflicts with the opening and verification order and would use a gated word too early.",
-   "resolution": "Treat rule 28 as the first payment-request question within the promise stage, after the named-customer question, both security checks and account retrieval."
+   "rules": "Rule 1 forbids \"payment\" before identity verification; rule 39 requires explaining that \"payments can take one business day to appear\".",
+   "literal_reading": "A customer may report having paid before verification, requiring a payment-related explanation while the singular word is gated.",
+   "resolution": "Say \"Payments can take one business day to appear.\" This preserves the required explanation without using the exact gated singular form or disclosing account details."
   },
   {
-   "rules": "Rule 36: \"One promise per product\"; rule 37: \"If it fails, try once more.\"",
-   "literal_reading": "If one promise is interpreted as one create_promise invocation, the required retry appears prohibited.",
-   "resolution": "Count successfully recorded promises, not failed recording attempts. Retry once only after failure; never retry after success."
-  },
-  {
-   "rules": "Rule 5: \"Ask when the customer can be reached\"; rule 9: when the customer has died, \"ask nothing else\".",
-   "literal_reading": "The general third-party callback question conflicts with the prohibition on further questions following a death notification.",
-   "resolution": "Apply the callback question only while reachability remains applicable. Once told the customer has died, give the required condolence and closing without another question."
+   "rules": "The extraction request requires every mandatory fixed statement, but also limits `lines` to \"at most 10\" and requires each entry to contain an \"exact sentence\".",
+   "literal_reading": "The brief contains more than ten qualifying fixed statements even after excluding questions, negotiation steps and variable account details.",
+   "resolution": "There is no fully exhaustive ten-entry solution under the single-sentence constraint. The ten entries above prioritize event-specific notices. Additional required statements include \"I do not have that information.\" for questions the tools cannot answer and \"I am calling from the collections team about a late payment.\" after verified account retrieval. Negotiation also requires explaining that the remainder stays overdue and that a below-floor amount cannot be accepted."
   }
  ],
  "self_conflict_check": []

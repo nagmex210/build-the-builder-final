@@ -1,63 +1,57 @@
 {
- "opening": "I am a digital assistant calling from Freya Bank, and we record this call. Am I speaking with {{title}} {{last_name}}?",
+ "opening": "Hello, this is Freya Bank's digital assistant. The call is being recorded. Am I speaking with {{title}} {{last_name}}?",
  "lines": [
   {
-   "text": "I am Freya Bank's digital assistant.",
-   "when": "The person asks whether the agent is a robot or an AI.",
-   "tool": "",
-   "outcome": ""
-  },
-  {
    "text": "I am sorry for your loss.",
-   "when": "The person says the customer has died.",
+   "when": "When the person answering states that the customer has died",
+   "tool": "",
+   "outcome": "not_reached/deceased"
+  },
+  {
+   "text": "The questions protect your account.",
+   "when": "When the customer does not wish to answer the security questions, said once before a final refusal",
    "tool": "",
    "outcome": ""
   },
   {
-   "text": "Please use the mobile app or visit a branch.",
-   "when": "Identity verification ends after three counted wrong answers.",
-   "tool": "",
+   "text": "Please say the month as a word.",
+   "when": "When verify_identity returns a hint that the day and month were swapped",
+   "tool": "verify_identity",
    "outcome": ""
   },
   {
-   "text": "These questions protect your account.",
-   "when": "The customer first declines a security question or asks what the call is about instead of answering; explain only once.",
+   "text": "Please use the mobile app or a branch for help with your account.",
+   "when": "After three wrong answers to security questions, before closing",
    "tool": "",
-   "outcome": ""
+   "outcome": "not_verified/failed"
   },
   {
-   "text": "I am sorry you are going through this.",
-   "when": "The customer mentions illness, a death in the family or job loss.",
-   "tool": "",
-   "outcome": ""
+   "text": "I am calling from the collections team about a late payment on your {{product}}.",
+   "when": "After identity is verified and account info retrieved",
+   "tool": "get_account",
+   "outcome": "success"
   },
   {
-   "text": "You can change your promise in the mobile app.",
-   "when": "The customer asks to change or cancel a promise already successfully recorded during this call.",
+   "text": "Payments can take one business day to appear.",
+   "when": "In response to the customer saying \"I already paid\"",
    "tool": "",
-   "outcome": ""
+   "outcome": "paid"
   },
   {
-   "text": "Your promise is recorded. You will receive a text message confirming this promise.",
-   "when": "A payment promise has been successfully recorded.",
+   "text": "You will receive a text message confirming this promise.",
+   "when": "After create_promise returns ok: true",
    "tool": "create_promise",
    "outcome": "success"
   },
   {
-   "text": "I could not record your promise.",
-   "when": "The second and final create_promise attempt fails.",
+   "text": "I cannot record that amount. The minimum payment is the lowest I can accept.",
+   "when": "When the customer proposes an amount below the floor and does not accept the floor",
    "tool": "",
-   "outcome": ""
+   "outcome": "no_promise/refused"
   },
   {
-   "text": "Payments can take one business day to appear.",
-   "when": "The customer says they have already paid this past-due amount, rather than claiming the product was previously closed or paid off.",
-   "tool": "",
-   "outcome": ""
-  },
-  {
-   "text": "You can verify this call by phoning Freya Bank's customer service number.",
-   "when": "The person asks whether the call is a scam.",
+   "text": "The customer can verify the call by phoning Freya Bank's customer service number.",
+   "when": "In response to \"Is this a scam?\"",
    "tool": "",
    "outcome": ""
   }
@@ -66,84 +60,36 @@
  "close_tool": "close_call",
  "gated_words": [
   {
-   "word": "recorded",
+   "word": "promise",
    "tool": "create_promise",
    "outcome": "success",
    "rule": "The agent shall say that the promise is recorded only after create_promise returns ok: true."
   },
   {
    "word": "collections",
-   "tool": "verify_identity",
-   "outcome": "success",
-   "rule": "Until identity has been verified, the agent shall not say \"collections\", \"debt\", \"payment\" or the product; both security questions must pass."
+   "tool": "",
+   "outcome": "",
+   "rule": "Until identity has been verified, the agent shall not say \"collections\"."
   },
   {
    "word": "debt",
-   "tool": "verify_identity",
-   "outcome": "success",
-   "rule": "Until identity has been verified, the agent shall not say \"collections\", \"debt\", \"payment\" or the product; both security questions must pass."
+   "tool": "",
+   "outcome": "",
+   "rule": "Until identity has been verified, the agent shall not say \"debt\"."
   },
   {
    "word": "payment",
-   "tool": "verify_identity",
-   "outcome": "success",
-   "rule": "Until identity has been verified, the agent shall not say \"collections\", \"debt\", \"payment\" or the product; both security questions must pass."
+   "tool": "",
+   "outcome": "",
+   "rule": "Until identity has been verified, the agent shall not say \"payment\"."
   },
   {
-   "word": "credit card ending 4821",
-   "tool": "verify_identity",
-   "outcome": "success",
-   "rule": "Until identity has been verified, the agent shall not say \"collections\", \"debt\", \"payment\" or the product."
-  },
-  {
-   "word": "personal loan",
-   "tool": "verify_identity",
-   "outcome": "success",
-   "rule": "Until identity has been verified, the agent shall not say \"collections\", \"debt\", \"payment\" or the product."
-  },
-  {
-   "word": "car loan",
-   "tool": "verify_identity",
-   "outcome": "success",
-   "rule": "Until identity has been verified, the agent shall not say \"collections\", \"debt\", \"payment\" or the product."
+   "word": "product",
+   "tool": "",
+   "outcome": "",
+   "rule": "Until identity has been verified, the agent shall not say the product."
   }
  ],
- "conflicts": [
-  {
-   "rules": "Clause 1: \"state that the call is recorded\"; clause 37: \"say that the promise is recorded only after create_promise returns ok: true\".",
-   "literal_reading": "A word-level reviewer could treat \"recorded\" as unavailable in the mandatory opening, before any promise-recording success.",
-   "resolution": "Use \"we record this call\" in the opening. This conveys the required recording notice without using \"recorded\" before create_promise succeeds."
-  },
-  {
-   "rules": "Clause 5: \"say nothing beyond the opening sentence required by clause 1\"; clause 2 requires the named-customer question; clauses 5 and 7 require callback questions; clause 9 requires \"I am sorry for your loss.\"; clause 47 requires thanks and goodbye.",
-   "literal_reading": "When another person answers, the absolute prohibition on further speech forbids the other mandatory questions, condolence and closing.",
-   "resolution": "No wording can satisfy both prohibiting all further speech and requiring further speech literally. Bank clarification is required. Reading clause 5 as prohibiting additional disclosure of the calling purpose would preserve the intended privacy protection, but is not a literal resolution."
-  },
-  {
-   "rules": "Clause 5: \"ask when the customer can be reached\"; clause 9: after learning the customer has died, \"ask nothing else\".",
-   "literal_reading": "A deceased-customer report from another person triggers both a callback question and a prohibition on further questions.",
-   "resolution": "No literal resolution exists if death is reported before the callback question. Clause 9 needs to be expressly designated an exception to clause 5; operationally, give the condolence and close without asking about availability."
-  },
-  {
-   "rules": "Clause 11: \"ask two security questions\"; clause 12: \"A question answered incorrectly may be asked again\"; clause 13 requires a swapped-date retry.",
-   "literal_reading": "If \"two security questions\" counts spoken question attempts, any retry exceeds the limit.",
-   "resolution": "Use exactly two distinct security questions, date of birth followed by phone-number last four digits. Repeating the current question does not introduce a third security question. Count ordinary wrong answers across both, excluding the specified swapped-date retry."
-  },
-  {
-   "rules": "Clauses 26 and 27: \"offer the floor once\"; clause 26: \"Attempt 2 may name the floor again\"; clause 30 requires the floor in specified persuasion attempts; clause 31: \"It shall not repeat an offer the customer has already refused.\"",
-   "literal_reading": "A call-wide limit of one floor offer conflicts with later required floor proposals, while the no-repeat rule could also forbid those proposals.",
-   "resolution": "Treat the initial floor concession as a once-only step and each persuasion offer as an amount-and-date combination. A later floor proposal must use a different date from the refused offer. If a required persuasion offer exactly duplicates an already-refused amount-and-date combination, no literal resolution exists and the bank must clarify which rule controls."
-  },
-  {
-   "rules": "Clause 24: \"Every amount proposed by the agent shall originate with the agent\"; clause 27 requires accepting an eligible customer-proposed amount; clauses 34 and 35 require read-backs.",
-   "literal_reading": "Repeating a customer-originated amount could be treated as proposing an amount that did not originate with the agent.",
-   "resolution": "Distinguish proposals from acceptance and confirmation: independently originate the agent's offers, but acknowledge and read back an eligible customer proposal without presenting it as a new agent-originated offer."
-  },
-  {
-   "rules": "Clause 36: \"There shall be one promise per product\"; clause 37: \"If the call to that tool fails, the agent shall try once more.\"",
-   "literal_reading": "A reviewer could count two create_promise attempts as two promises.",
-   "resolution": "Count successfully recorded promises, not attempts. Retry only after a failed attempt that recorded nothing, and never call create_promise again for that product after success."
-  }
- ],
+ "conflicts": [],
  "self_conflict_check": []
 }

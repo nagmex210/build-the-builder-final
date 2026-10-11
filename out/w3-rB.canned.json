@@ -1,174 +1,127 @@
 {
- "opening": "I am a digital assistant calling from Freya Bank, and we record this call. Am I speaking with {{title}} {{last_name}}?",
+ "opening": "I\u2019m Freya Bank\u2019s digital assistant, and we are recording this call. Am I speaking with {{title}} {{last_name}}?",
  "lines": [
   {
-   "text": "I am Freya Bank's digital assistant.",
-   "when": "Asked whether the caller is a robot or an AI.",
+   "text": "I am sorry for your loss.",
+   "when": "The person answering says the customer has died.",
    "tool": "",
    "outcome": ""
   },
   {
-   "text": "I am sorry for your loss.",
-   "when": "The person answering says the customer has died; ask nothing further.",
+   "text": "The questions protect your account.",
+   "when": "The customer declines to answer security questions; explain this once.",
    "tool": "",
    "outcome": ""
   },
   {
    "text": "Please use the mobile app or visit a branch.",
-   "when": "Identity verification ends after three counted wrong answers.",
+   "when": "The identity check ends after three wrong answers.",
    "tool": "",
    "outcome": ""
   },
   {
-   "text": "These questions protect your account.",
-   "when": "The customer first declines a security question or asks what the call is about instead of answering; explain once.",
+   "text": "I\u2019m calling from the collections team about a late payment.",
+   "when": "After identity is verified and the account has been retrieved.",
    "tool": "",
    "outcome": ""
   },
   {
-   "text": "I am sorry you are going through this.",
-   "when": "The customer mentions illness, a death in the family or job loss.",
+   "text": "I\u2019m sorry to hear that.",
+   "when": "The customer mentions illness, a death in the family, or job loss.",
    "tool": "",
    "outcome": ""
   },
   {
-   "text": "You can change your promise in the mobile app.",
-   "when": "The customer asks to change or cancel a promise already successfully recorded during this call.",
+   "text": "I couldn\u2019t record that promise.",
+   "when": "A product\u2019s promise fails to record on both allowed attempts.",
    "tool": "",
    "outcome": ""
   },
   {
-   "text": "You will receive a text message confirming this promise.",
-   "when": "A promise has been successfully recorded for a product.",
+   "text": "Your promise has been recorded.",
+   "when": "After a promise is successfully recorded.",
    "tool": "create_promise",
    "outcome": "success"
   },
   {
-   "text": "I could not record this promise.",
-   "when": "The second create_promise call for the same product fails; retain other successful promises and apply Brief B's product-level handling.",
+   "text": "You will receive a text message confirming this promise.",
+   "when": "After a promise has been recorded.",
    "tool": "",
    "outcome": ""
   },
   {
    "text": "Payments can take one business day to appear.",
-   "when": "The customer says they have already paid the current past-due amount for a product; continue with other products.",
+   "when": "The customer says they already paid the current past-due amount.",
    "tool": "",
    "outcome": ""
   },
   {
-   "text": "You can verify this call by phoning Freya Bank's customer service number.",
-   "when": "The person answering asks whether this is a scam.",
+   "text": "You can verify this call by phoning Freya Bank\u2019s customer service number.",
+   "when": "The customer asks whether this is a scam.",
    "tool": "",
    "outcome": ""
   }
  ],
- "goodbye": "Thank you for your time, and goodbye.",
+ "goodbye": "Thank you. Goodbye.",
  "close_tool": "close_call",
  "gated_words": [
   {
    "word": "recorded",
    "tool": "create_promise",
    "outcome": "success",
-   "rule": "The agent shall say that the promise is recorded only after `create_promise` returns `ok: true`."
-  },
-  {
-   "word": "collections",
-   "tool": "verify_identity",
-   "outcome": "success",
-   "rule": "Until identity has been verified, the agent shall not say \"collections\", \"debt\", \"payment\" or the product; both security questions must pass."
-  },
-  {
-   "word": "debt",
-   "tool": "verify_identity",
-   "outcome": "success",
-   "rule": "Until identity has been verified, the agent shall not say \"collections\", \"debt\", \"payment\" or the product; both security questions must pass."
-  },
-  {
-   "word": "payment",
-   "tool": "verify_identity",
-   "outcome": "success",
-   "rule": "Until identity has been verified, the agent shall not say \"collections\", \"debt\", \"payment\" or the product; both security questions must pass."
-  },
-  {
-   "word": "credit card ending 4821",
-   "tool": "verify_identity",
-   "outcome": "success",
-   "rule": "Until identity has been verified, the agent shall not say ... the product."
-  },
-  {
-   "word": "personal loan",
-   "tool": "verify_identity",
-   "outcome": "success",
-   "rule": "Until identity has been verified, the agent shall not say ... the product."
-  },
-  {
-   "word": "car loan",
-   "tool": "verify_identity",
-   "outcome": "success",
-   "rule": "Until identity has been verified, the agent shall not say ... the product."
+   "rule": "The agent shall say that the promise is recorded only after create_promise returns ok: true."
   }
  ],
  "conflicts": [
   {
-   "rules": "A1: \"state that the call is recorded\"; A37: \"say that the promise is recorded only after `create_promise` returns `ok: true`\".",
-   "literal_reading": "A word-level reviewer could treat \"recorded\" as prohibited in the opening, although A37 concerns promises rather than call recording.",
-   "resolution": "Use \"we record this call\" in the opening, preserving the recording notice without using \"recorded\"."
+   "rules": "The opening must state that the call is recorded; the promise may be described as \u201crecorded\u201d only after create_promise succeeds.",
+   "literal_reading": "The required opening notice contains the gated word \u201crecorded\u201d before the promise-recording event.",
+   "resolution": "Say \u201cthis call is being recorded\u201d in the opening. This gives the required recording notice without using the gated word."
   },
   {
-   "rules": "A5: \"say nothing beyond the opening sentence\"; A2: ask who is speaking; A5 and A7: ask about availability; A9: \"I am sorry for your loss.\"; A47: thank the customer and say goodbye.",
-   "literal_reading": "When another person answers, the absolute silence rule prohibits the identification, callback, condolence and closing utterances that other clauses require.",
-   "resolution": "No wording satisfies all of these literally. The bank must clarify that A5 prohibits additional disclosure of the call's purpose, not the expressly required identification, callback, condolence and closing utterances."
+   "rules": "Brief A rule 28 says the first request shall be \u201cCan you make this payment today?\u201d; Brief B clause 4 replaces that request with asking whether the customer can pay all products today.",
+   "literal_reading": "Both could be read as requiring the first payment question, but they specify different questions.",
+   "resolution": "Use Brief B\u2019s all-products-today question first; if the customer cannot pay all products, handle each product in returned order without repeating the today question."
   },
   {
-   "rules": "B2: disclose every late product \"before asking for anything\"; A1: no product disclosure before verification; A2 and A11: ask identification and security questions; A16: retrieve the account after both questions pass.",
-   "literal_reading": "If \"anything\" includes identification and security answers, disclosure must precede questions needed to permit and obtain that disclosure.",
-   "resolution": "No literal ordering satisfies the unrestricted wording. The bank must scope \"anything\" to payment requests; the privacy-preserving flow is identification, verification, account retrieval, all product disclosures, then payment requests."
+   "rules": "Brief A rule 34 requires a read-back and \u201cDo you confirm?\u201d; Brief B clause 7 requires all promises to be read back together and one confirmation.",
+   "literal_reading": "The inherited rule could be read as requiring confirmation separately for each product, while Brief B requires only one combined confirmation.",
+   "resolution": "Read back all promises together and ask \u201cDo you confirm?\u201d once."
   },
   {
-   "rules": "A11: \"ask two security questions\"; A12: \"A question answered incorrectly may be asked again\"; A13: ask for the month as a word.",
-   "literal_reading": "Two questions could be read as a limit of two utterances, excluding expressly permitted retries.",
-   "resolution": "Ask two distinct security fields, in the specified order; retries repeat the current field rather than introduce a third security question."
+   "rules": "Brief A rule 46 says Brief A shall never use add_note; Brief B clause 8 requires add_note for each product without a promise.",
+   "literal_reading": "Because Brief B extends Brief A, the inherited prohibition could be read as barring the notes Brief B requires.",
+   "resolution": "Apply Brief B\u2019s product-note requirement to Brief B calls; add no notes on transfers, as Brief B clause 10 expressly requires."
   },
   {
-   "rules": "A12: \"Three wrong answers in total shall end the check\"; A13: \"That retry shall not count as a wrong answer\".",
-   "literal_reading": "A swapped-day/month answer could be counted as an incorrect answer under the general rule but excluded under the hint rule.",
-   "resolution": "Apply the explicit hint exception: request the month as a word without charging that retry against the three counted wrong answers."
+   "rules": "Brief B clause 8 requires notes for products without promises; Brief B clause 10 says no notes whatsoever may be added on any transfer.",
+   "literal_reading": "A product without a promise on a transfer call could appear to require a note and forbid one.",
+   "resolution": "On any transfer, add no notes; otherwise add the required notes for products without promises."
   },
   {
-   "rules": "A26 and A27: \"offer the floor once\"; A26: \"Attempt 2 may name the floor again\"; A30: attempt 2 proposes the floor on the deadline; A31: \"It shall not repeat an offer the customer has already refused\".",
-   "literal_reading": "A lifetime limit of one floor offer conflicts with a later floor offer; the required later offer may also duplicate a refused amount-and-date combination.",
-   "resolution": "The initial floor concession and a later offer on a different date can be distinct offers, but this requires scoping \"once\" to the concession step. If the required amount and date exactly duplicate a refused offer, no literal resolution exists; the bank must clarify precedence."
+   "rules": "Brief B clause 1 sets a maximum of two products; the later memo replaces that maximum with three.",
+   "literal_reading": "The extract and memo specify different maximum product counts.",
+   "resolution": "Follow the later memo: the maximum is three products."
   },
   {
-   "rules": "B7: ask \"Do you confirm?\" \"once for the combined read-back\"; A35: after a change, \"read it back again\"; A34: create a promise \"only after a clear yes\".",
-   "literal_reading": "A call-wide one-confirmation limit would prevent confirmation of revised terms.",
-   "resolution": "Ask once per combined read-back, never separately per product. A customer change creates a revised combined read-back requiring a clear yes before recording."
+   "rules": "Brief B clause 11 sets three failed create_promise calls as the limit; the later memo replaces it with two failed calls.",
+   "literal_reading": "The extract and memo specify different failure limits.",
+   "resolution": "Follow the later memo: retry once after a failed call, and apply clause 11\u2019s product-level failure treatment after the second failed call."
   },
   {
-   "rules": "B7: \"`create_promise` shall be called once per product, subject to the failure retry provision\"; amended B11: a failed call \"is tried once more\"; A36: \"one promise per product\".",
-   "literal_reading": "Counting every attempt as a promise or treating \"once\" as an absolute tool-call limit would prohibit the retry.",
-   "resolution": "One successfully recorded promise is allowed per product. The express retry exception permits one additional call after a failed attempt, for at most two failed calls per product."
-  },
-  {
-   "rules": "B8 and B9: add a note for products without promises and continue with the others; B10: on any transfer, \"no notes whatsoever shall be added, either before or after the transfer\".",
-   "literal_reading": "An immediate note for an early product would make a later mandatory transfer violate the prohibition on earlier notes.",
-   "resolution": "Hold note details locally while handling products and possible transfers. Write notes only in the terminal non-transfer branch; discard pending notes on a transfer. The brief does not require immediate add_note calls."
-  },
-  {
-   "rules": "A18: deadlines of the \"10th\" and \"5th\" business days; A memo: replacements \"12th\" and \"7th\". B1: maximum \"two products\"; B memo: \"3 products\". B11: \"three failed calls\"; B memo: \"2 failed calls\".",
-   "literal_reading": "Reading superseded values as concurrently binding produces conflicting deadline, product-count and failure-count limits.",
-   "resolution": "Apply the explicit amendments: 12 business days for the early band, 7 for the late band, one to three products, and two failed create_promise calls per product. Superseded values are not active requirements."
-  },
-  {
-   "rules": "A46: \"Brief A shall never use `add_note`\"; B8: call `add_note` for each product without a promise; A39 and A40: close for paid claims or disputes; B9: continue with other products.",
-   "literal_reading": "Carrying forward the replaced single-product rules would both prohibit required notes and require premature closure.",
-   "resolution": "Apply Brief B's express replacements to multi-product calls: note products without promises, subject to the transfer prohibition, and continue with other products. Retain Brief A only where unchanged."
-  },
-  {
-   "rules": "B4: \"Each product shall begin at attempt 1\"; A29: a customer-proposed date or amount \"shall never constitute a refusal\"; A32: hardship requires \"no persuasion attempt\" and \"takes priority over clauses 30 and 41\".",
-   "literal_reading": "An unconditional attempt-1 requirement would force persuasion even when a customer proposes acceptable terms or reports hardship.",
-   "resolution": "Handle customer proposals under the date and amount rules, and apply the expressly retained hardship precedence. Attempt 1 is the starting point only when product-level persuasion is applicable."
+   "rules": "Brief A rule 37 says a second recording failure leads to a no_promise/service_error closure; Brief B clause 11 replaces that single-product failure closure with product-level handling and a note, subject to the transfer prohibition.",
+   "literal_reading": "The inherited closure instruction could be read as requiring the call to close immediately, while Brief B requires handling the failed product and continuing.",
+   "resolution": "Use Brief B\u2019s product-level handling: note the failed product when permitted and continue; do not add notes on a transfer."
   }
  ],
- "self_conflict_check": []
+ "self_conflict_check": [
+  {
+   "text": "opening",
+   "gated": [
+    "recorded"
+   ],
+   "before": "I\u2019m Freya Bank\u2019s digital assistant, and this call is being recorded. Am I speaking with {{title}} {{last_name}}?",
+   "after": "I\u2019m Freya Bank\u2019s digital assistant, and we are recording this call. Am I speaking with {{title}} {{last_name}}?"
+  }
+ ]
 }
