@@ -1,0 +1,15 @@
+  invalid rep PUB-12 (try 1): ['resumed from msg_10_1791685941246 (latest reply msg_23_1791685943838, isBranch=True)']
+FAIL PUB-11 0/2 | verify_identity > verify_identity > verify_identity > get_account > get_account > create_promise > create_promise > create_promise > create_promise > close_call
+       - [plain] conversation: The one create_promise per product check fails because the credit card had two create_promise calls: a failed attempt with cc_2288 and a successful retry with p1.
+       - [pieces] conversation: The one create_promise per product check fails because the credit card had two create_promise attempts: a failed call with cc_2288 and a successful retry with p1.
+FAIL PUB-12 0/2 | verify_identity > verify_identity > verify_identity > get_account > get_account > create_promise > create_promise > add_note > add_note > close_call
+       - [plain] conversation: The refused-note check is not clearly satisfied: two add_note calls were made, but only one success result appears, so a recorded refused note for each loan is not confirmed.
+       - [asks_back] conversation: The car loan received two payment attempts (140 today and 140 by Friday) instead of the required one for the early band.
+FAIL PUB-13 1/2 | verify_identity > verify_identity > verify_identity > get_account > add_note > add_note > close_call
+       - [pieces] outcome ('no_promise', 'refused'), expected ('promise', None)
+       - [pieces] promises [], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]
+       - [pieces] notes [('cc_6604', 'refused'), ('pl_9988', 'refused')], expected []
+       - [pieces] conversation: No credit card payment was recorded for 30 October, no loan payment was recorded for its 23 October deadline, and no read-back named both dates.
+
+fast_eval: 0 / 3 passed (2 rep(s), all reps must pass), 2751 s
+harness: 0 case(s) still INVALID after 2 re-run(s) (not a measurement), 1 rep(s) re-run

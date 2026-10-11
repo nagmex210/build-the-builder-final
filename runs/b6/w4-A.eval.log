@@ -1,0 +1,24 @@
+PASS PUB-01 2/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+PASS PUB-02 2/2 | schedule_callback > close_call
+PASS PUB-03 2/2 | verify_identity > verify_identity > verify_identity > close_call
+PASS PUB-04 2/2 | verify_identity > verify_identity > verify_identity > get_account > get_account > get_account > create_promise > close_call
+FAIL PUB-05 0/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+       - [in_words] conversation: The no-persuasion check fails because the agent asks the customer to make the past-due payment today.
+       - [asks_back] outcome ('no_promise', 'refused'), expected ('no_promise', 'hardship')
+       - [asks_back] conversation: The agent failed the no-persuasion and no-plan checks by repeatedly proposing payment dates after the customer said they could not pay and offering a partial payment of 150 with the remainder overdue.
+FAIL PUB-06 0/2 | verify_identity > verify_identity > verify_identity > get_account > get_account > get_account > create_promise > close_call
+       - [corrects] conversation: The required promise for 637.50 on Friday, 16 October 2026 was not recorded through a successful tool call.
+       - [talkative] outcome ('no_promise', 'refused'), expected ('promise', None)
+       - [talkative] promises [], expected [('p1', 637.5, '2026-10-16')]
+       - [talkative] conversation: The minimum-payment check fails because the agent offered an incorrect minimum of 150.00 and made repeated offers, and no promise for 637.50 on Friday 16 October was agreed or recorded.
+PASS PUB-07 2/2 | verify_identity > verify_identity > verify_identity > get_account > get_account > create_promise > close_call
+FAIL PUB-08 1/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+       - [asks_back] conversation: The agent did not say payments can take one business day to appear.
+FAIL PUB-09 1/2 | verify_identity > verify_identity > verify_identity > get_account > transfer_to_agent > close_call
+       - [pieces] outcome ('no_promise', 'refused'), expected ('transferred', 'restructuring')
+       - [pieces] transfers [], expected [{'queue': 'restructuring'}]
+       - [pieces] conversation: The required transfer_to_agent call with queue restructuring was never made.
+PASS PUB-10 2/2 | verify_identity > verify_identity > verify_identity > get_account > get_account > create_promise > create_promise > close_call
+
+fast_eval: 6 / 10 passed (2 rep(s), all reps must pass), 2295 s
+harness: 0 case(s) still INVALID after 2 re-run(s) (not a measurement), 0 rep(s) re-run

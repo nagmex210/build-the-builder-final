@@ -1,0 +1,26 @@
+  invalid rep PUB-09 (try 1): ['harness: chat turn timed out and no reply appeared']
+FAIL PUB-01 1/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [pieces] conversation: The agent said 'collections' when the latest identity tool result explicitly stated that identity was not verified.
+PASS PUB-02 2/2 | schedule_callback > close_call
+FAIL PUB-03 1/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [talkative] outcome ('promise', None), expected ('not_verified', 'failed')
+       - [talkative] promises [('p1', 95.0, '2026-10-14')], expected []
+       - [talkative] conversation: The agent did not end the check after the third incorrect birth date, disclosed the credit card product and amount owed, and never directed the customer to use the app or a branch.
+PASS PUB-04 2/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+PASS PUB-05 2/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+FAIL PUB-06 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [pieces] conversation: The minimum-payment check fails because the agent first offered an incorrect minimum of 150.00 and later offered 637.50, rather than offering the minimum once with the note that the rest stays overdue.
+       - [corrects] outcome ('no_promise', 'refused'), expected ('promise', None)
+       - [corrects] promises [], expected [('p1', 637.5, '2026-10-16')]
+       - [corrects] conversation: The minimum payment was offered multiple times, initially with the incorrect amount of 150.00, and no promise for 637.50 on Friday 16 October was recorded.
+FAIL PUB-07 1/2 | verify_identity > verify_identity > get_account > create_promise > close_call
+       - [pieces] conversation: The promise for Tuesday 27 October was not recorded: the agent only validated the date and requested confirmation, with no successful recording tool call.
+PASS PUB-08 2/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+FAIL PUB-09 1/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+       - [in_words] outcome ('no_promise', 'refused'), expected ('transferred', 'restructuring')
+       - [in_words] transfers [], expected [{'queue': 'restructuring'}]
+       - [in_words] conversation: The agent never called transfer_to_agent with queue restructuring and proposed its own payment plan of 800 by October 23.
+PASS PUB-10 2/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > close_call
+
+fast_eval: 5 / 10 passed (2 rep(s), all reps must pass), 1896 s
+harness: 0 case(s) still INVALID after 2 re-run(s) (not a measurement), 1 rep(s) re-run

@@ -1,0 +1,207 @@
+{
+ "workflow_id": "494ff161-fbcf-48a3-956a-8d4b2854a768",
+ "passed": 0,
+ "total": 3,
+ "invalid": 0,
+ "rows": [
+  {
+   "id": "PUB-11",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "conversation: The one create_promise per product check fails because the credit card had two create_promise calls: a failed attempt with cc_2288 and a successful retry with p1."
+   ],
+   "call_id": "51af4171-e6c7-4628-a890-e55a36e7bce6",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 9,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "51af4171-e6c7-4628-a890-e55a36e7bce6",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-12",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "conversation: The refused-note check is not clearly satisfied: two add_note calls were made, but only one success result appears, so a recorded refused note for each loan is not confirmed."
+   ],
+   "call_id": "5f84b93f-39d3-4eaf-b2ff-36c7af65b085",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "add_note",
+    "add_note",
+    "close_call"
+   ],
+   "turns": 10,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "5f84b93f-39d3-4eaf-b2ff-36c7af65b085",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-13",
+   "style": "pieces",
+   "pass": false,
+   "failed": [
+    "outcome ('no_promise', 'refused'), expected ('promise', None)",
+    "promises [], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]",
+    "notes [('cc_6604', 'refused'), ('pl_9988', 'refused')], expected []",
+    "conversation: No credit card payment was recorded for 30 October, no loan payment was recorded for its 23 October deadline, and no read-back named both dates."
+   ],
+   "call_id": "bc6ab939-83a8-4e59-8d8a-d008a7c20e98",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "add_note",
+    "add_note",
+    "close_call"
+   ],
+   "turns": 11,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "bc6ab939-83a8-4e59-8d8a-d008a7c20e98",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-11",
+   "style": "pieces",
+   "pass": false,
+   "failed": [
+    "conversation: The one create_promise per product check fails because the credit card had two create_promise attempts: a failed call with cc_2288 and a successful retry with p1."
+   ],
+   "call_id": "1784a5c8-3cf3-4bc3-8238-4d8354e995ca",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 9,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "1784a5c8-3cf3-4bc3-8238-4d8354e995ca",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-12",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "conversation: The car loan received two payment attempts (140 today and 140 by Friday) instead of the required one for the early band."
+   ],
+   "call_id": "f4c5a4a5-1f60-4700-a317-3700e1bc08b0",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "add_note",
+    "add_note",
+    "close_call"
+   ],
+   "turns": 11,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "2e94dd4b-916f-4cb8-9f77-258eaa99fb10",
+     "invalid": true,
+     "replays": [
+      "resumed from msg_10_1791685941246 (latest reply msg_23_1791685943838, isBranch=True)"
+     ]
+    },
+    {
+     "call_id": "f4c5a4a5-1f60-4700-a317-3700e1bc08b0",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-13",
+   "style": "corrects",
+   "pass": true,
+   "failed": [],
+   "call_id": "ca607d2d-3882-484d-a555-210293fdef6e",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "get_account",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 9,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "ca607d2d-3882-484d-a555-210293fdef6e",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  }
+ ]
+}
