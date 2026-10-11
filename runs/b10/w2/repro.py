@@ -122,6 +122,20 @@ def r6():
         print(f"  {name:24s} identity_state = {v.get('identity_state'):14s} route -> {route('identity', v, last)}")
 
 
+
+def r7():
+    print("R7 an id the model BUILT ('credit_card_2288', 'pl_1234', 'CC_2288') on a multi-product account: what reaches the bank?")
+    A = tool(wf, "get_account", "load_account")
+    v = fresh()
+    acc = {"status": "success", "status_code": 200, "message": "", "header": {}, "data": {"ok": True, "products": [
+        {"product_id": "p1", "type": "credit_card", "card_last4": "2288", "past_due": 300, "days_late": 9, "minimum_payment": 90},
+        {"product_id": "p2", "type": "personal_loan", "account_last4": "1234", "past_due": 500, "days_late": 20, "instalment_amount": 250}]}}
+    post(A, v, acc)
+    for pid in ("credit_card_2288", "pl_1234", "CC_2288", "loan", "p3"):
+        c = pre(T, v, {"customer_id": "C1", "product_id": pid, "amount": "300", "date": "2026-10-16"})
+        print(f"  model sent {pid:18s} -> request product_id = {c['body']['product_id']}")
+
+
 if __name__ == "__main__":
     for f in sys.argv[2:] or ["r1", "r2"]:
         globals()[f]()

@@ -152,6 +152,26 @@ try:
                         _stack.extend(reversed(_o))
                 if _known:
                     _v['known_ids'] = _json.dumps(_known)
+                # b10-w2 (M7, port of idea/b7-1 e9dfe52 + cca104a, mapping part only): every listed item with an id and
+                # its short text fields, so the pre-hook maps an id the model BUILT ('credit_card_2288', 'pl_1234') to
+                # the one listed item it can only mean, instead of a refused write and a second write for the item.
+                _items = []
+                _stack = [_d]
+                while _stack:
+                    _o = _stack.pop()
+                    if isinstance(_o, list):
+                        _stack.extend(reversed(_o))
+                    elif isinstance(_o, dict):
+                        _ik = [k for k in _o.keys() if str(k).endswith('_id') and k != 'customer_id' and isinstance(_o.get(k), (str, int))]
+                        if _ik and _o is not _d:
+                            _items.append({'_key': str(_ik[0]), '_id': str(_o.get(_ik[0])),
+                                           '_text': [str(x).lower() for k, x in _o.items() if k not in _ik and k not in ('band', 'deadline', 'deadline_weekday')
+                                                     and isinstance(x, str) and 2 <= len(str(x)) <= 40]})
+                        for _x in _o.values():
+                            if isinstance(_x, (dict, list)):
+                                _stack.append(_x)
+                if _items:
+                    _v['known_items'] = _json.dumps(_items)
 except Exception:
     pass
 '''
@@ -200,6 +220,23 @@ try:
                     _b[_k] = _low[_val.lower()]
                 elif len(_ids) == 1:
                     _b[_k] = _ids[0]
+                elif _val:
+                    # An id the model built: the one listed item whose own text fields (type, last digits, name, or
+                    # the initials of a multi-word type) appear in it. A tie or no match: sent as it is (bank answers).
+                    _its = _json.loads(vars.get('known_items') or '[]')
+                    _al = lambda z: ''.join(ch for ch in str(z).lower() if ch.isalnum())
+                    _vl = _al(_val)
+                    _sc = []
+                    for _it in _its:
+                        if _it.get('_key') != _k:
+                            continue
+                        _n = sum(len(_al(x)) for x in _it.get('_text') or [] if len(_al(x)) >= 2 and _al(x) in _vl)
+                        _ini = [''.join(w[0] for w in str(x).replace('-', ' ').replace('_', ' ').split() if w) for x in _it.get('_text') or []]
+                        _n += sum(len(i) for i in _ini if len(i) >= 2 and _vl.startswith(i))
+                        _sc.append((_n, _it.get('_id')))
+                    _sc.sort(reverse=True)
+                    if _sc and _sc[0][0] > 0 and (len(_sc) == 1 or _sc[1][0] < _sc[0][0]):
+                        _b[_k] = _sc[0][1]
 except Exception:
     pass
 try:

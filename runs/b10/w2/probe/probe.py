@@ -43,15 +43,18 @@ tool = {"type": "function", "config": {"timeoutMs": 10000, "maxRetries": 0},
                          "body": {"type": "object", "properties": {"label": {"type": "string", "default": "{{label}}", "description": "the label"}}, "required": ["label"]}},
                          "required": ["body"]}},
         "pre_process_code": PRE, "post_process_code": POST}
+HANG = json.load(open(pathlib.Path(__file__).resolve().parents[4] / "out" / "w2-A.workflow.json"))["nodes"]["hang_up"]
 wf = {"initial_node": "talk", "system_prompt": "You are a test assistant.", "global_nodes": {},
       "nodes": {"talk": {"name": "talk", "node_type": "conversation", "on_enter": {"type": "tts", "text": "Ready."},
                          "on_enter_first_entry_only": True,
                          "task_message": "When the user gives labels, call probe_write once per label, ALL IN THE SAME TURN as parallel tool calls. Then report each result's `trace` field verbatim.",
-                         "tools": [tool], "transitions": []}}}
+                         "tools": [tool], "transitions": [{"target_node": "hang_up", "description": "never", "condition": {"logic": "or", "conditions": [{"variable": "probe_write_success_count", "operator": "greater_than", "operand": 50}]}}]},
+                "hang_up": HANG}, "test_variables": {"now": "2026-10-11T10:00:00"}}
 if __name__ == "__main__":
     st = freya.save_workflow("w2-rA", wf, state_file=str(pathlib.Path(__file__).resolve().parents[4] / ".freya-agents.json"))
     print(st)
     wid = st["workflow_id"]
+    if "--save-only" in sys.argv: sys.exit(0)
     r = freya.api("POST", "/api/v2/chat/message", {"workflowId": wid, "message": "Hi", "customerVariables": {"now": "2026-10-11T10:00:00"}})
     cid = r.get("callId"); print("A:", r.get("response"))
     r = freya.api("POST", "/api/v2/chat/message", {"workflowId": wid, "callId": cid, "fromMessageId": r.get("messageId"),
