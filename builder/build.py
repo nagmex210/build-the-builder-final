@@ -216,14 +216,35 @@ async def claude_stream(prompt, options, trace, label="build agent"):
                 print(f"\ndone: {message.num_turns} turns, {message.duration_ms / 1000:.0f} s", flush=True)
 
 
+def clear_slot(slot):
+    """Build reliability (seen b8): with old files of the slot in out/ (a previous build's workflow.prev.json, generator
+    scripts like out/<slot>.gen.py or out/gen_<slot>/), the inner agent edits THEM instead of building from the brief:
+    the same commit then ships an older builder's agent and its defects (an unbound {{var}} came back this way). On
+    Sunday the slot is new; every build starts as if it were. Old files move out of the kit (not deleted)."""
+    import re as _re, shutil, tempfile
+    keys = {slot, slot.replace("-", ""), slot.replace("-", "_")}
+    pat = _re.compile(r"(^|[^A-Za-z0-9])(" + "|".join(_re.escape(k) for k in keys) + r")([^A-Za-z0-9]|$)")
+    dest, moved = None, []
+    for d in (KIT / "out", KIT / "scratch"):
+        for f in (d.iterdir() if d.exists() else []):
+            if pat.search(f.name):
+                dest = dest or pathlib.Path(tempfile.mkdtemp(prefix=f"btb-old-{slot}-"))
+                shutil.move(str(f), str(dest / f.name)); moved.append(f.name)
+    return moved, dest
+
+
 async def run(slot, tools, briefs):
     t0 = time.time()
+    moved, dest = clear_slot(slot)
     trace = KIT / "runs" / "traces" / f"{slot}-{time.strftime('%Y%m%d-%H%M%S')}.jsonl"
     trace.parent.mkdir(parents=True, exist_ok=True)
     os.environ["BTB_TRACE"] = str(trace)          # btb/llm.py appends its model calls here too
     os.environ["BTB_TOOLS_API"] = str(tools)      # save.py puts back every body field this API file requires
     print(f"trace: {trace}", flush=True)
     print(f"BUILD START {now()} slot={slot}", flush=True)
+    if moved:
+        print(f"clean slot: moved {len(moved)} old file(s) of this slot out of the kit to {dest}", flush=True)
+        log(trace, event="clean slot", what="old files of this slot moved away so the build starts from the brief", moved=moved, to=str(dest))
     stop_tail = threading.Event()
     tailer = threading.Thread(target=tail_model_calls, args=(str(trace), stop_tail), daemon=True)
     tailer.start()
@@ -243,7 +264,8 @@ async def run(slot, tools, briefs):
               f"Do not run tools/run_cases.py or any practice cases (a new brief comes without them), and do not read "
               f"other slots' files in out/: build only from the files named here, the docs and the example. "
               f"Time limit: you have {BUDGET_S // 60} minutes in total, then you are stopped. Save a complete first version "
-              f"early (within about 10 minutes), then improve and re-save. Live chat tests: a few turns only, no waiting loops.")
+              f"early (within about 10 minutes), then improve and re-save. Build from the brief: never start from an earlier "
+              f"workflow or generator script (if you write a generator, name it out/{slot}.gen.py). Live chat tests: a few turns only, no waiting loops.")
     # Every build starts from no workflow file: the inner Claude would otherwise edit the previous build's file and keep
     # its old hook blocks (harden/robust do not replace a block they already find), and a failed Claude run would ship it.
     old_wf = KIT / "out" / f"{slot}.workflow.json"
