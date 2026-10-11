@@ -112,13 +112,16 @@ async def self_simulate(slot, tools, briefs, trace, wf_file, final_pass, options
         return
     log(trace, event="test", what="self-simulation round 1: deterministic ledger checks", where=r1["where"], n=r1["n"],
         failed=r1["n_failed"], checks_failed=r1["n_checks_failed"], seconds=round(time.time() - t_start), rows=r1["rows"])
-    print(f"self-test 1 ({r1['where']}): {r1['n_failed']}/{r1['n']} personas failed a check ({r1['n_checks_failed']} checks)", flush=True)
+    print(f"self-test 1 ({r1['where']}): {r1['n_failed']}/{r1['n']} personas failed a check ({r1['n_checks_failed']} checks)"
+          f"{'; NO chat ran to the end: the agent was NOT tested' if not r1['n'] else ''}", flush=True)
     print_round("self-test 1: personas written from the brief, deterministic ledger checks", r1)
     (KIT / "out" / f"{slot}.selftest1.json").write_text(json.dumps({"personas": personas, **r1}, indent=1, default=str))
     r1_s = time.time() - t_start
     retest_s = min(ROUND_S, r1_s + 60)          # the re-test takes about as long as round 1 did (platform load)
     if not r1["n_failed"] or r1["n"] < len(personas) or left() < retest_s + 90:
-        log(trace, event="ship", what="no fix round", why="no failed check" if not r1["n_failed"] else
+        # a round with no valid chat has no failed check either: say why it is not a pass (seen b10: 12/12 chats 402)
+        log(trace, event="ship", what="no fix round", why=f"no valid chat ({len(r1['rows'])} not usable): untested, not passed"
+            if not r1["n"] else "no failed check" if not r1["n_failed"] else
             ("too few valid chats" if r1["n"] < len(personas) else "no time left"))
         return
     best = wf_file.read_text()
