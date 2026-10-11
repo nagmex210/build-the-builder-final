@@ -48,7 +48,7 @@ try:
             _err0 = str(_d.get('error') or result.get('message') or '').lower()
             if _v.get('dup_hit_' + _t):
                 _same = 'the same values were sent again'
-            elif _failed and isinstance(_prev, dict) and any(w in _err0 for w in ('already', 'exists', 'duplicate')):
+            elif _failed and isinstance(_prev, dict) and (any(w in _err0 for w in ('exist', 'duplicate')) or ('already' in _err0 and 'closed' not in _err0)):
                 _same = ('the bank answered: ' + str(_d.get('error') or result.get('message'))[:120] +
                          '; the values on record are the earlier ones: ' + str(_prev.get('fp') or '').replace('|', ', '))
             if _same:
