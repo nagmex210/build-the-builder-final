@@ -162,6 +162,13 @@ async def self_simulate(slot, tools, briefs, trace, wf_file, final_pass, options
         await asyncio.wait_for(claude_stream(prompt, options, trace, "self-test fix"), timeout=fix_s)
     except asyncio.TimeoutError:
         log(trace, event="budget", what="fix round stopped at its time budget")
+    except Exception as e:  # noqa: BLE001  b10 merge: an SDK error (CLIJSONDecodeError, a >1 MB message after an Edit of
+        # the workflow file) killed main-A/main-B with no result line. The half-done fix is not trusted: the platform
+        # still holds the build's saved workflow, so put the file back and ship that.
+        wf_file.write_text(best)
+        log(trace, event="ship", what="fix round crashed: shipping the build's saved workflow", error=str(e)[:300])
+        print(f"self-test fix round crashed ({str(e)[:150]}); shipping the build's saved workflow", flush=True)
+        return
     log(trace, event="fix", what="self-simulation fix round: Claude EDITs the workflow with the failed checks", seconds=round(time.time() - t))
     try:
         json.loads(wf_file.read_text())
@@ -326,6 +333,7 @@ async def run(slot, tools, briefs):
         allowed_tools=["Read", "Write", "Edit", "Glob", "Grep", "Bash"],
         permission_mode="dontAsk",
         max_turns=150,
+        max_buffer_size=16 * 1024 * 1024,   # the SDK's 1 MB default: an Edit of a big workflow file crashed the fix round (b10)
         env={"BASH_DEFAULT_TIMEOUT_MS": "900000", "BASH_MAX_TIMEOUT_MS": "1200000", "CLAUDE_CODE_DISABLE_BACKGROUND_TASKS": "1",
              "BTB_TRACE": str(trace)},
     )
@@ -497,7 +505,11 @@ async def run(slot, tools, briefs):
     if saved:
         await build_check(slot, tools, briefs, trace, wf_file, final_pass, options)
     if saved and SELFTEST:
-        await self_simulate(slot, tools, briefs, trace, wf_file, final_pass, options)
+        try:
+            await self_simulate(slot, tools, briefs, trace, wf_file, final_pass, options)
+        except Exception as e:  # noqa: BLE001  the self-test must never cost the build its result line
+            log(trace, event="test", what="self-simulation crashed", error=str(e)[:300])
+            print(f"self-test crashed: {str(e)[:200]}", flush=True)
         st = KIT / "out" / f"{slot}.selftest1.json"
         if st.exists():
             import buildcheck
