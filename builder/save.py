@@ -3,7 +3,7 @@ slot. Prints {"workflow_id", "agent_id", "version"}.
 
     python3 builder/save.py <slot> <workflow.json>
 """
-import fcntl, json, pathlib, sys
+import fcntl, json, os, pathlib, sys
 
 KIT = pathlib.Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(KIT)); sys.path.insert(0, str(KIT / "builder"))
@@ -15,7 +15,14 @@ from guards import install as install_guards  # noqa: E402
 
 
 def finish_and_save(slot, wf, canned=None):
-    names = harden(wf)
+    names = []
+    api = os.environ.get("BTB_TOOLS_API")
+    if api and pathlib.Path(api).exists():          # the build agent can drop a required field (b5: customer_id everywhere)
+        from apicheck import repair
+        names += ["api-required:" + f for f in repair(wf, json.loads(pathlib.Path(api).read_text()))]
+    from hookcheck import repair as repair_hooks   # a hook that raises fails its tool every call (b5: `response`)
+    names += ["hook-repair:" + f for f in repair_hooks(wf)]
+    names += harden(wf)
     calc = KIT / "out" / f"{slot}.calc.json"
     if calc.exists():
         c = json.loads(calc.read_text())

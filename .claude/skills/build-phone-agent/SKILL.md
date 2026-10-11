@@ -48,6 +48,12 @@ Work from the kit folder. Use only what the brief and the tool API file say. Do 
   id from the product's name. The pre-hook repairs an id only when there is a single candidate.
 - When a tool returns `ok: false` for a reason other than a service failure (wrong id, already recorded, refused), the
   agent tells the customer the truth in one sentence and follows the brief; it does not repeat an identical call.
+- A write that already succeeded in this call and is sent again with the same values is not sent to the bank: its
+  result has `tool_outcome` starting with `ALREADY RECORDED` (also when the bank answers "already exists" after our own
+  success). That is a success: never call it a failure or a service error, never send it again, continue.
+- In your own hooks the post-hook's input is `result` and the pre-hook's is `config` (there is no `response`): a
+  hook that raises fails its tool on EVERY call. Keep every body field the tool API file marks required, in the body
+  `properties` and its `required` list. `save.py` checks both and repairs them.
 
 ## Customers talk like people
 
