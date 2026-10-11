@@ -403,3 +403,4 @@ b10 families: the owner's five (BUG HUNT pipeline, BUG HUNT workflow, SIMPLIFY, 
 verbatim to runs/next_families.txt; the owner note's families block is removed from merger_notes.md (handled), its b10
 merger instruction kept.
 WARNING for b10: the main-A/B/rA/rB/C slots on Freya hold the merge/b9 builds (not kept), not the champion's; rebuild main-* from main before any official or final run.
+(11:20-11:31 the b9 merger tried to rebuild main-A/main-B from main: every save PUT answered 504 and the builds hit the 10-min tool limit; the main-* slots are in an unknown state, rebuild them. Logs: runs/b9/rebuild/.)
