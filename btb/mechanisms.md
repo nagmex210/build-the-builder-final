@@ -6,7 +6,7 @@ Last update: after batch b8 workers + the aborted b7 merge (2026-10-11 ~07:40 UT
 
 ## 0. Read first (b8)
 
-- **The b7 merge candidate after its two fixes (merge/b7 66d7282) beat the champion OFFICIALLY on every brief**:
+- **The b7 merge candidate after its two fixes (merge/b7 66d7282) beat the champion OFFICIALLY on A and raw-B, tied B and raw-A**:
   A 9/10, B 2/3, rA 10/10, rB 3/3 = 24 vs champion (b6) 7+2+10+1 = 20; fast 14/26 vs 12; C 3/12 vs 1-2. The abort
   was on the PRE-fix 0/3 raw-B (hook over the size limit, M53). Re-measure it or carry its fixes (section 4).
 - **Self-simulation has been a no-op since b7**: workspace 2 answers 402 Insufficient credits, every build logs
@@ -135,7 +135,7 @@ M17/M25/M52. LLM mistake counts / best-of-N cannot pick builds; rule TEXT covera
 
 | failure kind still on main | branch / commit with the fix | status |
 |---|---|---|
-| hook over 128 KB (M53); tool names with '/' in the calc spec -> no guard (official B 0/3) | merge/b7 66d7282 (compact spec) + cedb5ea | **official on merge/b7: A 9, B 2, rA 10, rB 3 (best ever)**; add a size gate (b8-1 fc3beb3 `_put` cap, b8-5 83381f9) |
+| hook over 128 KB (M53); tool names with '/' in the calc spec -> no guard (official B 0/3) | merge/b7 66d7282 (compact spec) + cedb5ea | **official on merge/b7: A 9, B 2, rA 10, rB 3 (best ever)**; size flag now in main hookcheck (b03d0a9, b8 merge); shrinking hooks still only on merge/b7 66d7282, b8-1 fc3beb3, b8-5 83381f9 |
 | invented floor / floor twice (M27) | idea/b7-2 0e86b1b check_promise_amount; idea/b8-4 39e86d1..af9d73e (amount in check_promise_date + floor_offered count) | b7-2 is in merge/b7 (official floor case 2/2); b8-4 rA 6/10 = champion, A 5/10 (noise) |
 | silent stale build when nothing saved (M9); stale slot files (M57); unbound vars / reachability (M58) | idea/b8-3 d3b1ed9, 1454263, bbfc17e buildcheck.py | measured: 2/9 -> 0/9 defects, 2/9 -> 0/9 stale reuse; no score effect expected |
 | condition-less transitions (M46), SDK buffer (M47) | idea/b7-2 8d47ffc, 4723aef (in merge/b7) | pure robustness |
