@@ -22,8 +22,7 @@ scored ONLY by deterministic checks on the bank's ledger (no LLM judge: judge mi
    - the persona's CHECKS written from the brief.
 Returns {"n": valid chats, "n_failed": chats with a failed check, "n_checks_failed": k, "rows": [...]}.
 """
-import argparse, datetime, json, os, pathlib, subprocess, sys, time
-from concurrent.futures import ThreadPoolExecutor
+import argparse, datetime, json, os, pathlib, subprocess, sys, threading, time
 
 KIT = pathlib.Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(KIT)); sys.path.insert(0, str(KIT / "tools")); sys.path.insert(0, str(KIT / "btb")); sys.path.insert(0, str(KIT / "builder"))
@@ -151,7 +150,8 @@ class Workspace2:
         if k:
             try:
                 freya.HEADERS["Authorization"] = "Bearer " + k; freya._ws = None; os.environ.pop("FREYA_WORKSPACE_ID", None)
-                st = freya.save_workflow("st-" + self.slot, self.wf, state_file=str(KIT / ".freya-agents-ws2.json"))
+                from save import locked_save    # parallel builds share this state file too
+                st = locked_save("st-" + self.slot, self.wf, KIT / ".freya-agents-ws2.json")
                 self.used = True
                 return st["workflow_id"], "workspace 2"
             except Exception as e:  # noqa: BLE001
@@ -422,16 +422,27 @@ def run_tests(slot, wf, scenarios, calc_file, timeout=CHAT_S + 120, reps=2):
     scenarios = [s for s in scenarios for _ in range(reps)]
     with Workspace2(slot, wf) as (wid, where):
         if wid is None:
-            wid = json.loads((KIT / ".freya-agents.json").read_text())[slot]["workflow_id"]
-        ex = ThreadPoolExecutor(len(scenarios) or 1)
-        futs = [ex.submit(run_one, wid, s, lib) for s in scenarios]
-        rows, t0 = [], time.time()
-        for s, f in zip(scenarios, futs):
+            from save import read_state
+            wid = read_state(slot, KIT / ".freya-agents.json")["workflow_id"]
+        # Daemon threads, not a ThreadPoolExecutor: its workers are joined at interpreter exit, so one chat stuck in
+        # platform 5xx retries kept the finished build process alive past BUILD END (and past the 30-min cap).
+        res = [None] * len(scenarios)
+        def play(i, s):
             try:
-                rows.append(f.result(timeout=max(1, timeout - (time.time() - t0))))
-            except Exception:  # noqa: BLE001  a stuck chat must not hold the build
-                rows.append({"title": s["title"], "customer": s["cust"]["id"], "harness_error": "chat did not finish in time", "failed": [], "tools": []})
-        ex.shutdown(wait=False, cancel_futures=True)
+                res[i] = run_one(wid, s, lib)
+            except Exception as e:  # noqa: BLE001
+                res[i] = e
+        threads = [threading.Thread(target=play, args=(i, s), daemon=True) for i, s in enumerate(scenarios)]
+        for th in threads:
+            th.start()
+        rows, t0 = [], time.time()
+        for i, (s, th) in enumerate(zip(scenarios, threads)):
+            th.join(max(1, timeout - (time.time() - t0)))
+            if isinstance(res[i], dict):
+                rows.append(res[i])
+            else:  # a stuck or crashed chat must not hold the build
+                rows.append({"title": s["title"], "customer": s["cust"]["id"], "failed": [], "tools": [],
+                             "harness_error": "chat did not finish in time" if res[i] is None else f"chat crashed: {str(res[i])[:150]}"})
     valid = [r for r in rows if "harness_error" not in r]
     return {"where": where, "n": len(valid), "n_failed": sum(1 for r in valid if r["failed"]),
             "n_checks_failed": sum(len(r["failed"]) for r in valid), "rows": rows}

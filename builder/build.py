@@ -87,12 +87,21 @@ async def self_simulate(slot, tools, briefs, trace, wf_file, final_pass, options
     text = "\n\n".join(pathlib.Path(b).read_text() for b in briefs)
     calc_file = KIT / "out" / f"{slot}.calc.json"
     loop = asyncio.get_running_loop()
+    # Round 1 is bounded by the build's time left too (it used to get ROUND_S whatever was left: a late build ran past 30 min).
+    MARGIN_S, MIN_ROUND_S = 60, 120
+    if left() < MIN_ROUND_S + MARGIN_S + 60:
+        log(trace, event="test", what="self-simulation round 1", error=f"SELF-TEST DID NOT RUN: only {left():.0f} s of the build budget left")
+        print(f"self-test skipped: only {left():.0f} s of the build budget left", flush=True)
+        return
     try:
         personas = await loop.run_in_executor(None, selftest.write_personas, text, tools, KIT / "public-test-set.json", SELFTEST_N)
         log(trace, event="test", what="self-simulation: personas + ledger checks written from the brief",
             personas=[{"title": p["title"], "customer": p["customer"], "script": p["script"], "checks": p["checks"]} for p in personas])
         wf1 = json.loads(wf_file.read_text())
-        r1 = await loop.run_in_executor(None, selftest.run_tests, slot, wf1, personas, calc_file, ROUND_S)
+        r1_budget = min(ROUND_S, left() - MARGIN_S)
+        if r1_budget < MIN_ROUND_S:
+            raise RuntimeError(f"SELF-TEST DID NOT RUN: only {left():.0f} s of the build budget left after writing personas")
+        r1 = await loop.run_in_executor(None, selftest.run_tests, slot, wf1, personas, calc_file, r1_budget)
     except Exception as e:  # noqa: BLE001
         log(trace, event="test", what="self-simulation round 1", error=str(e)[:300]); print(f"self-test skipped: {e}", flush=True)
         return
@@ -234,7 +243,8 @@ def clear_slot(slot):
     Sunday the slot is new; every build starts as if it were. Old files move out of the kit (not deleted)."""
     import re as _re, shutil, tempfile
     keys = {slot, slot.replace("-", ""), slot.replace("-", "_")}
-    pat = _re.compile(r"(^|[^A-Za-z0-9])(" + "|".join(_re.escape(k) for k in keys) + r")([^A-Za-z0-9]|$)")
+    # '-' is never a boundary and '_' not after the name: slot 'brief-a' must not take 'brief-a-raw.*' (another slot's files)
+    pat = _re.compile(r"(^|[^A-Za-z0-9-])(" + "|".join(_re.escape(k) for k in keys) + r")([^A-Za-z0-9_-]|$)")
     dest, moved = None, []
     for d in (KIT / "out", KIT / "scratch"):
         for f in (d.iterdir() if d.exists() else []):
@@ -440,7 +450,8 @@ async def run(slot, tools, briefs):
                                           json.loads(st.read_text()))
             log(trace, event="test", what="buildcheck after self-simulation (round-1 record: catastrophic failure?)", errors=errs)
             print(f"buildcheck (shipped): {len(errs)} problem(s){': ' + '; '.join(errs) if errs else ''}", flush=True)
-    state = json.loads((KIT / ".freya-agents.json").read_text()).get(slot) if (KIT / ".freya-agents.json").exists() else None
+    from save import read_state
+    state = read_state(slot, KIT / ".freya-agents.json")
     if state and not saved:
         # Build reliability (seen b8): the agent failed, nothing was saved in THIS run, and the slot's state still named the
         # previous build's agent, which was then printed as this build's result. A build that saved nothing fails loudly.
