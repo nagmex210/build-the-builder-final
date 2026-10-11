@@ -75,6 +75,15 @@ try:
                                          + (', '.join(_done) or str(len(_done)) + ' question(s)')
                                          + ('. Identity is fully verified: do not ask any security question again.' if _all else
                                             '. Ask only a question that is not in this list.'))
+            # Identity gate (M18): while the tool's all-verified flag is false, the result says so in words; seen
+            # officially: after one wrong and one right answer the model "moved on" and invented an amount.
+            _allk = [k for k in _d.keys() if 'verif' in str(k).lower() and 'all' in str(k).lower()]
+            if _allk and str(_d.get(_allk[0])).lower() in ('false', '0', 'none', ''):
+                _d['identity_status'] = ('NOT VERIFIED YET (' + str(_allk[0]) + ' is false). You know nothing about '
+                                         'the account: never mention any amount, product, debt or account status. '
+                                         'Follow the brief\'s identity rule: ask the next security question (a '
+                                         'question answered wrongly is asked again if the brief allows), or end '
+                                         'the check when no attempts are left.')
             if _t.startswith('get_') and _v is not None:
                 _known = {}
                 _stack = [_d]
