@@ -168,8 +168,21 @@ try:
         if str(_dd.get('tool_outcome') or '').startswith('ALREADY RECORDED'):
             _say = []                     # a re-send of a recorded write: its line was said the first time
         if _say:
+            import re as _re
+            _src = [_dd] + [_x for _v in _dd.values() if isinstance(_v, list) for _x in _v[:1] if isinstance(_x, dict)] + [vars]
+
+            def _val(_k):                 # a brief placeholder <<k>>: the result's (or first item's, or call) field of that name
+                for _loose in (False, True):  # exact name first; a loose match never takes an id field
+                    for _d in _src:
+                        for _f, _v in _d.items():
+                            if isinstance(_v, (str, int, float)) and (_f == _k or _loose and (_k in _f or _f in _k)
+                                                                       and not _re.search(r'(^|_)(id|ref)$', _f)):
+                                return str(_v)
+                return '[' + _k + ']'
+            _say = [_re.sub(r'<<\s*(\w+)\s*>>', lambda _m: _val(_m.group(1)), s) for s in _say]
             _dd['say_now'] = ('SAY EXACTLY, word for word, in your next message: ' + ' '.join('"' + s + '"' for s in _say)
-                              + ' Do not reword it. Then continue with the next step.')
+                              + ' Do not reword it (only put the real value from this result in place of any [field]).'
+                              ' Then continue with the next step.')
 except Exception:
     pass
 '''
@@ -297,7 +310,7 @@ def apply(wf, canned):
         fn = t.get("function") or {}
         name = fn.get("name")
         if name in by_tool and "say_now" not in (t.get("post_process_code") or ""):
-            t["post_process_code"] = ((t.get("post_process_code") or "").rstrip() + "\n" + HOOK.replace("__LINES__", repr(by_tool[name])).lstrip("\n"))
+            t["post_process_code"] = ((t.get("post_process_code") or "").rstrip() + "\n" + HOOK.replace("__LINES__", repr([(o, x.replace("{{", "<<").replace("}}", ">>")) for o, x in by_tool[name]])).lstrip("\n"))
             done.append("say_now:" + name)
     sp = wf.get("system_prompt") or ""
     if MARK not in sp and (opening or lines or goodbye):   # goodbye text itself: close_structure's end_call node
