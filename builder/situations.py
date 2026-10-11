@@ -125,6 +125,10 @@ def apply(wf, spec):
             lines.append(f"FIRST RULE (brief): {str(e['first_line']).strip()}")
         lines.append("The customer has just told you their situation. Respond to it now, ONCE, in the brief's order. "
                      "Never repeat a sentence you or an earlier node already said in this call.")
+        lines.append("EVERY OFFER AND QUESTION OF THIS SITUATION IS MADE AT MOST ONCE PER CALL (even if you enter this node "
+                     "again): before you speak, look at the conversation; if the offer (e.g. a transfer or support offer) "
+                     "or sympathy was already said, do not say it again: take the customer's latest words as the answer "
+                     "and do the next step (if unclear: one short yes/no question that does not repeat the offer).")
         for o in e.get("once_only") or []:
             if str(o).strip():
                 lines.append(f"ONCE PER CALL: {str(o).strip()}. If it was already said earlier in this call (look at the "
@@ -179,6 +183,13 @@ def check(wf, spec, tool_defs=None):
             todo += list(targets.get(k, ())) + [nodes[k].get("passthrough_default_transition")]
         return False
 
+    exit_keys = {_find(nodes, e["name"]) for e in (spec or {}).get("exits") or []} - {None}
+    # triage-only router: some node that hands off to specialists must also hand off to a separate main-path node
+    routers = [k for k, n in nodes.items() if k not in exit_keys and n.get("node_type") == "conversation"
+               and {t.get("target_node") for t in n.get("transitions") or []} & exit_keys]
+    if routers and not any(t.get("target_node") in routers for k in routers for t in nodes[k].get("transitions") or []):
+        problems.append(f"node '{routers[0]}' routes to the specialists but there is no separate main-path node: make it a "
+                        "triage-only router (state the debt, route) with a tool-call transition to its own negotiate node")
     for e in (spec or {}).get("exits") or []:
         name = e["name"]
         node = nodes.get(name)
