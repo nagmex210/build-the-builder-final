@@ -176,6 +176,7 @@ async def run(slot, tools, briefs):
     trace = KIT / "runs" / "traces" / f"{slot}-{time.strftime('%Y%m%d-%H%M%S')}.jsonl"
     trace.parent.mkdir(parents=True, exist_ok=True)
     os.environ["BTB_TRACE"] = str(trace)          # btb/llm.py appends its model calls here too
+    os.environ["BTB_TOOLS_API"] = str(tools)      # save.py puts back every body field this API file requires
     print(f"trace: {trace}", flush=True)
     print(f"BUILD START {now()} slot={slot}", flush=True)
     stop_tail = threading.Event()
@@ -287,6 +288,16 @@ async def run(slot, tools, briefs):
             names, saved = finish_and_save(slot, wf)
             wf_file.write_text(json.dumps(wf, indent=1))
             errs, warns = lint(wf)
+            try:
+                from hookcheck import errors as hook_errors
+                errs = errs + hook_errors(wf)
+            except Exception as e:  # noqa: BLE001
+                warns = warns + [f"hook dry-run check failed: {e}"]
+            try:
+                from apicheck import missing
+                errs = errs + missing(wf, json.loads(pathlib.Path(tools).read_text()))
+            except Exception as e:  # noqa: BLE001
+                warns = warns + [f"API required-field check failed: {e}"]
             with trace.open("a") as out:
                 out.write(json.dumps({"event": "harden+robust+save", "round": tag, "tools": names, "saved": saved}) + "\n")
                 out.write(json.dumps({"event": "test", "what": "structural lint of the saved workflow", "errors": errs, "warnings": warns}) + "\n")

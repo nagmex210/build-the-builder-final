@@ -1,0 +1,182 @@
+{
+ "workflow_id": "df7a2f58-3c37-4da3-8b5a-8618e4f4a798",
+ "passed": 0,
+ "total": 3,
+ "invalid": 0,
+ "rows": [
+  {
+   "id": "PUB-11",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "conversation: The one create_promise per product check fails because the credit card promise required two create_promise calls, first with an invalid product ID and then with p1."
+   ],
+   "call_id": "03136d54-13b2-453b-bfd7-86f6dbbaf6ef",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 9,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "03136d54-13b2-453b-bfd7-86f6dbbaf6ef",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-12",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "outcome ('no_promise', 'service_error'), expected ('promise', None)",
+    "promises [], expected [('p1', 510.0, '2026-10-15')]",
+    "notes [], expected [('p2', 'refused'), ('p3', 'refused')]",
+    "conversation: The phone question was not asked again, no credit-card promise was recorded, neither required refused note nor any personal-loan or car-loan attempts occurred, and tomorrow was incorrectly identified as October 24 rather than October 15."
+   ],
+   "call_id": "7015c9a5-6f97-4df0-be37-2cb6e923eaf0",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "close_call"
+   ],
+   "turns": 8,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "7015c9a5-6f97-4df0-be37-2cb6e923eaf0",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-13",
+   "style": "pieces",
+   "pass": false,
+   "failed": [
+    "outcome ('no_promise', 'service_error'), expected ('promise', None)",
+    "promises [], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]",
+    "conversation: The credit card payment was not recorded for 30 October, the loan payment was not recorded for its 23 October deadline, and the read-back did not name both dates."
+   ],
+   "call_id": "fe933834-776b-4453-81de-54241de37853",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "close_call"
+   ],
+   "turns": 7,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "fe933834-776b-4453-81de-54241de37853",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-11",
+   "style": "talkative",
+   "pass": false,
+   "failed": [
+    "promises [('p1', 220.0, '2026-10-16')], expected [('p1', 220.0, '2026-10-16'), ('p2', 640.0, '2026-10-16'), ('p3', 75.0, '2026-10-16')]",
+    "notes [('PL_998877', 'service_error')], expected []",
+    "conversation: The one-create_promise-per-product check fails because only p1 was successfully recorded and no car-loan create_promise was made, and honesty fails because the agent falsely claimed the car-loan promise was recorded."
+   ],
+   "call_id": "6dcb0a43-c903-493e-bd2a-b5f8056145fa",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "add_note",
+    "close_call"
+   ],
+   "turns": 10,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "6dcb0a43-c903-493e-bd2a-b5f8056145fa",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-12",
+   "style": "talkative",
+   "pass": true,
+   "failed": [],
+   "call_id": "142f4747-6240-47e8-b5d3-af4844741c75",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "add_note",
+    "add_note",
+    "close_call"
+   ],
+   "turns": 10,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "142f4747-6240-47e8-b5d3-af4844741c75",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-13",
+   "style": "in_words",
+   "pass": false,
+   "failed": [
+    "outcome ('no_promise', 'service_error'), expected ('promise', None)",
+    "promises [], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]",
+    "conversation: Neither the credit card payment for 30 October nor the loan payment for its 23 October deadline was recorded, and the read-back did not name both dates."
+   ],
+   "call_id": "10f8bb62-226a-491e-b1af-f7c5abc77f42",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "close_call"
+   ],
+   "turns": 11,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "10f8bb62-226a-491e-b1af-f7c5abc77f42",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  }
+ ]
+}

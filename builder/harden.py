@@ -35,6 +35,45 @@ try:
             _sc = 0
         _st = str(result.get('status') or 'success').lower()
         _failed = _st not in ('success', 'ok') or _sc >= 400 or _d.get('ok') in (False, 'false', 'False')
+        _same = ''
+        if _v is not None and __WRITE__:
+            # Idempotent writes: a re-send the pre-hook sent to the no-op path, or a bank "already exists" answer after
+            # our own success for the same tool and product, is reported as ALREADY RECORDED (never as a failure).
+            try:
+                _wq = _json.loads(_v.get('write_req_' + _t) or '[]')
+                _wok = _json.loads(_v.get('writes_ok') or '{}')
+            except Exception:
+                _wq, _wok = [], dict()
+            _prev = _wok.get(_t + '#' + str(_wq[0])) if (len(_wq) == 2 and isinstance(_wok, dict)) else None
+            _err0 = str(_d.get('error') or result.get('message') or '').lower()
+            _ack = all(str(k).endswith('_id') for k in _d.keys() if k not in ('ok', 'error', 'tool_outcome', 'what_to_do_next', 'message'))
+            _bare = not [k for k in _d.keys() if k not in ('ok', 'status', 'message', 'what_to_do_next', 'tool_outcome')]
+            if _v.get('dup_hit_' + _t) and _bare:
+                # only the no-op's bare answer: a parallel sibling of the same tool (M20 shares the flag) keeps its own result
+                _same = 'the same values were sent again'
+            elif _failed and isinstance(_prev, dict) and (any(w in _err0 for w in ('exist', 'duplicate')) or ('already' in _err0 and 'closed' not in _err0)):
+                _same = ('the bank answered: ' + str(_d.get('error') or result.get('message'))[:120] +
+                         '; the values on record are the earlier ones: ' + str(_prev.get('fp') or '').replace('|', ', '))
+            if _same:
+                _v['dup_hit_' + _t] = ''
+                if _v.get('last_tool_failed') == _t:
+                    _v['last_tool_failed'] = ''
+                result['status'] = 'success'
+                result['status_code'] = 200
+                result['message'] = 'already recorded'
+                _d = dict(ok=True, already_recorded=True)
+                _d.update((_prev or dict()).get('ids') or dict())
+                _d['tool_outcome'] = ('ALREADY RECORDED earlier in this call: do not send it again. ' + _t +
+                                      (' for ' + str(_wq[0]) if _wq and _wq[0] else '') + ' succeeded earlier in this call ('
+                                      + _same + '), so it IS recorded and nothing new was sent. This is not a failure: never '
+                                      'tell the customer it could not be saved and never treat it as a service error. '
+                                      'Continue with the next step.')
+                result['data'] = _d
+                _failed = False
+            elif not _failed and _ack and len(_wq) == 2 and isinstance(_wok, dict) and not _v.get('guard_block_' + _t):
+                _wok[_t + '#' + str(_wq[0])] = dict(fp=_wq[1], ids=dict((k, x) for k, x in _d.items()
+                                                                       if str(k).endswith('_id') and isinstance(x, (str, int))))
+                _v['writes_ok'] = _json.dumps(_wok)
         if _failed:
             _n = 1
             if _v is not None:
@@ -57,7 +96,9 @@ try:
             if _v is not None and _v.get('last_tool_failed') == _t:
                 _v['last_tool_failed'] = ''
             _keys = [k for k in _d.keys() if k not in ('ok', 'error', 'tool_outcome', 'what_to_do_next')]
-            if __WRITE__ and all(str(k).endswith('_id') for k in _keys):
+            if _same:
+                pass
+            elif __WRITE__ and all(str(k).endswith('_id') for k in _keys):
                 _d['tool_outcome'] = ('SUCCESS: ' + _t + ' was carried out and recorded. Only now may you tell the '
                                       'customer it is recorded. Speak to the customer now.')
             if _v is not None and str(_d.get('verified')).lower() == 'true':
@@ -151,6 +192,35 @@ try:
                     _b[_k] = _ids[0]
 except Exception:
     pass
+try:
+    # Idempotent writes (M12): an identical re-send of a write that already SUCCEEDED in this call goes to the host's
+    # no-op path (nothing reaches the bank) and the post-hook answers ALREADY RECORDED. Key = tool + the request's own
+    # *_id fields (the product), value = the request's fields except free text.
+    import json as _json
+    vars['dup_hit_' + __TOOL__] = ''
+    vars['write_req_' + __TOOL__] = ''
+    _bq = config.get('body') if isinstance(config, dict) else None
+    if isinstance(_bq, dict):
+        def _nv(x):
+            try:
+                return str(round(float(str(x).replace(',', '').strip()), 2))
+            except Exception:
+                return str(x).strip().lower()
+        _pk = '|'.join(str(_bq.get(k)) for k in sorted(_bq) if str(k).endswith('_id') and k != 'customer_id')
+        _fp = '|'.join(str(k) + '=' + _nv(_bq.get(k)) for k in sorted(_bq)
+                       if not (isinstance(_bq.get(k), str) and len(str(_bq.get(k)).split()) >= 4))
+        vars['write_req_' + __TOOL__] = _json.dumps([_pk, _fp])
+        try:
+            _wok = _json.loads(vars.get('writes_ok') or '{}')
+        except Exception:
+            _wok = dict()
+        _prev = _wok.get(__TOOL__ + '#' + _pk) if isinstance(_wok, dict) else None
+        _u = str(config.get('url') or '').split('/')
+        if isinstance(_prev, dict) and _prev.get('fp') == _fp and __NOOP__ and len(_u) > 2 and _u[0] in ('http:', 'https:') and _u[2]:
+            vars['dup_hit_' + __TOOL__] = _pk or 'this call'
+            config['url'] = _u[0] + '//' + _u[2] + __NOOP__
+except Exception:
+    pass
 '''
 
 
@@ -165,6 +235,15 @@ def _api_tools(wf):
                 yield t
     for t in wf.get("tools") or []:
         yield t
+
+
+def _noop(t):
+    """The tool host's no-op path (guards.find_noop, probed once per host): an identical re-send of a write goes there."""
+    try:
+        from guards import find_noop, _url
+        return find_noop(_url(t))
+    except Exception:  # noqa: BLE001
+        return ""
 
 
 def harden(wf):
@@ -192,7 +271,8 @@ def harden(wf):
             t["post_process_code"] = (old_post + "\n" if old_post else "") + post.lstrip("\n")
         old_pre = (t.get("pre_process_code") or "").strip()
         if write and "known_ids" not in old_pre:
-            t["pre_process_code"] = PRE.replace("__TOOL__", repr(name)).lstrip("\n") + ("\n" + old_pre if old_pre else "")
+            pre = PRE.replace("__TOOL__", repr(name)).replace("__NOOP__", repr(_noop(t)))
+            t["pre_process_code"] = pre.lstrip("\n") + ("\n" + old_pre if old_pre else "")
         done.append(name)
     return done
 

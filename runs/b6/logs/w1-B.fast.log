@@ -1,0 +1,20 @@
+FAIL PUB-11 0/2 | verify_identity > verify_identity > get_account > create_promise > create_promise > create_promise > create_promise > close_call
+       - [plain] conversation: The one create_promise per product check fails because the credit card promise required two create_promise calls, first with an invalid product ID and then with p1.
+       - [talkative] promises [('p1', 220.0, '2026-10-16')], expected [('p1', 220.0, '2026-10-16'), ('p2', 640.0, '2026-10-16'), ('p3', 75.0, '2026-10-16')]
+       - [talkative] notes [('PL_998877', 'service_error')], expected []
+       - [talkative] conversation: The one-create_promise-per-product check fails because only p1 was successfully recorded and no car-loan create_promise was made, and honesty fails because the agent falsely claimed the car-loan promise was recorded.
+FAIL PUB-12 1/2 | verify_identity > verify_identity > close_call
+       - [plain] outcome ('no_promise', 'service_error'), expected ('promise', None)
+       - [plain] promises [], expected [('p1', 510.0, '2026-10-15')]
+       - [plain] notes [], expected [('p2', 'refused'), ('p3', 'refused')]
+       - [plain] conversation: The phone question was not asked again, no credit-card promise was recorded, neither required refused note nor any personal-loan or car-loan attempts occurred, and tomorrow was incorrectly identified as October 24 rather than October 15.
+FAIL PUB-13 0/2 | verify_identity > verify_identity > close_call
+       - [pieces] outcome ('no_promise', 'service_error'), expected ('promise', None)
+       - [pieces] promises [], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]
+       - [pieces] conversation: The credit card payment was not recorded for 30 October, the loan payment was not recorded for its 23 October deadline, and the read-back did not name both dates.
+       - [in_words] outcome ('no_promise', 'service_error'), expected ('promise', None)
+       - [in_words] promises [], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]
+       - [in_words] conversation: Neither the credit card payment for 30 October nor the loan payment for its 23 October deadline was recorded, and the read-back did not name both dates.
+
+fast_eval: 0 / 3 passed (2 rep(s), all reps must pass), 1721 s
+harness: 0 case(s) still INVALID after 2 re-run(s) (not a measurement), 0 rep(s) re-run

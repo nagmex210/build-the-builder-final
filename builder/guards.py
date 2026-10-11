@@ -61,7 +61,7 @@ try:
     vars['guard_block_' + _T] = ''
     _gb = config.get('body') if isinstance(config, dict) else None
     _G = SPEC.get('guards') or dict()
-    if isinstance(_gb, dict):
+    if isinstance(_gb, dict) and not vars.get('dup_hit_' + _T):       # an identical re-send: harden answers it
         _t = today_of(vars.get(SPEC.get('now_variable') or 'now'))
         _why = []
         _pid = str(_gb.get(_G.get('promise_product_field') or 'product_id') or '')
@@ -168,7 +168,7 @@ try:
     _gb = config.get('body') if isinstance(config, dict) else None
     _G = SPEC.get('guards') or dict()
     _cb = SPEC.get('callback') or dict()
-    if isinstance(_gb, dict) and _G.get('callback_date_field') and _cb.get('business_days_ahead') is not None:
+    if isinstance(_gb, dict) and not vars.get('dup_hit_' + _T) and _G.get('callback_date_field') and _cb.get('business_days_ahead') is not None:
         _now = str(vars.get(SPEC.get('now_variable') or 'now') or '')
         _t = today_of(_now)
         _why = []
