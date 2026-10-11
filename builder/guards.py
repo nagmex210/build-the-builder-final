@@ -250,6 +250,42 @@ CHECK_NAME = "check_promise_date"
 # A code-only lookup (A: "code answers"): the model sends the date the CUSTOMER named, code says whether it can be
 # recorded and, if not, the ONE date to offer. The request goes to the no-op path (nothing reaches the bank).
 CHECK_PRE = r'''
+def check_amount(_pid, _p, _as, vars):
+    # M27: the amount to OFFER comes from code. The model sends the amount the customer named (0 = "I cannot pay the
+    # full amount" / no figure named); code answers keep it, or the ONE lower amount the brief allows (the floor).
+    _G = SPEC.get('guards') or dict()
+    _a = num(_as)
+    _mx = _p.get('max')
+    _fl = _p.get('floor')
+    if _fl is not None and _mx is not None:
+        _fl = min(_fl, _mx)
+    try:
+        _fo = json.loads(vars.get('floor_offered') or '{}')
+    except Exception:
+        _fo = dict()
+    _seen = int(_fo.get(_pid) or 0) if isinstance(_fo, dict) else 0
+    if _a is not None and _mx is not None and _a > _mx + 0.005:
+        return dict(ok=True, can_record=False, offer_amount=_mx, say='CANNOT BE RECORDED: ' + str(_a) + ' is more than the full amount owed on product ' + _pid +
+                    ' (' + str(_mx) + '). The most that can be recorded is ' + str(_mx) + '.')
+    if _a is not None and _a > 0 and (_fl is None or _a >= _fl - 0.005):
+        return dict(ok=True, can_record=True, amount=_a, say='CAN BE RECORDED: ' + str(_a) + ' is an allowed amount for product ' + _pid +
+                    '. Keep the customer\'s amount (do not offer a different figure).')
+    if _fl is None:
+        return dict(ok=True, can_record=None, say='Code has no lowest amount for product ' + _pid + ': follow the brief\'s rule for this product exactly; '
+                    'never invent a minimum or a round figure.')
+    if isinstance(_fo, dict):
+        _fo[_pid] = _seen + 1
+        vars['floor_offered'] = json.dumps(_fo)
+    _w = ('' if (_a is None or _a <= 0) else (str(_a) + ' is below the lowest amount that can be recorded. '))
+    if _seen >= 1:
+        return dict(ok=True, can_record=False, lowest_amount=_fl, floor_already_offered=_seen,
+                    say='CANNOT BE RECORDED: ' + _w + 'The lowest amount for product ' + _pid + ' (' + str(_fl) + ') was ALREADY offered in this call. '
+                    'Do not offer it again (unless the brief explicitly allows a repeat) and never offer any other figure: follow the brief\'s next step for a customer who cannot pay it '
+                    '(e.g. the refusal note, a transfer or the hardship route, as the brief says).')
+    return dict(ok=True, can_record=False, lowest_amount=_fl,
+                say=('CANNOT BE RECORDED: ' if _w else '') + _w + 'CODE COMPUTED THE LOWEST AMOUNT for product ' + _pid + ': ' + str(_fl) +
+                ' (the brief\'s floor, already rounded the brief\'s way). If the brief lets you offer a lower amount now, offer exactly ' + str(_fl) +
+                ' (never a smaller, round or other figure, never "any amount") and only as often as the brief allows.')
 try:
     _gb = config.get('body') if isinstance(config, dict) else None
     _G = SPEC.get('guards') or dict()
@@ -263,11 +299,18 @@ try:
             _prods = dict()
         _p = _prods.get(_pid) if isinstance(_prods, dict) else None
         _ds = str(_gb.get('date') or '').strip()[:10]
+        if chr(123) in _ds:
+            _ds = ''
         try:
             _d = D.fromisoformat(_ds)
         except Exception:
             _d = None
-        if _d is None:
+        _as = str(_gb.get('amount') if _gb.get('amount') is not None else '').strip()
+        if chr(123) in _as:
+            _as = ''
+        if _as and isinstance(_p, dict) and _d is None:
+            _out = check_amount(_pid, _p, _as, vars)
+        elif _d is None and not _as:
             _out = dict(ok=False, can_record=False, say='Ask the customer for the exact day (the date "' + _ds + '" is not a date in YYYY-MM-DD form).')
         elif not isinstance(_p, dict):
             _out = dict(ok=False, can_record=False, say='Unknown product_id "' + _pid + '": copy it exactly from the account result' +
@@ -300,6 +343,12 @@ try:
                 _out = dict(ok=True, can_record=False, offer_date=_o.isoformat(), say='CANNOT BE RECORDED: ' + '; '.join(_why) +
                             '. CODE COMPUTED THE DATE TO OFFER: ' + fmt(_o) + '. Tell the customer in one short sentence why, and offer exactly ' +
                             fmt(_o) + ' (no other date).')
+            if _as:
+                _am = check_amount(_pid, _p, _as, vars)
+                _out['amount_check'] = _am
+                _out['say'] = _out['say'] + ' AMOUNT: ' + _am.get('say', '')
+                if not _am.get('can_record'):
+                    _out['can_record'] = False
     vars['guard_check_result'] = json.dumps(_out)    # one shared slot: parallel sibling calls can overwrite it (M20)
     config['url'] = noop_url(config.get('url'))
 except Exception:
@@ -334,18 +383,21 @@ def _add_check_tool(wf, promise, g, noop):
             continue
         t = {"type": "function", "config": copy.deepcopy(promise.get("config") or {"timeoutMs": 12000, "maxRetries": 0}),
              "function": {"name": CHECK_NAME, "handler": "__function__:api_call",
-                          "description": "Code check of a promise date, BEFORE you answer the customer. Call it as soon as the customer "
-                                         "names a day (after looking the day up in DATE FACTS), with the product_id and that date as YYYY-MM-DD. "
-                                         "The result says CAN BE RECORDED (keep the customer's date) or CANNOT BE RECORDED with the one date "
-                                         "to offer. Say what `say` tells you. It records nothing. ONE call per message: with several products, "
+                          "description": "Code check of a promise date and/or amount, BEFORE you answer the customer. Call it as soon as the customer "
+                                         "names a day (after looking the day up in DATE FACTS), with the product_id and that date as YYYY-MM-DD; "
+                                         "and as soon as the customer names an amount below the full amount or says they cannot pay the full amount, "
+                                         "with the product_id and that amount (0 if they named no figure). "
+                                         "The result says CAN BE RECORDED (keep the customer's value) or CANNOT BE RECORDED with the one date "
+                                         "or amount to offer. Say what `say` tells you. It records nothing. ONE call per message: with several products, "
                                          "check them one after the other, never two in parallel.",
                           "parameters": {"type": "object", "properties": {
                               "url": {"type": "string", "default": u[0] + "//" + u[2] + noop},
                               "method": {"type": "string", "default": "POST"},
                               "headers": {"type": "object", "properties": {"Content-Type": {"type": "string", "default": "application/json"}}},
-                              "body": {"type": "object", "required": ["product_id", "date"], "properties": {
+                              "body": {"type": "object", "required": ["product_id"], "properties": {
                                   "product_id": {"type": "string", "default": "{{product_id}}", "description": "product_id copied exactly from the account result."},
-                                  "date": {"type": "string", "default": "{{date}}", "description": "the day the customer named, YYYY-MM-DD"}}}},
+                                  "date": {"type": "string", "default": "{{date}}", "description": "the day the customer named, YYYY-MM-DD (empty if only an amount is checked)"},
+                                  "amount": {"type": "string", "default": "{{amount}}", "description": "the amount the customer named for this product, digits only; 0 if they cannot pay the full amount and named no figure; empty if only a date is checked"}}}},
                               "required": ["body"]}}}
         tools.append(t)
         node["tools"] = tools
@@ -354,7 +406,10 @@ def _add_check_tool(wf, promise, g, noop):
             node["task_message"] = (tm.rstrip() + "\nDATE CHECK IN CODE: whenever the customer names a payment day, call " + CHECK_NAME +
                                     " (product_id, date) BEFORE you answer, one product per message, and say what its result tells you: keep their date when it "
                                     "CAN BE RECORDED, otherwise offer exactly its offer_date. Never offer the deadline instead of a date "
-                                    "the check accepted.")
+                                    "the check accepted.\nAMOUNT CHECK IN CODE: when the customer cannot pay the full amount of a product (or names a lower "
+                                    "figure), call " + CHECK_NAME + " (product_id, amount = their figure or 0) BEFORE you name any lower amount, and say what "
+                                    "its result tells you. The ONLY lower amount you may ever name is the result's lowest_amount; never invent a minimum, a "
+                                    "round figure or \"any amount\".")
         added = True
     return added
 
