@@ -165,6 +165,8 @@ try:
         _bad = str(_dd.get('tool_outcome') or '').startswith('FAILED') or _dd.get('ok') in (False, 'false', 'False') \
             or str(result.get('status') or 'success').lower() not in ('success', 'ok')
         _say = [x for o, x in _cl if (o == 'failure') == _bad]
+        if str(_dd.get('tool_outcome') or '').startswith('ALREADY RECORDED'):
+            _say = []                     # a re-send of a recorded write: its line was said the first time
         if _say:
             _dd['say_now'] = ('SAY EXACTLY, word for word, in your next message: ' + ' '.join('"' + s + '"' for s in _say)
                               + ' Do not reword it. Then continue with the next step.')

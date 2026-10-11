@@ -1,0 +1,220 @@
+{
+ "workflow_id": "d9c20cb2-0add-4650-8e81-f7790b6a5fcc",
+ "passed": 0,
+ "total": 3,
+ "invalid": 0,
+ "rows": [
+  {
+   "id": "PUB-11",
+   "style": "pieces",
+   "pass": false,
+   "failed": [
+    "conversation: The one create_promise per product check fails because the credit-card promise was attempted twice, first with an invalid product ID and then successfully with p1."
+   ],
+   "call_id": "5b2ef4df-1ae6-4608-8d93-b31475bf8bbe",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 10,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "5b2ef4df-1ae6-4608-8d93-b31475bf8bbe",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-12",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "promises [], expected [('p1', 510.0, '2026-10-15')]",
+    "notes [('car_loan', 'refused'), ('personal_loan', 'refused')], expected [('p2', 'refused'), ('p3', 'refused')]",
+    "conversation: No credit-card promise was recorded despite the agent claiming it was noted, and the agent also claimed the loan refusals were noted before making the note tool calls."
+   ],
+   "call_id": "194329c2-e960-407e-9012-3c7d68e712be",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "add_note",
+    "add_note",
+    "close_call"
+   ],
+   "turns": 12,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "ea79fc65-c61e-483d-a8e5-d08c12730664",
+     "invalid": true,
+     "replays": [
+      "resumed from msg_6_1791685425601 (latest reply msg_19_1791685427327, isBranch=True)"
+     ]
+    },
+    {
+     "call_id": "a63f60b8-2d52-41fc-b625-7723f67497dd",
+     "invalid": true,
+     "replays": [
+      "resumed from msg_4_1791685522804 (latest reply msg_17_1791685523416, isBranch=True)"
+     ]
+    },
+    {
+     "call_id": "194329c2-e960-407e-9012-3c7d68e712be",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-13",
+   "style": "corrects",
+   "pass": false,
+   "failed": [
+    "promises [('p1', 300.0, '2026-10-23'), ('p2', 900.0, '2026-10-23')], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]",
+    "conversation: The credit card was recorded for 23 October instead of 30 October, and the read-back named only 23 October rather than both required dates."
+   ],
+   "call_id": "00c78e8b-21f5-4032-ab2c-26fb31e42703",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 7,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "5f5e9edf-d619-4416-b6b4-ae0014413d81",
+     "invalid": true,
+     "replays": [
+      "resumed from msg_15_1791685209268 (latest reply msg_26_1791685210178, isBranch=True)"
+     ]
+    },
+    {
+     "call_id": "00c78e8b-21f5-4032-ab2c-26fb31e42703",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-11",
+   "style": "corrects",
+   "pass": false,
+   "failed": [
+    "conversation: The one create_promise per product check fails because the agent attempted create_promise twice for the credit card, first with an invalid product ID and then with p1."
+   ],
+   "call_id": "13a5b326-0e2d-41ea-99b7-39f2044f4333",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 9,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "13a5b326-0e2d-41ea-99b7-39f2044f4333",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-12",
+   "style": "in_words",
+   "pass": false,
+   "failed": [
+    "outcome ('no_promise', 'refused'), expected ('promise', None)",
+    "promises [], expected [('p1', 510.0, '2026-10-15')]",
+    "notes [('car_loan_456', 'refused'), ('credit_card_789', 'refused'), ('personal_loan_123', 'refused')], expected [('p2', 'refused'), ('p3', 'refused')]",
+    "conversation: No credit-card promise was recorded, refused notes used product IDs not matching the account, the personal loan received three persuasion attempts instead of two, and the agent claimed notes were made before calling the note tool."
+   ],
+   "call_id": "903d8aaf-310e-4e3d-a06d-b9ce11f22932",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "add_note",
+    "add_note",
+    "add_note",
+    "close_call"
+   ],
+   "turns": 10,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "903d8aaf-310e-4e3d-a06d-b9ce11f22932",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-13",
+   "style": "corrects",
+   "pass": false,
+   "failed": [
+    "promises [('p1', 300.0, '2026-10-23'), ('p2', 900.0, '2026-10-23')], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]",
+    "conversation: The credit card was recorded for 23 October instead of 30 October, and the read-back named 23 October for both products rather than both required dates."
+   ],
+   "call_id": "95a55875-410b-46c2-8be6-02e2a910f30b",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 10,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "95a55875-410b-46c2-8be6-02e2a910f30b",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  }
+ ]
+}

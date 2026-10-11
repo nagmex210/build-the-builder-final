@@ -309,7 +309,7 @@ def _run_one(workflow_id, sc, lib):
     cu = sc["cust"]
     sess = session(cu["id"])
     persona = PERSONA.format(who=cu["name"], script=sc["script"], identity=json.dumps(cu["identity"]), products=json.dumps(cu["products"]))
-    hist, call_id, err, turns, ok_tools = [], None, None, [], []
+    hist, call_id, err, turns, ok_tools, id_passed = [], None, None, [], [], []
     msg, t0 = "Hello?", time.time()
     try:
         for _ in range(MAX_TURNS):
@@ -319,6 +319,11 @@ def _run_one(workflow_id, sc, lib):
             turns += [("customer", msg), ("agent", agent)]
             led = ledger(sess["customer_id"])
             ok_tools.append({c["tool"] for c in led.get("calls") or [] if not _failed(c)})
+            id_passed.append(any(c["tool"] == "verify_identity" and isinstance(c.get("result"), dict)
+                                 and any(any(w in str(k).lower() for w in ("verif", "pass", "correct", "match", "valid", "confirm", "success"))
+                                         and any(w in str(k).lower() for w in ("all", "identity", "fully", "complete", "overall", "customer"))
+                                         and str(x).lower() == "true"
+                                         for k, x in c["result"].items()) for c in led.get("calls") or []))
             if led.get("calls") and led["calls"][-1]["tool"] == "close_call":
                 break
             if msg.strip().lower().startswith("thank you, goodbye"):
@@ -349,7 +354,8 @@ def _run_one(workflow_id, sc, lib):
     if err and not (calls and calls[-1]["tool"] == "close_call"):
         return {**row, "harness_error": err, "failed": []}
     failed = check_ledger(calls, sess.get("now") or cu["now"], sc.get("checks") or [], lib) \
-        + check_gated([t for w, t in turns if w == "agent"], ok_tools)
+        + check_gated([t for w, t in turns if w == "agent"], ok_tools) \
+        + check_privacy([t for w, t in turns if w == "agent"], id_passed)
     if hung and "close_call" not in row["tools"]:
         failed.append("the call was hung up (" + "; ".join(hung)[:160] + ") without close_call: no outcome was recorded")
     return {**row, "hang_up": hung, "failed": failed}
@@ -387,6 +393,20 @@ def check_gated(agent_msgs, ok_tools):
         early = [g for g in GATED if g.get("tool") and "succ" in str(g.get("outcome", "success")).lower() and g["tool"] not in seen]
         for w in gated_hits(m, early):
             bad.append(f'agent said "{w}" in message {i} before the brief allows it ({next(g.get("rule", "") for g in early if g["word"] == w)[:120]}): "{m[:160]}"')
+    return bad
+
+
+def check_privacy(agent_msgs, id_passed):
+    """Identity gate lint (M18): before the identity tool's all-verified flag is true (message of the passing turn
+    included, since the check result arrives in that turn), no agent message may name an amount or debt/account status."""
+    from identity_gate import privacy_hits
+    bad = []
+    for i, m in enumerate(agent_msgs):
+        if i < len(id_passed) and id_passed[i]:
+            break
+        hits = privacy_hits(m)
+        if hits:
+            bad.append(f'agent disclosed account content before identity was verified (message {i}: {", ".join(hits[:3])}): "{m[:160]}"')
     return bad
 
 

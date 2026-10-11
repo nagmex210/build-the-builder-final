@@ -1,0 +1,52 @@
+scorer: /home/ubuntu/btb/repo/btb/brief_c/score_c.py | bank: https://responding-simply-dpi-electro.trycloudflare.com
+  invalid rep C-07 (try 1): ['resumed from msg_4_1791691018195 (latest reply msg_8_1791691019047, isBranch=True)']
+  invalid rep C-05 (try 1): ['harness: chat turn timed out and no reply appeared']
+  invalid rep C-01 (try 1): ['harness: chat turn timed out and no reply appeared']
+  invalid rep C-07 (try 2): ['resumed from msg_4_1791691063349 (latest reply msg_8_1791691064906, isBranch=True)']
+  invalid rep C-03 (try 1): ['resumed from msg_10_1791691243211 (latest reply msg_21_1791691243747, isBranch=True)']
+  invalid rep C-10 (try 1): ['harness: chat turn timed out and no reply appeared']
+  invalid rep C-07 (try 3): ['resumed from msg_4_1791691233070 (latest reply msg_8_1791691235718, isBranch=True)']
+FAIL C-01 0/1 | verify_identity > verify_identity > get_account > create_promise > close_call > create_promise
+       - [plain] the call was not closed with close_call
+       - [plain] tool calls after close_call
+       - [plain] conversation: The agent did not say 'Thank you for your time. Goodbye.' before closing the call with close_call.
+FAIL C-02 0/1 | schedule_callback > close_call
+       - [plain] conversation: The agent did not refuse Friday 6 November as a weekend callback day; it only reported that the callback could not be booked.
+FAIL C-03 0/1 | verify_identity > verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [plain] promises [('A1', 640.0, '2026-11-12')], expected [('A1', 640.0, '2026-11-11')]
+       - [plain] conversation: The agent recorded 'next Wednesday' as 12 November 2026 instead of Wednesday 11 November 2026.
+PASS C-04 1/1 | verify_identity > verify_identity > verify_identity > close_call
+FAIL C-05 0/1 | verify_identity > verify_identity > verify_identity > get_account > add_note > close_call
+       - [plain] outcome ('no_payment', 'REFUSED'), expected ('arranged', None)
+       - [plain] promises [], expected [('A1', 194.0, '2026-11-22')]
+       - [plain] notes [('A1', 'REFUSED')], expected []
+       - [plain] conversation: The floor offered was 50.00 instead of the required 194.
+FAIL C-06 0/1 | verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > add_note > close_call
+       - [plain] outcome ('no_payment', 'REFUSED'), expected ('arranged', None)
+       - [plain] promises [('A1', 622.58, '2026-11-29')], expected [('A1', 622.57, '2026-12-15'), ('A1', 622.58, '2026-11-29')]
+       - [plain] notes [('A1', 'REFUSED')], expected []
+INVALID C-07 0/1 | verify_identity > verify_identity > get_account > close_call > add_note > add_note
+       - [plain] notes [], expected [('A1', 'BREATHING_SPACE'), ('A2', 'BREATHING_SPACE')]
+       - [plain] the call was not closed with close_call
+       - [plain] tool calls after close_call
+       - [plain] conversation: Both accounts with arrears and days overdue were not named before anything was asked: the agent first asked for the customer’s identity, postcode, and birth month.
+       - [plain] harness: chat turn timed out and no reply appeared
+FAIL C-08 0/1 | verify_identity > verify_identity > get_account > add_note > create_promise > add_note > close_call
+       - [plain] promises [('A2', 1100.0, '2026-11-10')], expected [('A2', 1100.0, '2026-11-05')]
+       - [plain] conversation: The agent asked identity questions before naming all three accounts and recorded the loan promise for 10 November rather than the required 5 November deadline, seven calendar days after the call.
+FAIL C-09 0/1 | verify_identity > verify_identity > get_account > create_promise > create_promise > create_promise > close_call
+       - [plain] promises [('A1', 1500.0, '2026-12-10'), ('A2', 200.0, '2026-12-10')], expected [('A1', 1500.0, '2026-12-10'), ('A2', 500.0, '2026-12-10')]
+       - [plain] conversation: The agent offered 800 for the loan and then 200, rather than the required 500 remaining under the 2,000 call limit.
+FAIL C-10 0/1 | verify_identity > verify_identity > verify_identity > get_account > add_note > create_promise > create_promise > create_promise > add_note > close_call
+       - [plain] outcome ('arranged', None), expected ('no_payment', 'SERVICE_ERROR')
+       - [plain] promises [('A2', 260.0, '2026-12-07')], expected []
+       - [plain] notes [('A1', 'REFUSED'), ('A1', 'REFUSED')], expected [('A1', 'REFUSED'), ('A2', 'SERVICE_ERROR')]
+       - [plain] conversation: The overdraft persuasion offered 50 instead of the required floor of 120 on 3 December, create_promise was tried three times rather than exactly twice, and the agent said the card promise was recorded instead of telling the customer it could not 
+FAIL C-11 0/1 | verify_identity > verify_identity > get_account > create_promise > transfer_to_agent > close_call
+       - [plain] promises [('A1', 820.0, '2026-11-29')], expected [('A1', 820.0, '2026-11-22')]
+       - [plain] conversation: The agent neither refused today because it was after 15:00 nor offered Sunday 22 November, and discussed the overdraft before reading back and recording the card promise.
+FAIL C-12 0/1 | verify_identity > verify_identity > get_account > transfer_to_agent > transfer_to_agent > close_call
+       - [plain] transfers [{'queue': 'fraud'}, {'queue': 'fraud'}], expected [{'queue': 'fraud'}]
+
+fast_eval: 1 / 12 passed (1 rep(s), all reps must pass), 424 s
+harness: 1 case(s) still INVALID after 2 re-run(s) (not a measurement), 6 rep(s) re-run

@@ -176,6 +176,7 @@ async def run(slot, tools, briefs):
     trace = KIT / "runs" / "traces" / f"{slot}-{time.strftime('%Y%m%d-%H%M%S')}.jsonl"
     trace.parent.mkdir(parents=True, exist_ok=True)
     os.environ["BTB_TRACE"] = str(trace)          # btb/llm.py appends its model calls here too
+    os.environ["BTB_TOOLS_API"] = str(tools)      # save.py puts back every body field this API file requires
     print(f"trace: {trace}", flush=True)
     print(f"BUILD START {now()} slot={slot}", flush=True)
     stop_tail = threading.Event()
@@ -209,6 +210,12 @@ async def run(slot, tools, briefs):
         old_canned.unlink()
     canned_proc = subprocess.Popen([sys.executable, str(KIT / "builder" / "canned.py"), "extract", "--slot", slot, "--tools", tools, *briefs],
                                    cwd=KIT, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True, env={**os.environ, "BTB_TRACE": str(trace)})
+    # A1 router + specialists: the brief's post-account situations (exits with named triggers), extracted by Azure in parallel.
+    sit_file = KIT / "out" / f"{slot}.situations.json"
+    if sit_file.exists():
+        sit_file.unlink()
+    sit_proc = subprocess.Popen([sys.executable, str(KIT / "builder" / "situations.py"), "extract", "--slot", slot, "--tools", tools, *briefs],
+                                cwd=KIT, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, env={**os.environ, "BTB_TRACE": str(trace)})
     # Code steps: dates, business days, deadlines and floors are computed by generated, locally tested code.
     t_calc = time.time()
     calc = subprocess.run([sys.executable, str(KIT / "builder" / "datecalc.py"), "--slot", slot, "--tools", tools, *briefs],
@@ -243,6 +250,22 @@ async def run(slot, tools, briefs):
                    "result says NOT RECORDED with `offer_instead` (the one date/amount code computed). Tell the promise node: when a "
                    "result has offer_instead, offer exactly that value. "
                    "If the brief's rule differs from these facts, follow the brief and mention it in your final line.")
+    try:
+        sit_out, sit_err = sit_proc.communicate(timeout=180)
+    except subprocess.TimeoutExpired:
+        sit_proc.kill(); sit_out, sit_err = "", "timeout"
+    sys.path.insert(0, str(KIT / "builder"))
+    import situations
+    sit_spec = json.loads(sit_file.read_text()) if sit_file.exists() else None
+    log(trace, event="test", what="A1: brief's situations after the account lookup extracted (router + specialist routes)",
+        ok=bool(sit_spec), exits=[{"name": e["name"], "triggers": e.get("triggers"), "tools": e.get("tools"), "close": e.get("close"),
+                                   "first_line": e.get("first_line"), "once_only": e.get("once_only"), "promise": e.get("promise_allowed")}
+                                  for e in (sit_spec or {}).get("exits", [])], error=(sit_err or "")[-300:])
+    print(f"[test] A1 situations: {', '.join(e['name'] for e in (sit_spec or {}).get('exits', [])) or 'none (extraction failed)'}", flush=True)
+    if sit_spec and sit_spec.get("exits"):
+        prompt += ("\n\n" + situations.prompt_block(sit_spec) + "\nBefore every save run `python3 builder/situations.py check "
+                   f"out/{slot}.workflow.json out/{slot}.situations.json` and fix each problem it lists (or, if the brief "
+                   "shows the extracted situation is wrong, say so in your final line).")
     with trace.open("a") as out:
         out.write(json.dumps({"event": "start", "at": time.strftime("%Y-%m-%dT%H:%M:%S%z"), "slot": slot, "tools": tools,
                               "briefs": briefs, "model": options.model}) + "\n")
@@ -287,6 +310,21 @@ async def run(slot, tools, briefs):
             names, saved = finish_and_save(slot, wf)
             wf_file.write_text(json.dumps(wf, indent=1))
             errs, warns = lint(wf)
+            try:
+                from hookcheck import errors as hook_errors
+                errs = errs + hook_errors(wf)
+            except Exception as e:  # noqa: BLE001
+                warns = warns + [f"hook dry-run check failed: {e}"]
+            try:
+                from apicheck import missing
+                errs = errs + missing(wf, json.loads(pathlib.Path(tools).read_text()))
+            except Exception as e:  # noqa: BLE001
+                warns = warns + [f"API required-field check failed: {e}"]
+            sit_spec = json.loads(sit_file.read_text()) if sit_file.exists() else None
+            if sit_spec:
+                import situations
+                log(trace, event="test", what="A1: router/specialist coverage of the brief's situations (deterministic)",
+                    round=tag, problems=situations.check(wf, sit_spec))
             with trace.open("a") as out:
                 out.write(json.dumps({"event": "harden+robust+save", "round": tag, "tools": names, "saved": saved}) + "\n")
                 out.write(json.dumps({"event": "test", "what": "structural lint of the saved workflow", "errors": errs, "warnings": warns}) + "\n")

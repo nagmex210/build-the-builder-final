@@ -1,0 +1,389 @@
+{
+ "workflow_id": "3f1e0c2c-d777-4204-bbf2-39eac684c2a5",
+ "passed": 2,
+ "total": 12,
+ "invalid": 0,
+ "rows": [
+  {
+   "id": "C-01",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "the call was not closed with close_call",
+    "tool calls after close_call",
+    "conversation: The agent did not say 'Thank you for your time. Goodbye.' before closing the call with close_call."
+   ],
+   "call_id": "7a3f0904-aea1-4727-b9d0-64cd37df2014",
+   "now": "2026-11-01T10:30",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call",
+    "create_promise"
+   ],
+   "turns": 11,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "fcbaedf2-c5fa-478c-a55d-fa39dacfe519",
+     "invalid": true,
+     "replays": [
+      "resumed from msg_10_1791689685560 (latest reply msg_21_1791689686268, isBranch=True)"
+     ]
+    },
+    {
+     "call_id": "7a3f0904-aea1-4727-b9d0-64cd37df2014",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "C-02",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "conversation: The agent did not refuse Friday 6 November as a callback day because it is a weekend; it only said the callback could not be booked."
+   ],
+   "call_id": "f6174265-674a-4f58-9237-1a9eee96102a",
+   "now": "2026-11-05T16:00",
+   "tools": [
+    "schedule_callback",
+    "close_call"
+   ],
+   "turns": 4,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "f6174265-674a-4f58-9237-1a9eee96102a",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "C-03",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "promises [('A1', 640.0, '2026-11-23')], expected [('A1', 640.0, '2026-11-11')]",
+    "the call was not closed with close_call",
+    "tool calls after close_call",
+    "conversation: The check that 'next Wednesday' is recorded as Wednesday 11 November fails because neither that request nor a promise for 11 November appears in the transcript."
+   ],
+   "call_id": "5b52a14e-ed81-4a99-9686-afe429fb26b3",
+   "now": "2026-11-09T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call",
+    "create_promise"
+   ],
+   "turns": 9,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "5b52a14e-ed81-4a99-9686-afe429fb26b3",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "C-04",
+   "style": null,
+   "pass": true,
+   "failed": [],
+   "call_id": "f1d72d23-e1c9-4f3f-90d7-80be4b5c1bfe",
+   "now": "2026-11-04T13:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "close_call"
+   ],
+   "turns": 5,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "f1d72d23-e1c9-4f3f-90d7-80be4b5c1bfe",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "C-05",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "outcome ('no_payment', 'SERVICE_ERROR'), expected ('arranged', None)",
+    "promises [], expected [('A1', 194.0, '2026-11-22')]",
+    "notes [('A1', 'SERVICE_ERROR')], expected []",
+    "conversation: The agent offered a floor of 100.00 instead of 194, and did not refuse Friday 20 November and offer Sunday 22 November as an alternative."
+   ],
+   "call_id": "adc9390e-4dc6-48bf-a74d-d88314252ce3",
+   "now": "2026-11-17T10:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "add_note",
+    "close_call"
+   ],
+   "turns": 8,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "adc9390e-4dc6-48bf-a74d-d88314252ce3",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "C-06",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "promises [('A1', 622.57, '2026-12-06'), ('A1', 622.58, '2026-11-29')], expected [('A1', 622.57, '2026-12-15'), ('A1', 622.58, '2026-11-29')]",
+    "notes [('A1', 'SERVICE_ERROR')], expected []",
+    "conversation: The agent did not clearly identify 26 November as a bank holiday and later named 6 December as the account deadline instead of consistently using 29 November."
+   ],
+   "call_id": "da6dd1c5-ea8d-4e1e-a444-8d0d06e03e3c",
+   "now": "2026-11-22T12:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "add_note",
+    "close_call"
+   ],
+   "turns": 13,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "7a90a2a6-2417-482c-a5bb-5cb8d509f2ad",
+     "invalid": true,
+     "replays": []
+    },
+    {
+     "call_id": "4f803d1a-62d0-47f7-9a34-ed3f60dcb05c",
+     "invalid": true,
+     "replays": [
+      "resumed from msg_12_1791690034099 (latest reply msg_23_1791690034711, isBranch=True)"
+     ]
+    },
+    {
+     "call_id": "da6dd1c5-ea8d-4e1e-a444-8d0d06e03e3c",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "C-07",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "conversation: Both accounts were not named with arrears and days overdue before anything was asked: the agent first asked for the customer's name, postcode and birth month."
+   ],
+   "call_id": "473c9930-9f7f-4337-8ef8-ed43f22180b8",
+   "now": "2026-11-25T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "add_note",
+    "add_note",
+    "close_call"
+   ],
+   "turns": 6,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "205261e1-e99c-443c-a39b-8f741b2520c6",
+     "invalid": true,
+     "replays": [
+      "resumed from msg_4_1791689735144 (latest reply msg_8_1791689736184, isBranch=True)"
+     ]
+    },
+    {
+     "call_id": "ab9778c8-59da-47cf-9a94-1abf51e58e31",
+     "invalid": true,
+     "replays": [
+      "resumed from msg_4_1791689788241 (latest reply msg_6_1791689788548, isBranch=True)"
+     ]
+    },
+    {
+     "call_id": "473c9930-9f7f-4337-8ef8-ed43f22180b8",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "C-08",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "promises [('A2', 1100.0, '2026-11-10')], expected [('A2', 1100.0, '2026-11-05')]",
+    "conversation: The agent asked identity questions before naming all three accounts, and recorded the loan promise for 10 November rather than the required 5 November deadline."
+   ],
+   "call_id": "bcaffdc2-93a0-4db0-9555-643012513ee4",
+   "now": "2026-10-29T14:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "add_note",
+    "create_promise",
+    "add_note",
+    "close_call"
+   ],
+   "turns": 9,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "bcaffdc2-93a0-4db0-9555-643012513ee4",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "C-09",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "promises [('A1', 1500.0, '2026-12-10'), ('A2', 400.0, '2026-12-10')], expected [('A1', 1500.0, '2026-12-10'), ('A2', 500.0, '2026-12-10')]",
+    "conversation: The agent did not offer 500 for the loan as required, instead initially confirming 800 and later recording the customer's proposed 400."
+   ],
+   "call_id": "6e4aff58-145b-47ad-8be1-0cf8189bf46e",
+   "now": "2026-12-06T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 8,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "6e4aff58-145b-47ad-8be1-0cf8189bf46e",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "C-10",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "outcome ('no_payment', 'REFUSED'), expected ('no_payment', 'SERVICE_ERROR')",
+    "notes [('A1', 'REFUSED'), ('A1', 'REFUSED'), ('A2', 'REFUSED')], expected [('A1', 'REFUSED'), ('A2', 'SERVICE_ERROR')]",
+    "conversation: The overdraft persuasion used 100 and then any amount rather than one offer of the 120 floor on 3 December, and create_promise was never called rather than tried exactly twice."
+   ],
+   "call_id": "2f8b1f02-09e0-449e-8831-f124b3fc8f12",
+   "now": "2026-11-30T09:45",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "add_note",
+    "add_note",
+    "add_note",
+    "close_call"
+   ],
+   "turns": 13,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "2f8b1f02-09e0-449e-8831-f124b3fc8f12",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "C-11",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "promises [('A1', 820.0, '2026-11-29')], expected [('A1', 820.0, '2026-11-22')]",
+    "conversation: The agent neither refused today because it was after 15:00 nor offered Sunday 22 November, and discussed the overdraft before reading back and recording the card promise."
+   ],
+   "call_id": "051b986f-d76e-4951-83ad-15c9eb153daf",
+   "now": "2026-11-19T16:10",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "transfer_to_agent",
+    "close_call"
+   ],
+   "turns": 7,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "051b986f-d76e-4951-83ad-15c9eb153daf",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "C-12",
+   "style": null,
+   "pass": true,
+   "failed": [],
+   "call_id": "7ca64e62-94dc-4801-a415-a2569414806d",
+   "now": "2026-12-08T15:30",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "transfer_to_agent",
+    "close_call"
+   ],
+   "turns": 4,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "7ca64e62-94dc-4801-a415-a2569414806d",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  }
+ ]
+}

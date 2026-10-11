@@ -1,0 +1,16 @@
+  invalid rep PUB-12 (try 1): ['resumed from msg_10_1791685706947 (latest reply msg_23_1791685708874, isBranch=True)']
+  invalid rep PUB-13 (try 1): ['harness: chat turn timed out and no reply appeared']
+  invalid rep PUB-12 (try 2): ['resumed from msg_7_1791685846417 (latest reply msg_22_1791685850087, isBranch=True)']
+FAIL PUB-11 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > create_promise > create_promise > close_call
+       - [asks_back] conversation: The one create_promise per product check fails because the agent made two create_promise attempts for the credit card, first with invalid product_id cc_2288 and then with p1.
+       - [asks_back] conversation: The one create_promise per product check fails because the credit card had two create_promise calls: one failed attempt with CC_2288 and one successful retry with p1.
+FAIL PUB-12 0/2 | verify_identity > verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > add_note > add_note > close_call
+       - [pieces] conversation: The car loan received two persuasion attempts after the initial payment request, rather than the required one for the early band.
+       - [corrects] outcome ('no_promise', 'service_error'), expected ('promise', None)
+       - [corrects] notes [('p1', 'service_error'), ('p2', 'refused'), ('p3', 'refused')], expected [('p2', 'refused'), ('p3', 'refused')]
+       - [corrects] conversation: The phone question was not asked again, the car loan received two attempts instead of one, the refused notes have no tool results confirming success, and the agent claimed the credit-card promise was noted before any successful recording tool cal
+FAIL PUB-13 1/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > create_promise > close_call
+       - [pieces] conversation: The loan was not recorded on its deadline of October 23; no create_promise call was made for the loan.
+
+fast_eval: 0 / 3 passed (2 rep(s), all reps must pass), 1707 s
+harness: 0 case(s) still INVALID after 2 re-run(s) (not a measurement), 3 rep(s) re-run

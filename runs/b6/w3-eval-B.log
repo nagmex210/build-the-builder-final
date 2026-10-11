@@ -1,0 +1,15 @@
+FAIL PUB-11 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > create_promise > create_promise > close_call
+       - [pieces] conversation: The one create_promise per product check fails because the credit card had two create_promise attempts: a failed attempt using cc_2288 and a successful retry using p1.
+       - [pieces] conversation: The one create_promise per product check fails because no create_promise call was made for the car loan (p3).
+FAIL PUB-12 0/2 | verify_identity > verify_identity > verify_identity > verify_identity > get_account > create_promise > add_note > add_note > create_promise > add_note > close_call
+       - [plain] outcome ('no_promise', 'refused'), expected ('promise', None)
+       - [plain] promises [], expected [('p1', 510.0, '2026-10-15')]
+       - [plain] notes [('CC_9015', 'service_error'), ('CL_5678', 'refused'), ('PL_1234', 'refused')], expected [('p2', 'refused'), ('p3', 'refused')]
+       - [plain] conversation: No credit-card promise was successfully recorded, the refused notes used unrecognized product IDs rather than p2 and p3, and the agent made two car-loan attempts instead of one.
+       - [pieces] conversation: The credit-card promise is not confirmed successful and uses an invalid product ID, neither other product has a refused note, and the car loan receives two attempts instead of one.
+FAIL PUB-13 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > create_promise > close_call
+       - [in_words] conversation: The loan was not recorded on its deadline, October 23rd: no create_promise call was made for the loan.
+       - [talkative] conversation: Neither the credit card payment for 30 October nor the loan payment for its 23 October deadline was recorded via a successful tool call, although the read-back named both dates.
+
+fast_eval: 0 / 3 passed (2 rep(s), all reps must pass), 437 s
+harness: 0 case(s) still INVALID after 2 re-run(s) (not a measurement), 0 rep(s) re-run

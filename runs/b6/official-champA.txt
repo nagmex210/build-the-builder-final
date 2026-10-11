@@ -1,0 +1,44 @@
+PASS PUB-01 easy   Happy path     | verify > verify > get_account > promise > close_call
+PASS PUB-02 medium Third party    | schedule_callback > close_call
+FAIL PUB-03 medium Identity       | verify > verify > verify > close_call
+       - outcome ('not_verified', 'declined'), expected ('not_verified', 'failed')
+       - conversation: The call failed to meet the following criteria: 1. The assistant did not tell the customer to use the app or visit a branch after the identification process ended. 2. The identification check ended due to customer refusal after two wrong answers,
+PASS PUB-04 medium Dates          | verify > verify > get_account > promise > close_call
+PASS PUB-05 medium Hardship       | verify > verify > get_account > close_call
+PASS PUB-06 hard   Amounts        | verify > verify > get_account > promise > close_call
+PASS PUB-07 hard   Dates          | verify > verify > get_account > promise > close_call
+PASS PUB-08 medium Already paid   | verify > verify > get_account > close_call
+PASS PUB-09 medium Restructuring  | verify > verify > get_account > transfer_to_agent > close_call
+PASS PUB-10 hard   Tool failure   | verify > verify > get_account > promise > promise > close_call
+
+slowest agent turn per call: median 5 s, worst 7 s. Failed calls where the customer hung up: 0.
+-- run 1 of 2: 9 / 10 passed, 123 s
+
+PASS PUB-01 easy   Happy path     | verify > verify > get_account > promise > close_call
+PASS PUB-02 medium Third party    | schedule_callback > close_call
+PASS PUB-03 medium Identity       | verify > verify > verify > verify > close_call
+PASS PUB-04 medium Dates          | verify > verify > get_account > promise > close_call
+FAIL PUB-05 medium Hardship       | verify > verify > get_account > close_call
+       - conversation: The agent failed the requirement to offer the support team only once. It offered the support team in Message 8 ("I can connect you with our customer support team") and then again in Message 10 ("I can still connect you with customer support"). Al
+FAIL PUB-06 hard   Amounts        | verify > verify > get_account > promise > close_call
+       - conversation: The agent failed to follow the instruction 'agent never asks how much she can pay' because in Message 12 it asked, 'How much can you pay, and on what date?' and in Message 14 it asked, 'How much can you pay on that day?'. Although the agent corre
+PASS PUB-07 hard   Dates          | verify > verify > get_account > promise > close_call
+PASS PUB-08 medium Already paid   | verify > verify > get_account > close_call
+PASS PUB-09 medium Restructuring  | verify > verify > get_account > transfer_to_agent > close_call
+PASS PUB-10 hard   Tool failure   | verify > verify > get_account > promise > promise > close_call
+
+slowest agent turn per call: median 5 s, worst 8 s. Failed calls where the customer hung up: 0.
+-- run 2 of 2: 8 / 10 passed, 112 s
+
+PASS PUB-01 2/2
+PASS PUB-02 2/2
+FAIL PUB-03 1/2
+PASS PUB-04 2/2
+FAIL PUB-05 1/2
+FAIL PUB-06 1/2
+PASS PUB-07 2/2
+PASS PUB-08 2/2
+PASS PUB-09 2/2
+PASS PUB-10 2/2
+
+7 / 10 passed (bank records and conversation checks), a customer counts with 2 of 2 runs. Last simulation 47a6d57d-5e52-4c96-bda4-02e6d4e96f20, status completed, 235 s.

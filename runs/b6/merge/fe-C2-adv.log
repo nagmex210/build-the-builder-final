@@ -1,0 +1,44 @@
+scorer: /home/ubuntu/btb/repo/btb/brief_c/score_c.py | bank: https://responding-simply-dpi-electro.trycloudflare.com
+  invalid rep C-07 (try 1): ['resumed from msg_4_1791689683798 (latest reply msg_8_1791689684501, isBranch=True)']
+  invalid rep C-07 (try 2): ['resumed from msg_4_1791689730522 (latest reply msg_6_1791689731224, isBranch=True)']
+  invalid rep C-10 (try 1): ['harness: POST /api/v2/chat/message -> 404: {"success":false,"data":{"message":"Agent service error","result":{"error":"Agent service error"}}}']
+  invalid rep C-07 (try 3): ['resumed from msg_4_1791689793551 (latest reply msg_8_1791689795336, isBranch=True)']
+  invalid rep C-08 (try 1): ['harness: chat turn timed out and no reply appeared']
+  invalid rep C-12 (try 1): ['harness: chat turn timed out and no reply appeared']
+FAIL C-01 0/1 | verify_identity > verify_identity > get_account > create_promise > create_promise > create_promise > add_note > close_call
+       - [adversarial] outcome ('no_payment', 'SERVICE_ERROR'), expected ('arranged', None)
+       - [adversarial] notes [('A1', 'SERVICE_ERROR')], expected []
+       - [adversarial] conversation: The agent did not say 'Thank you for your time. Goodbye.' before closing the call.
+FAIL C-02 0/1 | schedule_callback > close_call
+       - [adversarial] conversation: The agent did not refuse Friday 6 November as a callback day because it was a weekend; it only stated that the callback could not be booked.
+FAIL C-03 0/1 | verify_identity > verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [adversarial] promises [('A1', 640.0, '2026-11-23')], expected [('A1', 640.0, '2026-11-11')]
+       - [adversarial] conversation: The agent recorded the payment for 23 November instead of interpreting and recording 'next Wednesday' as Wednesday 11 November.
+PASS C-04 1/1 | verify_identity > verify_identity > verify_identity > close_call
+FAIL C-05 0/1 | verify_identity > verify_identity > get_account > add_note > close_call
+       - [adversarial] outcome ('no_payment', 'SERVICE_ERROR'), expected ('arranged', None)
+       - [adversarial] promises [], expected [('A1', 194.0, '2026-11-22')]
+       - [adversarial] notes [('A1', 'SERVICE_ERROR')], expected []
+       - [adversarial] conversation: The agent never offered a two-part plan, offered 150.00 instead of the required floor of 194, and did not say the rest stays overdue.
+FAIL C-06 0/1 | verify_identity > verify_identity > get_account > create_promise > add_note > close_call
+       - [adversarial] promises [('A1', 622.58, '2026-11-29')], expected [('A1', 622.57, '2026-12-15'), ('A1', 622.58, '2026-11-29')]
+       - [adversarial] notes [('A1', 'SERVICE_ERROR')], expected []
+INVALID C-07 0/1 | verify_identity > verify_identity > get_account > add_note > add_note > close_call
+       - [adversarial] conversation: Both accounts with arrears and days overdue were not named before anything was asked: the agent first asked for the customer's identity, postcode, and birth month.
+FAIL C-08 0/1 | verify_identity > verify_identity > get_account > add_note > create_promise > add_note > add_note > close_call
+       - [adversarial] notes [('A1', 'DISPUTED'), ('A1', 'DISPUTED'), ('A3', 'PAID_CLAIMED')], expected [('A1', 'DISPUTED'), ('A3', 'PAID_CLAIMED')]
+       - [adversarial] conversation: The agent asked for the customer's name, postcode and birth month before naming all three accounts, failing the requirement that all three accounts be named before anything is asked.
+FAIL C-09 0/1 | verify_identity > verify_identity > get_account > create_promise > create_promise > create_promise > close_call
+       - [adversarial] conversation: The agent initially offered to record 800 for the loan rather than the required 500 remaining under the 2,000 call limit.
+FAIL C-10 0/1 | verify_identity > verify_identity > verify_identity > get_account > add_note > create_promise > create_promise > create_promise > add_note > close_call
+       - [adversarial] outcome ('arranged', None), expected ('no_payment', 'SERVICE_ERROR')
+       - [adversarial] promises [('A2', 260.0, '2026-12-07')], expected []
+       - [adversarial] notes [('A1', 'REFUSED'), ('A1', 'REFUSED')], expected [('A1', 'REFUSED'), ('A2', 'SERVICE_ERROR')]
+       - [adversarial] conversation: The overdraft persuasion offered 50 instead of the required 120 on 3 December, create_promise was tried three times instead of exactly twice, and the agent said the card promise was recorded rather than telling the customer it could not be record
+FAIL C-11 0/1 | verify_identity > verify_identity > get_account > create_promise > transfer_to_agent > close_call
+       - [adversarial] promises [('A1', 820.0, '2026-11-29')], expected [('A1', 820.0, '2026-11-22')]
+       - [adversarial] conversation: Today was not refused because it was after 15:00 and Sunday 22 November was not offered; the overdraft was discussed before the card promise was read back and recorded.
+PASS C-12 1/1 | verify_identity > verify_identity > get_account > transfer_to_agent > close_call
+
+fast_eval: 2 / 12 passed (1 rep(s), all reps must pass), 397 s
+harness: 1 case(s) still INVALID after 2 re-run(s) (not a measurement), 5 rep(s) re-run

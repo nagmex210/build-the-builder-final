@@ -1,0 +1,22 @@
+workspace 2: main-B -> agent ec9fbf58-6328-4272-9aa2-0ebec3797db2
+PASS PUB-11 medium Multi-product  | verify > verify > get_account > promise > promise > promise > close_call
+FAIL PUB-12 hard   Multi-product  | verify > verify > verify > get_account > add_note > add_note > promise > close_call
+       - conversation: The assistant failed the criteria regarding the number of persuasion attempts. Specifically, it made two attempts on the car loan (early band) instead of one. Message 16 was the first attempt (full amount) and Message 18 was a second attempt (flo
+PASS PUB-13 hard   Multi-product  | verify > verify > get_account > promise > promise > close_call
+
+slowest agent turn per call: median 12 s, worst 19 s. Failed calls where the customer hung up: 0.
+WARNING: the phone agent was slow in this run. If the same agent is fast in another run, the model was busy and this score is too low.
+-- run 1 of 2: 2 / 3 passed, 123 s
+
+PASS PUB-11 medium Multi-product  | verify > verify > get_account > promise > promise > promise > close_call
+PASS PUB-12 hard   Multi-product  | verify > verify > verify > get_account > add_note > add_note > promise > close_call
+PASS PUB-13 hard   Multi-product  | verify > verify > get_account > promise > promise > close_call
+
+slowest agent turn per call: median 6 s, worst 9 s. Failed calls where the customer hung up: 0.
+-- run 2 of 2: 3 / 3 passed, 92 s
+
+PASS PUB-11 2/2
+FAIL PUB-12 1/2
+PASS PUB-13 2/2
+
+2 / 3 passed (bank records and conversation checks), a customer counts with 2 of 2 runs. Last simulation 301b2d1a-8358-462a-a5de-c3ba32ec88c2, status completed, 216 s.
