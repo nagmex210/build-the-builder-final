@@ -8,7 +8,7 @@ __pycache__/
 runs/*/work/
 /build/
 /gen/
-.freya-agents.json.lock
+.freya-agents*.lock
 submission/
 traces/
 .freya-agents-ws2.json
