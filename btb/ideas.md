@@ -113,3 +113,18 @@ Our builds are all the same 6-node shape, so explore other shapes:
   (every path, the five customer styles, a manipulative caller), runs them against the saved workflow through the
   chat endpoint, checks the ledger/tool calls against expectations computed from the brief, fixes, and re-saves,
   inside the 30 minutes. The trace must show every simulated persona and result (the event rules ask for tests).
+
+## A18. Policy as a gate graph (owner design, generalises the per-item gates)
+
+Every rule-bound decision in a brief is a boolean gate over call state, extracted as DATA at build time and
+evaluated by CODE inside the workflow (never an outside URL). The model only asks "what is allowed now?" and says it.
+- Primitives: AND (close allowed = every item resolved AND every required note written AND no transfer pending),
+  OR (identity passes = check A OR check B, if the brief allows either; any-item acceptance in a combined ask),
+  XOR / exactly-one (an item ends promised XOR refused XOR transferred, never two; one outcome code per call),
+  NOT (no account talk while NOT identity_passed), COUNT/AT-MOST-k (attempt budgets, identity retries, call
+  amount caps), and CHAIN (gate B is evaluated only after gate A passes: identity -> lookup -> per-item -> close).
+- Per item, the same gate template is instantiated once per row of the ledger (any number of products).
+- Build time: a schema-constrained extraction lists the brief's gates (name, inputs, operator, threshold, source
+  clause); a compiler emits the code step + the allowed-move text; a lint checks every gate input exists (tool
+  field, ledger column, identity flag) and every brief rule maps to a gate (coverage).
+- Test: the brief's own stated examples run through the compiled gates (independent oracle, idea 4).

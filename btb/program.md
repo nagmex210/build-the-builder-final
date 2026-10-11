@@ -67,6 +67,8 @@ fix these before anything else, and checks them on brief C):
 5. Mandatory sentences inserted verbatim and checked (lint), not paraphrased by the model.
 6. Every node that can mention a date (opening included) gets the DATE FACTS block.
 7. Multi-product (up to 3 products): product ids only from the lookup; per-product promises/notes; no invented ids.
+Owner design for the next batches: A18 in btb/ideas.md (policy as a gate graph: AND/OR/XOR/NOT/AT-MOST-k/CHAIN gates
+extracted as data, evaluated in code inside the workflow); the merger assigns an A18 family until the champion has it.
 Consistency: a case passes only if all 3 hidden runs pass, so a code-enforced fix beats a prompt-wording fix.
 
 ## Score of a builder version (the number we optimise)
