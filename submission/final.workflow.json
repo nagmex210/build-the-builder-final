@@ -1,0 +1,987 @@
+{
+ "workflow_id": "ea4cb70f-09e0-4830-b3de-fab4cf045547",
+ "agent_id": "04b7fb71-d6b7-4ea1-802b-9c33f78c157e",
+ "updated_at": "2026-10-11T17:57:01.190Z",
+ "workflow": {
+  "nodes": {
+   "end": {
+    "name": "end",
+    "tools": [],
+    "on_enter": {
+     "type": "silent"
+    },
+    "position": {
+     "x": 400,
+     "y": 0
+    },
+    "terminal": {
+     "type": "function",
+     "function": {
+      "name": "closing_end",
+      "handler": "__function__:end_call",
+      "parameters": {
+       "type": "object",
+       "properties": {
+        "message_mode": {
+         "type": "string",
+         "default": "none"
+        }
+       }
+      },
+      "description": ""
+     }
+    },
+    "node_type": "end_call",
+    "assertions": [],
+    "passthrough": false,
+    "pre_actions": [],
+    "transitions": [],
+    "role_message": "",
+    "task_message": "",
+    "interruptible": true,
+    "max_node_turns": null,
+    "response_mapping": [],
+    "extraction_schema": [],
+    "max_turn_transition": null,
+    "truncation_strategy": "keep_all",
+    "suppress_tool_results": false,
+    "truncation_window_size": 10,
+    "on_enter_first_entry_only": false,
+    "disable_inactivity_monitor": true,
+    "passthrough_default_transition": null,
+    "return_to_previous_on_interrupt": false
+   },
+   "main": {
+    "name": "main",
+    "tools": [
+     {
+      "type": "function",
+      "config": {
+       "timeoutMs": 12000,
+       "maxRetries": 0
+      },
+      "function": {
+       "name": "cards_list",
+       "handler": "__function__:api_call",
+       "parameters": {
+        "type": "object",
+        "properties": {
+         "url": {
+          "type": "string",
+          "default": "https://btb-bank-mock.barsyayc.workers.dev/cards.list"
+         },
+         "body": {
+          "type": "object",
+          "required": [
+           "data"
+          ],
+          "properties": {
+           "call": {
+            "type": "object",
+            "default": {
+             "lang": "tr"
+            },
+            "properties": {
+             "lang": {
+              "type": "string",
+              "default": "tr"
+             }
+            }
+           },
+           "data": {
+            "type": "object",
+            "default": {
+             "aiFlow": "CardOps",
+             "customerNo": "{{customerNumber}}"
+            },
+            "required": [
+             "customerNo",
+             "aiFlow"
+            ],
+            "properties": {
+             "aiFlow": {
+              "type": "string",
+              "default": "CardOps",
+              "description": "Always CardOps"
+             },
+             "customerNo": {
+              "type": "string",
+              "default": "{{customerNumber}}",
+              "description": "Customer number"
+             }
+            }
+           }
+          }
+         },
+         "method": {
+          "type": "string",
+          "default": "POST"
+         },
+         "headers": {
+          "type": "object",
+          "properties": {
+           "Content-Type": {
+            "type": "string",
+            "default": "application/json"
+           }
+          }
+         }
+        }
+       },
+       "description": "List the caller's cards. Call once at the start."
+      },
+      "pre_process_code": "try:\n    _o2, _c2 = chr(123) * 2, chr(125) * 2\n    _b0 = config.get('body') if isinstance(config, dict) else None\n    if isinstance(_b0, dict):\n        for _k0 in list(_b0.keys()):\n            _x0 = _b0.get(_k0)\n            if isinstance(_x0, str) and _o2 in _x0:\n                _nm = _x0.replace(_o2, '').replace(_c2, '').strip()\n                _cand = [vars.get('cards_list' + '_args.' + _k0), vars.get('cards_list' + '_args.' + _nm), vars.get(_nm), vars.get(_k0)]\n                _cand = [c for c in _cand if c not in (None, '') and _o2 not in str(c)]\n                if _cand:\n                    _b0[_k0] = _cand[0]\n                else:\n                    _b0[_k0] = ''\nexcept Exception:\n    pass\ntry:\n    _b1 = config.get('body') if isinstance(config, dict) else None\n    if isinstance(_b1, dict):\n        _sel1 = [str(_x1) for _k1, _x1 in _b1.items() if isinstance(_x1, str) and _x1\n                 and not str(_k1).endswith('_id') and not any(w in str(_k1).lower() for w in ('answer', 'value', 'response', 'digits', 'dob', 'date', 'amount'))]\n        vars['last_request_' + 'cards_list'] = ' '.join(_sel1)[:60]\nexcept Exception:\n    pass\ntry:\n    import json as _json\n    _kn = vars.get('known_ids')\n    if isinstance(_kn, str) and _kn:\n        _kn = _json.loads(_kn)\n    _b = config.get('body') if isinstance(config, dict) else None\n    if isinstance(_kn, dict) and isinstance(_b, dict):\n        for _k, _ids in _kn.items():\n            if _k in _b and _ids:\n                _val = str(_b.get(_k) or '').strip()\n                if _val in _ids:\n                    continue\n                _low = dict((str(i).lower(), i) for i in _ids)\n                if _val.lower() in _low:\n                    _b[_k] = _low[_val.lower()]\n                elif len(_ids) == 1:\n                    _b[_k] = _ids[0]\n                elif _val:\n                    # An id the model built: the one listed item whose own text fields (type, last digits, name, or\n                    # the initials of a multi-word type) appear in it. A tie or no match: sent as it is (bank answers).\n                    _its = _json.loads(vars.get('known_items') or '[]')\n                    _al = lambda z: ''.join(ch for ch in str(z).lower() if ch.isalnum())\n                    _vl = _al(_val)\n                    _sc = []\n                    for _it in _its:\n                        if _it.get('_key') != _k:\n                            continue\n                        _n = sum(len(_al(x)) for x in _it.get('_text') or [] if len(_al(x)) >= 2 and _al(x) in _vl)\n                        _ini = [''.join(w[0] for w in str(x).replace('-', ' ').replace('_', ' ').split() if w) for x in _it.get('_text') or []]\n                        _n += sum(len(i) for i in _ini if len(i) >= 2 and _vl.startswith(i))\n                        _sc.append((_n, _it.get('_id')))\n                    _sc.sort(reverse=True)\n                    if _sc and _sc[0][0] > 0 and (len(_sc) == 1 or _sc[1][0] < _sc[0][0]):\n                        _b[_k] = _sc[0][1]\nexcept Exception:\n    pass\ntry:\n    # Idempotent writes (M12): an identical re-send of a write that already SUCCEEDED in this call goes to the host's\n    # no-op path (nothing reaches the bank) and the post-hook answers ALREADY RECORDED. Key = tool + the request's own\n    # *_id fields (the product), value = the request's fields except free text.\n    import json as _json\n    vars['dup_hit_' + 'cards_list'] = ''\n    vars['write_req_' + 'cards_list'] = ''\n    _bq = config.get('body') if isinstance(config, dict) else None\n    if isinstance(_bq, dict):\n        def _nv(x):\n            try:\n                return str(round(float(str(x).replace(',', '').strip()), 2))\n            except Exception:\n                return str(x).strip().lower()\n        _pk = '|'.join(str(_bq.get(k)) for k in sorted(_bq) if str(k).endswith(('_id', '_ref', '_no', '_number', '_index')) and not str(k).startswith('customer'))\n        _fp = '|'.join(str(k) + '=' + _nv(_bq.get(k)) for k in sorted(_bq)\n                       if not (isinstance(_bq.get(k), str) and len(str(_bq.get(k)).split()) >= 4))\n        vars['write_req_' + 'cards_list'] = _json.dumps([_pk, _fp])\n        try:\n            _wok = _json.loads(vars.get('writes_ok') or '{}')\n        except Exception:\n            _wok = dict()\n        _prev = _wok.get('cards_list' + '#' + _pk) if isinstance(_wok, dict) else None\n        _u = str(config.get('url') or '').split('/')\n        if isinstance(_prev, dict) and _prev.get('fp') == _fp and '/health' and len(_u) > 2 and _u[0] in ('http:', 'https:') and _u[2]:\n            vars['dup_hit_' + 'cards_list'] = _pk or 'this call'\n            config['url'] = _u[0] + '//' + _u[2] + '/health'\nexcept Exception:\n    pass\n",
+      "post_process_code": "try:\n    import json as _json\n    _t = 'cards_list'\n    _v = vars if isinstance(globals().get('vars'), dict) else None\n    if isinstance(result, dict):\n        result.pop('header', None)\n        _d = result.get('data')\n        if not isinstance(_d, dict):\n            _d = {'raw': _d}\n            result['data'] = _d\n        try:\n            _sc = int(result.get('status_code') or 0)\n        except Exception:\n            _sc = 0\n        _st = str(result.get('status') or 'success').lower()\n        _failed = _st not in ('success', 'ok') or _sc >= 400 or _d.get('ok') in (False, 'false', 'False')\n        _same = ''\n        if _v is not None and True:\n            # Idempotent writes: a re-send the pre-hook sent to the no-op path, or a bank \"already exists\" answer after\n            # our own success for the same tool and product, is reported as ALREADY RECORDED (never as a failure).\n            try:\n                _wq = _json.loads(_v.get('write_req_' + _t) or '[]')\n                _wok = _json.loads(_v.get('writes_ok') or '{}')\n            except Exception:\n                _wq, _wok = [], dict()\n            _prev = _wok.get(_t + '#' + str(_wq[0])) if (len(_wq) == 2 and isinstance(_wok, dict)) else None\n            _err0 = str(_d.get('error') or result.get('message') or '').lower()\n            _ack = all(str(k).endswith(('_id', '_ref')) for k in _d.keys() if k not in ('ok', 'error', 'tool_outcome', 'what_to_do_next', 'message'))\n            _bare = not [k for k in _d.keys() if k not in ('ok', 'status', 'message', 'what_to_do_next', 'tool_outcome')]\n            if _v.get('dup_hit_' + _t) and _bare:\n                # only the no-op's bare answer: a parallel sibling of the same tool (M20 shares the flag) keeps its own result\n                _same = 'the same values were sent again'\n            elif _failed and isinstance(_prev, dict) and (any(w in _err0 for w in ('exist', 'duplicate')) or ('already' in _err0 and 'closed' not in _err0)):\n                _same = ('the bank answered: ' + str(_d.get('error') or result.get('message'))[:120] +\n                         '; the values on record are the earlier ones: ' + str(_prev.get('fp') or '').replace('|', ', '))\n            if _same:\n                _v['dup_hit_' + _t] = ''\n                if _v.get('last_tool_failed') == _t:\n                    _v['last_tool_failed'] = ''\n                result['status'] = 'success'\n                result['status_code'] = 200\n                result['message'] = 'already recorded'\n                _d = dict(ok=True, already_recorded=True)\n                _d.update((_prev or dict()).get('ids') or dict())\n                _d['tool_outcome'] = ('ALREADY RECORDED earlier in this call: do not send it again. ' + _t +\n                                      (' for ' + str(_wq[0]) if _wq and _wq[0] else '') + ' succeeded earlier in this call ('\n                                      + _same + '), so it IS recorded and nothing new was sent. This is not a failure: never '\n                                      'tell the customer it could not be saved and never treat it as a service error. '\n                                      'Continue with the next step.')\n                result['data'] = _d\n                _failed = False\n            elif not _failed and _ack and len(_wq) == 2 and isinstance(_wok, dict) and not _v.get('guard_block_' + _t):\n                _wok[_t + '#' + str(_wq[0])] = dict(fp=_wq[1], ids=dict((k, x) for k, x in _d.items()\n                                                                       if str(k).endswith(('_id', '_ref')) and isinstance(x, (str, int))))\n                _v['writes_ok'] = _json.dumps(_wok)\n        if _failed:\n            _n = 1\n            if _v is not None:\n                try:\n                    _n = int(_v.get('tool_failures_' + _t) or 0) + 1\n                except Exception:\n                    _n = 1\n                _v['tool_failures_' + _t] = _n\n                _v['last_tool_failed'] = _t\n            _err = _d.get('error') or result.get('message') or 'service error'\n            if 0 < _sc < 500:\n                # b10-w2: the bank ANSWERED and rejected these values (ok=false with its reason). The same values get the\n                # same answer, so never tell the model to resend them (seen: an unreadable date \"call again now with\n                # the same values\" next to the identity code's \"ask again\"; a rejected write re-sent as a duplicate).\n                _msg = ('FAILED: ' + _t + ' was NOT carried out and NOTHING was recorded: the bank rejected the values '\n                        '(error: ' + str(_err) + '). This is failure number ' + str(_n) + ' of ' + _t + ' in this call. '\n                        'Never tell the customer it was recorded, booked, sent or done. Never send the same values '\n                        'again: they get the same answer. Correct the value the error names (ask the customer if '\n                        'needed) and follow the brief.')\n            else:\n                _msg = ('FAILED: ' + _t + ' was NOT carried out and NOTHING was recorded (error: ' + str(_err) + '). '\n                        'This is failure number ' + str(_n) + ' of ' + _t + ' in this call. Never tell the customer it was '\n                        'recorded, booked, sent or done. Apply the brief rule for a failed tool call: if it allows another '\n                        'attempt, call ' + _t + ' again now with the same values; otherwise tell the customer plainly that '\n                        'it could not be done and continue as the brief says.')\n            if 'id' in str(_err).lower() and _v is not None and _v.get('known_ids'):\n                _msg += ' Use only these ids, exactly as written: ' + str(_v.get('known_ids')) + '.'\n            _d['tool_outcome'] = _msg\n        else:\n            if _v is not None and _v.get('last_tool_failed') == _t:\n                _v['last_tool_failed'] = ''\n            _keys = [k for k in _d.keys() if k not in ('ok', 'error', 'tool_outcome', 'what_to_do_next')]\n            if _same:\n                pass\n            elif True and all(str(k).endswith(('_id', '_ref')) for k in _keys):\n                _d['tool_outcome'] = ('SUCCESS: ' + _t + ' was carried out and recorded. Only now may you tell the '\n                                      'customer it is recorded. Speak to the customer now.')\n            if _v is not None and str(_d.get('verified')).lower() == 'true':\n                # Identity memory (b4-5): a passed question is stored in the call's variables, so a repeated or\n                # replayed turn never asks it again. The pre-hook stashed the request's selector values.\n                _done = [x for x in str(_v.get('verified_items') or '').split('|') if x]\n                _sel = str(_v.get('last_request_' + _t) or '')\n                if _sel and _sel not in _done:\n                    _done.append(_sel)\n                _v['verified_items'] = '|'.join(_done)\n                _all = str(_d.get('all_verified')).lower() == 'true'\n                if _all:\n                    _v['identity_verified'] = 'true'\n                _d['verified_so_far'] = ('Already passed in this call (never ask these again): '\n                                         + (', '.join(_done) or str(len(_done)) + ' question(s)')\n                                         + ('. Identity is fully verified: do not ask any security question again.' if _all else\n                                            '. Ask only a question that is not in this list.'))\n            # Identity gate (M18): while the tool's all-verified flag is false, the result says so in words; seen\n            # officially: after one wrong and one right answer the model \"moved on\" and invented an amount.\n            _allk = [k for k in _d.keys() if 'verif' in str(k).lower() and 'all' in str(k).lower()]\n            if _allk and str(_d.get(_allk[0])).lower() in ('false', '0', 'none', ''):\n                _d['identity_status'] = ('NOT VERIFIED YET (' + str(_allk[0]) + ' is false). You know nothing about '\n                                         'the account: never mention any amount, product or account detail. '\n                                         'Follow the brief\\'s identity rule: ask the next security question (a '\n                                         'question answered wrongly is asked again if the brief allows), or end '\n                                         'the check when no attempts are left.')\n            if _t.startswith('get_') and _v is not None:\n                _known = {}\n                _stack = [_d]\n                while _stack:\n                    _o = _stack.pop()\n                    if isinstance(_o, dict):\n                        for _k2, _x in _o.items():\n                            if str(_k2).endswith('_id') and _k2 != 'customer_id' and isinstance(_x, (str, int)):\n                                _known.setdefault(str(_k2), [])\n                                if str(_x) not in _known[str(_k2)]:\n                                    _known[str(_k2)].append(str(_x))\n                            else:\n                                _stack.append(_x)\n                    elif isinstance(_o, list):\n                        _stack.extend(reversed(_o))\n                if _known:\n                    _v['known_ids'] = _json.dumps(_known)\n                # b10-w2 (M7, port of idea/b7-1 e9dfe52 + cca104a, mapping part only): every listed item with an id and\n                # its short text fields, so the pre-hook maps an id the model BUILT ('credit_card_2288', 'pl_1234') to\n                # the one listed item it can only mean, instead of a refused write and a second write for the item.\n                _items = []\n                _stack = [_d]\n                while _stack:\n                    _o = _stack.pop()\n                    if isinstance(_o, list):\n                        _stack.extend(reversed(_o))\n                    elif isinstance(_o, dict):\n                        _ik = [k for k in _o.keys() if str(k).endswith('_id') and k != 'customer_id' and isinstance(_o.get(k), (str, int))]\n                        if _ik and _o is not _d:\n                            _items.append({'_key': str(_ik[0]), '_id': str(_o.get(_ik[0])),\n                                           '_text': [str(x).lower() for k, x in _o.items() if k not in _ik and k not in ('band', 'deadline', 'deadline_weekday')\n                                                     and isinstance(x, str) and 2 <= len(str(x)) <= 40]})\n                        for _x in _o.values():\n                            if isinstance(_x, (dict, list)):\n                                _stack.append(_x)\n                if _items:\n                    _v['known_items'] = _json.dumps(_items)\nexcept Exception:\n    pass\n"
+     },
+     {
+      "type": "function",
+      "config": {
+       "timeoutMs": 12000,
+       "maxRetries": 0
+      },
+      "function": {
+       "name": "cards_balance",
+       "handler": "__function__:api_call",
+       "parameters": {
+        "type": "object",
+        "properties": {
+         "url": {
+          "type": "string",
+          "default": "https://btb-bank-mock.barsyayc.workers.dev/cards.balance"
+         },
+         "body": {
+          "type": "object",
+          "required": [
+           "data"
+          ],
+          "properties": {
+           "call": {
+            "type": "object",
+            "default": {
+             "lang": "tr"
+            },
+            "properties": {
+             "lang": {
+              "type": "string",
+              "default": "tr"
+             }
+            }
+           },
+           "data": {
+            "type": "object",
+            "default": {
+             "cardNumber": "{{cardNumber}}"
+            },
+            "required": [
+             "cardNumber"
+            ],
+            "properties": {
+             "cardNumber": {
+              "type": "string",
+              "default": "{{cardNumber}}",
+              "description": "Exactly the masked cardNumber string from the cards_list result (digits plus asterisks, e.g. 123456******7890), copied character by character; never only the last four digits."
+             }
+            }
+           }
+          }
+         },
+         "method": {
+          "type": "string",
+          "default": "POST"
+         },
+         "headers": {
+          "type": "object",
+          "properties": {
+           "Content-Type": {
+            "type": "string",
+            "default": "application/json"
+           }
+          }
+         }
+        }
+       },
+       "description": "Statement debt, dates and balances of one card."
+      },
+      "pre_process_code": "try:\n    _o2, _c2 = chr(123) * 2, chr(125) * 2\n    _b0 = config.get('body') if isinstance(config, dict) else None\n    if isinstance(_b0, dict):\n        for _k0 in list(_b0.keys()):\n            _x0 = _b0.get(_k0)\n            if isinstance(_x0, str) and _o2 in _x0:\n                _nm = _x0.replace(_o2, '').replace(_c2, '').strip()\n                _cand = [vars.get('cards_balance' + '_args.' + _k0), vars.get('cards_balance' + '_args.' + _nm), vars.get(_nm), vars.get(_k0)]\n                _cand = [c for c in _cand if c not in (None, '') and _o2 not in str(c)]\n                if _cand:\n                    _b0[_k0] = _cand[0]\n                else:\n                    _b0[_k0] = ''\nexcept Exception:\n    pass\ntry:\n    _b1 = config.get('body') if isinstance(config, dict) else None\n    if isinstance(_b1, dict):\n        _sel1 = [str(_x1) for _k1, _x1 in _b1.items() if isinstance(_x1, str) and _x1\n                 and not str(_k1).endswith('_id') and not any(w in str(_k1).lower() for w in ('answer', 'value', 'response', 'digits', 'dob', 'date', 'amount'))]\n        vars['last_request_' + 'cards_balance'] = ' '.join(_sel1)[:60]\nexcept Exception:\n    pass\ntry:\n    import json as _json\n    _kn = vars.get('known_ids')\n    if isinstance(_kn, str) and _kn:\n        _kn = _json.loads(_kn)\n    _b = config.get('body') if isinstance(config, dict) else None\n    if isinstance(_kn, dict) and isinstance(_b, dict):\n        for _k, _ids in _kn.items():\n            if _k in _b and _ids:\n                _val = str(_b.get(_k) or '').strip()\n                if _val in _ids:\n                    continue\n                _low = dict((str(i).lower(), i) for i in _ids)\n                if _val.lower() in _low:\n                    _b[_k] = _low[_val.lower()]\n                elif len(_ids) == 1:\n                    _b[_k] = _ids[0]\n                elif _val:\n                    # An id the model built: the one listed item whose own text fields (type, last digits, name, or\n                    # the initials of a multi-word type) appear in it. A tie or no match: sent as it is (bank answers).\n                    _its = _json.loads(vars.get('known_items') or '[]')\n                    _al = lambda z: ''.join(ch for ch in str(z).lower() if ch.isalnum())\n                    _vl = _al(_val)\n                    _sc = []\n                    for _it in _its:\n                        if _it.get('_key') != _k:\n                            continue\n                        _n = sum(len(_al(x)) for x in _it.get('_text') or [] if len(_al(x)) >= 2 and _al(x) in _vl)\n                        _ini = [''.join(w[0] for w in str(x).replace('-', ' ').replace('_', ' ').split() if w) for x in _it.get('_text') or []]\n                        _n += sum(len(i) for i in _ini if len(i) >= 2 and _vl.startswith(i))\n                        _sc.append((_n, _it.get('_id')))\n                    _sc.sort(reverse=True)\n                    if _sc and _sc[0][0] > 0 and (len(_sc) == 1 or _sc[1][0] < _sc[0][0]):\n                        _b[_k] = _sc[0][1]\nexcept Exception:\n    pass\ntry:\n    # Idempotent writes (M12): an identical re-send of a write that already SUCCEEDED in this call goes to the host's\n    # no-op path (nothing reaches the bank) and the post-hook answers ALREADY RECORDED. Key = tool + the request's own\n    # *_id fields (the product), value = the request's fields except free text.\n    import json as _json\n    vars['dup_hit_' + 'cards_balance'] = ''\n    vars['write_req_' + 'cards_balance'] = ''\n    _bq = config.get('body') if isinstance(config, dict) else None\n    if isinstance(_bq, dict):\n        def _nv(x):\n            try:\n                return str(round(float(str(x).replace(',', '').strip()), 2))\n            except Exception:\n                return str(x).strip().lower()\n        _pk = '|'.join(str(_bq.get(k)) for k in sorted(_bq) if str(k).endswith(('_id', '_ref', '_no', '_number', '_index')) and not str(k).startswith('customer'))\n        _fp = '|'.join(str(k) + '=' + _nv(_bq.get(k)) for k in sorted(_bq)\n                       if not (isinstance(_bq.get(k), str) and len(str(_bq.get(k)).split()) >= 4))\n        vars['write_req_' + 'cards_balance'] = _json.dumps([_pk, _fp])\n        try:\n            _wok = _json.loads(vars.get('writes_ok') or '{}')\n        except Exception:\n            _wok = dict()\n        _prev = _wok.get('cards_balance' + '#' + _pk) if isinstance(_wok, dict) else None\n        _u = str(config.get('url') or '').split('/')\n        if isinstance(_prev, dict) and _prev.get('fp') == _fp and '/health' and len(_u) > 2 and _u[0] in ('http:', 'https:') and _u[2]:\n            vars['dup_hit_' + 'cards_balance'] = _pk or 'this call'\n            config['url'] = _u[0] + '//' + _u[2] + '/health'\nexcept Exception:\n    pass\n",
+      "post_process_code": "try:\n    import json as _json\n    _t = 'cards_balance'\n    _v = vars if isinstance(globals().get('vars'), dict) else None\n    if isinstance(result, dict):\n        result.pop('header', None)\n        _d = result.get('data')\n        if not isinstance(_d, dict):\n            _d = {'raw': _d}\n            result['data'] = _d\n        try:\n            _sc = int(result.get('status_code') or 0)\n        except Exception:\n            _sc = 0\n        _st = str(result.get('status') or 'success').lower()\n        _failed = _st not in ('success', 'ok') or _sc >= 400 or _d.get('ok') in (False, 'false', 'False')\n        _same = ''\n        if _v is not None and True:\n            # Idempotent writes: a re-send the pre-hook sent to the no-op path, or a bank \"already exists\" answer after\n            # our own success for the same tool and product, is reported as ALREADY RECORDED (never as a failure).\n            try:\n                _wq = _json.loads(_v.get('write_req_' + _t) or '[]')\n                _wok = _json.loads(_v.get('writes_ok') or '{}')\n            except Exception:\n                _wq, _wok = [], dict()\n            _prev = _wok.get(_t + '#' + str(_wq[0])) if (len(_wq) == 2 and isinstance(_wok, dict)) else None\n            _err0 = str(_d.get('error') or result.get('message') or '').lower()\n            _ack = all(str(k).endswith(('_id', '_ref')) for k in _d.keys() if k not in ('ok', 'error', 'tool_outcome', 'what_to_do_next', 'message'))\n            _bare = not [k for k in _d.keys() if k not in ('ok', 'status', 'message', 'what_to_do_next', 'tool_outcome')]\n            if _v.get('dup_hit_' + _t) and _bare:\n                # only the no-op's bare answer: a parallel sibling of the same tool (M20 shares the flag) keeps its own result\n                _same = 'the same values were sent again'\n            elif _failed and isinstance(_prev, dict) and (any(w in _err0 for w in ('exist', 'duplicate')) or ('already' in _err0 and 'closed' not in _err0)):\n                _same = ('the bank answered: ' + str(_d.get('error') or result.get('message'))[:120] +\n                         '; the values on record are the earlier ones: ' + str(_prev.get('fp') or '').replace('|', ', '))\n            if _same:\n                _v['dup_hit_' + _t] = ''\n                if _v.get('last_tool_failed') == _t:\n                    _v['last_tool_failed'] = ''\n                result['status'] = 'success'\n                result['status_code'] = 200\n                result['message'] = 'already recorded'\n                _d = dict(ok=True, already_recorded=True)\n                _d.update((_prev or dict()).get('ids') or dict())\n                _d['tool_outcome'] = ('ALREADY RECORDED earlier in this call: do not send it again. ' + _t +\n                                      (' for ' + str(_wq[0]) if _wq and _wq[0] else '') + ' succeeded earlier in this call ('\n                                      + _same + '), so it IS recorded and nothing new was sent. This is not a failure: never '\n                                      'tell the customer it could not be saved and never treat it as a service error. '\n                                      'Continue with the next step.')\n                result['data'] = _d\n                _failed = False\n            elif not _failed and _ack and len(_wq) == 2 and isinstance(_wok, dict) and not _v.get('guard_block_' + _t):\n                _wok[_t + '#' + str(_wq[0])] = dict(fp=_wq[1], ids=dict((k, x) for k, x in _d.items()\n                                                                       if str(k).endswith(('_id', '_ref')) and isinstance(x, (str, int))))\n                _v['writes_ok'] = _json.dumps(_wok)\n        if _failed:\n            _n = 1\n            if _v is not None:\n                try:\n                    _n = int(_v.get('tool_failures_' + _t) or 0) + 1\n                except Exception:\n                    _n = 1\n                _v['tool_failures_' + _t] = _n\n                _v['last_tool_failed'] = _t\n            _err = _d.get('error') or result.get('message') or 'service error'\n            if 0 < _sc < 500:\n                # b10-w2: the bank ANSWERED and rejected these values (ok=false with its reason). The same values get the\n                # same answer, so never tell the model to resend them (seen: an unreadable date \"call again now with\n                # the same values\" next to the identity code's \"ask again\"; a rejected write re-sent as a duplicate).\n                _msg = ('FAILED: ' + _t + ' was NOT carried out and NOTHING was recorded: the bank rejected the values '\n                        '(error: ' + str(_err) + '). This is failure number ' + str(_n) + ' of ' + _t + ' in this call. '\n                        'Never tell the customer it was recorded, booked, sent or done. Never send the same values '\n                        'again: they get the same answer. Correct the value the error names (ask the customer if '\n                        'needed) and follow the brief.')\n            else:\n                _msg = ('FAILED: ' + _t + ' was NOT carried out and NOTHING was recorded (error: ' + str(_err) + '). '\n                        'This is failure number ' + str(_n) + ' of ' + _t + ' in this call. Never tell the customer it was '\n                        'recorded, booked, sent or done. Apply the brief rule for a failed tool call: if it allows another '\n                        'attempt, call ' + _t + ' again now with the same values; otherwise tell the customer plainly that '\n                        'it could not be done and continue as the brief says.')\n            if 'id' in str(_err).lower() and _v is not None and _v.get('known_ids'):\n                _msg += ' Use only these ids, exactly as written: ' + str(_v.get('known_ids')) + '.'\n            _d['tool_outcome'] = _msg\n        else:\n            if _v is not None and _v.get('last_tool_failed') == _t:\n                _v['last_tool_failed'] = ''\n            _keys = [k for k in _d.keys() if k not in ('ok', 'error', 'tool_outcome', 'what_to_do_next')]\n            if _same:\n                pass\n            elif True and all(str(k).endswith(('_id', '_ref')) for k in _keys):\n                _d['tool_outcome'] = ('SUCCESS: ' + _t + ' was carried out and recorded. Only now may you tell the '\n                                      'customer it is recorded. Speak to the customer now.')\n            if _v is not None and str(_d.get('verified')).lower() == 'true':\n                # Identity memory (b4-5): a passed question is stored in the call's variables, so a repeated or\n                # replayed turn never asks it again. The pre-hook stashed the request's selector values.\n                _done = [x for x in str(_v.get('verified_items') or '').split('|') if x]\n                _sel = str(_v.get('last_request_' + _t) or '')\n                if _sel and _sel not in _done:\n                    _done.append(_sel)\n                _v['verified_items'] = '|'.join(_done)\n                _all = str(_d.get('all_verified')).lower() == 'true'\n                if _all:\n                    _v['identity_verified'] = 'true'\n                _d['verified_so_far'] = ('Already passed in this call (never ask these again): '\n                                         + (', '.join(_done) or str(len(_done)) + ' question(s)')\n                                         + ('. Identity is fully verified: do not ask any security question again.' if _all else\n                                            '. Ask only a question that is not in this list.'))\n            # Identity gate (M18): while the tool's all-verified flag is false, the result says so in words; seen\n            # officially: after one wrong and one right answer the model \"moved on\" and invented an amount.\n            _allk = [k for k in _d.keys() if 'verif' in str(k).lower() and 'all' in str(k).lower()]\n            if _allk and str(_d.get(_allk[0])).lower() in ('false', '0', 'none', ''):\n                _d['identity_status'] = ('NOT VERIFIED YET (' + str(_allk[0]) + ' is false). You know nothing about '\n                                         'the account: never mention any amount, product or account detail. '\n                                         'Follow the brief\\'s identity rule: ask the next security question (a '\n                                         'question answered wrongly is asked again if the brief allows), or end '\n                                         'the check when no attempts are left.')\n            if _t.startswith('get_') and _v is not None:\n                _known = {}\n                _stack = [_d]\n                while _stack:\n                    _o = _stack.pop()\n                    if isinstance(_o, dict):\n                        for _k2, _x in _o.items():\n                            if str(_k2).endswith('_id') and _k2 != 'customer_id' and isinstance(_x, (str, int)):\n                                _known.setdefault(str(_k2), [])\n                                if str(_x) not in _known[str(_k2)]:\n                                    _known[str(_k2)].append(str(_x))\n                            else:\n                                _stack.append(_x)\n                    elif isinstance(_o, list):\n                        _stack.extend(reversed(_o))\n                if _known:\n                    _v['known_ids'] = _json.dumps(_known)\n                # b10-w2 (M7, port of idea/b7-1 e9dfe52 + cca104a, mapping part only): every listed item with an id and\n                # its short text fields, so the pre-hook maps an id the model BUILT ('credit_card_2288', 'pl_1234') to\n                # the one listed item it can only mean, instead of a refused write and a second write for the item.\n                _items = []\n                _stack = [_d]\n                while _stack:\n                    _o = _stack.pop()\n                    if isinstance(_o, list):\n                        _stack.extend(reversed(_o))\n                    elif isinstance(_o, dict):\n                        _ik = [k for k in _o.keys() if str(k).endswith('_id') and k != 'customer_id' and isinstance(_o.get(k), (str, int))]\n                        if _ik and _o is not _d:\n                            _items.append({'_key': str(_ik[0]), '_id': str(_o.get(_ik[0])),\n                                           '_text': [str(x).lower() for k, x in _o.items() if k not in _ik and k not in ('band', 'deadline', 'deadline_weekday')\n                                                     and isinstance(x, str) and 2 <= len(str(x)) <= 40]})\n                        for _x in _o.values():\n                            if isinstance(_x, (dict, list)):\n                                _stack.append(_x)\n                if _items:\n                    _v['known_items'] = _json.dumps(_items)\nexcept Exception:\n    pass\n"
+     },
+     {
+      "type": "function",
+      "config": {
+       "timeoutMs": 12000,
+       "maxRetries": 0
+      },
+      "function": {
+       "name": "statement_week_get",
+       "handler": "__function__:api_call",
+       "parameters": {
+        "type": "object",
+        "properties": {
+         "url": {
+          "type": "string",
+          "default": "https://btb-bank-mock.barsyayc.workers.dev/statement.week.get"
+         },
+         "body": {
+          "type": "object",
+          "required": [
+           "data"
+          ],
+          "properties": {
+           "call": {
+            "type": "object",
+            "default": {
+             "lang": "tr"
+            },
+            "properties": {
+             "lang": {
+              "type": "string",
+              "default": "tr"
+             }
+            }
+           },
+           "data": {
+            "type": "object",
+            "default": {
+             "cardNumber": "{{cardNumber}}"
+            },
+            "required": [
+             "cardNumber"
+            ],
+            "properties": {
+             "cardNumber": {
+              "type": "string",
+              "default": "{{cardNumber}}",
+              "description": "Exactly the masked cardNumber string from the cards_list result (digits plus asterisks, e.g. 123456******7890), copied character by character; never only the last four digits."
+             }
+            }
+           }
+          }
+         },
+         "method": {
+          "type": "string",
+          "default": "POST"
+         },
+         "headers": {
+          "type": "object",
+          "properties": {
+           "Content-Type": {
+            "type": "string",
+            "default": "application/json"
+           }
+          }
+         }
+        }
+       },
+       "description": "Current statement week, statementDay and next dates of the card."
+      },
+      "pre_process_code": "try:\n    _o2, _c2 = chr(123) * 2, chr(125) * 2\n    _b0 = config.get('body') if isinstance(config, dict) else None\n    if isinstance(_b0, dict):\n        for _k0 in list(_b0.keys()):\n            _x0 = _b0.get(_k0)\n            if isinstance(_x0, str) and _o2 in _x0:\n                _nm = _x0.replace(_o2, '').replace(_c2, '').strip()\n                _cand = [vars.get('statement_week_get' + '_args.' + _k0), vars.get('statement_week_get' + '_args.' + _nm), vars.get(_nm), vars.get(_k0)]\n                _cand = [c for c in _cand if c not in (None, '') and _o2 not in str(c)]\n                if _cand:\n                    _b0[_k0] = _cand[0]\n                else:\n                    _b0[_k0] = ''\nexcept Exception:\n    pass\ntry:\n    _b1 = config.get('body') if isinstance(config, dict) else None\n    if isinstance(_b1, dict):\n        _sel1 = [str(_x1) for _k1, _x1 in _b1.items() if isinstance(_x1, str) and _x1\n                 and not str(_k1).endswith('_id') and not any(w in str(_k1).lower() for w in ('answer', 'value', 'response', 'digits', 'dob', 'date', 'amount'))]\n        vars['last_request_' + 'statement_week_get'] = ' '.join(_sel1)[:60]\nexcept Exception:\n    pass\ntry:\n    import json as _json\n    _kn = vars.get('known_ids')\n    if isinstance(_kn, str) and _kn:\n        _kn = _json.loads(_kn)\n    _b = config.get('body') if isinstance(config, dict) else None\n    if isinstance(_kn, dict) and isinstance(_b, dict):\n        for _k, _ids in _kn.items():\n            if _k in _b and _ids:\n                _val = str(_b.get(_k) or '').strip()\n                if _val in _ids:\n                    continue\n                _low = dict((str(i).lower(), i) for i in _ids)\n                if _val.lower() in _low:\n                    _b[_k] = _low[_val.lower()]\n                elif len(_ids) == 1:\n                    _b[_k] = _ids[0]\n                elif _val:\n                    # An id the model built: the one listed item whose own text fields (type, last digits, name, or\n                    # the initials of a multi-word type) appear in it. A tie or no match: sent as it is (bank answers).\n                    _its = _json.loads(vars.get('known_items') or '[]')\n                    _al = lambda z: ''.join(ch for ch in str(z).lower() if ch.isalnum())\n                    _vl = _al(_val)\n                    _sc = []\n                    for _it in _its:\n                        if _it.get('_key') != _k:\n                            continue\n                        _n = sum(len(_al(x)) for x in _it.get('_text') or [] if len(_al(x)) >= 2 and _al(x) in _vl)\n                        _ini = [''.join(w[0] for w in str(x).replace('-', ' ').replace('_', ' ').split() if w) for x in _it.get('_text') or []]\n                        _n += sum(len(i) for i in _ini if len(i) >= 2 and _vl.startswith(i))\n                        _sc.append((_n, _it.get('_id')))\n                    _sc.sort(reverse=True)\n                    if _sc and _sc[0][0] > 0 and (len(_sc) == 1 or _sc[1][0] < _sc[0][0]):\n                        _b[_k] = _sc[0][1]\nexcept Exception:\n    pass\ntry:\n    # Idempotent writes (M12): an identical re-send of a write that already SUCCEEDED in this call goes to the host's\n    # no-op path (nothing reaches the bank) and the post-hook answers ALREADY RECORDED. Key = tool + the request's own\n    # *_id fields (the product), value = the request's fields except free text.\n    import json as _json\n    vars['dup_hit_' + 'statement_week_get'] = ''\n    vars['write_req_' + 'statement_week_get'] = ''\n    _bq = config.get('body') if isinstance(config, dict) else None\n    if isinstance(_bq, dict):\n        def _nv(x):\n            try:\n                return str(round(float(str(x).replace(',', '').strip()), 2))\n            except Exception:\n                return str(x).strip().lower()\n        _pk = '|'.join(str(_bq.get(k)) for k in sorted(_bq) if str(k).endswith(('_id', '_ref', '_no', '_number', '_index')) and not str(k).startswith('customer'))\n        _fp = '|'.join(str(k) + '=' + _nv(_bq.get(k)) for k in sorted(_bq)\n                       if not (isinstance(_bq.get(k), str) and len(str(_bq.get(k)).split()) >= 4))\n        vars['write_req_' + 'statement_week_get'] = _json.dumps([_pk, _fp])\n        try:\n            _wok = _json.loads(vars.get('writes_ok') or '{}')\n        except Exception:\n            _wok = dict()\n        _prev = _wok.get('statement_week_get' + '#' + _pk) if isinstance(_wok, dict) else None\n        _u = str(config.get('url') or '').split('/')\n        if isinstance(_prev, dict) and _prev.get('fp') == _fp and '/health' and len(_u) > 2 and _u[0] in ('http:', 'https:') and _u[2]:\n            vars['dup_hit_' + 'statement_week_get'] = _pk or 'this call'\n            config['url'] = _u[0] + '//' + _u[2] + '/health'\nexcept Exception:\n    pass\n",
+      "post_process_code": "try:\n    import json as _json\n    _t = 'statement_week_get'\n    _v = vars if isinstance(globals().get('vars'), dict) else None\n    if isinstance(result, dict):\n        result.pop('header', None)\n        _d = result.get('data')\n        if not isinstance(_d, dict):\n            _d = {'raw': _d}\n            result['data'] = _d\n        try:\n            _sc = int(result.get('status_code') or 0)\n        except Exception:\n            _sc = 0\n        _st = str(result.get('status') or 'success').lower()\n        _failed = _st not in ('success', 'ok') or _sc >= 400 or _d.get('ok') in (False, 'false', 'False')\n        _same = ''\n        if _v is not None and True:\n            # Idempotent writes: a re-send the pre-hook sent to the no-op path, or a bank \"already exists\" answer after\n            # our own success for the same tool and product, is reported as ALREADY RECORDED (never as a failure).\n            try:\n                _wq = _json.loads(_v.get('write_req_' + _t) or '[]')\n                _wok = _json.loads(_v.get('writes_ok') or '{}')\n            except Exception:\n                _wq, _wok = [], dict()\n            _prev = _wok.get(_t + '#' + str(_wq[0])) if (len(_wq) == 2 and isinstance(_wok, dict)) else None\n            _err0 = str(_d.get('error') or result.get('message') or '').lower()\n            _ack = all(str(k).endswith(('_id', '_ref')) for k in _d.keys() if k not in ('ok', 'error', 'tool_outcome', 'what_to_do_next', 'message'))\n            _bare = not [k for k in _d.keys() if k not in ('ok', 'status', 'message', 'what_to_do_next', 'tool_outcome')]\n            if _v.get('dup_hit_' + _t) and _bare:\n                # only the no-op's bare answer: a parallel sibling of the same tool (M20 shares the flag) keeps its own result\n                _same = 'the same values were sent again'\n            elif _failed and isinstance(_prev, dict) and (any(w in _err0 for w in ('exist', 'duplicate')) or ('already' in _err0 and 'closed' not in _err0)):\n                _same = ('the bank answered: ' + str(_d.get('error') or result.get('message'))[:120] +\n                         '; the values on record are the earlier ones: ' + str(_prev.get('fp') or '').replace('|', ', '))\n            if _same:\n                _v['dup_hit_' + _t] = ''\n                if _v.get('last_tool_failed') == _t:\n                    _v['last_tool_failed'] = ''\n                result['status'] = 'success'\n                result['status_code'] = 200\n                result['message'] = 'already recorded'\n                _d = dict(ok=True, already_recorded=True)\n                _d.update((_prev or dict()).get('ids') or dict())\n                _d['tool_outcome'] = ('ALREADY RECORDED earlier in this call: do not send it again. ' + _t +\n                                      (' for ' + str(_wq[0]) if _wq and _wq[0] else '') + ' succeeded earlier in this call ('\n                                      + _same + '), so it IS recorded and nothing new was sent. This is not a failure: never '\n                                      'tell the customer it could not be saved and never treat it as a service error. '\n                                      'Continue with the next step.')\n                result['data'] = _d\n                _failed = False\n            elif not _failed and _ack and len(_wq) == 2 and isinstance(_wok, dict) and not _v.get('guard_block_' + _t):\n                _wok[_t + '#' + str(_wq[0])] = dict(fp=_wq[1], ids=dict((k, x) for k, x in _d.items()\n                                                                       if str(k).endswith(('_id', '_ref')) and isinstance(x, (str, int))))\n                _v['writes_ok'] = _json.dumps(_wok)\n        if _failed:\n            _n = 1\n            if _v is not None:\n                try:\n                    _n = int(_v.get('tool_failures_' + _t) or 0) + 1\n                except Exception:\n                    _n = 1\n                _v['tool_failures_' + _t] = _n\n                _v['last_tool_failed'] = _t\n            _err = _d.get('error') or result.get('message') or 'service error'\n            if 0 < _sc < 500:\n                # b10-w2: the bank ANSWERED and rejected these values (ok=false with its reason). The same values get the\n                # same answer, so never tell the model to resend them (seen: an unreadable date \"call again now with\n                # the same values\" next to the identity code's \"ask again\"; a rejected write re-sent as a duplicate).\n                _msg = ('FAILED: ' + _t + ' was NOT carried out and NOTHING was recorded: the bank rejected the values '\n                        '(error: ' + str(_err) + '). This is failure number ' + str(_n) + ' of ' + _t + ' in this call. '\n                        'Never tell the customer it was recorded, booked, sent or done. Never send the same values '\n                        'again: they get the same answer. Correct the value the error names (ask the customer if '\n                        'needed) and follow the brief.')\n            else:\n                _msg = ('FAILED: ' + _t + ' was NOT carried out and NOTHING was recorded (error: ' + str(_err) + '). '\n                        'This is failure number ' + str(_n) + ' of ' + _t + ' in this call. Never tell the customer it was '\n                        'recorded, booked, sent or done. Apply the brief rule for a failed tool call: if it allows another '\n                        'attempt, call ' + _t + ' again now with the same values; otherwise tell the customer plainly that '\n                        'it could not be done and continue as the brief says.')\n            if 'id' in str(_err).lower() and _v is not None and _v.get('known_ids'):\n                _msg += ' Use only these ids, exactly as written: ' + str(_v.get('known_ids')) + '.'\n            _d['tool_outcome'] = _msg\n        else:\n            if _v is not None and _v.get('last_tool_failed') == _t:\n                _v['last_tool_failed'] = ''\n            _keys = [k for k in _d.keys() if k not in ('ok', 'error', 'tool_outcome', 'what_to_do_next')]\n            if _same:\n                pass\n            elif True and all(str(k).endswith(('_id', '_ref')) for k in _keys):\n                _d['tool_outcome'] = ('SUCCESS: ' + _t + ' was carried out and recorded. Only now may you tell the '\n                                      'customer it is recorded. Speak to the customer now.')\n            if _v is not None and str(_d.get('verified')).lower() == 'true':\n                # Identity memory (b4-5): a passed question is stored in the call's variables, so a repeated or\n                # replayed turn never asks it again. The pre-hook stashed the request's selector values.\n                _done = [x for x in str(_v.get('verified_items') or '').split('|') if x]\n                _sel = str(_v.get('last_request_' + _t) or '')\n                if _sel and _sel not in _done:\n                    _done.append(_sel)\n                _v['verified_items'] = '|'.join(_done)\n                _all = str(_d.get('all_verified')).lower() == 'true'\n                if _all:\n                    _v['identity_verified'] = 'true'\n                _d['verified_so_far'] = ('Already passed in this call (never ask these again): '\n                                         + (', '.join(_done) or str(len(_done)) + ' question(s)')\n                                         + ('. Identity is fully verified: do not ask any security question again.' if _all else\n                                            '. Ask only a question that is not in this list.'))\n            # Identity gate (M18): while the tool's all-verified flag is false, the result says so in words; seen\n            # officially: after one wrong and one right answer the model \"moved on\" and invented an amount.\n            _allk = [k for k in _d.keys() if 'verif' in str(k).lower() and 'all' in str(k).lower()]\n            if _allk and str(_d.get(_allk[0])).lower() in ('false', '0', 'none', ''):\n                _d['identity_status'] = ('NOT VERIFIED YET (' + str(_allk[0]) + ' is false). You know nothing about '\n                                         'the account: never mention any amount, product or account detail. '\n                                         'Follow the brief\\'s identity rule: ask the next security question (a '\n                                         'question answered wrongly is asked again if the brief allows), or end '\n                                         'the check when no attempts are left.')\n            if _t.startswith('get_') and _v is not None:\n                _known = {}\n                _stack = [_d]\n                while _stack:\n                    _o = _stack.pop()\n                    if isinstance(_o, dict):\n                        for _k2, _x in _o.items():\n                            if str(_k2).endswith('_id') and _k2 != 'customer_id' and isinstance(_x, (str, int)):\n                                _known.setdefault(str(_k2), [])\n                                if str(_x) not in _known[str(_k2)]:\n                                    _known[str(_k2)].append(str(_x))\n                            else:\n                                _stack.append(_x)\n                    elif isinstance(_o, list):\n                        _stack.extend(reversed(_o))\n                if _known:\n                    _v['known_ids'] = _json.dumps(_known)\n                # b10-w2 (M7, port of idea/b7-1 e9dfe52 + cca104a, mapping part only): every listed item with an id and\n                # its short text fields, so the pre-hook maps an id the model BUILT ('credit_card_2288', 'pl_1234') to\n                # the one listed item it can only mean, instead of a refused write and a second write for the item.\n                _items = []\n                _stack = [_d]\n                while _stack:\n                    _o = _stack.pop()\n                    if isinstance(_o, list):\n                        _stack.extend(reversed(_o))\n                    elif isinstance(_o, dict):\n                        _ik = [k for k in _o.keys() if str(k).endswith('_id') and k != 'customer_id' and isinstance(_o.get(k), (str, int))]\n                        if _ik and _o is not _d:\n                            _items.append({'_key': str(_ik[0]), '_id': str(_o.get(_ik[0])),\n                                           '_text': [str(x).lower() for k, x in _o.items() if k not in _ik and k not in ('band', 'deadline', 'deadline_weekday')\n                                                     and isinstance(x, str) and 2 <= len(str(x)) <= 40]})\n                        for _x in _o.values():\n                            if isinstance(_x, (dict, list)):\n                                _stack.append(_x)\n                if _items:\n                    _v['known_items'] = _json.dumps(_items)\nexcept Exception:\n    pass\n"
+     },
+     {
+      "type": "function",
+      "config": {
+       "timeoutMs": 12000,
+       "maxRetries": 0
+      },
+      "function": {
+       "name": "statement_week_decide",
+       "handler": "__function__:api_call",
+       "parameters": {
+        "type": "object",
+        "properties": {
+         "url": {
+          "type": "string",
+          "default": "https://btb-bank-mock.barsyayc.workers.dev/statement.week.decide"
+         },
+         "body": {
+          "type": "object",
+          "required": [
+           "data"
+          ],
+          "properties": {
+           "call": {
+            "type": "object",
+            "default": {
+             "lang": "tr"
+            },
+            "properties": {
+             "lang": {
+              "type": "string",
+              "default": "tr"
+             }
+            }
+           },
+           "data": {
+            "type": "object",
+            "default": {
+             "cardNumber": "{{cardNumber}}",
+             "statementDay": "{{statementDay}}",
+             "newStatementWeek": "{{newStatementWeek}}"
+            },
+            "required": [
+             "cardNumber",
+             "newStatementWeek",
+             "statementDay"
+            ],
+            "properties": {
+             "cardNumber": {
+              "type": "string",
+              "default": "{{cardNumber}}",
+              "description": "Exactly the masked cardNumber string from the cards_list result (digits plus asterisks, e.g. 123456******7890), copied character by character; never only the last four digits."
+             },
+             "statementDay": {
+              "type": "integer",
+              "default": "{{statementDay}}",
+              "description": "statementDay from statement_week_get"
+             },
+             "newStatementWeek": {
+              "type": "integer",
+              "default": "{{newStatementWeek}}",
+              "description": "Chosen week 1-4, not the current week."
+             }
+            }
+           }
+          }
+         },
+         "method": {
+          "type": "string",
+          "default": "POST"
+         },
+         "headers": {
+          "type": "object",
+          "properties": {
+           "Content-Type": {
+            "type": "string",
+            "default": "application/json"
+           }
+          }
+         }
+        }
+       },
+       "description": "Preview the new dates for a chosen week. Does not change anything."
+      },
+      "pre_process_code": "try:\n    _o2, _c2 = chr(123) * 2, chr(125) * 2\n    _b0 = config.get('body') if isinstance(config, dict) else None\n    if isinstance(_b0, dict):\n        for _k0 in list(_b0.keys()):\n            _x0 = _b0.get(_k0)\n            if isinstance(_x0, str) and _o2 in _x0:\n                _nm = _x0.replace(_o2, '').replace(_c2, '').strip()\n                _cand = [vars.get('statement_week_decide' + '_args.' + _k0), vars.get('statement_week_decide' + '_args.' + _nm), vars.get(_nm), vars.get(_k0)]\n                _cand = [c for c in _cand if c not in (None, '') and _o2 not in str(c)]\n                if _cand:\n                    _b0[_k0] = _cand[0]\n                else:\n                    _b0[_k0] = ''\nexcept Exception:\n    pass\ntry:\n    _b1 = config.get('body') if isinstance(config, dict) else None\n    if isinstance(_b1, dict):\n        _sel1 = [str(_x1) for _k1, _x1 in _b1.items() if isinstance(_x1, str) and _x1\n                 and not str(_k1).endswith('_id') and not any(w in str(_k1).lower() for w in ('answer', 'value', 'response', 'digits', 'dob', 'date', 'amount'))]\n        vars['last_request_' + 'statement_week_decide'] = ' '.join(_sel1)[:60]\nexcept Exception:\n    pass\ntry:\n    import json as _json\n    _kn = vars.get('known_ids')\n    if isinstance(_kn, str) and _kn:\n        _kn = _json.loads(_kn)\n    _b = config.get('body') if isinstance(config, dict) else None\n    if isinstance(_kn, dict) and isinstance(_b, dict):\n        for _k, _ids in _kn.items():\n            if _k in _b and _ids:\n                _val = str(_b.get(_k) or '').strip()\n                if _val in _ids:\n                    continue\n                _low = dict((str(i).lower(), i) for i in _ids)\n                if _val.lower() in _low:\n                    _b[_k] = _low[_val.lower()]\n                elif len(_ids) == 1:\n                    _b[_k] = _ids[0]\n                elif _val:\n                    # An id the model built: the one listed item whose own text fields (type, last digits, name, or\n                    # the initials of a multi-word type) appear in it. A tie or no match: sent as it is (bank answers).\n                    _its = _json.loads(vars.get('known_items') or '[]')\n                    _al = lambda z: ''.join(ch for ch in str(z).lower() if ch.isalnum())\n                    _vl = _al(_val)\n                    _sc = []\n                    for _it in _its:\n                        if _it.get('_key') != _k:\n                            continue\n                        _n = sum(len(_al(x)) for x in _it.get('_text') or [] if len(_al(x)) >= 2 and _al(x) in _vl)\n                        _ini = [''.join(w[0] for w in str(x).replace('-', ' ').replace('_', ' ').split() if w) for x in _it.get('_text') or []]\n                        _n += sum(len(i) for i in _ini if len(i) >= 2 and _vl.startswith(i))\n                        _sc.append((_n, _it.get('_id')))\n                    _sc.sort(reverse=True)\n                    if _sc and _sc[0][0] > 0 and (len(_sc) == 1 or _sc[1][0] < _sc[0][0]):\n                        _b[_k] = _sc[0][1]\nexcept Exception:\n    pass\ntry:\n    # Idempotent writes (M12): an identical re-send of a write that already SUCCEEDED in this call goes to the host's\n    # no-op path (nothing reaches the bank) and the post-hook answers ALREADY RECORDED. Key = tool + the request's own\n    # *_id fields (the product), value = the request's fields except free text.\n    import json as _json\n    vars['dup_hit_' + 'statement_week_decide'] = ''\n    vars['write_req_' + 'statement_week_decide'] = ''\n    _bq = config.get('body') if isinstance(config, dict) else None\n    if isinstance(_bq, dict):\n        def _nv(x):\n            try:\n                return str(round(float(str(x).replace(',', '').strip()), 2))\n            except Exception:\n                return str(x).strip().lower()\n        _pk = '|'.join(str(_bq.get(k)) for k in sorted(_bq) if str(k).endswith(('_id', '_ref', '_no', '_number', '_index')) and not str(k).startswith('customer'))\n        _fp = '|'.join(str(k) + '=' + _nv(_bq.get(k)) for k in sorted(_bq)\n                       if not (isinstance(_bq.get(k), str) and len(str(_bq.get(k)).split()) >= 4))\n        vars['write_req_' + 'statement_week_decide'] = _json.dumps([_pk, _fp])\n        try:\n            _wok = _json.loads(vars.get('writes_ok') or '{}')\n        except Exception:\n            _wok = dict()\n        _prev = _wok.get('statement_week_decide' + '#' + _pk) if isinstance(_wok, dict) else None\n        _u = str(config.get('url') or '').split('/')\n        if isinstance(_prev, dict) and _prev.get('fp') == _fp and '/health' and len(_u) > 2 and _u[0] in ('http:', 'https:') and _u[2]:\n            vars['dup_hit_' + 'statement_week_decide'] = _pk or 'this call'\n            config['url'] = _u[0] + '//' + _u[2] + '/health'\nexcept Exception:\n    pass\n",
+      "post_process_code": "try:\n    import json as _json\n    _t = 'statement_week_decide'\n    _v = vars if isinstance(globals().get('vars'), dict) else None\n    if isinstance(result, dict):\n        result.pop('header', None)\n        _d = result.get('data')\n        if not isinstance(_d, dict):\n            _d = {'raw': _d}\n            result['data'] = _d\n        try:\n            _sc = int(result.get('status_code') or 0)\n        except Exception:\n            _sc = 0\n        _st = str(result.get('status') or 'success').lower()\n        _failed = _st not in ('success', 'ok') or _sc >= 400 or _d.get('ok') in (False, 'false', 'False')\n        _same = ''\n        if _v is not None and True:\n            # Idempotent writes: a re-send the pre-hook sent to the no-op path, or a bank \"already exists\" answer after\n            # our own success for the same tool and product, is reported as ALREADY RECORDED (never as a failure).\n            try:\n                _wq = _json.loads(_v.get('write_req_' + _t) or '[]')\n                _wok = _json.loads(_v.get('writes_ok') or '{}')\n            except Exception:\n                _wq, _wok = [], dict()\n            _prev = _wok.get(_t + '#' + str(_wq[0])) if (len(_wq) == 2 and isinstance(_wok, dict)) else None\n            _err0 = str(_d.get('error') or result.get('message') or '').lower()\n            _ack = all(str(k).endswith(('_id', '_ref')) for k in _d.keys() if k not in ('ok', 'error', 'tool_outcome', 'what_to_do_next', 'message'))\n            _bare = not [k for k in _d.keys() if k not in ('ok', 'status', 'message', 'what_to_do_next', 'tool_outcome')]\n            if _v.get('dup_hit_' + _t) and _bare:\n                # only the no-op's bare answer: a parallel sibling of the same tool (M20 shares the flag) keeps its own result\n                _same = 'the same values were sent again'\n            elif _failed and isinstance(_prev, dict) and (any(w in _err0 for w in ('exist', 'duplicate')) or ('already' in _err0 and 'closed' not in _err0)):\n                _same = ('the bank answered: ' + str(_d.get('error') or result.get('message'))[:120] +\n                         '; the values on record are the earlier ones: ' + str(_prev.get('fp') or '').replace('|', ', '))\n            if _same:\n                _v['dup_hit_' + _t] = ''\n                if _v.get('last_tool_failed') == _t:\n                    _v['last_tool_failed'] = ''\n                result['status'] = 'success'\n                result['status_code'] = 200\n                result['message'] = 'already recorded'\n                _d = dict(ok=True, already_recorded=True)\n                _d.update((_prev or dict()).get('ids') or dict())\n                _d['tool_outcome'] = ('ALREADY RECORDED earlier in this call: do not send it again. ' + _t +\n                                      (' for ' + str(_wq[0]) if _wq and _wq[0] else '') + ' succeeded earlier in this call ('\n                                      + _same + '), so it IS recorded and nothing new was sent. This is not a failure: never '\n                                      'tell the customer it could not be saved and never treat it as a service error. '\n                                      'Continue with the next step.')\n                result['data'] = _d\n                _failed = False\n            elif not _failed and _ack and len(_wq) == 2 and isinstance(_wok, dict) and not _v.get('guard_block_' + _t):\n                _wok[_t + '#' + str(_wq[0])] = dict(fp=_wq[1], ids=dict((k, x) for k, x in _d.items()\n                                                                       if str(k).endswith(('_id', '_ref')) and isinstance(x, (str, int))))\n                _v['writes_ok'] = _json.dumps(_wok)\n        if _failed:\n            _n = 1\n            if _v is not None:\n                try:\n                    _n = int(_v.get('tool_failures_' + _t) or 0) + 1\n                except Exception:\n                    _n = 1\n                _v['tool_failures_' + _t] = _n\n                _v['last_tool_failed'] = _t\n            _err = _d.get('error') or result.get('message') or 'service error'\n            if 0 < _sc < 500:\n                # b10-w2: the bank ANSWERED and rejected these values (ok=false with its reason). The same values get the\n                # same answer, so never tell the model to resend them (seen: an unreadable date \"call again now with\n                # the same values\" next to the identity code's \"ask again\"; a rejected write re-sent as a duplicate).\n                _msg = ('FAILED: ' + _t + ' was NOT carried out and NOTHING was recorded: the bank rejected the values '\n                        '(error: ' + str(_err) + '). This is failure number ' + str(_n) + ' of ' + _t + ' in this call. '\n                        'Never tell the customer it was recorded, booked, sent or done. Never send the same values '\n                        'again: they get the same answer. Correct the value the error names (ask the customer if '\n                        'needed) and follow the brief.')\n            else:\n                _msg = ('FAILED: ' + _t + ' was NOT carried out and NOTHING was recorded (error: ' + str(_err) + '). '\n                        'This is failure number ' + str(_n) + ' of ' + _t + ' in this call. Never tell the customer it was '\n                        'recorded, booked, sent or done. Apply the brief rule for a failed tool call: if it allows another '\n                        'attempt, call ' + _t + ' again now with the same values; otherwise tell the customer plainly that '\n                        'it could not be done and continue as the brief says.')\n            if 'id' in str(_err).lower() and _v is not None and _v.get('known_ids'):\n                _msg += ' Use only these ids, exactly as written: ' + str(_v.get('known_ids')) + '.'\n            _d['tool_outcome'] = _msg\n        else:\n            if _v is not None and _v.get('last_tool_failed') == _t:\n                _v['last_tool_failed'] = ''\n            _keys = [k for k in _d.keys() if k not in ('ok', 'error', 'tool_outcome', 'what_to_do_next')]\n            if _same:\n                pass\n            elif True and all(str(k).endswith(('_id', '_ref')) for k in _keys):\n                _d['tool_outcome'] = ('SUCCESS: ' + _t + ' was carried out and recorded. Only now may you tell the '\n                                      'customer it is recorded. Speak to the customer now.')\n            if _v is not None and str(_d.get('verified')).lower() == 'true':\n                # Identity memory (b4-5): a passed question is stored in the call's variables, so a repeated or\n                # replayed turn never asks it again. The pre-hook stashed the request's selector values.\n                _done = [x for x in str(_v.get('verified_items') or '').split('|') if x]\n                _sel = str(_v.get('last_request_' + _t) or '')\n                if _sel and _sel not in _done:\n                    _done.append(_sel)\n                _v['verified_items'] = '|'.join(_done)\n                _all = str(_d.get('all_verified')).lower() == 'true'\n                if _all:\n                    _v['identity_verified'] = 'true'\n                _d['verified_so_far'] = ('Already passed in this call (never ask these again): '\n                                         + (', '.join(_done) or str(len(_done)) + ' question(s)')\n                                         + ('. Identity is fully verified: do not ask any security question again.' if _all else\n                                            '. Ask only a question that is not in this list.'))\n            # Identity gate (M18): while the tool's all-verified flag is false, the result says so in words; seen\n            # officially: after one wrong and one right answer the model \"moved on\" and invented an amount.\n            _allk = [k for k in _d.keys() if 'verif' in str(k).lower() and 'all' in str(k).lower()]\n            if _allk and str(_d.get(_allk[0])).lower() in ('false', '0', 'none', ''):\n                _d['identity_status'] = ('NOT VERIFIED YET (' + str(_allk[0]) + ' is false). You know nothing about '\n                                         'the account: never mention any amount, product or account detail. '\n                                         'Follow the brief\\'s identity rule: ask the next security question (a '\n                                         'question answered wrongly is asked again if the brief allows), or end '\n                                         'the check when no attempts are left.')\n            if _t.startswith('get_') and _v is not None:\n                _known = {}\n                _stack = [_d]\n                while _stack:\n                    _o = _stack.pop()\n                    if isinstance(_o, dict):\n                        for _k2, _x in _o.items():\n                            if str(_k2).endswith('_id') and _k2 != 'customer_id' and isinstance(_x, (str, int)):\n                                _known.setdefault(str(_k2), [])\n                                if str(_x) not in _known[str(_k2)]:\n                                    _known[str(_k2)].append(str(_x))\n                            else:\n                                _stack.append(_x)\n                    elif isinstance(_o, list):\n                        _stack.extend(reversed(_o))\n                if _known:\n                    _v['known_ids'] = _json.dumps(_known)\n                # b10-w2 (M7, port of idea/b7-1 e9dfe52 + cca104a, mapping part only): every listed item with an id and\n                # its short text fields, so the pre-hook maps an id the model BUILT ('credit_card_2288', 'pl_1234') to\n                # the one listed item it can only mean, instead of a refused write and a second write for the item.\n                _items = []\n                _stack = [_d]\n                while _stack:\n                    _o = _stack.pop()\n                    if isinstance(_o, list):\n                        _stack.extend(reversed(_o))\n                    elif isinstance(_o, dict):\n                        _ik = [k for k in _o.keys() if str(k).endswith('_id') and k != 'customer_id' and isinstance(_o.get(k), (str, int))]\n                        if _ik and _o is not _d:\n                            _items.append({'_key': str(_ik[0]), '_id': str(_o.get(_ik[0])),\n                                           '_text': [str(x).lower() for k, x in _o.items() if k not in _ik and k not in ('band', 'deadline', 'deadline_weekday')\n                                                     and isinstance(x, str) and 2 <= len(str(x)) <= 40]})\n                        for _x in _o.values():\n                            if isinstance(_x, (dict, list)):\n                                _stack.append(_x)\n                if _items:\n                    _v['known_items'] = _json.dumps(_items)\nexcept Exception:\n    pass\n"
+     },
+     {
+      "type": "function",
+      "config": {
+       "timeoutMs": 12000,
+       "maxRetries": 0
+      },
+      "function": {
+       "name": "statement_week_change",
+       "handler": "__function__:api_call",
+       "parameters": {
+        "type": "object",
+        "properties": {
+         "url": {
+          "type": "string",
+          "default": "https://btb-bank-mock.barsyayc.workers.dev/statement.week.change"
+         },
+         "body": {
+          "type": "object",
+          "required": [
+           "data"
+          ],
+          "properties": {
+           "call": {
+            "type": "object",
+            "default": {
+             "lang": "tr"
+            },
+            "properties": {
+             "lang": {
+              "type": "string",
+              "default": "tr"
+             }
+            }
+           },
+           "data": {
+            "type": "object",
+            "default": {
+             "cardNumber": "{{cardNumber}}",
+             "statementDay": "{{statementDay}}",
+             "newStatementWeek": "{{newStatementWeek}}"
+            },
+            "required": [
+             "cardNumber",
+             "newStatementWeek",
+             "statementDay"
+            ],
+            "properties": {
+             "cardNumber": {
+              "type": "string",
+              "default": "{{cardNumber}}",
+              "description": "Exactly the masked cardNumber string from the cards_list result (digits plus asterisks, e.g. 123456******7890), copied character by character; never only the last four digits."
+             },
+             "statementDay": {
+              "type": "integer",
+              "default": "{{statementDay}}",
+              "description": "statementDay from statement_week_get"
+             },
+             "newStatementWeek": {
+              "type": "integer",
+              "default": "{{newStatementWeek}}",
+              "description": "Week previewed and explicitly confirmed with evet."
+             }
+            }
+           }
+          }
+         },
+         "method": {
+          "type": "string",
+          "default": "POST"
+         },
+         "headers": {
+          "type": "object",
+          "properties": {
+           "Content-Type": {
+            "type": "string",
+            "default": "application/json"
+           }
+          }
+         }
+        }
+       },
+       "description": "Change the statement week. Only after the preview was read and the caller said an explicit yes. Once only."
+      },
+      "pre_process_code": "try:\n    _o2, _c2 = chr(123) * 2, chr(125) * 2\n    _b0 = config.get('body') if isinstance(config, dict) else None\n    if isinstance(_b0, dict):\n        for _k0 in list(_b0.keys()):\n            _x0 = _b0.get(_k0)\n            if isinstance(_x0, str) and _o2 in _x0:\n                _nm = _x0.replace(_o2, '').replace(_c2, '').strip()\n                _cand = [vars.get('statement_week_change' + '_args.' + _k0), vars.get('statement_week_change' + '_args.' + _nm), vars.get(_nm), vars.get(_k0)]\n                _cand = [c for c in _cand if c not in (None, '') and _o2 not in str(c)]\n                if _cand:\n                    _b0[_k0] = _cand[0]\n                else:\n                    _b0[_k0] = ''\nexcept Exception:\n    pass\ntry:\n    _b1 = config.get('body') if isinstance(config, dict) else None\n    if isinstance(_b1, dict):\n        _sel1 = [str(_x1) for _k1, _x1 in _b1.items() if isinstance(_x1, str) and _x1\n                 and not str(_k1).endswith('_id') and not any(w in str(_k1).lower() for w in ('answer', 'value', 'response', 'digits', 'dob', 'date', 'amount'))]\n        vars['last_request_' + 'statement_week_change'] = ' '.join(_sel1)[:60]\nexcept Exception:\n    pass\ntry:\n    import json as _json\n    _kn = vars.get('known_ids')\n    if isinstance(_kn, str) and _kn:\n        _kn = _json.loads(_kn)\n    _b = config.get('body') if isinstance(config, dict) else None\n    if isinstance(_kn, dict) and isinstance(_b, dict):\n        for _k, _ids in _kn.items():\n            if _k in _b and _ids:\n                _val = str(_b.get(_k) or '').strip()\n                if _val in _ids:\n                    continue\n                _low = dict((str(i).lower(), i) for i in _ids)\n                if _val.lower() in _low:\n                    _b[_k] = _low[_val.lower()]\n                elif len(_ids) == 1:\n                    _b[_k] = _ids[0]\n                elif _val:\n                    # An id the model built: the one listed item whose own text fields (type, last digits, name, or\n                    # the initials of a multi-word type) appear in it. A tie or no match: sent as it is (bank answers).\n                    _its = _json.loads(vars.get('known_items') or '[]')\n                    _al = lambda z: ''.join(ch for ch in str(z).lower() if ch.isalnum())\n                    _vl = _al(_val)\n                    _sc = []\n                    for _it in _its:\n                        if _it.get('_key') != _k:\n                            continue\n                        _n = sum(len(_al(x)) for x in _it.get('_text') or [] if len(_al(x)) >= 2 and _al(x) in _vl)\n                        _ini = [''.join(w[0] for w in str(x).replace('-', ' ').replace('_', ' ').split() if w) for x in _it.get('_text') or []]\n                        _n += sum(len(i) for i in _ini if len(i) >= 2 and _vl.startswith(i))\n                        _sc.append((_n, _it.get('_id')))\n                    _sc.sort(reverse=True)\n                    if _sc and _sc[0][0] > 0 and (len(_sc) == 1 or _sc[1][0] < _sc[0][0]):\n                        _b[_k] = _sc[0][1]\nexcept Exception:\n    pass\ntry:\n    # Idempotent writes (M12): an identical re-send of a write that already SUCCEEDED in this call goes to the host's\n    # no-op path (nothing reaches the bank) and the post-hook answers ALREADY RECORDED. Key = tool + the request's own\n    # *_id fields (the product), value = the request's fields except free text.\n    import json as _json\n    vars['dup_hit_' + 'statement_week_change'] = ''\n    vars['write_req_' + 'statement_week_change'] = ''\n    _bq = config.get('body') if isinstance(config, dict) else None\n    if isinstance(_bq, dict):\n        def _nv(x):\n            try:\n                return str(round(float(str(x).replace(',', '').strip()), 2))\n            except Exception:\n                return str(x).strip().lower()\n        _pk = '|'.join(str(_bq.get(k)) for k in sorted(_bq) if str(k).endswith(('_id', '_ref', '_no', '_number', '_index')) and not str(k).startswith('customer'))\n        _fp = '|'.join(str(k) + '=' + _nv(_bq.get(k)) for k in sorted(_bq)\n                       if not (isinstance(_bq.get(k), str) and len(str(_bq.get(k)).split()) >= 4))\n        vars['write_req_' + 'statement_week_change'] = _json.dumps([_pk, _fp])\n        try:\n            _wok = _json.loads(vars.get('writes_ok') or '{}')\n        except Exception:\n            _wok = dict()\n        _prev = _wok.get('statement_week_change' + '#' + _pk) if isinstance(_wok, dict) else None\n        _u = str(config.get('url') or '').split('/')\n        if isinstance(_prev, dict) and _prev.get('fp') == _fp and '/health' and len(_u) > 2 and _u[0] in ('http:', 'https:') and _u[2]:\n            vars['dup_hit_' + 'statement_week_change'] = _pk or 'this call'\n            config['url'] = _u[0] + '//' + _u[2] + '/health'\nexcept Exception:\n    pass\n",
+      "post_process_code": "try:\n    import json as _json\n    _t = 'statement_week_change'\n    _v = vars if isinstance(globals().get('vars'), dict) else None\n    if isinstance(result, dict):\n        result.pop('header', None)\n        _d = result.get('data')\n        if not isinstance(_d, dict):\n            _d = {'raw': _d}\n            result['data'] = _d\n        try:\n            _sc = int(result.get('status_code') or 0)\n        except Exception:\n            _sc = 0\n        _st = str(result.get('status') or 'success').lower()\n        _failed = _st not in ('success', 'ok') or _sc >= 400 or _d.get('ok') in (False, 'false', 'False')\n        _same = ''\n        if _v is not None and True:\n            # Idempotent writes: a re-send the pre-hook sent to the no-op path, or a bank \"already exists\" answer after\n            # our own success for the same tool and product, is reported as ALREADY RECORDED (never as a failure).\n            try:\n                _wq = _json.loads(_v.get('write_req_' + _t) or '[]')\n                _wok = _json.loads(_v.get('writes_ok') or '{}')\n            except Exception:\n                _wq, _wok = [], dict()\n            _prev = _wok.get(_t + '#' + str(_wq[0])) if (len(_wq) == 2 and isinstance(_wok, dict)) else None\n            _err0 = str(_d.get('error') or result.get('message') or '').lower()\n            _ack = all(str(k).endswith(('_id', '_ref')) for k in _d.keys() if k not in ('ok', 'error', 'tool_outcome', 'what_to_do_next', 'message'))\n            _bare = not [k for k in _d.keys() if k not in ('ok', 'status', 'message', 'what_to_do_next', 'tool_outcome')]\n            if _v.get('dup_hit_' + _t) and _bare:\n                # only the no-op's bare answer: a parallel sibling of the same tool (M20 shares the flag) keeps its own result\n                _same = 'the same values were sent again'\n            elif _failed and isinstance(_prev, dict) and (any(w in _err0 for w in ('exist', 'duplicate')) or ('already' in _err0 and 'closed' not in _err0)):\n                _same = ('the bank answered: ' + str(_d.get('error') or result.get('message'))[:120] +\n                         '; the values on record are the earlier ones: ' + str(_prev.get('fp') or '').replace('|', ', '))\n            if _same:\n                _v['dup_hit_' + _t] = ''\n                if _v.get('last_tool_failed') == _t:\n                    _v['last_tool_failed'] = ''\n                result['status'] = 'success'\n                result['status_code'] = 200\n                result['message'] = 'already recorded'\n                _d = dict(ok=True, already_recorded=True)\n                _d.update((_prev or dict()).get('ids') or dict())\n                _d['tool_outcome'] = ('ALREADY RECORDED earlier in this call: do not send it again. ' + _t +\n                                      (' for ' + str(_wq[0]) if _wq and _wq[0] else '') + ' succeeded earlier in this call ('\n                                      + _same + '), so it IS recorded and nothing new was sent. This is not a failure: never '\n                                      'tell the customer it could not be saved and never treat it as a service error. '\n                                      'Continue with the next step.')\n                result['data'] = _d\n                _failed = False\n            elif not _failed and _ack and len(_wq) == 2 and isinstance(_wok, dict) and not _v.get('guard_block_' + _t):\n                _wok[_t + '#' + str(_wq[0])] = dict(fp=_wq[1], ids=dict((k, x) for k, x in _d.items()\n                                                                       if str(k).endswith(('_id', '_ref')) and isinstance(x, (str, int))))\n                _v['writes_ok'] = _json.dumps(_wok)\n        if _failed:\n            _n = 1\n            if _v is not None:\n                try:\n                    _n = int(_v.get('tool_failures_' + _t) or 0) + 1\n                except Exception:\n                    _n = 1\n                _v['tool_failures_' + _t] = _n\n                _v['last_tool_failed'] = _t\n            _err = _d.get('error') or result.get('message') or 'service error'\n            if 0 < _sc < 500:\n                # b10-w2: the bank ANSWERED and rejected these values (ok=false with its reason). The same values get the\n                # same answer, so never tell the model to resend them (seen: an unreadable date \"call again now with\n                # the same values\" next to the identity code's \"ask again\"; a rejected write re-sent as a duplicate).\n                _msg = ('FAILED: ' + _t + ' was NOT carried out and NOTHING was recorded: the bank rejected the values '\n                        '(error: ' + str(_err) + '). This is failure number ' + str(_n) + ' of ' + _t + ' in this call. '\n                        'Never tell the customer it was recorded, booked, sent or done. Never send the same values '\n                        'again: they get the same answer. Correct the value the error names (ask the customer if '\n                        'needed) and follow the brief.')\n            else:\n                _msg = ('FAILED: ' + _t + ' was NOT carried out and NOTHING was recorded (error: ' + str(_err) + '). '\n                        'This is failure number ' + str(_n) + ' of ' + _t + ' in this call. Never tell the customer it was '\n                        'recorded, booked, sent or done. Apply the brief rule for a failed tool call: if it allows another '\n                        'attempt, call ' + _t + ' again now with the same values; otherwise tell the customer plainly that '\n                        'it could not be done and continue as the brief says.')\n            if 'id' in str(_err).lower() and _v is not None and _v.get('known_ids'):\n                _msg += ' Use only these ids, exactly as written: ' + str(_v.get('known_ids')) + '.'\n            _d['tool_outcome'] = _msg\n        else:\n            if _v is not None and _v.get('last_tool_failed') == _t:\n                _v['last_tool_failed'] = ''\n            _keys = [k for k in _d.keys() if k not in ('ok', 'error', 'tool_outcome', 'what_to_do_next')]\n            if _same:\n                pass\n            elif True and all(str(k).endswith(('_id', '_ref')) for k in _keys):\n                _d['tool_outcome'] = ('SUCCESS: ' + _t + ' was carried out and recorded. Only now may you tell the '\n                                      'customer it is recorded. Speak to the customer now.')\n            if _v is not None and str(_d.get('verified')).lower() == 'true':\n                # Identity memory (b4-5): a passed question is stored in the call's variables, so a repeated or\n                # replayed turn never asks it again. The pre-hook stashed the request's selector values.\n                _done = [x for x in str(_v.get('verified_items') or '').split('|') if x]\n                _sel = str(_v.get('last_request_' + _t) or '')\n                if _sel and _sel not in _done:\n                    _done.append(_sel)\n                _v['verified_items'] = '|'.join(_done)\n                _all = str(_d.get('all_verified')).lower() == 'true'\n                if _all:\n                    _v['identity_verified'] = 'true'\n                _d['verified_so_far'] = ('Already passed in this call (never ask these again): '\n                                         + (', '.join(_done) or str(len(_done)) + ' question(s)')\n                                         + ('. Identity is fully verified: do not ask any security question again.' if _all else\n                                            '. Ask only a question that is not in this list.'))\n            # Identity gate (M18): while the tool's all-verified flag is false, the result says so in words; seen\n            # officially: after one wrong and one right answer the model \"moved on\" and invented an amount.\n            _allk = [k for k in _d.keys() if 'verif' in str(k).lower() and 'all' in str(k).lower()]\n            if _allk and str(_d.get(_allk[0])).lower() in ('false', '0', 'none', ''):\n                _d['identity_status'] = ('NOT VERIFIED YET (' + str(_allk[0]) + ' is false). You know nothing about '\n                                         'the account: never mention any amount, product or account detail. '\n                                         'Follow the brief\\'s identity rule: ask the next security question (a '\n                                         'question answered wrongly is asked again if the brief allows), or end '\n                                         'the check when no attempts are left.')\n            if _t.startswith('get_') and _v is not None:\n                _known = {}\n                _stack = [_d]\n                while _stack:\n                    _o = _stack.pop()\n                    if isinstance(_o, dict):\n                        for _k2, _x in _o.items():\n                            if str(_k2).endswith('_id') and _k2 != 'customer_id' and isinstance(_x, (str, int)):\n                                _known.setdefault(str(_k2), [])\n                                if str(_x) not in _known[str(_k2)]:\n                                    _known[str(_k2)].append(str(_x))\n                            else:\n                                _stack.append(_x)\n                    elif isinstance(_o, list):\n                        _stack.extend(reversed(_o))\n                if _known:\n                    _v['known_ids'] = _json.dumps(_known)\n                # b10-w2 (M7, port of idea/b7-1 e9dfe52 + cca104a, mapping part only): every listed item with an id and\n                # its short text fields, so the pre-hook maps an id the model BUILT ('credit_card_2288', 'pl_1234') to\n                # the one listed item it can only mean, instead of a refused write and a second write for the item.\n                _items = []\n                _stack = [_d]\n                while _stack:\n                    _o = _stack.pop()\n                    if isinstance(_o, list):\n                        _stack.extend(reversed(_o))\n                    elif isinstance(_o, dict):\n                        _ik = [k for k in _o.keys() if str(k).endswith('_id') and k != 'customer_id' and isinstance(_o.get(k), (str, int))]\n                        if _ik and _o is not _d:\n                            _items.append({'_key': str(_ik[0]), '_id': str(_o.get(_ik[0])),\n                                           '_text': [str(x).lower() for k, x in _o.items() if k not in _ik and k not in ('band', 'deadline', 'deadline_weekday')\n                                                     and isinstance(x, str) and 2 <= len(str(x)) <= 40]})\n                        for _x in _o.values():\n                            if isinstance(_x, (dict, list)):\n                                _stack.append(_x)\n                if _items:\n                    _v['known_items'] = _json.dumps(_items)\nexcept Exception:\n    pass\n"
+     },
+     {
+      "type": "function",
+      "config": {
+       "timeoutMs": 12000,
+       "maxRetries": 0
+      },
+      "function": {
+       "name": "contact_email_get",
+       "handler": "__function__:api_call",
+       "parameters": {
+        "type": "object",
+        "properties": {
+         "url": {
+          "type": "string",
+          "default": "https://btb-bank-mock.barsyayc.workers.dev/contact.email.get"
+         },
+         "body": {
+          "type": "object",
+          "required": [
+           "data"
+          ],
+          "properties": {
+           "call": {
+            "type": "object",
+            "default": {
+             "lang": "tr"
+            },
+            "properties": {
+             "lang": {
+              "type": "string",
+              "default": "tr"
+             }
+            }
+           },
+           "data": {
+            "type": "object",
+            "default": {
+             "customerNo": "{{customerNumber}}",
+             "intAddressInfoType": "E"
+            },
+            "required": [
+             "customerNo",
+             "intAddressInfoType"
+            ],
+            "properties": {
+             "customerNo": {
+              "type": "string",
+              "default": "{{customerNumber}}",
+              "description": "Customer number"
+             },
+             "intAddressInfoType": {
+              "type": "string",
+              "default": "E",
+              "description": "Always E"
+             }
+            }
+           }
+          }
+         },
+         "method": {
+          "type": "string",
+          "default": "POST"
+         },
+         "headers": {
+          "type": "object",
+          "properties": {
+           "Content-Type": {
+            "type": "string",
+            "default": "application/json"
+           }
+          }
+         }
+        }
+       },
+       "description": "Registered e-mail address of the caller."
+      },
+      "pre_process_code": "try:\n    _o2, _c2 = chr(123) * 2, chr(125) * 2\n    _b0 = config.get('body') if isinstance(config, dict) else None\n    if isinstance(_b0, dict):\n        for _k0 in list(_b0.keys()):\n            _x0 = _b0.get(_k0)\n            if isinstance(_x0, str) and _o2 in _x0:\n                _nm = _x0.replace(_o2, '').replace(_c2, '').strip()\n                _cand = [vars.get('contact_email_get' + '_args.' + _k0), vars.get('contact_email_get' + '_args.' + _nm), vars.get(_nm), vars.get(_k0)]\n                _cand = [c for c in _cand if c not in (None, '') and _o2 not in str(c)]\n                if _cand:\n                    _b0[_k0] = _cand[0]\n                else:\n                    _b0[_k0] = ''\nexcept Exception:\n    pass\ntry:\n    _b1 = config.get('body') if isinstance(config, dict) else None\n    if isinstance(_b1, dict):\n        _sel1 = [str(_x1) for _k1, _x1 in _b1.items() if isinstance(_x1, str) and _x1\n                 and not str(_k1).endswith('_id') and not any(w in str(_k1).lower() for w in ('answer', 'value', 'response', 'digits', 'dob', 'date', 'amount'))]\n        vars['last_request_' + 'contact_email_get'] = ' '.join(_sel1)[:60]\nexcept Exception:\n    pass\ntry:\n    import json as _json\n    _kn = vars.get('known_ids')\n    if isinstance(_kn, str) and _kn:\n        _kn = _json.loads(_kn)\n    _b = config.get('body') if isinstance(config, dict) else None\n    if isinstance(_kn, dict) and isinstance(_b, dict):\n        for _k, _ids in _kn.items():\n            if _k in _b and _ids:\n                _val = str(_b.get(_k) or '').strip()\n                if _val in _ids:\n                    continue\n                _low = dict((str(i).lower(), i) for i in _ids)\n                if _val.lower() in _low:\n                    _b[_k] = _low[_val.lower()]\n                elif len(_ids) == 1:\n                    _b[_k] = _ids[0]\n                elif _val:\n                    # An id the model built: the one listed item whose own text fields (type, last digits, name, or\n                    # the initials of a multi-word type) appear in it. A tie or no match: sent as it is (bank answers).\n                    _its = _json.loads(vars.get('known_items') or '[]')\n                    _al = lambda z: ''.join(ch for ch in str(z).lower() if ch.isalnum())\n                    _vl = _al(_val)\n                    _sc = []\n                    for _it in _its:\n                        if _it.get('_key') != _k:\n                            continue\n                        _n = sum(len(_al(x)) for x in _it.get('_text') or [] if len(_al(x)) >= 2 and _al(x) in _vl)\n                        _ini = [''.join(w[0] for w in str(x).replace('-', ' ').replace('_', ' ').split() if w) for x in _it.get('_text') or []]\n                        _n += sum(len(i) for i in _ini if len(i) >= 2 and _vl.startswith(i))\n                        _sc.append((_n, _it.get('_id')))\n                    _sc.sort(reverse=True)\n                    if _sc and _sc[0][0] > 0 and (len(_sc) == 1 or _sc[1][0] < _sc[0][0]):\n                        _b[_k] = _sc[0][1]\nexcept Exception:\n    pass\ntry:\n    # Idempotent writes (M12): an identical re-send of a write that already SUCCEEDED in this call goes to the host's\n    # no-op path (nothing reaches the bank) and the post-hook answers ALREADY RECORDED. Key = tool + the request's own\n    # *_id fields (the product), value = the request's fields except free text.\n    import json as _json\n    vars['dup_hit_' + 'contact_email_get'] = ''\n    vars['write_req_' + 'contact_email_get'] = ''\n    _bq = config.get('body') if isinstance(config, dict) else None\n    if isinstance(_bq, dict):\n        def _nv(x):\n            try:\n                return str(round(float(str(x).replace(',', '').strip()), 2))\n            except Exception:\n                return str(x).strip().lower()\n        _pk = '|'.join(str(_bq.get(k)) for k in sorted(_bq) if str(k).endswith(('_id', '_ref', '_no', '_number', '_index')) and not str(k).startswith('customer'))\n        _fp = '|'.join(str(k) + '=' + _nv(_bq.get(k)) for k in sorted(_bq)\n                       if not (isinstance(_bq.get(k), str) and len(str(_bq.get(k)).split()) >= 4))\n        vars['write_req_' + 'contact_email_get'] = _json.dumps([_pk, _fp])\n        try:\n            _wok = _json.loads(vars.get('writes_ok') or '{}')\n        except Exception:\n            _wok = dict()\n        _prev = _wok.get('contact_email_get' + '#' + _pk) if isinstance(_wok, dict) else None\n        _u = str(config.get('url') or '').split('/')\n        if isinstance(_prev, dict) and _prev.get('fp') == _fp and '/health' and len(_u) > 2 and _u[0] in ('http:', 'https:') and _u[2]:\n            vars['dup_hit_' + 'contact_email_get'] = _pk or 'this call'\n            config['url'] = _u[0] + '//' + _u[2] + '/health'\nexcept Exception:\n    pass\n",
+      "post_process_code": "try:\n    import json as _json\n    _t = 'contact_email_get'\n    _v = vars if isinstance(globals().get('vars'), dict) else None\n    if isinstance(result, dict):\n        result.pop('header', None)\n        _d = result.get('data')\n        if not isinstance(_d, dict):\n            _d = {'raw': _d}\n            result['data'] = _d\n        try:\n            _sc = int(result.get('status_code') or 0)\n        except Exception:\n            _sc = 0\n        _st = str(result.get('status') or 'success').lower()\n        _failed = _st not in ('success', 'ok') or _sc >= 400 or _d.get('ok') in (False, 'false', 'False')\n        _same = ''\n        if _v is not None and True:\n            # Idempotent writes: a re-send the pre-hook sent to the no-op path, or a bank \"already exists\" answer after\n            # our own success for the same tool and product, is reported as ALREADY RECORDED (never as a failure).\n            try:\n                _wq = _json.loads(_v.get('write_req_' + _t) or '[]')\n                _wok = _json.loads(_v.get('writes_ok') or '{}')\n            except Exception:\n                _wq, _wok = [], dict()\n            _prev = _wok.get(_t + '#' + str(_wq[0])) if (len(_wq) == 2 and isinstance(_wok, dict)) else None\n            _err0 = str(_d.get('error') or result.get('message') or '').lower()\n            _ack = all(str(k).endswith(('_id', '_ref')) for k in _d.keys() if k not in ('ok', 'error', 'tool_outcome', 'what_to_do_next', 'message'))\n            _bare = not [k for k in _d.keys() if k not in ('ok', 'status', 'message', 'what_to_do_next', 'tool_outcome')]\n            if _v.get('dup_hit_' + _t) and _bare:\n                # only the no-op's bare answer: a parallel sibling of the same tool (M20 shares the flag) keeps its own result\n                _same = 'the same values were sent again'\n            elif _failed and isinstance(_prev, dict) and (any(w in _err0 for w in ('exist', 'duplicate')) or ('already' in _err0 and 'closed' not in _err0)):\n                _same = ('the bank answered: ' + str(_d.get('error') or result.get('message'))[:120] +\n                         '; the values on record are the earlier ones: ' + str(_prev.get('fp') or '').replace('|', ', '))\n            if _same:\n                _v['dup_hit_' + _t] = ''\n                if _v.get('last_tool_failed') == _t:\n                    _v['last_tool_failed'] = ''\n                result['status'] = 'success'\n                result['status_code'] = 200\n                result['message'] = 'already recorded'\n                _d = dict(ok=True, already_recorded=True)\n                _d.update((_prev or dict()).get('ids') or dict())\n                _d['tool_outcome'] = ('ALREADY RECORDED earlier in this call: do not send it again. ' + _t +\n                                      (' for ' + str(_wq[0]) if _wq and _wq[0] else '') + ' succeeded earlier in this call ('\n                                      + _same + '), so it IS recorded and nothing new was sent. This is not a failure: never '\n                                      'tell the customer it could not be saved and never treat it as a service error. '\n                                      'Continue with the next step.')\n                result['data'] = _d\n                _failed = False\n            elif not _failed and _ack and len(_wq) == 2 and isinstance(_wok, dict) and not _v.get('guard_block_' + _t):\n                _wok[_t + '#' + str(_wq[0])] = dict(fp=_wq[1], ids=dict((k, x) for k, x in _d.items()\n                                                                       if str(k).endswith(('_id', '_ref')) and isinstance(x, (str, int))))\n                _v['writes_ok'] = _json.dumps(_wok)\n        if _failed:\n            _n = 1\n            if _v is not None:\n                try:\n                    _n = int(_v.get('tool_failures_' + _t) or 0) + 1\n                except Exception:\n                    _n = 1\n                _v['tool_failures_' + _t] = _n\n                _v['last_tool_failed'] = _t\n            _err = _d.get('error') or result.get('message') or 'service error'\n            if 0 < _sc < 500:\n                # b10-w2: the bank ANSWERED and rejected these values (ok=false with its reason). The same values get the\n                # same answer, so never tell the model to resend them (seen: an unreadable date \"call again now with\n                # the same values\" next to the identity code's \"ask again\"; a rejected write re-sent as a duplicate).\n                _msg = ('FAILED: ' + _t + ' was NOT carried out and NOTHING was recorded: the bank rejected the values '\n                        '(error: ' + str(_err) + '). This is failure number ' + str(_n) + ' of ' + _t + ' in this call. '\n                        'Never tell the customer it was recorded, booked, sent or done. Never send the same values '\n                        'again: they get the same answer. Correct the value the error names (ask the customer if '\n                        'needed) and follow the brief.')\n            else:\n                _msg = ('FAILED: ' + _t + ' was NOT carried out and NOTHING was recorded (error: ' + str(_err) + '). '\n                        'This is failure number ' + str(_n) + ' of ' + _t + ' in this call. Never tell the customer it was '\n                        'recorded, booked, sent or done. Apply the brief rule for a failed tool call: if it allows another '\n                        'attempt, call ' + _t + ' again now with the same values; otherwise tell the customer plainly that '\n                        'it could not be done and continue as the brief says.')\n            if 'id' in str(_err).lower() and _v is not None and _v.get('known_ids'):\n                _msg += ' Use only these ids, exactly as written: ' + str(_v.get('known_ids')) + '.'\n            _d['tool_outcome'] = _msg\n        else:\n            if _v is not None and _v.get('last_tool_failed') == _t:\n                _v['last_tool_failed'] = ''\n            _keys = [k for k in _d.keys() if k not in ('ok', 'error', 'tool_outcome', 'what_to_do_next')]\n            if _same:\n                pass\n            elif True and all(str(k).endswith(('_id', '_ref')) for k in _keys):\n                _d['tool_outcome'] = ('SUCCESS: ' + _t + ' was carried out and recorded. Only now may you tell the '\n                                      'customer it is recorded. Speak to the customer now.')\n            if _v is not None and str(_d.get('verified')).lower() == 'true':\n                # Identity memory (b4-5): a passed question is stored in the call's variables, so a repeated or\n                # replayed turn never asks it again. The pre-hook stashed the request's selector values.\n                _done = [x for x in str(_v.get('verified_items') or '').split('|') if x]\n                _sel = str(_v.get('last_request_' + _t) or '')\n                if _sel and _sel not in _done:\n                    _done.append(_sel)\n                _v['verified_items'] = '|'.join(_done)\n                _all = str(_d.get('all_verified')).lower() == 'true'\n                if _all:\n                    _v['identity_verified'] = 'true'\n                _d['verified_so_far'] = ('Already passed in this call (never ask these again): '\n                                         + (', '.join(_done) or str(len(_done)) + ' question(s)')\n                                         + ('. Identity is fully verified: do not ask any security question again.' if _all else\n                                            '. Ask only a question that is not in this list.'))\n            # Identity gate (M18): while the tool's all-verified flag is false, the result says so in words; seen\n            # officially: after one wrong and one right answer the model \"moved on\" and invented an amount.\n            _allk = [k for k in _d.keys() if 'verif' in str(k).lower() and 'all' in str(k).lower()]\n            if _allk and str(_d.get(_allk[0])).lower() in ('false', '0', 'none', ''):\n                _d['identity_status'] = ('NOT VERIFIED YET (' + str(_allk[0]) + ' is false). You know nothing about '\n                                         'the account: never mention any amount, product or account detail. '\n                                         'Follow the brief\\'s identity rule: ask the next security question (a '\n                                         'question answered wrongly is asked again if the brief allows), or end '\n                                         'the check when no attempts are left.')\n            if _t.startswith('get_') and _v is not None:\n                _known = {}\n                _stack = [_d]\n                while _stack:\n                    _o = _stack.pop()\n                    if isinstance(_o, dict):\n                        for _k2, _x in _o.items():\n                            if str(_k2).endswith('_id') and _k2 != 'customer_id' and isinstance(_x, (str, int)):\n                                _known.setdefault(str(_k2), [])\n                                if str(_x) not in _known[str(_k2)]:\n                                    _known[str(_k2)].append(str(_x))\n                            else:\n                                _stack.append(_x)\n                    elif isinstance(_o, list):\n                        _stack.extend(reversed(_o))\n                if _known:\n                    _v['known_ids'] = _json.dumps(_known)\n                # b10-w2 (M7, port of idea/b7-1 e9dfe52 + cca104a, mapping part only): every listed item with an id and\n                # its short text fields, so the pre-hook maps an id the model BUILT ('credit_card_2288', 'pl_1234') to\n                # the one listed item it can only mean, instead of a refused write and a second write for the item.\n                _items = []\n                _stack = [_d]\n                while _stack:\n                    _o = _stack.pop()\n                    if isinstance(_o, list):\n                        _stack.extend(reversed(_o))\n                    elif isinstance(_o, dict):\n                        _ik = [k for k in _o.keys() if str(k).endswith('_id') and k != 'customer_id' and isinstance(_o.get(k), (str, int))]\n                        if _ik and _o is not _d:\n                            _items.append({'_key': str(_ik[0]), '_id': str(_o.get(_ik[0])),\n                                           '_text': [str(x).lower() for k, x in _o.items() if k not in _ik and k not in ('band', 'deadline', 'deadline_weekday')\n                                                     and isinstance(x, str) and 2 <= len(str(x)) <= 40]})\n                        for _x in _o.values():\n                            if isinstance(_x, (dict, list)):\n                                _stack.append(_x)\n                if _items:\n                    _v['known_items'] = _json.dumps(_items)\nexcept Exception:\n    pass\n"
+     },
+     {
+      "type": "function",
+      "config": {
+       "timeoutMs": 12000,
+       "maxRetries": 0
+      },
+      "function": {
+       "name": "statement_pdf_send",
+       "handler": "__function__:api_call",
+       "parameters": {
+        "type": "object",
+        "properties": {
+         "url": {
+          "type": "string",
+          "default": "https://btb-bank-mock.barsyayc.workers.dev/statement.pdf.send"
+         },
+         "body": {
+          "type": "object",
+          "required": [
+           "data"
+          ],
+          "properties": {
+           "call": {
+            "type": "object",
+            "default": {
+             "lang": "tr"
+            },
+            "properties": {
+             "lang": {
+              "type": "string",
+              "default": "tr"
+             }
+            }
+           },
+           "data": {
+            "type": "object",
+            "default": {
+             "cardNumber": "{{cardNumber}}",
+             "customerNo": "{{customerNumber}}",
+             "currencyType": "{{currencyType}}",
+             "emailAddress": "{{emailAddress}}",
+             "statementDate": "{{statementDate}}"
+            },
+            "required": [
+             "customerNo",
+             "cardNumber",
+             "currencyType",
+             "statementDate",
+             "emailAddress"
+            ],
+            "properties": {
+             "cardNumber": {
+              "type": "string",
+              "default": "{{cardNumber}}",
+              "description": "Exactly the masked cardNumber string from the cards_list result (digits plus asterisks, e.g. 123456******7890), copied character by character; never only the last four digits."
+             },
+             "customerNo": {
+              "type": "string",
+              "default": "{{customerNumber}}",
+              "description": "Customer number"
+             },
+             "currencyType": {
+              "type": "string",
+              "default": "{{currencyType}}",
+              "description": "TL, USD, EUR or GBP"
+             },
+             "emailAddress": {
+              "type": "string",
+              "default": "{{emailAddress}}",
+              "description": "Only the registered address from contact_email_get, never another address."
+             },
+             "statementDate": {
+              "type": "string",
+              "default": "{{statementDate}}",
+              "description": "statementDate from cards_balance, dd.MM.yyyy"
+             }
+            }
+           }
+          }
+         },
+         "method": {
+          "type": "string",
+          "default": "POST"
+         },
+         "headers": {
+          "type": "object",
+          "properties": {
+           "Content-Type": {
+            "type": "string",
+            "default": "application/json"
+           }
+          }
+         }
+        }
+       },
+       "description": "Send the latest statement PDF to the registered e-mail. Only after the caller confirmed the address."
+      },
+      "pre_process_code": "try:\n    _o2, _c2 = chr(123) * 2, chr(125) * 2\n    _b0 = config.get('body') if isinstance(config, dict) else None\n    if isinstance(_b0, dict):\n        for _k0 in list(_b0.keys()):\n            _x0 = _b0.get(_k0)\n            if isinstance(_x0, str) and _o2 in _x0:\n                _nm = _x0.replace(_o2, '').replace(_c2, '').strip()\n                _cand = [vars.get('statement_pdf_send' + '_args.' + _k0), vars.get('statement_pdf_send' + '_args.' + _nm), vars.get(_nm), vars.get(_k0)]\n                _cand = [c for c in _cand if c not in (None, '') and _o2 not in str(c)]\n                if _cand:\n                    _b0[_k0] = _cand[0]\n                else:\n                    _b0[_k0] = ''\nexcept Exception:\n    pass\ntry:\n    _b1 = config.get('body') if isinstance(config, dict) else None\n    if isinstance(_b1, dict):\n        _sel1 = [str(_x1) for _k1, _x1 in _b1.items() if isinstance(_x1, str) and _x1\n                 and not str(_k1).endswith('_id') and not any(w in str(_k1).lower() for w in ('answer', 'value', 'response', 'digits', 'dob', 'date', 'amount'))]\n        vars['last_request_' + 'statement_pdf_send'] = ' '.join(_sel1)[:60]\nexcept Exception:\n    pass\ntry:\n    import json as _json\n    _kn = vars.get('known_ids')\n    if isinstance(_kn, str) and _kn:\n        _kn = _json.loads(_kn)\n    _b = config.get('body') if isinstance(config, dict) else None\n    if isinstance(_kn, dict) and isinstance(_b, dict):\n        for _k, _ids in _kn.items():\n            if _k in _b and _ids:\n                _val = str(_b.get(_k) or '').strip()\n                if _val in _ids:\n                    continue\n                _low = dict((str(i).lower(), i) for i in _ids)\n                if _val.lower() in _low:\n                    _b[_k] = _low[_val.lower()]\n                elif len(_ids) == 1:\n                    _b[_k] = _ids[0]\n                elif _val:\n                    # An id the model built: the one listed item whose own text fields (type, last digits, name, or\n                    # the initials of a multi-word type) appear in it. A tie or no match: sent as it is (bank answers).\n                    _its = _json.loads(vars.get('known_items') or '[]')\n                    _al = lambda z: ''.join(ch for ch in str(z).lower() if ch.isalnum())\n                    _vl = _al(_val)\n                    _sc = []\n                    for _it in _its:\n                        if _it.get('_key') != _k:\n                            continue\n                        _n = sum(len(_al(x)) for x in _it.get('_text') or [] if len(_al(x)) >= 2 and _al(x) in _vl)\n                        _ini = [''.join(w[0] for w in str(x).replace('-', ' ').replace('_', ' ').split() if w) for x in _it.get('_text') or []]\n                        _n += sum(len(i) for i in _ini if len(i) >= 2 and _vl.startswith(i))\n                        _sc.append((_n, _it.get('_id')))\n                    _sc.sort(reverse=True)\n                    if _sc and _sc[0][0] > 0 and (len(_sc) == 1 or _sc[1][0] < _sc[0][0]):\n                        _b[_k] = _sc[0][1]\nexcept Exception:\n    pass\ntry:\n    # Idempotent writes (M12): an identical re-send of a write that already SUCCEEDED in this call goes to the host's\n    # no-op path (nothing reaches the bank) and the post-hook answers ALREADY RECORDED. Key = tool + the request's own\n    # *_id fields (the product), value = the request's fields except free text.\n    import json as _json\n    vars['dup_hit_' + 'statement_pdf_send'] = ''\n    vars['write_req_' + 'statement_pdf_send'] = ''\n    _bq = config.get('body') if isinstance(config, dict) else None\n    if isinstance(_bq, dict):\n        def _nv(x):\n            try:\n                return str(round(float(str(x).replace(',', '').strip()), 2))\n            except Exception:\n                return str(x).strip().lower()\n        _pk = '|'.join(str(_bq.get(k)) for k in sorted(_bq) if str(k).endswith(('_id', '_ref', '_no', '_number', '_index')) and not str(k).startswith('customer'))\n        _fp = '|'.join(str(k) + '=' + _nv(_bq.get(k)) for k in sorted(_bq)\n                       if not (isinstance(_bq.get(k), str) and len(str(_bq.get(k)).split()) >= 4))\n        vars['write_req_' + 'statement_pdf_send'] = _json.dumps([_pk, _fp])\n        try:\n            _wok = _json.loads(vars.get('writes_ok') or '{}')\n        except Exception:\n            _wok = dict()\n        _prev = _wok.get('statement_pdf_send' + '#' + _pk) if isinstance(_wok, dict) else None\n        _u = str(config.get('url') or '').split('/')\n        if isinstance(_prev, dict) and _prev.get('fp') == _fp and '/health' and len(_u) > 2 and _u[0] in ('http:', 'https:') and _u[2]:\n            vars['dup_hit_' + 'statement_pdf_send'] = _pk or 'this call'\n            config['url'] = _u[0] + '//' + _u[2] + '/health'\nexcept Exception:\n    pass\n",
+      "post_process_code": "try:\n    import json as _json\n    _t = 'statement_pdf_send'\n    _v = vars if isinstance(globals().get('vars'), dict) else None\n    if isinstance(result, dict):\n        result.pop('header', None)\n        _d = result.get('data')\n        if not isinstance(_d, dict):\n            _d = {'raw': _d}\n            result['data'] = _d\n        try:\n            _sc = int(result.get('status_code') or 0)\n        except Exception:\n            _sc = 0\n        _st = str(result.get('status') or 'success').lower()\n        _failed = _st not in ('success', 'ok') or _sc >= 400 or _d.get('ok') in (False, 'false', 'False')\n        _same = ''\n        if _v is not None and True:\n            # Idempotent writes: a re-send the pre-hook sent to the no-op path, or a bank \"already exists\" answer after\n            # our own success for the same tool and product, is reported as ALREADY RECORDED (never as a failure).\n            try:\n                _wq = _json.loads(_v.get('write_req_' + _t) or '[]')\n                _wok = _json.loads(_v.get('writes_ok') or '{}')\n            except Exception:\n                _wq, _wok = [], dict()\n            _prev = _wok.get(_t + '#' + str(_wq[0])) if (len(_wq) == 2 and isinstance(_wok, dict)) else None\n            _err0 = str(_d.get('error') or result.get('message') or '').lower()\n            _ack = all(str(k).endswith(('_id', '_ref')) for k in _d.keys() if k not in ('ok', 'error', 'tool_outcome', 'what_to_do_next', 'message'))\n            _bare = not [k for k in _d.keys() if k not in ('ok', 'status', 'message', 'what_to_do_next', 'tool_outcome')]\n            if _v.get('dup_hit_' + _t) and _bare:\n                # only the no-op's bare answer: a parallel sibling of the same tool (M20 shares the flag) keeps its own result\n                _same = 'the same values were sent again'\n            elif _failed and isinstance(_prev, dict) and (any(w in _err0 for w in ('exist', 'duplicate')) or ('already' in _err0 and 'closed' not in _err0)):\n                _same = ('the bank answered: ' + str(_d.get('error') or result.get('message'))[:120] +\n                         '; the values on record are the earlier ones: ' + str(_prev.get('fp') or '').replace('|', ', '))\n            if _same:\n                _v['dup_hit_' + _t] = ''\n                if _v.get('last_tool_failed') == _t:\n                    _v['last_tool_failed'] = ''\n                result['status'] = 'success'\n                result['status_code'] = 200\n                result['message'] = 'already recorded'\n                _d = dict(ok=True, already_recorded=True)\n                _d.update((_prev or dict()).get('ids') or dict())\n                _d['tool_outcome'] = ('ALREADY RECORDED earlier in this call: do not send it again. ' + _t +\n                                      (' for ' + str(_wq[0]) if _wq and _wq[0] else '') + ' succeeded earlier in this call ('\n                                      + _same + '), so it IS recorded and nothing new was sent. This is not a failure: never '\n                                      'tell the customer it could not be saved and never treat it as a service error. '\n                                      'Continue with the next step.')\n                result['data'] = _d\n                _failed = False\n            elif not _failed and _ack and len(_wq) == 2 and isinstance(_wok, dict) and not _v.get('guard_block_' + _t):\n                _wok[_t + '#' + str(_wq[0])] = dict(fp=_wq[1], ids=dict((k, x) for k, x in _d.items()\n                                                                       if str(k).endswith(('_id', '_ref')) and isinstance(x, (str, int))))\n                _v['writes_ok'] = _json.dumps(_wok)\n        if _failed:\n            _n = 1\n            if _v is not None:\n                try:\n                    _n = int(_v.get('tool_failures_' + _t) or 0) + 1\n                except Exception:\n                    _n = 1\n                _v['tool_failures_' + _t] = _n\n                _v['last_tool_failed'] = _t\n            _err = _d.get('error') or result.get('message') or 'service error'\n            if 0 < _sc < 500:\n                # b10-w2: the bank ANSWERED and rejected these values (ok=false with its reason). The same values get the\n                # same answer, so never tell the model to resend them (seen: an unreadable date \"call again now with\n                # the same values\" next to the identity code's \"ask again\"; a rejected write re-sent as a duplicate).\n                _msg = ('FAILED: ' + _t + ' was NOT carried out and NOTHING was recorded: the bank rejected the values '\n                        '(error: ' + str(_err) + '). This is failure number ' + str(_n) + ' of ' + _t + ' in this call. '\n                        'Never tell the customer it was recorded, booked, sent or done. Never send the same values '\n                        'again: they get the same answer. Correct the value the error names (ask the customer if '\n                        'needed) and follow the brief.')\n            else:\n                _msg = ('FAILED: ' + _t + ' was NOT carried out and NOTHING was recorded (error: ' + str(_err) + '). '\n                        'This is failure number ' + str(_n) + ' of ' + _t + ' in this call. Never tell the customer it was '\n                        'recorded, booked, sent or done. Apply the brief rule for a failed tool call: if it allows another '\n                        'attempt, call ' + _t + ' again now with the same values; otherwise tell the customer plainly that '\n                        'it could not be done and continue as the brief says.')\n            if 'id' in str(_err).lower() and _v is not None and _v.get('known_ids'):\n                _msg += ' Use only these ids, exactly as written: ' + str(_v.get('known_ids')) + '.'\n            _d['tool_outcome'] = _msg\n        else:\n            if _v is not None and _v.get('last_tool_failed') == _t:\n                _v['last_tool_failed'] = ''\n            _keys = [k for k in _d.keys() if k not in ('ok', 'error', 'tool_outcome', 'what_to_do_next')]\n            if _same:\n                pass\n            elif True and all(str(k).endswith(('_id', '_ref')) for k in _keys):\n                _d['tool_outcome'] = ('SUCCESS: ' + _t + ' was carried out and recorded. Only now may you tell the '\n                                      'customer it is recorded. Speak to the customer now.')\n            if _v is not None and str(_d.get('verified')).lower() == 'true':\n                # Identity memory (b4-5): a passed question is stored in the call's variables, so a repeated or\n                # replayed turn never asks it again. The pre-hook stashed the request's selector values.\n                _done = [x for x in str(_v.get('verified_items') or '').split('|') if x]\n                _sel = str(_v.get('last_request_' + _t) or '')\n                if _sel and _sel not in _done:\n                    _done.append(_sel)\n                _v['verified_items'] = '|'.join(_done)\n                _all = str(_d.get('all_verified')).lower() == 'true'\n                if _all:\n                    _v['identity_verified'] = 'true'\n                _d['verified_so_far'] = ('Already passed in this call (never ask these again): '\n                                         + (', '.join(_done) or str(len(_done)) + ' question(s)')\n                                         + ('. Identity is fully verified: do not ask any security question again.' if _all else\n                                            '. Ask only a question that is not in this list.'))\n            # Identity gate (M18): while the tool's all-verified flag is false, the result says so in words; seen\n            # officially: after one wrong and one right answer the model \"moved on\" and invented an amount.\n            _allk = [k for k in _d.keys() if 'verif' in str(k).lower() and 'all' in str(k).lower()]\n            if _allk and str(_d.get(_allk[0])).lower() in ('false', '0', 'none', ''):\n                _d['identity_status'] = ('NOT VERIFIED YET (' + str(_allk[0]) + ' is false). You know nothing about '\n                                         'the account: never mention any amount, product or account detail. '\n                                         'Follow the brief\\'s identity rule: ask the next security question (a '\n                                         'question answered wrongly is asked again if the brief allows), or end '\n                                         'the check when no attempts are left.')\n            if _t.startswith('get_') and _v is not None:\n                _known = {}\n                _stack = [_d]\n                while _stack:\n                    _o = _stack.pop()\n                    if isinstance(_o, dict):\n                        for _k2, _x in _o.items():\n                            if str(_k2).endswith('_id') and _k2 != 'customer_id' and isinstance(_x, (str, int)):\n                                _known.setdefault(str(_k2), [])\n                                if str(_x) not in _known[str(_k2)]:\n                                    _known[str(_k2)].append(str(_x))\n                            else:\n                                _stack.append(_x)\n                    elif isinstance(_o, list):\n                        _stack.extend(reversed(_o))\n                if _known:\n                    _v['known_ids'] = _json.dumps(_known)\n                # b10-w2 (M7, port of idea/b7-1 e9dfe52 + cca104a, mapping part only): every listed item with an id and\n                # its short text fields, so the pre-hook maps an id the model BUILT ('credit_card_2288', 'pl_1234') to\n                # the one listed item it can only mean, instead of a refused write and a second write for the item.\n                _items = []\n                _stack = [_d]\n                while _stack:\n                    _o = _stack.pop()\n                    if isinstance(_o, list):\n                        _stack.extend(reversed(_o))\n                    elif isinstance(_o, dict):\n                        _ik = [k for k in _o.keys() if str(k).endswith('_id') and k != 'customer_id' and isinstance(_o.get(k), (str, int))]\n                        if _ik and _o is not _d:\n                            _items.append({'_key': str(_ik[0]), '_id': str(_o.get(_ik[0])),\n                                           '_text': [str(x).lower() for k, x in _o.items() if k not in _ik and k not in ('band', 'deadline', 'deadline_weekday')\n                                                     and isinstance(x, str) and 2 <= len(str(x)) <= 40]})\n                        for _x in _o.values():\n                            if isinstance(_x, (dict, list)):\n                                _stack.append(_x)\n                if _items:\n                    _v['known_items'] = _json.dumps(_items)\nexcept Exception:\n    pass\n"
+     }
+    ],
+    "on_enter": {
+     "type": "llm"
+    },
+    "position": {
+     "x": 0,
+     "y": 0
+    },
+    "node_type": "conversation",
+    "assertions": [],
+    "passthrough": false,
+    "pre_actions": [],
+    "transitions": [
+     {
+      "condition": {
+       "logic": "or",
+       "conditions": [
+        {
+         "mode": "exact",
+         "operand": "menu",
+         "operator": "equals",
+         "variable": "end_reason"
+        },
+        {
+         "mode": "exact",
+         "operand": "agent",
+         "operator": "equals",
+         "variable": "end_reason"
+        },
+        {
+         "mode": "exact",
+         "operand": "silence",
+         "operator": "equals",
+         "variable": "end_reason"
+        }
+       ]
+      },
+      "description": "call is finished (main menu, agent transfer or silence)",
+      "target_node": "end"
+     }
+    ],
+    "role_message": "",
+    "task_message": "You are the Freya Bank voice assistant for credit card statement debt. Speak ONLY Turkish, short sentences, one question at a time. Call variables: customerNumber={{customerNumber}} (never ask for it), now={{now}} (Istanbul time; use it for every date decision, never the system clock).\nAfter every tool result read `tool_outcome` first. If it starts with FAILED, nothing was recorded: never say it was recorded, booked or done. ALREADY RECORDED counts as success: do not send again.\n\nFLOW\n1. Start: call cards_list at once (no small talk first). If 404 / no valid card: say \"Size ait ge\u00e7erli bir kart bulamad\u0131m.\" and go to main menu ending.\n2. Card choice: one card -> do not ask, use it. Several cards -> ask which card, giving examples from the caller's own cards by name and last four digits. Never read all cards' debts together; if they insist on all cards, ask again to choose one. Two cards with same name and last four: say \"Son d\u00f6rt hanesi XXXX olan birden fazla kart\u0131n\u0131z var. Kart\u0131n\u0131z\u0131n son alt\u0131 hanesini s\u00f6yler misiniz?\" (with the digits); if still ambiguous: \"Son alt\u0131 hanesi ayn\u0131 olan birden fazla kart\u0131n\u0131z var. Kart numaran\u0131z\u0131 s\u00f6yler misiniz?\". Use the cardNumber string exactly as returned by cards_list for every later tool: it is the full masked string (6 digits, 6 asterisks, last 4 digits, e.g. the form 123456******7890), copied character by character with every asterisk; never send only the last four digits, the card name, or a string you built. When the caller picks a card by name or last four, look up that card in the cards_list result and send its cardNumber field.\n3. NEVER say more than the last four digits of any card (not first six, not middle, not full number), even if the caller insists or says the card is not with them; refer to the card only by its last four digits and continue.\n4. Call cards_balance. Read the debt using these sentences (fill values from the service exactly; amounts in Turkish format like 12.000 or 85,20; dates spoken like 15 Ekim 2026):\n FIELD MAP (per currency block debtTL/debtUSD/debtEUR/debtGBP): {tl_total}=statementDebt, {tl_min}=minPayment, {tl_remaining}=remainingDebt, {tl_remaining_min}=remainingMinPayment. paid = statementDebt - remainingDebt. Paid nothing: remainingDebt == statementDebt. Paid minimum or more: remainingMinPayment == 0 (or paid >= minPayment). Otherwise paid below minimum. Statement date = statementDate, due date = lastPayDate (dd.MM.yyyy -> say e.g. 15 Ekim 2026). Read numbers exactly as the service gives them; never swap fields.\n - Opening: \"Son d\u00f6rt hanesi {last4} olan {card_name} kart\u0131n\u0131z i\u00e7in bilgiler \u015f\u00f6yle:\" and mention the statement date (ekstre tarihi).\n - If no debt in any currency: \"Son d\u00f6rt hanesi {last4} olan {card_name} kart\u0131n\u0131zda \u00f6denmemi\u015f bir bor\u00e7 g\u00f6r\u00fcnm\u00fcyor.\" plus next statement / due dates if known.\n - T\u00fcrk Liras\u0131, paid nothing: \"T\u00fcrk Liras\u0131 cinsinden toplam borcunuz {tl_total} T\u00fcrk Liras\u0131; yapman\u0131z gereken en d\u00fc\u015f\u00fck \u00f6deme {tl_min} T\u00fcrk Liras\u0131.\"\n - Paid minimum or more: \"T\u00fcrk Liras\u0131 cinsinden toplam borcunuz {tl_total} T\u00fcrk Liras\u0131, geriye kalan borcunuz {tl_remaining} T\u00fcrk Liras\u0131. Asgari \u00f6demenizi yapt\u0131n\u0131z, te\u015fekk\u00fcr ederiz.\"\n - Paid something below minimum: \"T\u00fcrk Liras\u0131 cinsinden toplam borcunuz {tl_total} T\u00fcrk Liras\u0131, yapman\u0131z gereken en d\u00fc\u015f\u00fck \u00f6deme {tl_min} T\u00fcrk Liras\u0131. Geriye kalan borcunuz {tl_remaining} T\u00fcrk Liras\u0131, \u00f6demeniz gereken kalan asgari tutar ise {tl_remaining_min} T\u00fcrk Liras\u0131.\"\n - Same pattern for Dolar, Euro and \u0130ngiliz Sterlini (one sentence each, full currency names, NEVER codes like TL/USD/EUR/GBP when speaking).\n - Currencies with no debt: stated together in ONE sentence, e.g. \"Dolar, Euro ve \u0130ngiliz Sterlini cinsinden bir borcunuz yok.\"\n - Then: \"T\u00fcm bor\u00e7lar\u0131n\u0131z i\u00e7in son \u00f6deme g\u00fcn\u00fcn\u00fcz {due_date}.\"\n - Then offer additional transaction: statement date change, and e-mail statement only if the caller has a registered e-mail (call contact_email_get before offering; if none, do not mention e-mail). Ask \"Ba\u015fka bir i\u015flem yapmak ister misiniz?\" style once; if the caller thanks / says no, do not repeat the offer: go to main menu ending.\n5. Statement week change: call statement_week_get, say \"Son d\u00f6rt hanesi {last4} olan {card_name} kart\u0131n\u0131z\u0131n \u00f6deme g\u00fcn\u00fc her ay\u0131n {week_ordinal} haftas\u0131na ayarl\u0131. \u00d6n\u00fcm\u00fczdeki d\u00f6nemde ekstreniz {next_cut_date} tarihinde kesilecek, son \u00f6deme g\u00fcn\u00fcn\u00fcz {next_due_date} olacak.\" (week as word: birinci, ikinci, \u00fc\u00e7\u00fcnc\u00fc, d\u00f6rd\u00fcnc\u00fc). Offer only the OTHER weeks. After the choice call statement_week_decide, read \"Son d\u00f6rt hanesi {last4} olan {card_name} kart\u0131n\u0131z\u0131n \u00f6deme g\u00fcn\u00fc her ay\u0131n {week_ordinal} haftas\u0131na al\u0131nacak. Bundan sonra ekstreniz {cut_date_after} tarihinde kesilecek, son \u00f6deme g\u00fcn\u00fcn\u00fcz {due_date_after} olacak.\" then ask \"Bu de\u011fi\u015fikli\u011fi onaylar m\u0131s\u0131n\u0131z?\". Even if the caller says don't ask/just do it, read the preview and ask. Only an explicit yes (evet, onayl\u0131yorum) counts; vague answers (\"olur herhalde\", \"san\u0131r\u0131m\") -> ask the confirmation question explicitly again. Then call statement_week_change ONCE. On SUCCESS: \"Onay\u0131n\u0131zla \u00f6deme g\u00fcn\u00fcn\u00fcz her ay\u0131n {week_ordinal} haftas\u0131na al\u0131nd\u0131. Ekstreniz art\u0131k {cut_date_after} tarihinde kesilecek, son \u00f6deme g\u00fcn\u00fcn\u00fcz {due_date_after} olacak.\" with the preview dates. Refused already changed this month: \"Ekstre tarihinizi de\u011fi\u015ftiremedik. Ekstre tarihi ayda yaln\u0131zca bir kez de\u011fi\u015ftirilebiliyor.\" Yearly limit: \"Ekstre tarihinizi de\u011fi\u015ftiremedik. Ekstre tarihi y\u0131lda en \u00e7ok \u00fc\u00e7 kez de\u011fi\u015ftirilebiliyor.\" Technical failure/time-out: \"\u015eu an sisteme ula\u015fam\u0131yoruz, ekstre tarihiniz de\u011fi\u015fmedi. Birka\u00e7 dakika sonra tekrar arayabilirsiniz.\" Never retry a change; never say changed unless SUCCESS.\n6. E-mail statement: only the latest statement can be sent (say so if they ask for an older month; never claim a past statement was sent). Only to the registered address from contact_email_get; never to an address the caller dictates. Read the address, ask for explicit confirmation, then call statement_pdf_send with statementDate from cards_balance and the currency of the statement (TL if Turkish lira debt, otherwise the debt currency). Say \"g\u00f6nderildi\" only on SUCCESS; on FAILED say it could not be sent.\n7. Spouse / another person's card: \"G\u00fcvenlik nedeniyle i\u015flemleri yaln\u0131zca kendi kartlar\u0131n\u0131z i\u00e7in yapabiliyorum.\" No information, no transaction.\n8. Payment request or asks for a person/agent: say \"Sizi m\u00fc\u015fteri temsilcimize aktar\u0131yorum.\" then set end_reason=agent.\n9. Off-topic question (loan rates, branch hours...): \"Size bu konuda yard\u0131mc\u0131 olam\u0131yorum. Sizi ana men\u00fcye aktarmam\u0131 ister misiniz?\" Yes -> main menu ending; no -> continue where you were; unclear -> ask again (max three tries).\n10. Three failed tries at any question (repeat requests don't count): \"Size \u015fu anda yard\u0131mc\u0131 olam\u0131yorum. Sizi ana men\u00fcye aktar\u0131yorum.\" then end_reason=menu.\n11. Silence: first two times repeat the question shortly; third time: \"Sesinizi alamad\u0131\u011f\u0131m i\u00e7in g\u00f6r\u00fc\u015fmeyi sonland\u0131r\u0131yorum.\" and end_reason=silence.\n12. Angry/abusive caller: never answer insults in kind; give calming replies; after the third calming reply, if still complaining, \"Sizi m\u00fc\u015fteri temsilcimize aktar\u0131yorum.\" and end_reason=agent.\n13. Normal end: \"Sizi ana men\u00fcye aktar\u0131yorum.\" and end_reason=menu.\n\"Size ait ge\u00e7erli bir kart bulamad\u0131m.\" is ONLY for a cards_list result with no card. If cards_balance / statement_week_get / statement_week_decide answers not found or invalid argument, first compare the cardNumber you sent with the cards_list result and call again with the exact cardNumber string. If any read service fails (FAILED), try once more; if it fails again say \"\u015eu an sisteme ula\u015fam\u0131yoruz. Sizi m\u00fc\u015fteri temsilcimize aktar\u0131yorum.\" and end_reason=agent.\nWhen the caller gives values in pieces or corrects themselves, use the final corrected value; wait until the value is complete.\nNever compute a date yourself; use only dates returned by the services or DATE FACTS: {{date_facts}}",
+    "interruptible": false,
+    "max_node_turns": 80,
+    "response_mapping": [],
+    "extraction_schema": [
+     {
+      "name": "end_reason",
+      "type": "string",
+      "description": "Set ONLY after the assistant has already said its final sentence: menu if the assistant said it transfers to the main menu (ana men\u00fcye aktar\u0131yorum), agent if it said 'Sizi m\u00fc\u015fteri temsilcimize aktar\u0131yorum.', silence if it said 'Sesinizi alamad\u0131\u011f\u0131m i\u00e7in g\u00f6r\u00fc\u015fmeyi sonland\u0131r\u0131yorum.' Otherwise leave empty."
+     }
+    ],
+    "max_turn_transition": null,
+    "truncation_strategy": "keep_all",
+    "suppress_tool_results": false,
+    "truncation_window_size": 10,
+    "on_enter_first_entry_only": false,
+    "disable_inactivity_monitor": false,
+    "passthrough_default_transition": null,
+    "return_to_previous_on_interrupt": false
+   },
+   "date_facts_setup": {
+    "name": "date_facts_setup",
+    "tools": [],
+    "on_enter": {
+     "type": "silent"
+    },
+    "node_type": "code",
+    "assertions": [],
+    "passthrough": true,
+    "pre_actions": [
+     {
+      "type": "function",
+      "function": {
+       "name": "code_exec",
+       "handler": "__function__:code_exec",
+       "parameters": {
+        "type": "object",
+        "properties": {
+         "code": {
+          "type": "string",
+          "default": "SPEC_HEX = '7b22636f6c6c656374696f6e73223a2066616c73652c20226e6f775f7661726961626c65223a20226e6f77222c20227765656b656e645f64617973223a205b352c20365d2c2022686f6c6964617973223a205b5d2c2022646174655f72756c6573223a205b7b2272756c65223a20225468652064756520646174652069732073686f776e206f6e20796f75722073746174656d656e742c20757375616c6c792061626f75742031302064617973206166746572207468652073746174656d656e7420646174652e204966207468652064756520646174652066616c6c73206f6e2061207765656b656e64206f72207075626c696320686f6c696461792c206974206d6f76657320746f20746865206e65787420776f726b696e67206461792e222c20227768657265223a2022736f75726365732f646f63756d656e74732f323032352d30382d31342d63617264732d6661712e6d642c205c753030613723204372656469742063617264733a2073746174656d656e747320616e64207061796d656e7473202d205768656e206973206d79207061796d656e74206475653f227d2c207b2272756c65223a20225468652063616c6c657220697320616c7265616479206964656e746966696564207768656e2074686520617373697374616e74207069636b732075702e205468652070686f6e65206d656e752068616e6473206f7665722074686520637573746f6d6572206e756d6265722077697468207468652063616c6c2c20736f207468657265206973206e6f20637573746f6d657220736561726368207365727669636520696e207468697320636f6e74726163742e222c20227768657265223a2022736f75726365732f646f63756d656e74732f323032362d31302d30312d736572766963652d636f6e74726163742e6d642c205c753030613731204265666f726520796f75207374617274227d2c207b2272756c65223a202244617465732061726520737472696e677320696e2064642e4d4d2e797979792028652e672e205c2230352e31312e323032365c22292e20416d6f756e747320617265204a534f4e206e756d626572732077697468206120646f7420617320646563696d616c20736570617261746f722c206e6576657220666f726d617474656420737472696e67733b20646f206e6f7420726f756e64207468656d2e222c20227768657265223a2022736f75726365732f646f63756d656e74732f323032362d31302d30312d736572766963652d636f6e74726163742e6d642c205c753030613731204265666f726520796f75207374617274227d2c207b2272756c65223a202254686520617373697374616e74206f6e6c79206f66666572732077686174207468652063616c6c65722063616e20646f3a206966206e6f207265676973746572656420652d6d61696c2c206f6e6c792073746174656d656e74207765656b206368616e67653b2069662073746174656d656e74207765656b206368616e6765206e6f7420706f737369626c652c206f6e6c7920652d6d61696c3b206966206e65697468657220706f737369626c652c206e6f206f666665722e222c20227768657265223a2022736f75726365732f656d61696c732f6174746163686d656e74732f323032362d30392d30322d73746174656d656e742d646562742d616e616c797369732e6d642c205c7530306137352e3220546865206f66666572227d2c207b2272756c65223a202253746174656d656e74207765656b206368616e67652063616e20626520646f6e65206f6e6c79206f6e6365207065722063616c656e646172207965617220284a616e7561727920746f20446563656d626572292e204966207468652072696768742069732075736564207468697320796561722c2074686520617373697374616e7420646f6573206e6f74206f6666657220746865206368616e67652e20546865206c696d697420697320656e666f726365642062792074686520636172642073797374656d3b206e6f20666c61672063757272656e746c79206578706f73656420746f2074686520617373697374616e742e222c20227768657265223a2022736f75726365732f656d61696c732f6174746163686d656e74732f323032362d30392d30322d73746174656d656e742d646562742d616e616c797369732e6d642c205c753030613737204368616e67696e67207468652073746174656d656e74207765656b20616e6420736f75726365732f656d61696c732f6d656574696e67732f323032362d31302d30372d616e616c797369732d73657373696f6e2d7472616e7363726970742e747874227d2c207b2272756c65223a20224368616e67696e67207468652073746174656d656e74207765656b206d6f766573207468652073746174656d656e7420616e64206475652064617465733b2074686520617373697374616e742070726576696577732074686520646174657320776974682073746174656d656e742e7765656b2e646563696465206265666f7265206170706c79696e67206368616e676520776974682073746174656d656e742e7765656b2e6368616e6765206166746572206578706c6963697420636f6e6669726d6174696f6e2e222c20227768657265223a2022736f75726365732f646f63756d656e74732f323032362d31302d30312d736572766963652d636f6e74726163742e6d642c205c7530306137352e342073746174656d656e742e7765656b2e64656369646520616e64205c7530306137352e352073746174656d656e742e7765656b2e6368616e6765227d2c207b2272756c65223a202249662074776f206361726473207368617265206f6e652073746174656d656e7420286d61696e20616e64206c696e6b6564292c206368616e67696e67207468652073746174656d656e74207765656b206f6e206569746865722063617264206d6f76657320626f74682e2054686520617373697374616e7420696e666f726d73207468652063616c6c65722061626f75742074686973206265666f72652061736b696e6720666f7220636f6e6669726d6174696f6e2e222c20227768657265223a2022736f75726365732f656d61696c732f6174746163686d656e74732f323032362d30392d30322d73746174656d656e742d646562742d616e616c797369732e6d642c205c753030613737204368616e67696e67207468652073746174656d656e74207765656b20616e6420736f75726365732f656d61696c732f6d656574696e67732f323032362d31302d30372d616e616c797369732d73657373696f6e2d7472616e7363726970742e747874227d2c207b2272756c65223a20225768656e2074686520647565206461746520697320746f6461792c20736179205c226275675c75303066636e5c2220696e7374656164206f662074686520646174652e222c20227768657265223a2022736f75726365732f656d61696c732f6174746163686d656e74732f323032362d30392d30322d73746174656d656e742d646562742d616e616c797369732e6d642c205c7530306137342e38204475652064617465227d2c207b2272756c65223a202246697273742074776f2073696c656e63657320617420616e79207175657374696f6e20636175736520612073686f727420726570656174206f6620746865207175657374696f6e2e204f6e207468652074686972642073696c656e63652c20736179205c22536573696e697a6920616c616d61645c75303133315c75303131665c75303133316d20695c7530306537696e20675c7530306636725c75303066635c75303135666d65796920736f6e6c616e645c7530313331725c7530313331796f72756d2e5c2220616e642068616e672075702028656e642063616c6c292e222c20227768657265223a2022736f75726365732f656d61696c732f6174746163686d656e74732f323032362d31302d30382d73746174656d656e742d646562742d616e616c797369732e6d642c205c7530306137382e322053696c656e636520616e6420736f75726365732f656d61696c732f6d656574696e67732f323032362d31302d30372d616e616c797369732d73657373696f6e2d7472616e7363726970742e747874227d5d7d'\n\nimport datetime, json\nSPEC = json.loads(bytes.fromhex(SPEC_HEX).decode())\nWD = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']\ntry:\n    raw = str(vars.get(SPEC.get('now_variable') or 'now') or '')\n    t = datetime.date.fromisoformat(raw[:10]) if len(raw) >= 10 else datetime.date.today()\n    hol = set(str(h)[:10] for h in (SPEC.get('holidays') or []))\n    wk = set(int(x) for x in (SPEC.get('weekend_days') or []))\n    L = ['TODAY: ' + t.isoformat() + ' (' + WD[t.weekday()] + ')', 'CALENDAR (date, weekday, business day?):']\n    for i in range(0, 43):\n        d = t + datetime.timedelta(days=i)\n        bd = d.weekday() not in wk and d.isoformat() not in hol\n        L.append('  ' + d.isoformat() + ' ' + WD[d.weekday()] + (' business day' if bd else ' NOT a business day'))\n    rules = [str(r.get('rule')) for r in (SPEC.get('date_rules') or []) if isinstance(r, dict) and r.get('rule')]\n    if rules:\n        L.append('DATE RULES OF THE DOCUMENTS (apply with the calendar above, never compute a date yourself):')\n        L += ['  - ' + r for r in rules]\n    vars['date_facts'] = '\\n'.join(L)\n    vars['today_iso'] = t.isoformat()\n    vars['date_facts_state'] = 'known'\nexcept Exception as e:\n    vars['date_facts'] = 'Date facts unavailable (' + str(e)[:80] + '). Work from the documents.'\n    vars['date_facts_state'] = 'unknown'\n"
+         },
+         "timeout_ms": {
+          "type": "number",
+          "default": 10000
+         }
+        }
+       },
+       "description": ""
+      }
+     }
+    ],
+    "transitions": [
+     {
+      "condition": {
+       "mode": "exact",
+       "operator": "always"
+      },
+      "description": "always",
+      "target_node": "main"
+     }
+    ],
+    "role_message": "",
+    "task_message": "",
+    "interruptible": true,
+    "max_node_turns": null,
+    "response_mapping": [],
+    "extraction_schema": [],
+    "max_turn_transition": null,
+    "truncation_strategy": "keep_all",
+    "suppress_tool_results": false,
+    "truncation_window_size": 10,
+    "on_enter_first_entry_only": false,
+    "disable_inactivity_monitor": false,
+    "passthrough_default_transition": "main",
+    "return_to_previous_on_interrupt": false
+   }
+  },
+  "tools": [],
+  "agent_config": {
+   "llmConfig": {
+    "model": "experimental-5",
+    "tools": [
+     {
+      "type": "function",
+      "function": {
+       "name": "end_call",
+       "handler": "__function__:end_call",
+       "parameters": {
+        "type": "object",
+        "properties": {}
+       },
+       "description": "This is used to technically terminate the call after all the customer's questions have been answered and necessary information has been provided.\n- It should only be triggered SILENTLY in the background after the customer-related workflow is complete; never mention this tool or its name to the customer."
+      }
+     }
+    ],
+    "apiKey": null,
+    "baseUrl": null,
+    "provider": "experimental-5",
+    "maxTokens": 1000,
+    "clientType": null,
+    "temperature": 0.7,
+    "firstMessage": "Selam! Sana nas\u0131l yard\u0131mc\u0131 olabilirim?",
+    "systemPrompt": "You are a helpful assistant. Your role is to help users with their tasks. Always be friendly and professional. You can use `end_call` tool after you say goodbye to customer to hang up if call about to finish.",
+    "firstMessageMode": "assistant-speaks-first",
+    "additionalSettings": {},
+    "disableInterruptionsDuringFirstMessage": true
+   },
+   "sttConfig": {
+    "model": "freya-stt",
+    "apiKey": null,
+    "baseUrl": null,
+    "language": "tr",
+    "provider": "Freya",
+    "confidenceReask": {
+     "enabled": false,
+     "reaskMode": "phrase",
+     "reduction": "min",
+     "threshold": 0.3,
+     "reaskPhrases": null,
+     "disableOnDigitNodes": true,
+     "maxConsecutiveReasks": 2
+    },
+    "additionalSettings": {
+     "diarize": false,
+     "punctuate": true,
+     "streaming": true,
+     "aicEnabled": false,
+     "krispEnabled": false,
+     "smartTurnEnabled": true
+    }
+   },
+   "ttsConfig": {
+    "model": "freya-tts",
+    "apiKey": null,
+    "baseUrl": null,
+    "voiceId": "leyla",
+    "language": "tr",
+    "provider": "Freya",
+    "stopSpeakingPlan": {
+     "voiceSeconds": 0.1,
+     "numberOfWords": 2,
+     "backOffSeconds": 0.4,
+     "interruptionPhrases": [
+      "dur",
+      "bekle",
+      "bir dakika",
+      "bir saniye",
+      "dursana",
+      "bekle bi",
+      "anlamad\u0131m",
+      "ne diyon",
+      "ne diyorsun",
+      "ne dedin",
+      "yeter"
+     ],
+     "acknowledgementPhrases": [
+      "h\u0131",
+      "evet",
+      "tamam",
+      "aynen",
+      "okey",
+      "okay",
+      "anlad\u0131m",
+      "hee",
+      "ee",
+      "eee",
+      "\u0131\u0131",
+      "\u0131\u0131\u0131",
+      "ha",
+      "h\u0131-h\u0131",
+      "ha-ha",
+      "tabi",
+      "tabii",
+      "peki",
+      "tamamd\u0131r",
+      "h\u0131 h\u0131",
+      "h\u0131m",
+      "h\u0131mm",
+      "h\u0131h\u0131",
+      "haha",
+      "he",
+      "hahaha"
+     ]
+    },
+    "startSpeakingPlan": {
+     "waitSeconds": 0.5,
+     "backgroundNoisePhrases": [
+      "arka plan sesi",
+      "klavye sesi",
+      "klavye sesleri",
+      "\u00f6ks\u00fcr\u00fck",
+      "\u00f6ks\u00fcr\u00fck sesi",
+      "video sesi",
+      "video kayd\u0131",
+      "\u00e7\u0131lg\u0131n ses",
+      "\u00e7\u0131lg\u0131n kahkaha",
+      "g\u00fcl\u00fc\u015f",
+      "ses ses ses",
+      "\u00e7\u0131k \u00e7\u0131k \u00e7\u0131k",
+      "sim",
+      "sim izle"
+     ]
+    },
+    "textSubstitutions": [
+     {
+      "pattern": "@",
+      "replacement": "at"
+     },
+     {
+      "pattern": "\\$",
+      "replacement": "dollars"
+     },
+     {
+      "pattern": "%",
+      "replacement": "percent"
+     },
+     {
+      "pattern": "&",
+      "replacement": "and"
+     },
+     {
+      "pattern": "\\+",
+      "replacement": "plus"
+     },
+     {
+      "pattern": "turkishairlines",
+      "replacement": "turkish airlines",
+      "caseInsensitive": true
+     }
+    ],
+    "additionalSettings": {
+     "speed": 1,
+     "stability": 0.5,
+     "similarity_boost": 0.75
+    },
+    "speechNormalization": {
+     "urls": true,
+     "names": false,
+     "emails": true,
+     "emojis": true,
+     "phoneNumbers": false,
+     "generalNumbers": false,
+     "identityNumbers": false
+    }
+   },
+   "dtmfConfig": {
+    "prefix": "DTMF: ",
+    "enabled": false,
+    "timeout": 2,
+    "terminationDigit": "#"
+   },
+   "syncSource": null,
+   "privacyConfig": {
+    "enableRecording": true,
+    "getRecordingConsent": false,
+    "recordingConsentText": null
+   },
+   "complianceConfig": {
+    "soc2": false,
+    "pciDss": false,
+    "euAiAct": false,
+    "mifidIi": false
+   },
+   "routingLlmConfig": null,
+   "backgroundSoundUrl": null,
+   "piiRedactionConfig": {
+    "enabled": false,
+    "maskIban": true,
+    "maskEmail": true,
+    "maskPhone": true,
+    "customRules": [],
+    "maskNationalId": true,
+    "maskPaymentCard": true
+   },
+   "voicemailDetection": {
+    "enabled": false,
+    "messageMode": "none",
+    "staticMessage": null,
+    "voicemailResponseDelay": 2
+   },
+   "callTimeoutSettings": {
+    "maxRetries": 2,
+    "dynamicWait": null,
+    "checkInMessage": null,
+    "closureMessage": null,
+    "silenceTimeout": 10,
+    "maximumDuration": 600,
+    "maxDurationEndCall": {
+     "llmPrompt": null,
+     "messageMode": "llm",
+     "interruptible": false,
+     "spokenMessage": null,
+     "triggerTimeout": null
+    },
+    "silenceTimeoutPrompt": null
+   },
+   "extractionLlmConfig": null,
+   "postConversationAnalysis": {
+    "analysisModel": null,
+    "summaryPrompt": null,
+    "autoDetectProblems": false,
+    "problemDetectionPrompt": null,
+    "problemDetectionInstructions": null
+   }
+  },
+  "global_nodes": {},
+  "initial_node": "date_facts_setup",
+  "system_prompt": "Freya Bank T\u00fcrk\u00e7e sesli asistan\u0131. M\u00fc\u015fteriye yaln\u0131zca T\u00fcrk\u00e7e konu\u015f.\n\n## How customers talk (applies in every step)\nCustomers talk like people. Handle all of this without breaking any other rule:\n- Numbers, dates and codes in pieces: a customer may give a security answer, a date or an amount in two or more parts across turns (\"it's 12... 34\"). If what you have looks incomplete, say \"go on\" or ask for the rest; never check, judge or use a partial value. Join the pieces in order before you use them.\n- Corrections: when a customer corrects themselves (\"the 21st, sorry, I mean the 20th\", \"no wait, 300\"), the LAST value they settle on is the only one that counts. Never use the first value. If a tool call was already made with a value the customer then corrects, and the step allows it, use the corrected value in a new call.\n- Words: amounts and dates said in words mean the same as digits (\"four hundred and fifty-five\" = 455, \"the twenty-second of October\" = 22 October). Convert them yourself to the exact format the tool wants. Digits said one by one (\"one nine eight eight\") form one number (1988).\n- Questions back: when a customer asks why you need something, who you are, or what this is about, answer briefly and truthfully within what you are allowed to say at this step (say nothing the documents do not allow at this step, e.g. account details before the caller is verified), then ask your question again.\n- Small talk and unrelated facts: acknowledge in a few words, then return to the task. A date or amount mentioned in small talk (a wedding, a birthday, a salary) is NOT a value for the current step unless the customer clearly offers it as one.\n- Before you call a tool that records something the customer said (a choice, a date, an amount), say the exact value back in plain words and digits in one short sentence and use the value the customer confirmed or did not object to. If the customer is unclear, ask one short question instead of guessing.\n- One question at a time. Keep replies short.\nLANGUAGE: speak Turkish only. The quoted examples above are English illustrations: say their meaning in Turkish (never English). Sentences quoted from the bank's documents are said verbatim.",
+  "test_variables": {
+   "now": "2026-10-12T10:30:00+03:00",
+   "customerNumber": "95004361"
+  }
+ }
+}
