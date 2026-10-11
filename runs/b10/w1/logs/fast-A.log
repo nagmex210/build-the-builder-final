@@ -1,2 +1,165 @@
   invalid rep PUB-05 (try 1): ['harness: chat turn timed out and no reply appeared']
   invalid rep PUB-06 (try 1): ['harness: chat turn kept timing out']
+  invalid rep PUB-01 (try 1): ['harness: chat turn kept timing out']
+  invalid rep PUB-04 (try 1): ['harness: chat turn kept timing out']
+  invalid rep PUB-03 (try 1): ['harness: chat turn kept timing out']
+  invalid rep PUB-02 (try 1): ['harness: chat turn kept timing out']
+  invalid rep PUB-06 (try 2): ['harness: chat turn kept timing out']
+  invalid rep PUB-05 (try 2): ['harness: chat turn kept timing out']
+  invalid rep PUB-01 (try 2): ['harness: chat turn kept timing out']
+  invalid rep PUB-04 (try 2): ['harness: chat turn kept timing out']
+  invalid rep PUB-02 (try 2): ['harness: chat turn kept timing out']
+  invalid rep PUB-03 (try 2): ['harness: chat turn kept timing out']
+  invalid rep PUB-05 (try 3): ['harness: chat turn kept timing out']
+  invalid rep PUB-06 (try 3): ['harness: chat turn kept timing out']
+  invalid rep PUB-03 (try 3): ['harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"cac0a334-c607-4b01-a0b5-83adcae3154a"}}}']
+  invalid rep PUB-01 (try 3): ['harness: chat turn kept timing out']
+  invalid rep PUB-10 (try 1): ['harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"f209c4ac-c76e-46e7-b9a8-40fb58d37655"}}}']
+  invalid rep PUB-04 (try 3): ['harness: chat turn kept timing out']
+  invalid rep PUB-07 (try 1): ['harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"83b177fe-27e2-4ced-9ef7-b2e2bfc0d1c4"}}}']
+  invalid rep PUB-01 (try 1): ['harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"baa3d154-b293-4897-88a7-e430b3c2c862"}}}']
+  invalid rep PUB-08 (try 1): ['harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"913acccc-cbf5-4a08-a6e7-b47a9f55631f"}}}']
+  invalid rep PUB-01 (try 2): ['harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"3120e5e4-0fc3-495d-aaa3-ec97b3b37cb8"}}}']
+  invalid rep PUB-08 (try 2): ['harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"cdb19ab8-745f-458d-9964-df21d7bd1fb0"}}}']
+  invalid rep PUB-09 (try 1): ['harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"5353ade2-b101-403b-a6ab-ff167ad85db0"}}}']
+  invalid rep PUB-07 (try 2): ['harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"4b556d75-7f44-44d0-8977-6fc601e49882"}}}']
+  invalid rep PUB-02 (try 3): ['harness: chat turn kept timing out']
+  invalid rep PUB-09 (try 2): ['harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"df7b3efb-36dd-4816-93ca-b202de739951"}}}']
+  invalid rep PUB-07 (try 3): ['harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"d75893d3-20c1-43d6-8be5-467ba35553b0"}}}']
+  invalid rep PUB-08 (try 3): ['harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"be353521-66b9-4db8-84a6-6ca3dfcf37c2"}}}']
+  invalid rep PUB-02 (try 1): ['harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"e27741c5-dd92-4bd5-9cfc-da7a87716684"}}}']
+  invalid rep PUB-03 (try 1): ['harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"cf78ecd4-a856-41c4-9f5d-31e1aa062751"}}}']
+  invalid rep PUB-03 (try 2): ['harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"3d1700c3-41b1-4d1e-9bb6-d0b0132f1dc8"}}}']
+  invalid rep PUB-02 (try 2): ['harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"26cf9813-b245-4285-96ea-f012962f4d6e"}}}']
+  invalid rep PUB-10 (try 2): ['harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"17a6debd-9503-469a-a5ad-73583b945ef2"}}}']
+  invalid rep PUB-09 (try 3): ['harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"c8215277-2054-433f-8809-89ec1c5b6872"}}}']
+  invalid rep PUB-01 (try 3): ['harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"69cf367d-5363-48cd-82e5-3b9c515fe205"}}}']
+  invalid rep PUB-10 (try 3): ['harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"189628f3-3edf-473c-9fc9-0dde5deaa2bb"}}}']
+  invalid rep PUB-04 (try 1): ['harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"da1a7ab4-51be-46ee-8fce-849b1e706c9e"}}}']
+  invalid rep PUB-05 (try 1): ['harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"e88252a9-2332-48bd-8f38-5e7afe4873e4"}}}']
+  invalid rep PUB-06 (try 1): ['harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"d1865293-d8eb-4119-9d16-23f677f27f23"}}}']
+  invalid rep PUB-07 (try 1): ['harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"a330e2ce-3e1e-4b33-a0cb-2dd804408649"}}}']
+  invalid rep PUB-04 (try 2): ['harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"83fab678-a384-4da2-9dea-830500da9e59"}}}']
+  invalid rep PUB-05 (try 2): ['harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"4390e7bb-c0ba-4e48-b6b0-8b327a702cd4"}}}']
+  invalid rep PUB-06 (try 2): ['harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"f6b58482-5a01-456e-9320-fcde6b65a520"}}}']
+  invalid rep PUB-03 (try 3): ['harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"fdea4bcf-80f8-4750-ab2f-ef7122af2178"}}}']
+  invalid rep PUB-07 (try 2): ['harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"f684151a-5753-43ce-a28c-8e1054ad7212"}}}']
+  invalid rep PUB-04 (try 3): ['harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"763e22d3-6136-49ba-ada9-61766e4f1a78"}}}']
+  invalid rep PUB-05 (try 3): ['harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"574acb65-9dfa-4488-9281-f5e35db6e8ad"}}}']
+  invalid rep PUB-02 (try 3): ['harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"a9380c88-546e-4fed-a12c-5e7ec84f5ec1"}}}']
+  invalid rep PUB-07 (try 3): ['harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"6f915d7b-05dd-488b-bb8d-2c7b272c03ec"}}}']
+  invalid rep PUB-06 (try 3): ['harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"29d599da-f76b-46d5-a150-b89cedba30eb"}}}']
+  invalid rep PUB-09 (try 1): ['harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"57021e4a-601d-42c7-8370-90eb7e4ac10a"}}}']
+  invalid rep PUB-10 (try 1): ['harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"19fc52b0-febc-40e1-b87a-6fae29ddf5e5"}}}']
+  invalid rep PUB-09 (try 2): ['harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"255fef43-0494-4b37-a0c8-19c994bb1839"}}}']
+  invalid rep PUB-10 (try 2): ['harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"2d457c37-db56-4f90-a5e5-823355d2962e"}}}']
+  invalid rep PUB-08 (try 1): ['harness: chat turn kept timing out']
+  invalid rep PUB-09 (try 3): ['harness: chat turn kept timing out']
+  invalid rep PUB-10 (try 3): ['harness: chat turn kept timing out']
+  invalid rep PUB-08 (try 2): ['harness: chat turn kept timing out']
+  invalid rep PUB-08 (try 3): ['resumed from msg_4_1791722118745 (latest reply msg_4_1791722149307, isBranch=True)']
+INVALID PUB-01 0/2 | 
+       - [talkative] outcome (None, None), expected ('promise', None)
+       - [talkative] promises [], expected [('p1', 420.0, '2026-10-14')]
+       - [talkative] the call was not closed with close_call
+       - [talkative] conversation: The required security verification is not shown, create_promise was not called exactly once, and the text-message sentence was not said after the promise.
+       - [talkative] harness: chat turn kept timing out
+       - [plain] outcome (None, None), expected ('promise', None)
+       - [plain] promises [], expected [('p1', 420.0, '2026-10-14')]
+       - [plain] the call was not closed with close_call
+       - [plain] conversation: create_promise was not called exactly once, and the required text-message sentence was not said after the promise.
+       - [plain] harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"69cf367d-5363-48cd-82e5-3b9c515fe205"}}}
+INVALID PUB-02 0/2 | 
+       - [asks_back] outcome (None, None), expected ('not_reached', 'callback')
+       - [asks_back] callbacks [], expected [{'date': '2026-10-15', 'time': '11:00'}]
+       - [asks_back] the call was not closed with close_call
+       - [asks_back] conversation: No callback was scheduled for the next business day, 2026-10-15, at 11:00.
+       - [asks_back] harness: chat turn kept timing out
+       - [plain] outcome (None, None), expected ('not_reached', 'callback')
+       - [plain] callbacks [], expected [{'date': '2026-10-15', 'time': '11:00'}]
+       - [plain] the call was not closed with close_call
+       - [plain] conversation: No callback was scheduled for the next business day, 2026-10-15 at 11:00.
+       - [plain] harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"a9380c88-546e-4fed-a12c-5e7ec84f5ec1"}}}
+INVALID PUB-03 0/2 | 
+       - [in_words] outcome (None, None), expected ('not_verified', 'failed')
+       - [in_words] the call was not closed with close_call
+       - [in_words] conversation: The transcript does not show the check ending after the third wrong answer or the customer being told to use the app or a branch.
+       - [in_words] harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"cac0a334-c607-4b01-a0b5-83adcae3154a"}}}
+       - [talkative] outcome (None, None), expected ('not_verified', 'failed')
+       - [talkative] the call was not closed with close_call
+       - [talkative] conversation: The transcript does not clearly show the check ending after the third wrong answer or the customer being told to use the app or a branch.
+       - [talkative] harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"fdea4bcf-80f8-4750-ab2f-ef7122af2178"}}}
+INVALID PUB-04 0/2 | 
+       - [asks_back] outcome (None, None), expected ('promise', None)
+       - [asks_back] promises [], expected [('p1', 1250.0, '2026-10-23')]
+       - [asks_back] the call was not closed with close_call
+       - [asks_back] conversation: The transcript does not establish that her own date was not counted as a refusal, that the promise date was 23 October, or that the agent identified itself as a digital assistant when asked.
+       - [asks_back] harness: chat turn kept timing out
+       - [asks_back] outcome (None, None), expected ('promise', None)
+       - [asks_back] promises [], expected [('p1', 1250.0, '2026-10-23')]
+       - [asks_back] the call was not closed with close_call
+       - [asks_back] conversation: The transcript does not establish that her own date is not counted as a refusal, that the promise date is 23 October, or that the agent identifies itself as a digital assistant when asked.
+       - [asks_back] harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"763e22d3-6136-49ba-ada9-61766e4f1a78"}}}
+INVALID PUB-05 0/2 | 
+       - [asks_back] outcome (None, None), expected ('no_promise', 'hardship')
+       - [asks_back] the call was not closed with close_call
+       - [asks_back] conversation: The agent provided no sentence of sympathy and did not offer the support team once.
+       - [asks_back] harness: chat turn kept timing out
+       - [plain] outcome (None, None), expected ('no_promise', 'hardship')
+       - [plain] the call was not closed with close_call
+       - [plain] conversation: The agent provided no sentence of sympathy and did not offer the support team once.
+       - [plain] harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"574acb65-9dfa-4488-9281-f5e35db6e8ad"}}}
+INVALID PUB-06 0/2 | 
+       - [in_words] outcome (None, None), expected ('promise', None)
+       - [in_words] promises [], expected [('p1', 637.5, '2026-10-16')]
+       - [in_words] the call was not closed with close_call
+       - [in_words] conversation: The agent did not offer the minimum payment with notice that the rest stays overdue or establish a promise for 637.50 on Friday 16 October.
+       - [in_words] harness: chat turn kept timing out
+       - [pieces] outcome (None, None), expected ('promise', None)
+       - [pieces] promises [], expected [('p1', 637.5, '2026-10-16')]
+       - [pieces] the call was not closed with close_call
+       - [pieces] conversation: The agent did not offer the minimum payment with a note that the rest stays overdue or establish a promise for 637.50 on Friday 16 October.
+       - [pieces] harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"29d599da-f76b-46d5-a150-b89cedba30eb"}}}
+INVALID PUB-07 0/2 | 
+       - [asks_back] outcome (None, None), expected ('promise', None)
+       - [asks_back] promises [], expected [('p1', 540.0, '2026-10-27')]
+       - [asks_back] the call was not closed with close_call
+       - [asks_back] conversation: The agent did not ask for the exact day, reject 26 October and offer the next business day, or record a promise for Tuesday 27 October within the early-band deadline.
+       - [asks_back] harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"d75893d3-20c1-43d6-8be5-467ba35553b0"}}}
+       - [asks_back] outcome (None, None), expected ('promise', None)
+       - [asks_back] promises [], expected [('p1', 540.0, '2026-10-27')]
+       - [asks_back] the call was not closed with close_call
+       - [asks_back] conversation: The agent never asked for the exact day, rejected 26 October and offered the next business day, or recorded a promise for Tuesday 27 October within the early-band deadline.
+       - [asks_back] harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"6f915d7b-05dd-488b-bb8d-2c7b272c03ec"}}}
+INVALID PUB-08 0/2 | 
+       - [talkative] outcome (None, None), expected ('paid', None)
+       - [talkative] the call was not closed with close_call
+       - [talkative] conversation: The agent did not say payments can take one business day to appear.
+       - [talkative] harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"be353521-66b9-4db8-84a6-6ca3dfcf37c2"}}}
+       - [talkative] outcome (None, None), expected ('paid', None)
+       - [talkative] the call was not closed with close_call
+INVALID PUB-09 0/2 | 
+       - [pieces] outcome (None, None), expected ('transferred', 'restructuring')
+       - [pieces] transfers [], expected [{'queue': 'restructuring'}]
+       - [pieces] the call was not closed with close_call
+       - [pieces] conversation: The required transfer_to_agent call with queue restructuring was not made.
+       - [pieces] harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"c8215277-2054-433f-8809-89ec1c5b6872"}}}
+       - [plain] outcome (None, None), expected ('transferred', 'restructuring')
+       - [plain] transfers [], expected [{'queue': 'restructuring'}]
+       - [plain] the call was not closed with close_call
+       - [plain] conversation: The required transfer_to_agent call with queue restructuring was not made.
+       - [plain] harness: chat turn kept timing out
+INVALID PUB-10 0/2 | 
+       - [in_words] outcome (None, None), expected ('promise', None)
+       - [in_words] promises [], expected [('p1', 365.0, '2026-10-16')]
+       - [in_words] the call was not closed with close_call
+       - [in_words] conversation: The check requiring exactly one promise in the ledger after the retry is not satisfied because no retry or successful ledger entry is shown.
+       - [in_words] harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"189628f3-3edf-473c-9fc9-0dde5deaa2bb"}}}
+       - [asks_back] outcome (None, None), expected ('promise', None)
+       - [asks_back] promises [], expected [('p1', 365.0, '2026-10-16')]
+       - [asks_back] the call was not closed with close_call
+       - [asks_back] conversation: The check requiring exactly one promise in the ledger after the retry is not satisfied because no retry or successful ledger entry is shown.
+       - [asks_back] harness: chat turn kept timing out
+
+fast_eval: 0 / 10 passed (2 rep(s), all reps must pass), 2282 s
+harness: 10 case(s) still INVALID after 2 re-run(s) (not a measurement), 40 rep(s) re-run
