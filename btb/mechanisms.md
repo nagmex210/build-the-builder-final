@@ -1,33 +1,35 @@
 # Mechanisms (maintained by the standing analyst)
 
 General rules only: no case ids, names, brief values or scenario details. Evidence is in runs/analyst/<batch>.md and
-fix/cases:runs/mechanisms.md. Last update: after batch b4 (2026-10-10 ~22:10 UTC).
+fix/cases:runs/mechanisms.md. Last update: after batch b5 (2026-10-11 ~00:35 UTC).
 
 ## 1. Failure kinds (running counts, primary kind per failing run, platform-dead runs excluded)
 
-| kind | b1-b2 | b3 | b4 (226 fast calls, digest) | total | at fault |
-|---|---|---|---|---|---|
-| multi-product binding (amount/date/deadline of one item applied to another, item left out, stale per-item date) | (in per-item) | - | 28 | 28+ | builder |
-| dates (another band's deadline offered for a holiday, weekday phrase, wrong year) | 17 | 1 | 17 | 35 | builder |
-| per-item attempts / outcome counted wrong | 7 | 1 | 13 | 21 | builder |
-| tool order / duplicates (close in parallel with notes, tools after close, invented ids then retry, re-sent writes) | 24 | 2 | 15 | 41 | builder |
-| "once only" limit broken (floor offered twice, two sympathy sentences) | 0 | 0 | 12 | 12 | builder |
-| amounts (below-floor promise recorded, floor offered too early, invented floor) | 7 | 0 | 8 | 15 | builder |
-| wrong route: cannot-pay -> agent invents its own plan instead of the brief's transfer | 3 | 0 | 8 | 11 | builder |
-| identity gate (wrong answer read back instead of checked, attempts not stopped, wrong reason) | 8 | 2 | 6 | 16 | builder |
-| mandatory wording | 6 | 1 | 2 | 9 | builder |
-| honesty / privacy | 0 | 2 | 1 | 3 | builder |
-| harness: fast judge says a sentence/tool is missing that IS in the transcript | 11 | 5 | ~36 | ~52 | harness |
-| harness: fast simulated customer refuses or "corrects" to a date the case does not expect | 0 | 1 | ~6 | ~7 | harness |
-| platform: timeouts / branch-resume replays | heavy | ~55/69 | low (fast_eval now re-runs invalid reps) | - | platform |
+| kind | b1-b2 | b3 | b4 | b5 (362 fast calls, digest) | total | at fault |
+|---|---|---|---|---|---|---|
+| dates: deadline used as the TARGET, not an upper bound (holiday or valid earlier day answered with the deadline; own date counted as refusal) | 17 | 1 | 17 | ~38 | ~73 | builder |
+| amounts: invented floor named before the labelled one, below-floor promise | 7 | 0 | 8 | ~22 | ~37 | builder |
+| tool order / duplicates (invented ids then retries, close with notes, re-sent writes) | 24 | 2 | 15 | ~17 | ~58 | builder |
+| per-item attempts / outcome counted wrong | 7 | 1 | 13 | ~16 | ~37 | builder |
+| multi-product binding (one date for all, values swapped between items) | (per-item) | - | 28 | ~10 | ~38 | builder |
+| identity gate (wrong answer re-sent, read back, "verified" claimed, no stop at 0 left) | 8 | 2 | 6 | ~10 | ~26 | builder |
+| wrong route: cannot pay -> own plan instead of the brief's transfer | 3 | 0 | 8 | ~9 | ~20 | builder |
+| "once only" broken (floor twice, sympathy/support twice incl. router+specialist hand-off) | 0 | 0 | 12 | ~6 | ~18 | builder |
+| mandatory wording | 6 | 1 | 2 | 7 | 16 | builder |
+| honesty ("noted"/"recorded"/"verified" before the tool says so) | 0 | 2 | 1 | 3 | 6 | builder |
+| call ended without close (model goodbye -> platform end_call) | some | - | 3 official | 0 (fast cannot see it) | | builder+platform |
+| harness: fast judge misses lines/tools that ARE in the transcript; persona refuses the expected date | 11 | 6 | ~42 | 19 | ~78 | harness |
+| platform: timeouts / branch-resume replays | heavy | ~55/69 | low | 30 unfetchable + many INVALID re-runs | - | platform |
 
-b4: 80/226 fast calls pass. The judge-noise row is the largest single row again (see section 5).
+b5: 160/362 public fast calls pass. Official-only kinds (fast never shows them): "recorded" in the opening read as a
+premature claim (3 official b4 runs), call hung up without close (3). Fast-heavy kind: invented floor (fast personas
+ask "what do you suggest?"; official passes that case 5/6).
 
 ## 2. General mechanisms (each holds for ANY collections brief)
 
-M1. Show only this customer's facts: after the account loads, list and tag only the deadlines of this customer's own
-    products. A calendar tagged with every band's deadline ("after <other band> deadline" on a holiday) makes the model
-    offer its own deadline instead of the next business day. The single most repeated failure (b1-b4, official too).
+M1. Show only this customer's facts: list and tag only this customer's own deadlines. Necessary, NOT sufficient: with
+    correct own-band facts the model still answers a holiday (or a valid earlier day) with "the latest I can record is
+    <deadline>" (M27).
 M2. Dates and amounts are computed in code and read from one labelled line per product (full, floor, deadline,
     attempts). A code guard on the promise tool blocks a below-floor amount or an after-deadline date with the reason
     (seen working live: the model recovered with the right amount). Without the guard the model records what was said.
@@ -68,6 +70,34 @@ M16. Under platform load a chat can replay an old message; route on persisted ca
 M18. Before identity passes, no account content at all; identity results carry an explicit verdict line.
 M24. Platform-spoken text is verbatim every time: the opening as the first node's on_enter tts, success lines in the
     tool's post-hook, the goodbye in the close tool description. Risk: an extraction error becomes systematic.
+M26. The goodbye belongs to the platform, after close succeeded: the end node's spoken_message on the close tool's ok
+    route; the model is told never to say goodbye and to call close when the customer says bye. A model goodbye before
+    close lets the customer answer bye and the platform's own end_call hang up with no outcome (the platform's default
+    agent config ships an end_call tool and "use it after you say goodbye", H). Quoting the goodbye in the close tool's
+    description makes the model say it too (double goodbye, M10).
+M27. The value to OFFER must come from code, not only the value to RECORD. A write guard cannot catch a wrong choice
+    that is itself valid (the deadline instead of the next business day or the customer's own earlier day). Pattern: a
+    code-only check tool (no-op path, hooks only) the model calls with the customer's day before answering; code
+    replies "keep it" or the one date to offer. Same for amounts: the model invents a "minimum" (small round number)
+    before the labelled floor; the guard blocks the write and it recovers, but "offered once" is already broken.
+M28. A customer's own date or amount is never a refusal; the deadline is an upper bound, never a target. Say it in the
+    node and let the check tool (M27) state "keep the customer's date".
+M29. The identity tool result needs a verdict for EVERY answer, not only passes: "this answer is wrong, N left, identity
+    NOT verified, ask <next>", and at 0 left a terminal instruction (say the referral line, close with the outcome).
+    Without it the model re-sends an earlier wrong answer with the next one (burning attempts), reads one passed
+    question as "identity verified", and loops "still processing" at 0 left. Block a re-sent answer in the pre-hook.
+M30. Extraction is not a data path for values the model agreed: "yes" to the agent's own proposal extracts nothing;
+    typed extraction variables cannot be reset from code; a node-level response mapping may be absent in a later code
+    node's vars (read lists defensively). Per-item values must come from a tool call's explicit arguments.
+M31. Router + specialist exits work (tool-call transitions with named triggers fixed cannot-pay -> transfer), but the
+    hand-off must be silent: if the router speaks and the specialist speaks, sympathy/offers are said twice. The
+    specialist never repeats a sentence already said in the call and carries the brief's "no persuasion" first.
+M32. Parallel calls of the SAME hooked tool in one turn share its result variable (M20): two checks both answer for the
+    first item. One call per message, or key results by request.
+M33. Rewording a mandatory text to dodge a literal judge (a gated word in the opening) must keep the brief's required
+    content AND its position (e.g. "in the first sentence"); dropping or moving it trades one failure for another.
+M34. The builder's fixed stage order (opening -> identity -> account) can contradict a brief that orders stages
+    differently (state the accounts before any question). Stage order is a brief rule like any other (M3).
 M17. Best-of-N / LLM mistake counts cannot pick builds. M25: self-simulation with DETERMINISTIC ledger checks (ok=false
     results, close once and last, no account tool before identity, no repeated write, date <= deadline, amount >=
     floor) finds the same kinds the scorers find, but one prompt EDIT round does not fix code-level kinds (ids, tool
@@ -82,34 +112,43 @@ M17. Best-of-N / LLM mistake counts cannot pick builds. M25: self-simulation wit
 - Multi-product: all items stated before the first ask, one combined read-back, one write per item id.
 - Hardship: one sympathy sentence, one support offer, no persuasion, close.
 - Tool failure: retry once, say "recorded" only after SUCCESS.
+- A code answer the model can copy (check tool's "offer exactly <date>", guard's NOT RECORDED + the right value): the
+  model follows it and recovers (b5: holiday date right 2/2 once code named it).
 
-## 4. Carry-overs (fix exists on a non-champion branch; champion main still shows the failure)
+## 4. Carry-overs (fix exists on a non-champion branch; champion main 779b267 still shows the failure)
+
+merge/b5 (40b0d79, in progress) = idea/b5-1 + idea/b5-4 + idea/b5-5 (opening part). Rows marked (merge/b5) land if kept.
 
 | failure kind still on main | branch / commit with the fix | status |
 |---|---|---|
-| dates: other band's deadline on a holiday (M1) | fix/cases builder/datecalc.py (own-band tags after account load); idea/b4-4 4f9a81e (same idea, `build_facts(only_bands)`) | **top priority**: that case failed in 17 of 18 b4 runs on every branch; neither fix is in main or merge/b4 |
-| below-floor / after-deadline promise recorded (M2) | merge/b3 + idea/b4-4 builder/guards.py (no-op block path, live-verified) | main-based builds recorded below-floor amounts |
-| rule kinds dropped by the date schema (M3) | idea/b4-4 builder/datecalc.py (roll, rounding, cut-off, gap, slots, `unhandled_rules`) | offline-tested; inert on A/B; callback slots are C-informed |
-| invented ids + retries (M7) | merge/b2, merge/b3 harden id resolver (`ids_to_use`) | main lacks it; main-based B runs failed on it every time |
-| build dies on inner Claude quota (M9) | merge/b3 a257249 | **main still catches only the time budget: Sunday risk** |
-| close in parallel with notes (M12/M20) | idea/b3-3 statemachine.py (close only in wrap_up node) | unmeasured; idea/b4-1 close GUARD: do NOT merge as is (M19/M20) |
-| blocked close still hangs up (M19) | none: drop `success_count` from close->hang-up conditions (routing.md pattern 1) when the close tool has a guard | new |
-| per-item status (M13) | idea/b4-1 builder/items.py (per-item variables; install-bug fix: hook every copy of a tool) | the ledger text shows stale OPEN after parallel turns (M20) |
-| re-asking passed identity questions (M5/M16) | idea/b4-5 8d63d15 harden identity memory | taken into merge/b4 (ed7d8f8) |
-| verbatim opening/lines/goodbye (M10/M24) | idea/b4-3 builder/canned.py | taken into merge/b4 |
-| self-simulation (M25) | idea/b4-2 builder/selftest.py | taken into merge/b4 |
+| deadline offered instead of the customer's / next business day (M27/M28) | idea/b5-4 4a96534 check_promise_date (+b61c885 one per message, ade16ff valid ids) | (merge/b5); measured on re-saved slots only: right date 2/2 on the holiday case, own-date case 0/2 -> 2/2 |
+| below-floor / after-deadline promise recorded (M2) | idea/b5-4 3aeb428 guards.py | (merge/b5); never fired on A/B in v1 (the model's choices were valid but wrong: M27) |
+| invented floor named before the labelled one (M27) | none: a check_promise_amount tool (same pattern) or a code-rendered floor sentence | **open, top fast failure** |
+| rule kinds dropped by the date schema (M3) | idea/b5-4 datecalc.py (roll, rounding, cut-off, min days, gap, unhandled_rules) | (merge/b5); cut-off kind seen failing on the C check |
+| call ends without close / model goodbye (M26) / blocked close hangs up (M19) | idea/b5-1 ddc2695, e8e891f, bfa3791 canned.close_structure | (merge/b5); only the OFFICIAL scorer can measure it |
+| "recorded" in the opening (judge) | idea/b5-5 2036739 gated words + opening rewrite | (merge/b5); official-only; mind M33 |
+| invented ids + retries; bank accepts invented ids on notes (M7) | merge/b2, merge/b3 harden id resolver (`ids_to_use`) | **still not in main or merge/b5**; ~17 b5 fast failures |
+| identity: no verdict for wrong answers, re-sent answers, no stop at 0 left (M29) | none (main's harden.py only annotates passes) | **open** |
+| wrong route: cannot pay -> own plan (M22) | idea/b5-3 situations.py + router/specialist recipe (silent hand-off commit) | not merged; best cannot-pay -> transfer rate of the batch (5/6); hand-off fix measured once |
+| per-item attempts / binding (M13/M23) | none working: idea/b5-2 A5 loop 0/3 (M30); idea/b4-1 items.py (M20) | open; next try: per-item settle tool with explicit args |
+| close in parallel with notes (M12) | idea/b3-3 wrap_up node; A5 readback node (b5-2) | unmeasured / failed |
+| build "succeeds" with no build agent when the Claude token is missing | none | **open, Sunday risk**: fail loudly |
+| build dies on inner Claude quota (M9) | merged into main in b4 | done |
 
 ## 5. Variance sources (pass in one run, fail in another)
 
 - a value left to the model among several candidates (which deadline, which floor, which item's date): M1/M2/M23;
 - parallel tool calls in one turn: order of close vs notes, and lost hook state, differ per run (M12/M20);
 - per-item and "once only" counts in the model's head (M13/M21);
-- the simulated customer: talkative/asks_back styles push the model off the rule order; the fast customer may refuse
-  every allowed offer or "correct" to a date the case does not expect;
+- the simulated customer: talkative/asks_back styles push the model off the rule order ("what do you suggest?" makes
+  it invent a floor); the fast customer may refuse every allowed offer, "correct" to a date the case does not expect,
+  or move every item to one date;
 - the fast judge: (a) transcript fetched before the agent's FINAL message is saved, so closing sentences look missing
   (seen on 19k-char transcripts: not truncation; main's fast_eval still fetches once); (b) old 30k-tail truncation of
   the raw transcript (fixed on main: judge sees dialogue + tool calls only). Re-judging flipped whole cases to pass.
   The official judge sometimes counts the recording notice as a premature "recorded" claim;
 - platform: 5xx, timeouts, branch-resume replays under load (cap concurrent chats; workspace 2 is quieter);
+- fast vs official: official-only kinds (opening wording, hang-up without close) and fast-heavy kinds (invented floor)
+  mean fast_eval alone cannot rank w1/w5-type changes; fast_eval ends chats itself, so it never sees platform hang-ups;
 - build-to-build variance is real (same builder scored 0/10 and 6/10 on clean vs raw brief in one batch) but is not
   the main source of judge-visible defects (M17).
