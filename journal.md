@@ -281,3 +281,8 @@ they carried are fixed by shape rules.
 Left (b7 families): invented product ids (M7, ids_to_use still not in main), floor offered twice / invented floor
 (M27/M21: PUB-06 1/2 in every official A run), close loop to the node turn limit after goodbye (M35, official rB),
 support offered twice on hand-off re-entry (M40), key names read literally from A/B's API (Sunday risk).
+
+## b7 (aborted by the owner, 2026-10-11 ~06:15 UTC)
+
+The b7 merge candidate scored 0/3 on official raw-B (invented product ids, per-product dates swapped), so the owner stopped the merge and moved on. Branches merge/b7 and idea/b7-1..5 are kept for the archive.
+Owner direction for b8: brief B is stuck at 2/3 on one case, every time for the same reason: the model miscounts persuasion attempts per product and writes the wrong notes. Per-item gates decided in code, i.e. an OR gate for one combined ask, then dependent per-item gates, each with a code-counted budget. The model consults an internal logic step inside the workflow (never an outside URL), plus a build reliability worker. Families: runs/next_families.txt.
