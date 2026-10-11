@@ -35,7 +35,26 @@ GOODBYES = {
 }
 
 
+LANG_NAMES = ["English", "Turkish", "German", "French", "Spanish", "Italian", "Portuguese", "Dutch", "Arabic", "Russian",
+              "Polish", "Greek", "Swedish", "Danish", "Norwegian", "Finnish", "Czech", "Romanian", "Hungarian"]
+_EXPLICIT = re.compile(r"\b(?:the\s+)?(?:calls?|conversations?|phone\s+line|customers?|callers?|assistant|agent)\b[^.\n]{0,40}?"
+                       r"\b(?:(?:are|is|will\s+be|speaks?|talks?|held|run|conducted)\s+)?in\s+(" + "|".join(LANG_NAMES) + r")\b", re.I)
+
+
+def explicit_language(text):
+    """A language the documents STATE for the calls ("The calls are in X", "callers speak X") beats word counts: a
+    pack can be written in one language for a phone line that runs in another."""
+    hits = {}
+    for m in _EXPLICIT.finditer(text):
+        lang = m.group(1).capitalize()
+        hits[lang] = hits.get(lang, 0) + 1
+    return max(hits, key=hits.get) if hits else None
+
+
 def detect_language(text):
+    stated = explicit_language(text)
+    if stated:
+        return stated
     words = re.findall(r"[^\W\d_]+", text.lower())
     counts = {lang: sum(1 for w in words if w in set(sw)) for lang, sw in STOPWORDS.items()}
     tr_chars = len(re.findall(r"[ığşİĞŞ]", text))
