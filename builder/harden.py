@@ -70,7 +70,7 @@ try:
                                       'Continue with the next step.')
                 result['data'] = _d
                 _failed = False
-            elif not _failed and _ack and len(_wq) == 2 and isinstance(_wok, dict) and not _v.get('guard_block_' + _t):
+            elif not _failed and _ack and len(_wq) == 2 and isinstance(_wok, dict) and not _v.get('guard_block_' + _t) and not _v.get('idblock_' + _t):
                 _wok[_t + '#' + str(_wq[0])] = dict(fp=_wq[1], ids=dict((k, x) for k, x in _d.items()
                                                                        if str(k).endswith(('_id', '_ref')) and isinstance(x, (str, int))))
                 _v['writes_ok'] = _json.dumps(_wok)
@@ -269,6 +269,151 @@ except Exception:
 '''
 
 
+# Identifier check (generic): an identifier the model sends must be one a tool returned earlier in the call (or a
+# caller variable given at call start). Post-hook (every api tool): every scalar of the response is stored per field
+# name in vars['seen_vals']. Pre-hook (every api tool): a body field named like an identifier (id/no/number/ref/code...),
+# or a short code-like value of a field a response returned, is checked against the values seen for that field name;
+# a near miss with exactly one match (trailing digits, unique substring) is replaced, otherwise the call is NOT SENT
+# (no-op path) and the result lists the valid values. Never blocks a field no earlier tool returned.
+IDPRE = r"""
+try:
+    import json as _json, re as _re
+    _T9 = __TOOL__
+    vars['idblock_' + _T9] = ''
+    _nk9 = lambda z: _re.sub('[^a-z0-9]', '', str(z).lower())
+    try:
+        _seen9 = _json.loads(vars.get('seen_vals') or '{}')
+    except Exception:
+        _seen9 = dict()
+    if not vars.get('seen_start'):
+        # caller variables given at call start (customer number etc.) count as seen values
+        _st9 = dict()
+        for _k9, _x9 in list(vars.items()):
+            if isinstance(_x9, (str, int)) and not isinstance(_x9, bool) and 0 < len(str(_x9)) <= 40 and '{{' not in str(_x9):
+                _st9.setdefault(_nk9(_k9), []).append(str(_x9))
+        vars['seen_start'] = _json.dumps(_st9)
+    try:
+        _st9 = _json.loads(vars.get('seen_start') or '{}')
+    except Exception:
+        _st9 = dict()
+    _start9 = [x for v in _st9.values() for x in v]
+    _ID9 = ('id', 'no', 'nr', 'num', 'number', 'ref', 'code', 'iban', 'pan')
+    _FREE9 = ('date', 'amount', 'week', 'day', 'mail', 'phone', 'address', 'name', 'text', 'message', 'note', 'reason',
+              'answer', 'time', 'month', 'year', 'count', 'flow', 'lang')
+    def _isid9(k):
+        _tk = [t.lower() for t in _re.findall('[A-Z]?[a-z]+|[A-Z]+(?![a-z])|[0-9]+', str(k))]
+        return bool(_tk) and (_tk[-1] in _ID9 or any(t in ('id', 'iban', 'pan', 'ref') for t in _tk))
+    _bad9 = []
+    def _walk9(o):
+        if isinstance(o, dict):
+            for _k, _x in list(o.items()):
+                if isinstance(_x, (dict, list)):
+                    _walk9(_x)
+                    continue
+                if isinstance(_x, bool) or not isinstance(_x, (str, int)) or str(_x).strip() == '' or '{{' in str(_x):
+                    continue
+                _val = str(_x).strip()
+                _got = [v for v in (_seen9.get(_nk9(_k)) or []) if v]
+                if not _got:
+                    continue
+                _idn = _isid9(_k)
+                if not _idn:
+                    _kl = str(_k).lower()
+                    if any(w in _kl for w in _FREE9) or len(_val) < 3 or ' ' in _val or not any(c.isdigit() for c in _val):
+                        continue
+                _ok = list(dict.fromkeys(_got + (_st9.get(_nk9(_k)) or []) + _start9))
+                if _val in _ok:
+                    continue
+                _low = [v for v in _ok if v.lower() == _val.lower()]
+                if len(_low) == 1:
+                    o[_k] = type(_x)(_low[0]) if isinstance(_x, str) else _x
+                    continue
+                _dg = ''.join(c for c in _val if c.isdigit())
+                _m = []
+                if len(_dg) >= 3:
+                    def _suf(a, b):
+                        n = 0
+                        while n < min(len(a), len(b)) and a[-1 - n] == b[-1 - n]:
+                            n += 1
+                        return n
+                    _sc = [(_suf(_dg, ''.join(c for c in v if c.isdigit())), v) for v in _got]
+                    _best = max([s for s, v in _sc] or [0])
+                    if _best >= 3:
+                        _m = [v for s, v in _sc if s == _best]
+                if len(_m) != 1:
+                    _al = _nk9(_val)
+                    _m2 = [v for v in _got if len(_al) >= 3 and (_al in _nk9(v) or (len(_nk9(v)) >= 3 and _nk9(v) in _al))]
+                    if len(_m2) == 1 or not _m:
+                        _m = _m2
+                if len(_m) == 1:
+                    o[_k] = int(_m[0]) if isinstance(_x, int) and _m[0].isdigit() else _m[0]
+                else:
+                    _bad9.append((str(_k), _val, _got))
+        elif isinstance(o, list):
+            for _x in o:
+                _walk9(_x)
+    _b9 = config.get('body') if isinstance(config, dict) else None
+    _walk9(_b9)
+    if _bad9:
+        _msg9 = ('NOT SENT: ' + _T9 + ' was not sent to the bank and nothing was done: ' + '; '.join(
+            str(k) + ' = ' + repr(v) + ' is not a value any earlier tool returned (use exactly one of: ' + ', '.join(g[:12]) + ')'
+            for k, v, g in _bad9) + '. Never type or build an identifier yourself: copy it exactly from the earlier tool '
+            'result for the item the customer chose, then call ' + _T9 + ' again.')
+        vars['idblock_' + _T9] = _msg9
+        _u9 = str(config.get('url') or '').split('/')
+        if __NOOP__ and len(_u9) > 2 and _u9[0] in ('http:', 'https:') and _u9[2]:
+            config['url'] = _u9[0] + '//' + _u9[2] + __NOOP__
+        else:
+            config['url'] = 'https://not-sent.btb-idcheck.invalid/blocked'
+except Exception:
+    pass
+"""
+
+IDPOST = r"""
+try:
+    import json as _json, re as _re
+    _T9 = __TOOL__
+    _v9 = vars if isinstance(globals().get('vars'), dict) else None
+    _blk9 = _v9.get('idblock_' + _T9) if _v9 is not None else ''
+    _d9 = result.get('data') if isinstance(result, dict) else None
+    _bare9 = not isinstance(_d9, dict) or not [k for k in _d9.keys() if k not in ('ok', 'status', 'message', 'raw', 'error', 'what_to_do_next', 'tool_outcome')]
+    if _blk9 and isinstance(result, dict) and _bare9:
+        _v9['idblock_' + _T9] = ''
+        if _v9.get('last_tool_failed') == _T9:
+            _v9['last_tool_failed'] = ''
+            try:
+                _v9['tool_failures_' + _T9] = max(0, int(_v9.get('tool_failures_' + _T9) or 0) - 1)
+            except Exception:
+                pass
+        result['status'] = 'success'
+        result['status_code'] = 200
+        result['message'] = 'not sent'
+        result['data'] = dict(ok=False, not_sent=True, tool_outcome=_blk9)
+    elif _v9 is not None and isinstance(_d9, dict):
+        _nk9 = lambda z: _re.sub('[^a-z0-9]', '', str(z).lower())
+        try:
+            _seen9 = _json.loads(_v9.get('seen_vals') or '{}')
+        except Exception:
+            _seen9 = dict()
+        _stk9 = [_d9]
+        while _stk9:
+            _o9 = _stk9.pop()
+            if isinstance(_o9, dict):
+                for _k9, _x9 in _o9.items():
+                    if isinstance(_x9, (dict, list)):
+                        _stk9.append(_x9)
+                    elif isinstance(_x9, (str, int)) and not isinstance(_x9, bool) and 0 < len(str(_x9)) <= 64 and _k9 not in ('tool_outcome', 'what_to_do_next', 'message', 'error'):
+                        _l9 = _seen9.setdefault(_nk9(_k9), [])
+                        if str(_x9) not in _l9 and len(_l9) < 50:
+                            _l9.append(str(_x9))
+            elif isinstance(_o9, list):
+                _stk9.extend(_o9)
+        _v9['seen_vals'] = _json.dumps(_seen9)
+except Exception:
+    pass
+"""
+
+
 def _api_tools(wf):
     for node in (wf.get("nodes") or {}).values():
         for key in ("tools", "pre_actions"):
@@ -315,9 +460,16 @@ def harden(wf):
         if "tool_outcome" not in old_post:
             t["post_process_code"] = (old_post + "\n" if old_post else "") + post.lstrip("\n")
         old_pre = (t.get("pre_process_code") or "").strip()
+        noop = _noop(t)
+        head = ""
         if write and "known_ids" not in old_pre:
-            pre = PRE.replace("__TOOL__", repr(name)).replace("__NOOP__", repr(_noop(t)))
-            t["pre_process_code"] = pre.lstrip("\n") + ("\n" + old_pre if old_pre else "")
+            head = PRE.replace("__TOOL__", repr(name)).replace("__NOOP__", repr(noop)).strip("\n")
+        if "seen_vals" not in old_pre:
+            # after the template/known-ids repair, before the builder's own hooks (guards); its post-hook runs last
+            head += ("\n" if head else "") + IDPRE.replace("__TOOL__", repr(name)).replace("__NOOP__", repr(noop)).strip("\n")
+            t["post_process_code"] = (t.get("post_process_code") or "").rstrip() + "\n" + IDPOST.replace("__TOOL__", repr(name)).strip("\n") + "\n"
+        if head:
+            t["pre_process_code"] = head + ("\n" + old_pre if old_pre else "") + "\n"
         done.append(name)
     return done
 

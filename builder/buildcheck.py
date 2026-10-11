@@ -205,6 +205,40 @@ def problems(wf, api=None, selftest=None):
     return errs, warns
 
 
+def rules_coverage(wf, rules_text, min_share=0.5):
+    """FIX A coverage: each `- R<n> ...` rule of rules.md must share most of its content words (or its verbatim
+    sentence) with some prompt text of the workflow (node prompts, tool descriptions, hooks). Cheap keyword overlap,
+    any language. Returns (missing rule lines, number of rules)."""
+    import re as _re
+    texts = []
+
+    def walk(o):
+        if isinstance(o, dict):
+            for v in o.values():
+                walk(v)
+        elif isinstance(o, list):
+            for v in o:
+                walk(v)
+        elif isinstance(o, str) and len(o) > 20:
+            texts.append(o.lower())
+    walk(wf)
+    blob = "\n".join(texts)
+    words = lambda z: set(w for w in _re.findall(r"\w{4,}", z.lower()) if not w.isdigit())
+    allw = words(blob)
+    stop = {"when", "must", "agent", "customer", "source", "verbatim", "rule", "stage", "that", "this", "with", "then", "from"}
+    rules = [ln.strip() for ln in rules_text.split("## Per-document lists")[0].splitlines() if _re.match(r"\s*-\s*R\d+", ln)]
+    miss = []
+    for r in rules:
+        body = _re.sub(r"\(source:[^)]*\)", "", r)
+        verb = _re.findall(r'"([^"]{12,})"', body)
+        if verb and any(v.lower()[:40] in blob for v in verb):
+            continue
+        w = words(body) - stop
+        if w and len(w & allw) / len(w) < min_share:
+            miss.append(r)
+    return miss, len(rules)
+
+
 if __name__ == "__main__":
     wf = json.load(open(sys.argv[1]))
     api = json.load(open(sys.argv[2])) if len(sys.argv) > 2 else None

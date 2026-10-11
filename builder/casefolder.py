@@ -237,6 +237,70 @@ def set_server(api, mock_url):
     return api
 
 
+def _doc_date(p, txt):
+    """The document's date: from the file name, else from its first lines ('' when none)."""
+    for src in (p.name, txt[:600]):
+        m = re.search(r"(20\d\d)[-_.]?(0[1-9]|1[0-2])[-_.]?([0-3]\d)", src)
+        if m:
+            return "-".join(m.groups())
+        m = re.search(r"\b([0-3]?\d)[./]([01]?\d)[./](20\d\d)\b", src)
+        if m:
+            return f"{m.group(3)}-{int(m.group(2)):02d}-{int(m.group(1)):02d}"
+    return ""
+
+
+RULES_ONE = ("You extract the rules a bank phone agent must follow from ONE document of a case folder. List EVERY rule "
+             "the document states or implies, nothing invented: conversation stage and its condition, what the agent "
+             "must do or say (copy required sentences VERBATIM in the document's own language), how numbers, digits, "
+             "card/account numbers, dates, amounts and currencies are read aloud, which amounts/fields to read and "
+             "which not, offers and their wording, what to do when a service/tool fails, times out or returns nothing "
+             "(retry or not, transfer, closing), which tool to call when and with which values, refusals, identity, "
+             "the closing. One rule per line, format:\n- [stage] when <condition>: <what the agent must do/say> "
+             "(verbatim: \"...\")\nNo intro, no summary. If the document has no rule for the agent, answer: NONE.")
+RULES_MERGE = ("Merge the rule lists extracted from the documents of one case folder into ONE digest for the builder of "
+               "the phone agent. Keep EVERY distinct rule (merge duplicates), grouped by conversation stage in call "
+               "order, plus sections for number/amount reading, service failures, tool usage and the closing. Keep "
+               "verbatim sentences exactly. When documents disagree, the NEWER document (date given with each "
+               "document; a later decision over an earlier brief) wins: keep the newer rule and add 'CONFLICT: <older "
+               "source> said <...>; newer wins'. Format each rule as one line:\n- R<n> [stage] when <condition>: "
+               "<must do/say> (verbatim: \"...\") (source: <file>, <date>)\nAnswer with the digest only, in markdown.")
+
+
+def extract_rules(docs, out):
+    """FIX A: one strong Azure call per text document (in parallel), then one merge call -> out/rules.md.
+    docs: [(relative name, date, text)]. Returns the path, or None when the model calls fail."""
+    from concurrent.futures import ThreadPoolExecutor
+    sys.path.insert(0, str(KIT / "btb"))
+    from llm import chat
+
+    def one(d):
+        name, date, txt = d
+        try:
+            r = chat([{"role": "user", "content": RULES_ONE + f"\n\nDOCUMENT {name} (date: {date or 'unknown'}):\n" + txt[:60000]}],
+                     tier="strong", purpose=f"case folder: rules of {name}", max_tokens=6000, temperature=0)
+            return name, date, (r or "").strip()
+        except Exception as e:  # noqa: BLE001
+            print(f"case: rule extraction failed for {name}: {str(e)[:120]}", flush=True)
+            return name, date, ""
+    with ThreadPoolExecutor(max_workers=8) as ex:
+        per = list(ex.map(one, docs))
+    got = [(n, d, r) for n, d, r in per if r and r.strip().upper() != "NONE"]
+    if not got:
+        return None
+    lists = "".join(f"\n\n### {n} (date: {d or 'unknown'})\n{r}" for n, d, r in got)
+    try:
+        merged = chat([{"role": "user", "content": RULES_MERGE + "\n\nPER-DOCUMENT RULES:" + lists}], tier="strong",
+                      purpose="case folder: merge the rules digest", max_tokens=16000, temperature=0)
+    except Exception as e:  # noqa: BLE001
+        print(f"case: rules merge failed ({str(e)[:120]}): keeping the per-document lists", flush=True)
+        merged = lists
+    path = out / "rules.md"
+    path.write_text("# RULES digest of the case folder (every document; newer document wins on conflict)\n"
+                    "Documents: " + ", ".join(f"{n} ({d or 'undated'})" for n, d, _ in per) + "\n\n" + merged.strip()
+                    + "\n\n## Per-document lists (source detail)\n" + lists + "\n")
+    return path
+
+
 def prepare(folder, mock_url, slot):
     folder = pathlib.Path(folder).resolve()
     files = _files(folder)
@@ -255,7 +319,7 @@ def prepare(folder, mock_url, slot):
     tools = out / "tools.json"
     tools.write_text(json.dumps(api, indent=1, ensure_ascii=False))
     order = [p for p in (brief, readme) if p] + [p for p in files if p not in (brief, readme)]
-    parts, images, convo_txt = [], [], ""
+    parts, images, convo_txt, docs = [], [], "", []
     for p in order:
         rel = p.relative_to(folder)
         if p.suffix.lower() in IMG_EXT:
@@ -278,6 +342,8 @@ def prepare(folder, mock_url, slot):
         if p in (brief,):
             note = " (THE BRIEF: read first)"
         parts.append(f"\n\n===== FILE: {rel}{note} =====\n{txt}")
+        if p not in (contract_txt,):
+            docs.append((str(rel), _doc_date(p, txt), txt))
     bt = brief.read_text(errors="replace") if brief else ""
     lang = detect_language(bt + "\n" + convo_txt)
     head = (f"# CASE FOLDER {folder.name}\nAll documents of the case folder follow, each under its file name. "
@@ -285,6 +351,14 @@ def prepare(folder, mock_url, slot):
             f"{mock_url or 'as given'}).\n{language_instruction(lang)}\n")
     if images:
         head += "Images in the folder (flow drawings etc.; open them with the Read tool): " + ", ".join(sorted(set(images))) + "\n"
+    rules = None
+    if docs and os.environ.get("BTB_NO_RULES") != "1":
+        print(f"case: extracting the rules of {len(docs)} document(s) (Azure, parallel) + merge", flush=True)
+        rules = extract_rules(docs, out)
+    (out / "documents.json").write_text(json.dumps([str(folder / n) for n, _, _ in docs], ensure_ascii=False))
+    if rules:
+        head += (f"RULES DIGEST (primary spec, every document, newer wins on conflict): {rules}. Implement EVERY rule in it; "
+                 "read the documents below for detail.\n")
     case = out / "case.md"
     case.write_text(head + "".join(parts))
     return str(case), str(tools), lang

@@ -210,6 +210,15 @@ async def build_check(slot, tools, briefs, trace, wf_file, final_pass, options_b
     api = json.loads(pathlib.Path(tools).read_text())
     errs, warns = buildcheck.problems(json.loads(wf_file.read_text()), api)
     log(trace, event="test", what="buildcheck: deterministic broken-build check", errors=errs, warnings=warns)
+    rules_md = KIT / "runs" / "case" / slot / "rules.md"
+    if rules_md.exists():
+        try:
+            miss, total = buildcheck.rules_coverage(json.loads(wf_file.read_text()), rules_md.read_text())
+            log(trace, event="test", what=f"rules coverage: {total - len(miss)}/{total} rules of rules.md found in a node/tool prompt",
+                warnings=[f"rule not found in any prompt: {m}" for m in miss])
+            print(f"rules coverage: {total - len(miss)}/{total}" + (f"; missing: {' | '.join(m[:80] for m in miss[:10])}" if miss else ""), flush=True)
+        except Exception as e:  # noqa: BLE001
+            print(f"rules coverage check failed: {str(e)[:120]}", flush=True)
     print(f"buildcheck: {len(errs)} error(s), {len(warns)} warning(s){': ' + '; '.join(errs) if errs else ''}", flush=True)
     left = BUILD_TOTAL_S - (time.time() - BUILD_T0) - (SELFTEST_BUDGET_S // 3 if SELFTEST else 60)
     if not errs or left < 150:
@@ -351,6 +360,17 @@ async def run(slot, tools, briefs):
         sys.path.insert(0, str(KIT / "builder"))
         import casefolder
         prompt += " " + casefolder.language_instruction(os.environ["BTB_LANGUAGE"])
+    case_dir = KIT / "runs" / "case" / slot
+    if (case_dir / "documents.json").exists():
+        docs = json.loads((case_dir / "documents.json").read_text())
+        prompt += (" READ EVERY DOCUMENT of the case folder before you write anything (all of them are also inside the "
+                   "brief file; none may be skipped, each holds rules the others do not): " + ", ".join(docs) + ".")
+    if (case_dir / "rules.md").exists():
+        prompt += (f" RULES DIGEST: {case_dir / 'rules.md'} is the primary spec, extracted from every document (the newer "
+                   "document wins on a conflict). Implement EVERY rule in rules.md in the node or tool prompt where it "
+                   "applies (verbatim sentences word for word; number, digit, date and amount reading rules; failure "
+                   "handling; the closing); read the documents for detail. Before the final save, go through rules.md "
+                   "rule by rule and check each is in the workflow.")
     if os.environ.get("BTB_MOCK_URL"):
         prompt += (f" BANK SERVICES URL: every api_call tool's url must start with {os.environ['BTB_MOCK_URL']} (the mock of the "
                    "bank's services, servers[0].url of the tool API file) followed by the operation's path; never another host.")
