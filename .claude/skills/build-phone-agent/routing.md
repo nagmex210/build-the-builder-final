@@ -29,16 +29,57 @@ load_account (api_request, passthrough, silent)   pre_action = account lookup, n
 prepare (code, passthrough, silent)               Python: every number/date the conversation needs, as STRINGS:
    │  per-product summary line, floors, bands, deadlines, offer dates, "today", the business-day list for the next
    │  weeks, which product is current. Read the account list defensively (list / JSON string / flattened keys).
-   │  → negotiate (always)
-negotiate (conversation)        state the debt, all the promise logic, objections, transfers, notes, closing
-   │  tools: promise tool, transfer tool, note tool (only if the brief uses it), close tool
+   │  → router (always)
+router (conversation)           TRIAGE ONLY: state the debt (every product, as the brief orders), ask how the
+   │  customer wants to handle it, and route on the answer. No negotiation rules, no offers, no promise tool here.
+   │  tools: close tool (+ the transition tools the platform adds)
+   │  → hang_up             when close tool succeeded
+   │  → <exit specialist>   tool-call transition per exit situation (see "Router + specialists")
+   │  → negotiate           tool-call transition: the customer talks about paying (yes, a date, an amount, too much, a refusal, a question)
+negotiate (conversation)        MAIN PATH: all the promise logic, objections, persuasion, notes, closing
+   │  tools: promise tool, note tool (only if the brief uses it), close tool
    │  task_message shows the computed facts with {{vars}}, never asks the model to do calendar math
    │  post-hook on the promise tool adds what_to_do_next ("say it is recorded and the confirmation sentence" /
    │  "it failed: try once more" / "failed twice: say it could not be recorded, then close with <reason>")
    │  → hang_up             when close tool succeeded
+   │  → <exit specialist>   the SAME tool-call exits as the router (a situation can come up mid-negotiation)
+<exit specialists> (conversation, one per exit situation of the brief: transfer / hardship / dispute / ...)
+   │  tools: only that situation's tools (e.g. transfer, note, close; the promise tool only if the brief records a
+   │  promise there, e.g. when the customer themselves names one); short task_message with only its rules
+   │  → hang_up             when close tool succeeded
 hang_up (end_call)              message_mode "custom", spoken_message = the goodbye, on_enter silent. The PLATFORM says
                                 the goodbye after the close tool succeeded; the model never says goodbye itself.
 ```
+
+## Router + specialists (A1)
+
+After the account is loaded, the ROUTER only triages: it states the debt and decides which situation the call is in.
+The main path (the customer pays / negotiates) is its own node `negotiate` with all the promise rules. Every situation
+the brief handles differently (cannot pay even the lowest allowed amount after the allowed attempts, or wants a plan
+-> transfer; hardship; dispute / already paid; asks for a human; ...) gets its OWN short conversation node, named after
+the situation (use the names the build prompt gives), holding only that situation's rules, sentences, outcome/reason
+and tools. The build prompt lists the situations read from the brief; check each against the brief (the brief wins).
+
+- Exits are tool-call transitions (`"is_tool_call": true`), so the model calls `transition_to_<node>` the moment the
+  trigger holds. The transition `description` NAMES THE TRIGGER exactly as the brief defines it, with its threshold
+  (e.g. "The customer said they cannot pay even the lowest allowed amount after the persuasion attempts the brief
+  allows, or asked for an instalment plan: the brief requires a transfer"). Router and negotiate both list the
+  triggers under "WHEN TO LEAVE THIS NODE" and say: when a trigger holds, do not improvise an alternative (no own plan,
+  no amount below the floor, no other date): call the transition tool.
+- HAND-OFF WITHOUT DOUBLE SPEECH: the node that leaves calls the transition tool WITHOUT speaking in that turn (no
+  sympathy, no "one moment"): the specialist speaks first, once. The specialist never repeats a sentence already said
+  in the call (sympathy, an offer, an explanation): "once only" limits are per CALL, not per node.
+- A specialist's task_message STARTS with the brief's own clause for that situation (e.g. "make no persuasion
+  attempt"), then the steps in the brief's order (say the brief's sentence, offer what the brief offers ONCE, call the
+  transfer tool, write the note, close with the brief's outcome/reason). If the brief records a promise there only when
+  the customer names one, the specialist has the promise tool but never proposes a date or amount itself.
+- Put the close-tool -> hang_up transition FIRST in every node, then the exit transitions.
+- A transition back to negotiate only if the brief allows the customer to return (nothing recorded yet).
+- Shared rules (honesty, tool failures, customer speech) stay in `system_prompt`. DATE FACTS in every node that may
+  mention a date (router included when it states deadlines).
+- The third-party / wrong-person situations stay in the opening node (they happen before identity).
+- Multi-product: an exit may apply to one product only (the brief decides); then the specialist handles that product
+  and returns to negotiate for the next product with a tool-call transition.
 
 Multi-product briefs: keep ONE negotiate node and let the code node build an ordered product list with a summary
 per product; the prompt walks through them in order (one promise per product). Do not create one node per product.
