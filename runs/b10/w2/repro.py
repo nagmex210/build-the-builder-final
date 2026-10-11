@@ -68,6 +68,60 @@ def r4():
     print("  promise 500         :", r["data"].get("tool_outcome", "")[:400])
 
 
+
+def route(node, v, last):
+    """First matching transition of a node (equals / or groups only), with the last result flattened like the platform."""
+    flat = dict(v)
+    for k, x in (last.get("data") or {}).items():
+        flat["verify_identity_response.data." + k] = str(x)
+    def ok(c):
+        if isinstance(c.get("conditions"), list):
+            r = [ok(x) for x in c["conditions"]]
+            return all(r) if c.get("logic") == "and" else any(r)
+        if c.get("operator") == "equals":
+            return str(flat.get(c.get("variable"))) == str(c.get("operand"))
+        return False
+    for tr in wf["nodes"][node]["transitions"]:
+        if not tr.get("is_tool_call") and ok(tr.get("condition") or {}):
+            return tr["target_node"]
+    return "(stays in " + node + ")"
+
+
+def r5():
+    print("R5 identity gate: (a) bank result without a call-wide flag, both answers right; (b) two verify calls in one turn, the stale sibling's result lands last")
+    V = tool(wf, "verify_identity", "identity")
+    ok = lambda d: {"status": "success", "status_code": 200, "message": "", "data": dict(d), "header": {}}
+    v = fresh()
+    for b, d in [({"field": "date_of_birth", "answer": "1989-02-23"}, {"ok": True, "verified": True, "wrong_answers_left": 3}),
+                 ({"field": "phone_last4", "answer": "9904"}, {"ok": True, "verified": True, "wrong_answers_left": 3})]:
+        c = pre(V, v, dict(b, customer_id="C1")); last = post(V, v, ok(d), c)
+    print("  (a) identity_state =", v.get("identity_state"), "| say_next:", last["data"].get("say_next", "")[:70], "| route ->", route("identity", v, last))
+    v = fresh()
+    c1 = pre(V, v, {"customer_id": "C1", "field": "date_of_birth", "answer": "1989-02-23"})
+    c2 = pre(V, v, {"customer_id": "C1", "field": "phone_last4", "answer": "9904"})
+    r2_ = post(V, v, ok({"ok": True, "verified": True, "wrong_answers_left": 3, "all_verified": True}), c2)
+    r1_ = post(V, v, ok({"ok": True, "verified": True, "wrong_answers_left": 3, "all_verified": False}), c1)
+    print("  (b) identity_state =", v.get("identity_state"), "| route ->", route("identity", v, r1_))
+
+
+
+def r6():
+    print("R6 negatives (must NOT pass): one right + one wrong without a flag; both right but the bank flag says false; three wrong")
+    V = tool(wf, "verify_identity", "identity")
+    ok = lambda d: {"status": "success", "status_code": 200, "message": "", "data": dict(d), "header": {}}
+    for name, seq in [("right+wrong, no flag", [("date_of_birth", {"ok": True, "verified": True, "wrong_answers_left": 3}),
+                                                ("phone_last4", {"ok": True, "verified": False, "wrong_answers_left": 2})]),
+                      ("both right, flag false", [("date_of_birth", {"ok": True, "verified": True, "wrong_answers_left": 3, "all_verified": False}),
+                                                  ("phone_last4", {"ok": True, "verified": True, "wrong_answers_left": 3, "all_verified": False})]),
+                      ("three wrong", [("date_of_birth", {"ok": True, "verified": False, "wrong_answers_left": 2, "all_verified": False}),
+                                       ("date_of_birth", {"ok": True, "verified": False, "wrong_answers_left": 1, "all_verified": False}),
+                                       ("phone_last4", {"ok": True, "verified": False, "wrong_answers_left": 0, "all_verified": False})])]:
+        v = fresh()
+        for f, d in seq:
+            c = pre(V, v, {"customer_id": "C1", "field": f, "answer": "x"}); last = post(V, v, ok(d), c)
+        print(f"  {name:24s} identity_state = {v.get('identity_state'):14s} route -> {route('identity', v, last)}")
+
+
 if __name__ == "__main__":
     for f in sys.argv[2:] or ["r1", "r2"]:
         globals()[f]()

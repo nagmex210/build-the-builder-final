@@ -49,7 +49,20 @@ try:
         except Exception:
             _left = None
         _ok_false = _d.get('ok') in (False, 'false', 'False')
-        if _allk is not None and _tf(_d.get(_allk)):
+        # b10-w2 (M61/M20): 'passed' is computed from the call's OWN ledger too and never taken back. Seen officially:
+        # both answers verified but the bank result had no call-wide flag, so the state stayed 'asking next' and the
+        # call never reached the account; and two verify calls in one turn, where the stale sibling's result (flag
+        # false) landed last and overwrote the passed one.
+        _req = __REQUIRED__
+        _own = [x for x in str((_v or {}).get('identity_passed_items') or '').split('|') if x]
+        if _ansk is not None and _tf(_d.get(_ansk)) and _fld and _fld != 'the same question' and _fld not in _own:
+            _own.append(_fld)
+        _seen = _own + [x for x in str((_v or {}).get('verified_items') or '').split('|') if x]
+        _own_all = bool(_req) and all(any(r == x or r in x.split() for x in _seen) for r in _req)
+        if _v is not None:
+            _v['identity_passed_items'] = '|'.join(_own)
+        if str((_v or {}).get('identity_state') or '') == 'passed' or (_allk is not None and _tf(_d.get(_allk))) \
+                or (_allk is None and _own_all):
             _state = 'passed'
             _say = 'Identity is verified. Do not ask any security question again.'
         elif _left is not None and _left <= 0 and not (_ansk is not None and _tf(_d.get(_ansk))):
@@ -111,6 +124,33 @@ def _find_identity_tool(wf):
     return names[0] if names else None
 
 
+def _required(wf, tool):
+    """The questions the identity tool's API lists (the enum of its question selector field): when the bank's result
+    carries no call-wide flag, identity is passed once every listed question passed in this call. [] = not known."""
+    for t in (wf.get("tools") or []) + [t for n in (wf.get("nodes") or {}).values() for t in _tools_of(n)]:
+        if ((t.get("function") or {}).get("name") or "") != tool:
+            continue
+        body = ((((t.get("function") or {}).get("parameters") or {}).get("properties") or {}).get("body") or {}).get("properties") or {}
+        for k, leaf in body.items():
+            if any(w in str(k).lower() for w in ("field", "question", "type", "item")) and isinstance(leaf, dict) \
+                    and isinstance(leaf.get("enum"), list) and 1 < len(leaf["enum"]) <= 4:
+                return [str(x) for x in leaf["enum"]]
+    return []
+
+
+def _passed_route(tr, tool, fid):
+    """A transition out of an identity node that opens on the bank's verified flag: it also opens on the code state."""
+    c = tr.get("condition") or {}
+    if tr.get("target_node") == fid or not isinstance(c.get("conditions"), list) or c.get("logic", "or") != "or":
+        return False
+    for x in c["conditions"]:
+        v = str(x.get("variable") or "").lower()
+        if v.startswith(tool.lower() + "_response.data.") and str(x.get("operand")).lower() == "true" \
+                and any(w in v.split(".")[-1] for w in ("all", "fully", "identity", "complete", "overall")):
+            return True
+    return False
+
+
 def _referral(canned):
     """The brief's sentence for a failed identity check, from canned lines (when it mentions identity/verification
     failing or attempts running out)."""
@@ -144,7 +184,7 @@ def apply(wf, canned=None):
     failed_say = ("The identity check has FAILED: no attempts are left. Do not ask any more questions and say nothing "
                   "about any account. " + ('Say exactly: "' + ref + '" ' if ref else "Tell the customer where else they can get help, as the brief says. ")
                   + "Then call " + close + " now with the brief's outcome for a failed identity check.")
-    post = POST.replace("__TOOL__", repr(tool)).replace("__FAILED__", repr(failed_say))
+    post = POST.replace("__TOOL__", repr(tool)).replace("__FAILED__", repr(failed_say)).replace("__REQUIRED__", repr(_required(wf, tool)))
     id_nodes = []
     for nid, n in nodes.items():
         for t in _tools_of(n):
@@ -193,6 +233,12 @@ def apply(wf, canned=None):
             i = next((k + 1 for k, tr in enumerate(trs) if close.lower() in json.dumps(tr.get("condition") or {}).lower()), 0)
             trs.insert(i, {"target_node": fid, "description": "The identity check failed (code state)", "condition": cond})
             done.append("route:" + nid + "->" + fid)
+    passed = {"variable": "identity_state", "operator": "equals", "operand": "passed"}
+    for nid in id_nodes:
+        for tr in nodes[nid].get("transitions") or []:
+            if _passed_route(tr, tool, fid) and passed not in tr["condition"]["conditions"]:
+                tr["condition"]["conditions"].append(dict(passed))
+                done.append("route:" + nid + "->" + str(tr.get("target_node")) + " on identity_state=passed")
     # Gate wording in every node before identity passes.
     first = wf.get("initial_node")
     pre = list(id_nodes)

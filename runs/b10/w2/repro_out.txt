@@ -14,6 +14,13 @@ R4 the bank answers 200 ok=false (rejects the values) vs a 500 (service failure)
   verify 200 ok=false : FAILED: verify_identity was NOT carried out and NOTHING was recorded (error: answer is not a date. Send it as YYYY-MM-DD.). This is failure number 1 of verify_identity in this call. Never tell the customer it was recorded, booked, sent or done. Apply the brief rule for a failed tool call: if it allows another attempt, call verify_identity again now with the same values; otherwise tell the customer || say_next: The answer could not be read (not counted). Ask for date_of_birth again, clearly. Say nothing about any account.
   promise 200 ok=false: FAILED: create_promise was NOT carried out and NOTHING was recorded (error: amount must be a number). This is failure number 1 of create_promise in this call. Never tell the customer it was recorded, booked, sent or done. Apply the brief rule for a failed tool call: if it allows another attempt, call create_promise again now with the same values; otherwise tell the customer plainly that it could n
   promise 500         : FAILED: create_promise was NOT carried out and NOTHING was recorded (error: service unavailable). This is failure number 2 of create_promise in this call. Never tell the customer it was recorded, booked, sent or done. Apply the brief rule for a failed tool call: if it allows another attempt, call create_promise again now with the same values; otherwise tell the customer plainly that it could not b
+R5 identity gate: (a) bank result without a call-wide flag, both answers right; (b) two verify calls in one turn, the stale sibling's result lands last
+  (a) identity_state = asking next | say_next: This answer is correct, but identity is NOT verified yet. Never say th | route -> (stays in identity)
+  (b) identity_state = asking next | route -> (stays in identity)
+R6 negatives (must NOT pass): one right + one wrong without a flag; both right but the bank flag says false; three wrong
+  right+wrong, no flag     identity_state = retry phone_last4 route -> (stays in identity)
+  both right, flag false   identity_state = asking next    route -> (stays in identity)
+  three wrong              identity_state = failed         route -> identity_failed
 ######## after
 R1 sequential: real failure -> guard block -> real failure: which failure number does the model see?
   1 bank 500    : False | FAILED: create_promise was NOT carried out and NOTHING was recorded (error: service unavailable). This is failure number 1 of create_promise in this c | tool_failures = 1
@@ -30,3 +37,10 @@ R4 the bank answers 200 ok=false (rejects the values) vs a 500 (service failure)
   verify 200 ok=false : FAILED: verify_identity was NOT carried out and NOTHING was recorded: the bank rejected the values (error: answer is not a date. Send it as YYYY-MM-DD.). This is failure number 1 of verify_identity in this call. Never tell the customer it was recorded, booked, sent or done. Never send the same values again: they get the same answer. Correct the value the error names (ask the customer if needed) an || say_next: The answer could not be read (not counted). Ask for date_of_birth again, clearly. Say nothing about any account.
   promise 200 ok=false: FAILED: create_promise was NOT carried out and NOTHING was recorded: the bank rejected the values (error: amount must be a number). This is failure number 1 of create_promise in this call. Never tell the customer it was recorded, booked, sent or done. Never send the same values again: they get the same answer. Correct the value the error names (ask the customer if needed) and follow the brief.
   promise 500         : FAILED: create_promise was NOT carried out and NOTHING was recorded (error: service unavailable). This is failure number 2 of create_promise in this call. Never tell the customer it was recorded, booked, sent or done. Apply the brief rule for a failed tool call: if it allows another attempt, call create_promise again now with the same values; otherwise tell the customer plainly that it could not b
+R5 identity gate: (a) bank result without a call-wide flag, both answers right; (b) two verify calls in one turn, the stale sibling's result lands last
+  (a) identity_state = passed | say_next: Identity is verified. Do not ask any security question again. | route -> load_account
+  (b) identity_state = passed | route -> load_account
+R6 negatives (must NOT pass): one right + one wrong without a flag; both right but the bank flag says false; three wrong
+  right+wrong, no flag     identity_state = retry phone_last4 route -> (stays in identity)
+  both right, flag false   identity_state = asking next    route -> (stays in identity)
+  three wrong              identity_state = failed         route -> identity_failed
