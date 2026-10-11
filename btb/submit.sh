@@ -9,6 +9,9 @@
 #   runs/traces/<name>-<time>.jsonl    the detailed machine trace (scrubbed)
 #   submission/<name>.workflow.json    freya.export_workflow of the built phone agent (what gets scored)
 set -uo pipefail
+# Bash reads a script while it runs it: an edit or `git pull` of this file during a 30-min build made the running
+# submission fail with a syntax error after the build (seen b10). The whole body is one block, parsed before it starts.
+{
 KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 [ $# -ge 2 ] || { echo "usage: bash btb/submit.sh <brief.md> <tool_api.json> [name]" >&2; exit 2; }
 BRIEF="$(realpath "$1")"; TOOLS="$(realpath "$2")"
@@ -90,4 +93,5 @@ for f in sys.argv[2:]:
     except OSError: continue
     if n: print(f'submit: WARNING {n} key-shaped string(s) in {f}'); sys.exit(1)" "$KIT/btb" "$LOG" ${JSONL:+"$JSONL"} "$EXPORT" || LEFT=1
 [ "$LEFT" = 0 ] && echo "submit: key check: no key (env values, JWT/sk-/fak_/ghp_ patterns) found in $LOG ${JSONL:-} $EXPORT"
-[ "$RC" = 0 ] && [ "$EXPORT_OK" = yes ] && [ "$LEFT" = 0 ]
+[ "$RC" = 0 ] && [ "$EXPORT_OK" = yes ] && [ "$LEFT" = 0 ]; exit
+}
