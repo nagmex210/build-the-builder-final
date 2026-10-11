@@ -270,7 +270,8 @@ try:
         if _d is None:
             _out = dict(ok=False, can_record=False, say='Ask the customer for the exact day (the date "' + _ds + '" is not a date in YYYY-MM-DD form).')
         elif not isinstance(_p, dict):
-            _out = dict(ok=False, can_record=False, say='Unknown product_id "' + _pid + '": copy it exactly from the account result.')
+            _out = dict(ok=False, can_record=False, say='Unknown product_id "' + _pid + '": copy it exactly from the account result' +
+                        ((': one of ' + ', '.join(sorted(_prods))) if isinstance(_prods, dict) and _prods else '') + '. Call again with it.')
         else:
             _dl = D.fromisoformat(_p['deadline']) if _p.get('deadline') else None
             _why = []

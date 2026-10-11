@@ -95,6 +95,8 @@ c = chk({"product_id": "A", "date": "2027-03-11"})      # valid -> keep it
 check(c.get("can_record") is True and "Keep" in c.get("say", ""), f"check valid: {c}")
 c = chk({"product_id": "A", "date": "2027-03-20"})      # after k1's deadline -> the deadline
 check(c.get("can_record") is False and c.get("offer_date") == "2027-03-12", f"check after deadline: {c}")
+c = chk({"product_id": "loan_1", "date": "2027-03-11"})
+check("one of A, B" in c.get("say", ""), f"unknown id must list the ids: {c}")
 check(guards.install(wf, SPEC).count("check_promise_date") == 1 and sum(t["function"]["name"] == "check_promise_date" for t in wf["nodes"]["n"]["tools"]) == 1, "check tool duplicated on re-save")
 # spec without any of the new rules: nothing changes (no new lines, guards as before)
 plain = {k: v for k, v in SPEC.items() if k not in ("promise_cutoff_time", "promise_dates_min_gap_days", "rule_coverage")}
