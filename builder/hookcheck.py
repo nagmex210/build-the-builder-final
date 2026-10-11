@@ -53,6 +53,9 @@ def _first_error(t, key, code):
     return None
 
 
+HOOK_MAX = 110_000   # platform: hook code + its data over 131072 bytes fails the tool call (b8: account load lost on C)
+
+
 def errors(wf):
     out = []
     for t in _tools(wf):
@@ -60,6 +63,9 @@ def errors(wf):
             code = t.get(key)
             if not code:
                 continue
+            if len(code.encode()) > HOOK_MAX:
+                out.append(f"{(t.get('function') or {}).get('name')}.{key}: the hook is {len(code.encode())} bytes; with the"
+                           " tool's data it can pass the platform's 131072-byte limit and then fails every call")
             e = _first_error(t, key, code)
             if e is not None:
                 out.append(f"{(t.get('function') or {}).get('name')}.{key}: the hook raises {type(e).__name__}: {str(e)[:120]}"
