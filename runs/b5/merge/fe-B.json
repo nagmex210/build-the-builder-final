@@ -1,0 +1,206 @@
+{
+ "workflow_id": "4dd9f45a-df71-48f8-a2c1-69a8fd37aa7c",
+ "passed": 0,
+ "total": 3,
+ "invalid": 0,
+ "rows": [
+  {
+   "id": "PUB-11",
+   "style": "talkative",
+   "pass": false,
+   "failed": [
+    "conversation: The combined confirmation did not confirm the recorded date (the customer specified 2020, not 2026), there were two create_promise attempts per product rather than one, and the agent claimed the personal-loan promise was noted before any recording tool call."
+   ],
+   "call_id": "24fc07a3-96b5-488e-bb9c-aed196a58ccf",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 9,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "24fc07a3-96b5-488e-bb9c-aed196a58ccf",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-12",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "conversation: The car loan received two persuasion attempts instead of the required one for the early band."
+   ],
+   "call_id": "4937492d-8e9a-479b-a6af-7623937851d9",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "add_note",
+    "add_note",
+    "close_call"
+   ],
+   "turns": 11,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "4937492d-8e9a-479b-a6af-7623937851d9",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-13",
+   "style": "corrects",
+   "pass": true,
+   "failed": [],
+   "call_id": "2e4f10cf-3381-4b25-8627-ec9d6eb3a199",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 8,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "2e4f10cf-3381-4b25-8627-ec9d6eb3a199",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-11",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "conversation: The one create_promise per product check fails because the agent made three failed create_promise calls with invalid product IDs before making three successful calls with the correct IDs."
+   ],
+   "call_id": "d9b9652e-b6b1-4e17-8605-3313a176fcce",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 6,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "d9b9652e-b6b1-4e17-8605-3313a176fcce",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-12",
+   "style": "pieces",
+   "pass": false,
+   "failed": [
+    "promises [], expected [('p1', 510.0, '2026-10-15')]",
+    "notes [('cl_5678', 'refused'), ('pl_1234', 'refused')], expected [('p2', 'refused'), ('p3', 'refused')]",
+    "conversation: No credit-card promise or refused notes were recorded via tools, and the agent made three personal-loan persuasion attempts and two car-loan attempts instead of two and one."
+   ],
+   "call_id": "d1777431-4fc7-4587-891b-648cbcde6ae3",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "get_account",
+    "add_note",
+    "add_note",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 11,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "d1777431-4fc7-4587-891b-648cbcde6ae3",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-13",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "promises [('p1', 300.0, '2026-10-23'), ('p2', 900.0, '2026-10-23')], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]",
+    "conversation: The credit card was recorded for 23 October rather than 30 October, and the read-back named only 23 October instead of both required dates."
+   ],
+   "call_id": "1d544fea-f82d-4daa-901a-cfd8815b9c82",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "get_account",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 10,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "1d544fea-f82d-4daa-901a-cfd8815b9c82",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  }
+ ]
+}

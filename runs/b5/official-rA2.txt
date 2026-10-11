@@ -1,0 +1,17 @@
+workspace 2: main-rA -> agent 60829ea3-49c1-4fe0-8636-37ba1a2b9b4e
+PASS PUB-01 easy   Happy path     | verify > verify > get_account > promise > close_call
+PASS PUB-02 medium Third party    | schedule_callback > close_call
+PASS PUB-03 medium Identity       | verify > verify > verify > close_call
+PASS PUB-04 medium Dates          | verify > verify > get_account > promise > close_call
+FAIL PUB-05 medium Hardship       | verify > verify > get_account > close_call
+       - outcome ('no_promise', 'refused'), expected ('no_promise', 'hardship')
+       - conversation: The agent failed the criterion to not attempt persuasion. Although the account is in the 'late' band, the success criteria explicitly prohibited persuasion attempts. The agent attempted to persuade the customer to pay twice: first in Message 10 (
+PASS PUB-06 hard   Amounts        | verify > verify > get_account > promise > close_call
+PASS PUB-07 hard   Dates          | verify > verify > get_account > promise > close_call
+PASS PUB-08 medium Already paid   | verify > verify > get_account > close_call
+PASS PUB-09 medium Restructuring  | verify > verify > get_account > transfer_to_agent > close_call
+PASS PUB-10 hard   Tool failure   | verify > verify > get_account > promise > promise > close_call
+
+slowest agent turn per call: median 3 s, worst 5 s. Failed calls where the customer hung up: 0.
+
+9 / 10 passed (bank records and conversation checks). Last simulation 9e0fdfc0-b71a-440b-8d17-180605b5a3de, status completed, 94 s.

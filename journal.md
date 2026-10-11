@@ -167,3 +167,58 @@ Hypotheses for next batch (H):
 
 Slots: `main-A/B/rA/rB/C` hold the ed7d8f8 build; `main-A4/B4/rA4/rB4` hold the HEAD build (= main). The next merger
 rebuilds main-* anyway. Raw baselines for later batches, official, HEAD build: rA 7/10, rB 3/3, both 1 rep.
+
+## b5 merge (merger, 2026-10-11 00:14-01:5x UTC)
+
+Workers (fast = fast_eval --reps 2 --style random; champion b4 fast A4 B1 rA5 rB0 = 10/26):
+- w1 close in structure (goodbye platform-spoken by the end_call node only after close ok; close->hang-up on ok only;
+  model told never to say goodbye; self-sim flags hang-ups without close). Model goodbye before close 18/20 -> 0/20.
+  Fast A 5 (re-applied pass), rB 1. Found (H): platform default agent_config carries an end_call tool + "use end_call
+  after goodbye" system prompt. MERGED.
+- w2 A5 per-product loop: routing worked live, but per-item values through extraction failed ("yes" to the agent's
+  proposal extracts nothing). B/rB 0/3. NOT merged (first discard of A5; next attempt: settle_item tool with args).
+- w3 A1 router + specialists (situations.py): 10/26 = champion; plan-request transfer 4/4; new hand-off double-speech
+  kind, fix only partly measured. NOT merged this batch (re-assigned on top of the new main).
+- w4 guards on main + code-only check_promise_date tool (code answers CAN BE RECORDED / the one date to offer) +
+  b4-4 rule kinds (no callback slots, no oracle). v1 8/26; re-saved A with the check tool fixed PUB-04/07/10 in
+  every rep. MERGED.
+- w5 brief self-conflict detector (gated words, opening checked deterministically). 9/26. MERGED WITHOUT the
+  model-written conflict-resolution lines (risk of steering the model wrong); kept gated-word lines, the opening
+  check and the self-sim check_gated.
+No worker hard-coded brief A/B content (checked the diffs: values come from extraction, tool schemas, platform events).
+
+Merge = merge/b5: w1 + w4 + w5 (conflicts in canned.py / selftest.py resolved by hand: w1's "goodbye NOT yours" line
++ w5's gated words; selftest fails on both hang-up-without-close and gated words) at 40b0d79, then merger fix
+8bec0b7: harden adds `identity_status` "NOT VERIFIED YET ... never mention any amount/product" to a verify result
+while its all-verified flag is false (found reading official PUB-03: after one wrong + one right answer the model
+said "your account is past due ... 450 pounds", an invented amount).
+
+Measured on 40b0d79 builds (446-819 s incl. self-sim):
+- fast A 6/10 (re-judged 5), B 0/3 (invented product ids + retries, M7; per-item attempts), rA 3/10 (re-judged 6/10:
+  fast-judge transcript lag, e.g. "create_promise never called" on a clean call), rB 1/3 => 10/26 first pass, 12/26
+  with A/rA re-judged. C 2/12 random (b4: 3), 4/12 adversarial (b4: 4); C failures are duplicate create_promise after
+  success -> "already exists" -> service-error note (pre-existing M12 kind), date words, goodbye order (C's brief
+  wants the goodbye BEFORE close_call: w1 risk, fast judge only).
+- OFFICIAL A 6/10 (runs 8,7), again 8/10 (runs 9,8); B 2/3 (2,2) = champion; rA 8/10 (= baseline 8,8,7); rB 2/3
+  (baseline 1/3, 3/3). PUB-07 (holiday) 4/4 and PUB-10 (recording notice) 4/4.
+- SAME-SESSION CHAMPION (779b267 rebuilt as champ-A in a worktree): official A 6/10 (runs 8,8), failing PUB-07 1/2,
+  PUB-10 1/2, PUB-03 1/2, PUB-06 1/2.
+On HEAD 8bec0b7 builds: OFFICIAL A 9/10 (runs 9,9; only PUB-03 left), raw-A 9/10 (PUB-03 passed); fast A 6/10.
+B/rB on HEAD: see results.tsv row.
+
+Decision: KEEP (main = merge/b5). Accept rule (a)+(b)+(c): the two kinds targeted by w4 and w5 (holiday date ->
+deadline offered; recording notice read as premature "recorded") passed 4/4 officially on the merged build vs 1/2
+on the same-session champion, repeated over two official runs, different failure kinds (dates, mandatory wording),
+and both are code/structure mechanisms (code computes the one date to offer; the opening is checked against gated
+words; the goodbye is platform-spoken after close ok). Official A per run 8,7,9,8,9,9 vs champion 8,8 this session.
+
+Left: PUB-03 identity gate (model ignores the NOT VERIFIED line in 1 of 2; needs a code-decided identity state),
+PUB-12 per-item persuasion count (B every official run), PUB-05 support offered twice, C duplicate writes,
+B invented product ids (fast).
+Hypotheses (H) for b6: idempotent writes in code fix the C service-error kind; A5 with a settle_item tool fixes the
+per-item count; overriding the platform's default agent_config removes the auto end_call path entirely.
+- HEAD B rebuild (889 s): OFFICIAL B 0/3, identity never passed. Cause in the build log: the inner build agent
+  dropped customer_id from every tool's required body list, so the bank rejected every verify_identity; self-sim round 2
+  failed 11/12 personas and the build still shipped. Build variance + a builder robustness gap (no required-field lint, no
+  revert to the better self-sim version), not the identity_status line (it only adds a text field to the verify result,
+  never touches request schemas). B on the 40b0d79 build: official 2/3. Assigned as part of b6 family 1. Kept HEAD.

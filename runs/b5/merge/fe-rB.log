@@ -1,0 +1,14 @@
+workspace 2: workflow 5ef99c6d-8b6e-4cea-bbde-23d0f793f9cd
+FAIL PUB-11 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > create_promise > create_promise > create_promise > create_promise > close_call
+       - [in_words] conversation: The one create_promise per product check fails because the agent made two attempts for each product, first with an invalid product ID and then with the correct ID.
+       - [pieces] outcome ('no_promise', 'service_error'), expected ('promise', None)
+       - [pieces] promises [('p1', 220.0, '2026-10-16')], expected [('p1', 220.0, '2026-10-16'), ('p2', 640.0, '2026-10-16'), ('p3', 75.0, '2026-10-16')]
+       - [pieces] notes [('p1', 'service_error'), ('p2', 'service_error'), ('p3', 'service_error')], expected []
+       - [pieces] conversation: The one-create_promise-per-product check failed: the agent made repeated attempts with invalid product IDs and successfully recorded only p1, not p2 or p3.
+FAIL PUB-12 0/2 | verify_identity > verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > add_note > add_note > close_call
+       - [in_words] conversation: The car loan received two persuasion attempts (full payment and floor payment), but the early-band check allows only one.
+       - [in_words] conversation: The car loan received two persuasion attempts, but the early-band check requires exactly one.
+PASS PUB-13 2/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > create_promise > create_promise > close_call
+
+fast_eval: 1 / 3 passed (2 rep(s), all reps must pass), 277 s
+harness: 0 case(s) still INVALID after 2 re-run(s) (not a measurement), 0 rep(s) re-run

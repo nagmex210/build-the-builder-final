@@ -1,0 +1,203 @@
+{
+ "workflow_id": "5ef99c6d-8b6e-4cea-bbde-23d0f793f9cd",
+ "passed": 1,
+ "total": 3,
+ "invalid": 0,
+ "rows": [
+  {
+   "id": "PUB-11",
+   "style": "in_words",
+   "pass": false,
+   "failed": [
+    "conversation: The one create_promise per product check fails because the agent made two attempts for each product, first with an invalid product ID and then with the correct ID."
+   ],
+   "call_id": "ced5005f-0ca0-4db8-b55f-b60a01d4b4eb",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 9,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "ced5005f-0ca0-4db8-b55f-b60a01d4b4eb",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-12",
+   "style": "in_words",
+   "pass": false,
+   "failed": [
+    "conversation: The car loan received two persuasion attempts (full payment and floor payment), but the early-band check allows only one."
+   ],
+   "call_id": "1161fc04-29ff-4638-ac5f-3aa4997204ed",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "add_note",
+    "add_note",
+    "close_call"
+   ],
+   "turns": 11,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "1161fc04-29ff-4638-ac5f-3aa4997204ed",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-13",
+   "style": "asks_back",
+   "pass": true,
+   "failed": [],
+   "call_id": "71c042c0-c52e-493d-9d30-9c80eb6e6cf4",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 9,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "71c042c0-c52e-493d-9d30-9c80eb6e6cf4",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-11",
+   "style": "pieces",
+   "pass": false,
+   "failed": [
+    "outcome ('no_promise', 'service_error'), expected ('promise', None)",
+    "promises [('p1', 220.0, '2026-10-16')], expected [('p1', 220.0, '2026-10-16'), ('p2', 640.0, '2026-10-16'), ('p3', 75.0, '2026-10-16')]",
+    "notes [('p1', 'service_error'), ('p2', 'service_error'), ('p3', 'service_error')], expected []",
+    "conversation: The one-create_promise-per-product check failed: the agent made repeated attempts with invalid product IDs and successfully recorded only p1, not p2 or p3."
+   ],
+   "call_id": "15cd44cb-fb48-4ca7-bc3a-3d8b57c5e8f1",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "add_note",
+    "add_note",
+    "add_note",
+    "close_call"
+   ],
+   "turns": 10,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "15cd44cb-fb48-4ca7-bc3a-3d8b57c5e8f1",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-12",
+   "style": "in_words",
+   "pass": false,
+   "failed": [
+    "conversation: The car loan received two persuasion attempts, but the early-band check requires exactly one."
+   ],
+   "call_id": "10a673bf-100f-4ee2-8aa4-1eeccb5ac882",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "add_note",
+    "add_note",
+    "close_call"
+   ],
+   "turns": 11,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "10a673bf-100f-4ee2-8aa4-1eeccb5ac882",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-13",
+   "style": "talkative",
+   "pass": true,
+   "failed": [],
+   "call_id": "86774190-5bcc-4794-93e4-8ef1b5a7d624",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 10,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "86774190-5bcc-4794-93e4-8ef1b5a7d624",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  }
+ ]
+}

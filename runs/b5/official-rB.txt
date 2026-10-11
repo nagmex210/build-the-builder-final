@@ -1,0 +1,9 @@
+workspace 2: main-rB -> agent 93cb5ba5-e537-4019-bd2b-bfa97fa1ef65
+PASS PUB-11 medium Multi-product  | verify > verify > get_account > promise > promise > promise > close_call
+FAIL PUB-12 hard   Multi-product  | verify > verify > verify > get_account > promise > add_note > add_note > close_call
+       - conversation: The assistant failed to meet the persuasion attempt criteria for the car loan. The success criteria required exactly one attempt on the car loan (early band), but the assistant made two attempts: one for the full amount at [Message 16] and one fo
+PASS PUB-13 hard   Multi-product  | verify > verify > get_account > promise > promise > close_call
+
+slowest agent turn per call: median 5 s, worst 8 s. Failed calls where the customer hung up: 0.
+
+2 / 3 passed (bank records and conversation checks). Last simulation 9f90026a-63df-4577-a52d-24fc0684a0b9, status completed, 83 s.

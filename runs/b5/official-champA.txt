@@ -1,0 +1,46 @@
+PASS PUB-01 easy   Happy path     | verify > verify > get_account > promise > close_call
+PASS PUB-02 medium Third party    | schedule_callback > close_call
+FAIL PUB-03 medium Identity       | verify > verify > close_call
+       - outcome ('not_verified', 'declined'), expected ('not_verified', 'failed')
+       - conversation: The conversation failed for two reasons: 1. The check did not end after the third wrong answer; instead, the assistant prompted the user for their date of birth a fourth time in Message 10. 2. The assistant never instructed the customer to use th
+PASS PUB-04 medium Dates          | verify > verify > get_account > promise > close_call
+PASS PUB-05 medium Hardship       | verify > verify > get_account > close_call
+PASS PUB-06 hard   Amounts        | verify > verify > get_account > promise > close_call
+FAIL PUB-07 hard   Dates          | verify > verify > get_account > promise > close_call
+       - promises [('p1', 540.0, '2026-11-02')], expected [('p1', 540.0, '2026-10-27')]
+       - conversation: The agent failed two of the specific success criteria. While the agent correctly asked for an exact date and refused October 26th (which was a holiday), it did not offer the next business day (Tuesday, October 27th) as required. Instead, it jumpe
+PASS PUB-08 medium Already paid   | verify > verify > get_account > close_call
+PASS PUB-09 medium Restructuring  | verify > verify > get_account > transfer_to_agent > close_call
+PASS PUB-10 hard   Tool failure   | verify > verify > get_account > promise > promise > close_call
+
+slowest agent turn per call: median 3 s, worst 5 s. Failed calls where the customer hung up: 0.
+-- run 1 of 2: 8 / 10 passed, 83 s
+
+PASS PUB-01 easy   Happy path     | verify > verify > get_account > promise > close_call
+PASS PUB-02 medium Third party    | schedule_callback > close_call
+PASS PUB-03 medium Identity       | verify > verify > verify > close_call
+PASS PUB-04 medium Dates          | verify > verify > get_account > promise > close_call
+PASS PUB-05 medium Hardship       | verify > verify > get_account > close_call
+FAIL PUB-06 hard   Amounts        | verify > verify > get_account > promise > close_call
+       - conversation: The conversation failed on two success criteria. First, the agent asked the customer how much she could pay in Message 10 by saying, 'can you offer a different amount up to the full 2,125.10?', which violates the instruction to never ask this. Se
+PASS PUB-07 hard   Dates          | verify > verify > get_account > promise > close_call
+PASS PUB-08 medium Already paid   | verify > verify > get_account > close_call
+PASS PUB-09 medium Restructuring  | verify > verify > get_account > transfer_to_agent > close_call
+FAIL PUB-10 hard   Tool failure   | verify > verify > get_account > promise > promise > close_call
+       - conversation: The agent failed the criterion prohibiting the use of the word 'recorded' before a successful call. While 'recorded' is used in the legal disclaimer in Message 0, the successful API call to create the promise did not occur until after Message 9, 
+
+slowest agent turn per call: median 2 s, worst 2 s. Failed calls where the customer hung up: 0.
+-- run 2 of 2: 8 / 10 passed, 92 s
+
+PASS PUB-01 2/2
+PASS PUB-02 2/2
+FAIL PUB-03 1/2
+PASS PUB-04 2/2
+PASS PUB-05 2/2
+FAIL PUB-06 1/2
+FAIL PUB-07 1/2
+PASS PUB-08 2/2
+PASS PUB-09 2/2
+FAIL PUB-10 1/2
+
+6 / 10 passed (bank records and conversation checks), a customer counts with 2 of 2 runs. Last simulation 1e29377d-2534-41b6-bc99-4860ca4972cd, status completed, 175 s.

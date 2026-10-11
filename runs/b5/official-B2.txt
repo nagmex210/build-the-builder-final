@@ -1,0 +1,41 @@
+workspace 2: main-B -> agent ec9fbf58-6328-4272-9aa2-0ebec3797db2
+FAIL PUB-11 medium Multi-product  | verify > verify > verify > close_call
+       - outcome ('not_verified', 'failed'), expected ('promise', None)
+       - promises [], expected [('p1', 220.0, '2026-10-16'), ('p2', 640.0, '2026-10-16'), ('p3', 75.0, '2026-10-16')]
+       - conversation: The assistant failed to meet any of the success criteria because a technical error in the identity verification tool prevented the conversation from progressing to the product discussion phase. Consequently, no products were mentioned, no read-ba
+FAIL PUB-12 hard   Multi-product  | verify > verify > verify > close_call
+       - outcome ('not_verified', 'failed'), expected ('promise', None)
+       - promises [], expected [('p1', 510.0, '2026-10-15')]
+       - notes [], expected [('p2', 'refused'), ('p3', 'refused')]
+       - conversation: Several success criteria were not met. The agent repeated the date of birth question twice (Message 4 and Message 6) despite the criteria requiring it not be asked again. The phone question was never asked at all. Because the call failed during t
+FAIL PUB-13 hard   Multi-product  | verify > verify > verify
+       - outcome (None, None), expected ('promise', None)
+       - promises [], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]
+       - the call was not closed with close_call
+       - conversation: The assistant failed to verify the user's identity due to system errors in the 'verify_identity' tool, which prevented any discussion of the credit card or loan accounts. Consequently, no payment dates were recorded or read back. Additionally, th
+
+slowest agent turn per call: median 5 s, worst 7 s. Failed calls where the customer hung up: 1.
+-- run 1 of 2: 0 / 3 passed, 329 s
+
+FAIL PUB-11 medium Multi-product  | verify > verify > verify > close_call
+       - outcome ('not_verified', 'failed'), expected ('promise', None)
+       - promises [], expected [('p1', 220.0, '2026-10-16'), ('p2', 640.0, '2026-10-16'), ('p3', 75.0, '2026-10-16')]
+       - conversation: The success criteria were not met because the assistant encountered a persistent technical error during the identity verification phase. As a result: - No products were stated. - No read-backs or confirmations occurred. - No payment promises were
+FAIL PUB-12 hard   Multi-product  | verify > verify > verify > close_call
+       - outcome ('not_verified', 'failed'), expected ('promise', None)
+       - promises [], expected [('p1', 510.0, '2026-10-15')]
+       - notes [], expected [('p2', 'refused'), ('p3', 'refused')]
+       - conversation: The conversation failed several success criteria: - The date of birth was asked multiple times (Message 2, Message 4, and Message 6), violating the criterion that it should not be asked again. - The phone question was never asked, violating the c
+FAIL PUB-13 hard   Multi-product  | verify > verify > verify > close_call
+       - outcome ('not_verified', 'failed'), expected ('promise', None)
+       - promises [], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]
+       - conversation: The conversation failed to meet any of the success criteria because the assistant was unable to verify the user's identity. Due to internal technical errors in the identity verification tool, the assistant reached the maximum number of attempts a
+
+slowest agent turn per call: median 2 s, worst 2 s. Failed calls where the customer hung up: 0.
+-- run 2 of 2: 0 / 3 passed, 31 s
+
+FAIL PUB-11 0/2
+FAIL PUB-12 0/2
+FAIL PUB-13 0/2
+
+0 / 3 passed (bank records and conversation checks), a customer counts with 2 of 2 runs. Last simulation c296bdf1-bea5-47a5-9a54-6a34dc62f7e8, status completed, 360 s.

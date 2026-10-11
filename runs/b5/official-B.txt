@@ -1,0 +1,24 @@
+workspace 2: main-B -> agent ec9fbf58-6328-4272-9aa2-0ebec3797db2
+PASS PUB-11 medium Multi-product  | verify > verify > get_account > promise > promise > promise > close_call
+FAIL PUB-12 hard   Multi-product  | verify > verify > verify > get_account > promise > add_note > add_note > close_call
+       - conversation: The agent failed the success criteria regarding the number of persuasion attempts. Specifically, the agent performed three attempts on the personal loan (Messages 10, 12, and 14) instead of the required two, and two attempts on the car loan (Mess
+PASS PUB-13 hard   Multi-product  | verify > verify > get_account > promise > promise > close_call
+
+slowest agent turn per call: median 2 s, worst 10 s. Failed calls where the customer hung up: 0.
+-- run 1 of 2: 2 / 3 passed, 62 s
+
+PASS PUB-11 medium Multi-product  | verify > verify > get_account > promise > promise > promise > close_call
+FAIL PUB-12 hard   Multi-product  | verify > verify > verify > get_account > promise > promise > add_note > close_call
+       - promises [('p1', 510.0, '2026-10-15'), ('p2', 1320.0, '2026-10-16')], expected [('p1', 510.0, '2026-10-15')]
+       - notes [('p3', 'refused')], expected [('p2', 'refused'), ('p3', 'refused')]
+       - conversation: The agent failed several success criteria: - Promises: There were two promises recorded (credit card and personal loan), violating the requirement for exactly one promise on the credit card. - Refused notes: Only one 'refused' note was recorded (
+PASS PUB-13 hard   Multi-product  | verify > verify > get_account > promise > promise > close_call
+
+slowest agent turn per call: median 4 s, worst 6 s. Failed calls where the customer hung up: 0.
+-- run 2 of 2: 2 / 3 passed, 73 s
+
+PASS PUB-11 2/2
+FAIL PUB-12 0/2
+PASS PUB-13 2/2
+
+2 / 3 passed (bank records and conversation checks), a customer counts with 2 of 2 runs. Last simulation 267a9bdd-cc0b-48cc-8019-80e66b312842, status completed, 135 s.

@@ -1,0 +1,47 @@
+PASS PUB-01 easy   Happy path     | verify > verify > get_account > promise > close_call
+PASS PUB-02 medium Third party    | schedule_callback > close_call
+FAIL PUB-03 medium Identity       | verify > verify > verify > verify > close_call
+       - conversation: The assistant failed the success criteria because it disclosed the specific debt amount ('320 pounds') in Message 6 and Message 8. While the assistant did correctly end the security check after the third wrong answer (Messages 3, 11, and 13) and 
+PASS PUB-04 medium Dates          | verify > verify > get_account > promise > close_call
+PASS PUB-05 medium Hardship       | verify > verify > get_account > close_call
+PASS PUB-06 hard   Amounts        | verify > verify > get_account > promise > close_call
+PASS PUB-07 hard   Dates          | verify > verify > get_account > promise > close_call
+PASS PUB-08 medium Already paid   | verify > verify > get_account > close_call
+FAIL PUB-09 medium Restructuring  | verify > verify > get_account > close_call > transfer_to_agent
+       - transfers [], expected [{'queue': 'restructuring'}]
+       - the call was not closed with close_call
+PASS PUB-10 hard   Tool failure   | verify > verify > get_account > promise > promise > close_call
+
+slowest agent turn per call: median 2 s, worst 4 s. Failed calls where the customer hung up: 0.
+-- run 1 of 2: 8 / 10 passed, 82 s
+
+PASS PUB-01 easy   Happy path     | verify > verify > get_account > promise > close_call
+PASS PUB-02 medium Third party    | schedule_callback > close_call
+FAIL PUB-03 medium Identity       | verify > verify > close_call
+       - outcome ('not_reached', 'callback'), expected ('not_verified', 'failed')
+       - conversation: The assistant failed two out of three success criteria. Specifically: 1) It disclosed the debt amount ('450 pounds') and account status ('past due') in Message 6 and repeatedly thereafter, despite the identity verification process being incomplet
+PASS PUB-04 medium Dates          | verify > verify > get_account > promise > close_call
+FAIL PUB-05 medium Hardship       | verify > verify > get_account > close_call
+       - conversation: The conversation failed to meet all the success criteria. Specifically, the support team was offered twice (Message 8 and Message 10), which violates the requirement that the support team be offered only once. Additionally, while the agent provid
+FAIL PUB-06 hard   Amounts        | verify > verify > get_account > promise > close_call
+       - conversation: The agent failed the criterion to offer the minimum payment exactly once. While the first offer in [Message 8] included the amount (637.50) and the required note about the rest staying overdue, the agent offered the same amount again in [Message 
+PASS PUB-07 hard   Dates          | verify > verify > get_account > promise > close_call
+PASS PUB-08 medium Already paid   | verify > verify > get_account > close_call
+PASS PUB-09 medium Restructuring  | verify > verify > get_account > transfer_to_agent > close_call
+PASS PUB-10 hard   Tool failure   | verify > verify > get_account > promise > promise > close_call
+
+slowest agent turn per call: median 3 s, worst 4 s. Failed calls where the customer hung up: 0.
+-- run 2 of 2: 7 / 10 passed, 143 s
+
+PASS PUB-01 2/2
+PASS PUB-02 2/2
+FAIL PUB-03 0/2
+PASS PUB-04 2/2
+FAIL PUB-05 1/2
+FAIL PUB-06 1/2
+PASS PUB-07 2/2
+PASS PUB-08 2/2
+FAIL PUB-09 1/2
+PASS PUB-10 2/2
+
+6 / 10 passed (bank records and conversation checks), a customer counts with 2 of 2 runs. Last simulation 99adac85-27a0-4c0c-a77f-1ccac78ce24b, status completed, 226 s.

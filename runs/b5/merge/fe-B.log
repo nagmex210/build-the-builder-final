@@ -1,0 +1,15 @@
+workspace 2: workflow 4dd9f45a-df71-48f8-a2c1-69a8fd37aa7c
+FAIL PUB-11 0/2 | verify_identity > verify_identity > verify_identity > get_account > get_account > create_promise > create_promise > create_promise > create_promise > create_promise > create_promise > close_call
+       - [talkative] conversation: The combined confirmation did not confirm the recorded date (the customer specified 2020, not 2026), there were two create_promise attempts per product rather than one, and the agent claimed the personal-loan promise was noted before any recordin
+       - [asks_back] conversation: The one create_promise per product check fails because the agent made three failed create_promise calls with invalid product IDs before making three successful calls with the correct IDs.
+FAIL PUB-12 0/2 | verify_identity > verify_identity > verify_identity > verify_identity > get_account > get_account > create_promise > create_promise > add_note > add_note > close_call
+       - [plain] conversation: The car loan received two persuasion attempts instead of the required one for the early band.
+       - [pieces] promises [], expected [('p1', 510.0, '2026-10-15')]
+       - [pieces] notes [('cl_5678', 'refused'), ('pl_1234', 'refused')], expected [('p2', 'refused'), ('p3', 'refused')]
+       - [pieces] conversation: No credit-card promise or refused notes were recorded via tools, and the agent made three personal-loan persuasion attempts and two car-loan attempts instead of two and one.
+FAIL PUB-13 1/2 | verify_identity > verify_identity > verify_identity > get_account > get_account > create_promise > create_promise > create_promise > close_call
+       - [plain] promises [('p1', 300.0, '2026-10-23'), ('p2', 900.0, '2026-10-23')], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]
+       - [plain] conversation: The credit card was recorded for 23 October rather than 30 October, and the read-back named only 23 October instead of both required dates.
+
+fast_eval: 0 / 3 passed (2 rep(s), all reps must pass), 458 s
+harness: 0 case(s) still INVALID after 2 re-run(s) (not a measurement), 0 rep(s) re-run

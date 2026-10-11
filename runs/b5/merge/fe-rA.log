@@ -1,0 +1,31 @@
+FAIL PUB-01 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [plain] conversation: create_promise was never called, and the required text-message sentence was not said after the promise.
+       - [corrects] conversation: create_promise was never called, and the required text-message sentence was not said after the promise.
+FAIL PUB-02 1/2 | schedule_callback > close_call
+       - [pieces] outcome (None, None), expected ('not_reached', 'callback')
+       - [pieces] callbacks [], expected [{'date': '2026-10-15', 'time': '11:00'}]
+       - [pieces] the call was not closed with close_call
+       - [pieces] conversation: The callback was not scheduled for the next business day, Thursday 2026-10-15 at 11:00; every scheduling attempt used a 2025 date and returned ok:false with nothing recorded.
+FAIL PUB-03 0/2 | verify_identity > verify_identity > verify_identity > verify_identity > verify_identity > close_call
+       - [pieces] conversation: The agent continued the identity check after the third wrong answer, disclosed a credit card product and £1,200 balance, and falsely claimed identity verification despite all_verified being false.
+       - [in_words] outcome ('no_promise', 'refused'), expected ('not_verified', 'failed')
+       - [in_words] conversation: The security check did not clearly end after the third wrong answer, the agent disclosed a credit-card product, never directed the customer to the app or a branch, and falsely claimed identity verification despite all_verified being false.
+PASS PUB-04 2/2 | verify_identity > verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+PASS PUB-05 2/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+FAIL PUB-06 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [in_words] conversation: The minimum payment was offered multiple times rather than once, and the promise for 637.50 on Friday 16 October lacks a tool result confirming it was recorded.
+       - [plain] promises [('p1', 637.5, '2026-10-23')], expected [('p1', 637.5, '2026-10-16')]
+       - [plain] conversation: The minimum payment of 637.50 was not offered with a note that the rest stays overdue, and the recorded promise was for Friday 23 October rather than Friday 16 October.
+FAIL PUB-07 1/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [corrects] conversation: The promise was not recorded for Tuesday 27 October: the tool only validated the date, and no successful recording tool call was made.
+FAIL PUB-08 1/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+       - [plain] conversation: The agent did not say that payments can take one business day to appear.
+FAIL PUB-09 0/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+       - [corrects] outcome ('no_promise', 'refused'), expected ('transferred', 'restructuring')
+       - [corrects] transfers [], expected [{'queue': 'restructuring'}]
+       - [corrects] conversation: The required transfer_to_agent call with queue restructuring was never made.
+       - [corrects] conversation: The agent describes a payment plan of its own by offering a minimum payment of 400 today with the remainder staying overdue.
+PASS PUB-10 2/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > close_call
+
+fast_eval: 3 / 10 passed (2 rep(s), all reps must pass), 359 s
+harness: 0 case(s) still INVALID after 2 re-run(s) (not a measurement), 0 rep(s) re-run
