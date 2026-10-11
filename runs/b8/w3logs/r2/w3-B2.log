@@ -1,0 +1,65 @@
+builder: slot=w3-B2 tools=/home/ubuntu/btb/wt3/tools/openapi.json briefs=/home/ubuntu/btb/wt3/briefs/brief-a.md /home/ubuntu/btb/wt3/briefs/brief-b.md
+trace: /home/ubuntu/btb/wt3/runs/traces/w3-B2-20261011-062200.jsonl
+BUILD START 2026-10-11T06:22:00Z slot=w3-B2
+clean slot: moved 5 old file(s) of this slot out of the kit to /tmp/btb-old-w3-B2-14aomuzr
+[model call 2026-10-11T06:22:49] gpt-4.1-mini (Azure, btb/llm.py): A1: list the brief's situations after the account lookup (router + specialist routes)
+[test] datecalc: generated date/amount code run locally on 5 dates and fake products -> ok (52 s)
+[test] A1 situations: hardship, dispute, already_paid, cannot_pay_transfer, callback, dispute_transfer_human
+[model] build agent: Claude Agent SDK, claude-opus-5-5, skill build-phone-agent, budget 12 min
+[model call 2026-10-11T06:22:52] gpt-6-astra (Azure, btb/llm.py): extract calendar/amount spec for code steps
+[model call 2026-10-11T06:22:55Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 1: tools Skill
+  [Skill] {'skill': 'build-phone-agent', 'args': 'Slot: w3-B2'}
+[model call 2026-10-11T06:22:55] gpt-6-luna (Azure, btb/llm.py): A3: extract the brief's mandatory sentences as fixed text
+[model call 2026-10-11T06:22:56Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 2: text
+[model call 2026-10-11T06:22:57Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 3: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt3; cat briefs/brief-a.md briefs/brief-b.md; cat .claude/skills/build-phone-agent/rout
+    -> # Brief A: Freya Bank, early-stage collections, one product Freya Bank is fictional. Every customer, debt and payment here is synthetic. This brief has the density of a real bank specification. Read all of it. Most failed cases come from one rule that was skipped. ## 1. The job Freya Bank calls customers who are 1 to 45 days late on one product. The agent finds the customer, checks identity, state ...
+[model call 2026-10-11T06:22:58Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 4: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt3; cat examples/base-agent.json; python3 -c "\nimport json;d=json.load(open(\'out/w3-
+    -> { "nodes": { "identity": { "name": "identity", "tools": [ { "type": "function", "config": { "timeoutMs": 12000, "maxRetries": 0 }, "function": { "name": "verify_identity", "handler": "__function__:api_call", "parameters": { "type": "object", "properties": { "url": { "type": "string", "default": "https://freya-bank-mock.freyavoice.workers.dev/v1/verify_identity" }, "body": { "type": "object", "requ ...
+[model call 2026-10-11T06:23:00Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 5: text
+[model call 2026-10-11T06:23:01Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 6: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt3; python3 -c "\nimport json;d=json.load(open(\'tools/openapi.json\'));print(json.dum
+    -> {"post": {"summary": "End the call. Always the last tool call. Nothing is accepted after it.", "requestBody": {"required": true, "content": {"application/json": {"schema": {"type": "object", "properties": {"customer_id": {"type": "string"}, "outcome": {"type": "string", "enum": ["promise", "paid", "transferred", "no_promise", "not_verified", "not_reached"]}, "reason": {"type": "string", "descripti ...
+[model call 2026-10-11T06:23:03Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 7: text
+[model call 2026-10-11T06:23:04Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 8: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt3; sed -n 630,665p docs/workflow-format.md; grep -n "api_request" -A25 docs/tools-and
+    -> "message_mode": { "type": "string", "default": "custom" }, "spoken_message": { "type": "string", "default": "Thank you for calling. Goodbye." } } } } } } ``` | Parameter | Meaning | |---|---| | `message_mode` | `custom`: say `spoken_message`. `llm`: the model writes the farewell from `llm_prompt`. `none`: hang up without a farewell | | `spoken_message` | The fixed farewell for `custom`. `{{var}}`  ...
+[model call 2026-10-11T06:23:13Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 9: text
+[model call 2026-10-11T06:24:23Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 10: tools Bash
+  [Bash] {'command': 'mkdir -p /home/ubuntu/btb/wt3/out && cat > /home/ubuntu/btb/wt3/out/w3-B2.gen.py <<\'EOF\'\nimport json\nca
+    -> ERROR hang_up: end_call node without terminal 1 errors, 0 warnings []
+[model call 2026-10-11T06:24:25Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 11: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt3; grep -n "terminal" docs/workflow-format.md | head; sed -n 610,630p docs/workflow-f
+    -> 75:| `end_call` | Ends the call | optional farewell | `terminal` | 108:| `terminal` | object | | The end-call function. `end_call` nodes only | 201:- An unresolved variable in a prompt stays as the literal text `{{variable_name}}`. The model sees the placeholder. In a fixed spoken line (`on_enter.text`, a terminal `spoken_message`) the agent says it aloud. 523:- List terminal nodes in `excluded_no ...
+[model call 2026-10-11T06:24:26Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 12: text
+Fixing the end-call node format, then saving.
+[model call 2026-10-11T06:24:28Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 13: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt3; python3 - <<\'EOF\'\ns=open(\'out/w3-B2.gen.py\').read()\ns=s.replace(\'\'\'"disab
+    -> 0 errors, 0 warnings [] {"hardened_tools": ["schedule_callback", "transfer_to_agent", "close_call", "verify_identity", "transfer_to_agent", "close_call", "get_account", "close_call", "create_promise", "add_note", "close_call", "transfer_to_agent", "add_note", "close_call", "add_note", "close_call", "add_note", "close_call", "transfer_to_agent", "add_note", "close_call", "transfer_to_agent", "close ...
+[model call 2026-10-11T06:24:35Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 14: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt3; timeout 90 python3 -c "import freya,json; print(str(freya.api(\'POST\',\'/api/v2/c
+    -> {'response': "I'm Freya Bank's digital assistant, and we're capturing this call. Am I speaking with Ms Lee?", 'callId': 'a158660b-ad4a-46a0-ab5d-cd56fbe1880b', 'messageId': 'msg_4_1791699877744'}
+[model call 2026-10-11T06:24:50Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 15: text
+[model call 2026-10-11T06:24:50Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 16: text
+I built the workflow and saved it as slot w3-B2. It passes the lint check with 0 errors, and the situations check reported no problems. One live chat turn worked: the agent opened as Freya Bank's digital assistant, said the call is recorded and asked "Am I speaking with Ms Lee?". That one turn is the only test I ran; I did not test any calls past the opening.
+
+The workflow starts with the date-facts code node unchanged and runs opening, then identity, then the account lookup with your hook set word for word. After that a router states every late product and hands off to a negotiation node. Each of the six situations has its own node, and a goodbye node ends the call. The two rules in `unhandled_rules` are written word for word into the identity and negotiation nodes. The generator is `out/w3-B2.gen.py`.
+
+Where I went against the extracted situations, because Brief B wins:
+- **dispute and already_paid:** the extraction says they close the call with no way back to the main path. Brief B rule 9 says a dispute or "already paid" on one product does not end the call. These nodes now add a note for that product, then go back to negotiation if other products are still open. They close the call only when no products remain.
+- **cannot_pay_transfer:** with several products, a flat refusal is counted per product. So the node notes that product as refused and moves on to the next one, instead of closing at once. A request for a plan or lower instalments still transfers to the restructuring queue.
+- **Hardship:** when the customer declines support, the node adds a hardship note for each product without a promise, as Brief B requires.
+
+workflow_id c3de0563-d680-412a-88fa-a36f5bd7a61c, agent_id 3a05d7e9-1336-4c59-b616-a7255bcfd8d1. Brief B overrides the extraction: dispute and already_paid are noted per product and the call returns to negotiation, not closed.
+
+done: 11 turns, 117 s
+final save (build): {'workflow_id': 'c3de0563-d680-412a-88fa-a36f5bd7a61c', 'agent_id': '3a05d7e9-1336-4c59-b616-a7255bcfd8d1', 'version': 4}; lint: 0 errors, 0 warnings
+buildcheck: 0 error(s), 0 warning(s)
+[model call 2026-10-11T06:25:22] gpt-6-astra (Azure, btb/llm.py): self-simulation: write personas + ledger checks from the brief
+self-test 1 (workspace 2): 0/0 personas failed a check (0 checks)
+buildcheck (shipped): 0 problem(s)
+[freya] slot w3-B2: workflow_id=c3de0563-d680-412a-88fa-a36f5bd7a61c agent_id=3a05d7e9-1336-4c59-b616-a7255bcfd8d1 version=4 (published)
+[freya] exported: /home/ubuntu/btb/wt3/submission/w3-B2.workflow.json
+BUILD END 2026-10-11T06:25:26Z (206 s); trace scrubbed (0 secret(s) replaced): /home/ubuntu/btb/wt3/runs/traces/w3-B2-20261011-062200.jsonl
+{"workflow_id": "c3de0563-d680-412a-88fa-a36f5bd7a61c", "agent_id": "3a05d7e9-1336-4c59-b616-a7255bcfd8d1"}

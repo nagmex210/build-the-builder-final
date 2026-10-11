@@ -1,0 +1,2 @@
+  invalid rep PUB-11 (try 1): ['resumed from msg_9_1791700382254 (latest reply msg_22_1791700386434, isBranch=True)']
+  invalid rep PUB-12 (try 1): ['resumed from msg_4_1791700451649 (latest reply msg_17_1791700452510, isBranch=True)']

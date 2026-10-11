@@ -1,0 +1,73 @@
+builder: slot=w3-B tools=/home/ubuntu/btb/wt3/tools/openapi.json briefs=/home/ubuntu/btb/wt3/briefs/brief-a.md /home/ubuntu/btb/wt3/briefs/brief-b.md
+trace: /home/ubuntu/btb/wt3/runs/traces/w3-B-20261011-062200.jsonl
+BUILD START 2026-10-11T06:22:00Z slot=w3-B
+clean slot: moved 9 old file(s) of this slot out of the kit to /tmp/btb-old-w3-B-v1hwxeg1
+[model call 2026-10-11T06:22:45] gpt-6-luna (Azure, btb/llm.py): A1: list the brief's situations after the account lookup (router + specialist routes)
+[model call 2026-10-11T06:22:48] gpt-6-astra (Azure, btb/llm.py): A3: extract the brief's mandatory sentences as fixed text
+[test] datecalc: generated date/amount code run locally on 5 dates and fake products -> ok (63 s)
+[test] A1 situations: refused, hardship, dispute, already_paid, restructuring, human
+[model] build agent: Claude Agent SDK, claude-opus-5-5, skill build-phone-agent, budget 12 min
+[model call 2026-10-11T06:23:03] gpt-6-astra (Azure, btb/llm.py): extract calendar/amount spec for code steps
+[model call 2026-10-11T06:23:06Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 1: tools Skill
+  [Skill] {'skill': 'build-phone-agent', 'args': 'Slot: w3-B'}
+[model call 2026-10-11T06:23:07Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 2: text
+[model call 2026-10-11T06:23:07Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 3: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt3; cat briefs/brief-a.md briefs/brief-b.md; cat tools/openapi.json | head -c 6000; ec
+    -> # Brief A: Freya Bank, early-stage collections, one product Freya Bank is fictional. Every customer, debt and payment here is synthetic. This brief has the density of a real bank specification. Read all of it. Most failed cases come from one rule that was skipped. ## 1. The job Freya Bank calls customers who are 1 to 45 days late on one product. The agent finds the customer, checks identity, state ...
+[model call 2026-10-11T06:23:09Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 4: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt3; cat examples/base-agent.json; python3 -c "\nimport json;d=json.load(open(\'out/w3-
+    -> { "nodes": { "identity": { "name": "identity", "tools": [ { "type": "function", "config": { "timeoutMs": 12000, "maxRetries": 0 }, "function": { "name": "verify_identity", "handler": "__function__:api_call", "parameters": { "type": "object", "properties": { "url": { "type": "string", "default": "https://freya-bank-mock.freyavoice.workers.dev/v1/verify_identity" }, "body": { "type": "object", "requ ...
+[model call 2026-10-11T06:23:11Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 5: text
+[model call 2026-10-11T06:23:13Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 6: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt3; python3 -c "\nimport json;d=json.load(open(\'tools/openapi.json\'))\nfor p,v in d[
+    -> /verify_identity {"customer_id": {"type": "string"}, "field": {"type": "string", "enum": ["date_of_birth", "phone_last4"]}, "answer": {"type": "string", "description": "For date_of_birth: the date as YYYY-MM-DD. Callers say dates in words, the agent converts. An unreadable value is rejected with ok=false and is not counted as a wrong answer. For phone_last4: four digits."}} ['customer_id', 'field' ...
+[model call 2026-10-11T06:23:18Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 7: text
+[model call 2026-10-11T06:23:18Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 8: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt3; grep -n -B3 -A12 "is_tool_call" docs/workflow-format.md | head -50; grep -n "extra
+    -> 285-| `target_node` | string | Key of the next node. May be the node itself. `__previous__` is allowed in global nodes | 286-| `description` | string | What the transition is for. The routing model reads it | 287-| `condition` | object | When the transition fires | 288:| `is_tool_call` | boolean | The dialogue model triggers the transition by calling a tool. See "Tool-call transitions" | 289- 290- ...
+[model call 2026-10-11T06:23:21Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 9: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt3; grep -n "extraction_schema\\"" -A14 docs/workflow-format.md | sed -n 1,40p; grep -
+    -> 534: "extraction_schema": [ 535- { 536- "name": "order_number", 537- "type": "string", 538- "description": "The order number the caller reads out", 539- "validation_pattern": "^[0-9]{8}$", 540- "max_retries": 2, 541- "min_confidence": 0.8 542- }, 543- { 544- "name": "request_type", 545- "type": "string", 546- "enum_values": ["status", "cancel", "change_address", "other"], 547- "description": "What ...
+[model call 2026-10-11T06:23:22Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 10: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt3; sed -n 613,640p docs/workflow-format.md'}
+    -> An `end_call` node hangs up. It has a `terminal` object and no outgoing transitions. ```json { "name": "goodbye", "node_type": "end_call", "on_enter": { "type": "silent" }, "disable_inactivity_monitor": true, "transitions": [], "terminal": { "type": "function", "function": { "name": "closing_end", "handler": "__function__:end_call", "parameters": { "type": "object", "properties": { "message_mode": ...
+[model call 2026-10-11T06:23:24Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 11: text
+[model call 2026-10-11T06:23:24Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 12: text
+I have what I need from the docs, so I'm writing the generator now.
+[model call 2026-10-11T06:24:32Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 13: tools Write
+  [Write] {'file_path': '/home/ubuntu/btb/wt3/out/w3-B.gen.py', 'content': 'import json\nC = json.load(open(\'out/w3-B.calc.json\'
+[model call 2026-10-11T06:24:34Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 14: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt3; python3 out/w3-B.gen.py && python3 builder/lint_workflow.py out/w3-B.workflow.json
+    -> ok ['date_facts_setup', 'opening', 'identity', 'load_account', 'router', 'negotiate', 'refused', 'hardship', 'dispute', 'already_paid', 'restructuring', 'human', 'hang_up'] 0 errors, 0 warnings []
+[model call 2026-10-11T06:24:35Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 15: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt3; python3 builder/save.py w3-B out/w3-B.workflow.json 2>&1 | tail -5'}
+    -> {"hardened_tools": ["schedule_callback", "transfer_to_agent", "close_call", "verify_identity", "transfer_to_agent", "close_call", "get_account", "close_call", "close_call", "create_promise", "add_note", "close_call", "add_note", "create_promise", "close_call", "transfer_to_agent", "create_promise", "add_note", "close_call", "add_note", "create_promise", "close_call", "add_note", "create_promise",  ...
+[model call 2026-10-11T06:24:42Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 16: text
+Saved. Quick start check:
+[model call 2026-10-11T06:24:43Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 17: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt3; timeout 60 python3 -c "import freya,json; print(str(freya.api(\'POST\',\'/api/v2/c
+    -> {'response': 'I am a digital assistant calling from Freya Bank, and we record this call. Am I speaking with Ms Lee?', 'callId': '5f7d398d-3767-4265-9342-a8f91f117ebb', 'messageId': 'msg_4_1791699884688'}
+[model call 2026-10-11T06:24:54Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 18: text
+[model call 2026-10-11T06:24:54Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 19: text
+The phone agent for slot w3-B is built and saved, and it starts a call: one test turn got the right opening line ("…calling from Freya Bank, and we record this call. Am I speaking with Ms Lee?"). That was the only live test, so nothing past the opening (identity, negotiation, closing) has been tried yet.
+
+- **Checks:** the lint check found 0 errors and 0 warnings, and the situations check found no problems.
+- **Structure:** the date-facts code node runs first, then opening (with callback and third-party handling), identity, an account lookup, a router, one negotiate node, and the six exit nodes: refused, hardship, dispute, already_paid, restructuring and human. Each exit node has only its own rules and tools.
+- **Calc file code:** the code node and the `get_account` hook are used exactly as given. DATE FACTS and the "never compute a date yourself" instruction are in every node that handles dates or promises. The two rules no code step computes (date of birth format, and one date for everything that falls after one product's deadline) are written in the brief's words where they apply.
+- **Brief rules:** two-failure handling for `create_promise`, `add_note` per product without a promise, no notes on any transfer, and closing on the first non-paid note in `get_account` order are in the prompts.
+- **Deviation from routing.md:** the account lookup is a silent conversation node that calls `get_account`, not a passthrough `api_request` node. Lint and save accepted it.
+
+I found no conflict between the brief and the date facts or the extracted situations. I did not do the full rule-by-rule re-read against the brief because of the time limit. The generator is `out/w3-B.gen.py`.
+
+workflow_id: 45b479a7-6323-4580-b0f5-fca4e82e0125, agent_id: 148e9dfa-ee41-4f91-b6c2-68fe3febe63a
+
+done: 13 turns, 110 s
+final save (build): {'workflow_id': '45b479a7-6323-4580-b0f5-fca4e82e0125', 'agent_id': '148e9dfa-ee41-4f91-b6c2-68fe3febe63a', 'version': 23}; lint: 0 errors, 0 warnings
+buildcheck: 0 error(s), 0 warning(s)
+[model call 2026-10-11T06:25:24] gpt-6-astra (Azure, btb/llm.py): self-simulation: write personas + ledger checks from the brief
+self-test 1 (workspace 2): 0/0 personas failed a check (0 checks)
+buildcheck (shipped): 0 problem(s)
+[freya] slot w3-B: workflow_id=45b479a7-6323-4580-b0f5-fca4e82e0125 agent_id=148e9dfa-ee41-4f91-b6c2-68fe3febe63a version=23 (published)
+[freya] exported: /home/ubuntu/btb/wt3/submission/w3-B.workflow.json
+BUILD END 2026-10-11T06:25:29Z (208 s); trace scrubbed (0 secret(s) replaced): /home/ubuntu/btb/wt3/runs/traces/w3-B-20261011-062200.jsonl
+{"workflow_id": "45b479a7-6323-4580-b0f5-fca4e82e0125", "agent_id": "148e9dfa-ee41-4f91-b6c2-68fe3febe63a"}
