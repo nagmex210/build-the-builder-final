@@ -139,8 +139,8 @@ CLOSING = ("CLOSING (overrides anything above about goodbyes): never say goodbye
 _BYE_RULES = [   # phrase-level only: a whole sentence can also carry a mandatory line or a close reason
     (r"Before (?:calling|you call) the close tool,? say (?:the )?goodbye\.[ \t]*", ""),
     (r"(?:thank(?: the customer)?,? and )?say (?:the )?goodbye before (?:calling|you call)", "call"),
-    (r"\b(?:thank(?: the customer)?(?:,| and)\s*)?(?:say\s+)?(?:the\s+)?goodbye(?:\s+once)?(?:,|\s+and|\s+then)*\s+"
-     r"(?=(?:then\s+)?(?:call\s+)?`?close)", ""),
+    (r"\b(?:(?:say\s+)?thank(?:\s+(?:you|the customer|them|the person))?(?:,|\s+and)?\s*)?(?:say\s+)?(?:the\s+)?(?<!says )(?<!said )goodbye"
+     r"(?:\s+once)?(?:\s+in one short sentence)?(?:,|\s+and|\s+then)*\s+(?=(?:then\s+)?(?:call\s+)?`?close)", ""),
 ]
 
 
@@ -191,6 +191,10 @@ def close_structure(wf, canned=None):
             n["task_message"] = (_drop_bye(n.get("task_message")).rstrip() + "\n\n" + rule).strip()
     for t in _all_tools(wf):
         fn = t.get("function") or {}
+        if fn.get("name") != close:     # other tools' descriptions and hook texts ("say goodbye and call close") too
+            fn["description"] = _drop_bye(fn.get("description"))
+            if t.get("post_process_code"):
+                t["post_process_code"] = _drop_bye(t["post_process_code"])
         if fn.get("name") == close:
             d = re.sub(r'Before you call this, in the same turn, say exactly: "[^"]*" \(unless you already said it\)\. ', "", fn.get("description") or "")
             if "says the goodbye" not in d:
