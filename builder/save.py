@@ -44,11 +44,21 @@ def finish_and_save(slot, wf, canned=None):
     return names, state
 
 
-def locked_save(slot, wf, state_file):
-    """freya.save_workflow under an exclusive lock on <state_file>.lock (it reads, then truncates and rewrites the file)."""
-    with open(str(state_file) + ".lock", "w") as lock:
-        fcntl.flock(lock, fcntl.LOCK_EX)
-        return freya.save_workflow(slot, wf, state_file=str(state_file))
+def locked_save(slot, wf, state_file, tries=4):
+    """freya.save_workflow under an exclusive lock on <state_file>.lock (it reads, then truncates and rewrites the file).
+    A platform 5xx is retried (b9 main-B: the fix round's save and the restore both 504'd once, the build then reported the
+    slot's older version and Freya kept whichever PUT landed). An update PUT of the same workflow is idempotent."""
+    import re, time
+    for attempt in range(tries):
+        try:
+            with open(str(state_file) + ".lock", "w") as lock:
+                fcntl.flock(lock, fcntl.LOCK_EX)
+                return freya.save_workflow(slot, wf, state_file=str(state_file))
+        except RuntimeError as e:
+            if not re.search(r"-> 5\d\d", str(e)) or attempt == tries - 1:
+                raise
+            print(f"save {slot}: platform {str(e)[:80]}; retry {attempt + 1}", file=sys.stderr, flush=True)
+            time.sleep(10 + 10 * attempt)
 
 
 def read_state(slot, state_file=None):

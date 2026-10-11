@@ -471,7 +471,14 @@ async def run(slot, tools, briefs):
         try:
             sys.path.insert(0, str(KIT))
             import freya
-            freya.export_workflow(state["workflow_id"], str(export))
+            for attempt in range(3):   # a GET 504 under load left no export (b9 main-B); a GET is safe to repeat
+                try:
+                    freya.export_workflow(state["workflow_id"], str(export))
+                    break
+                except RuntimeError as e:
+                    if "-> 5" not in str(e) or attempt == 2:
+                        raise
+                    time.sleep(10)
             json.loads(export.read_text())
             print(f"[freya] exported: {export}", flush=True)
         except Exception as e:  # noqa: BLE001
