@@ -2,3 +2,22 @@
   invalid rep PUB-05 (try 1): ['resumed from msg_4_1791701252540 (latest reply msg_8_1791701253278, isBranch=True)']
   invalid rep PUB-05 (try 2): ['resumed from msg_4_1791701313411 (latest reply msg_8_1791701314145, isBranch=True)']
   invalid rep PUB-05 (try 3): ['resumed from msg_4_1791701354935 (latest reply msg_8_1791701355871, isBranch=True)']
+FAIL PUB-01 1/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [pieces] conversation: The agent said 'collections' after the latest identity tool result explicitly stated that identity was not verified.
+PASS PUB-02 2/2 | schedule_callback > close_call
+FAIL PUB-03 1/2 | verify_identity > verify_identity > verify_identity > close_call
+       - [plain] conversation: The customer was not told to use the app or a branch after the third wrong answer.
+PASS PUB-04 2/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+INVALID PUB-05 0/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+       - [in_words] conversation: The support team was offered twice rather than once.
+       - [talkative] conversation: The one-sentence sympathy check fails because the agent gives two sympathy sentences, one about traffic and another about the customer's hardship.
+FAIL PUB-06 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [plain] conversation: The minimum payment was offered twice rather than once: first as a lower amount of 637.50, then again as a payment of 637.50 on Friday, October 16.
+       - [in_words] conversation: The minimum payment was offered twice rather than once: first as 637.50 with the overdue-balance note, then again as 637.50 payable on Friday.
+PASS PUB-07 2/2 | verify_identity > verify_identity > get_account > create_promise > close_call
+PASS PUB-08 2/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+PASS PUB-09 2/2 | verify_identity > verify_identity > get_account > transfer_to_agent > close_call
+PASS PUB-10 2/2 | verify_identity > verify_identity > get_account > create_promise > create_promise > close_call
+
+fast_eval: 6 / 10 passed (2 rep(s), all reps must pass), 2768 s
+harness: 1 case(s) still INVALID after 2 re-run(s) (not a measurement), 3 rep(s) re-run
