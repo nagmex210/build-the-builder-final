@@ -266,6 +266,10 @@ RULES_MERGE = ("Merge the rule lists extracted from the documents of one case fo
                "<must do/say> (verbatim: \"...\") (source: <file>, <date>)\nAnswer with the digest only, in markdown.")
 
 
+DIGEST_EXTRACT_S = int(os.environ.get("BTB_DIGEST_EXTRACT_S", "150"))
+DIGEST_MERGE_S = int(os.environ.get("BTB_DIGEST_MERGE_S", "150"))
+
+
 def extract_rules(docs, out):
     """FIX A: one strong Azure call per text document (in parallel), then one merge call -> out/rules.md.
     docs: [(relative name, date, text)]. Returns the path, or None when the model calls fail."""
@@ -277,23 +281,33 @@ def extract_rules(docs, out):
         name, date, txt = d
         try:
             r = chat([{"role": "user", "content": RULES_ONE + f"\n\nDOCUMENT {name} (date: {date or 'unknown'}):\n" + txt[:60000]}],
-                     tier="strong", purpose=f"case folder: rules of {name}", max_tokens=6000, temperature=0)
+                     tier="fast", purpose=f"case folder: rules of {name}", max_tokens=6000, temperature=0)
             return name, date, (r or "").strip()
         except Exception as e:  # noqa: BLE001
             print(f"case: rule extraction failed for {name}: {str(e)[:120]}", flush=True)
             return name, date, ""
-    with ThreadPoolExecutor(max_workers=8) as ex:
-        per = list(ex.map(one, docs))
+    # hard time bounds: the whole build has 30 minutes; a slow model call must never stall it
+    from concurrent.futures import wait
+    ex = ThreadPoolExecutor(max_workers=14)
+    futs = {ex.submit(one, d): d for d in docs}
+    done, late = wait(futs, timeout=DIGEST_EXTRACT_S)
+    per = [f.result() for f in done] + [(futs[f][0], futs[f][1], "") for f in late]
+    if late:
+        print(f"case: rule extraction: {len(late)} document(s) over {DIGEST_EXTRACT_S}s, skipped", flush=True)
+    ex.shutdown(wait=False, cancel_futures=True)
     got = [(n, d, r) for n, d, r in per if r and r.strip().upper() != "NONE"]
     if not got:
         return None
     lists = "".join(f"\n\n### {n} (date: {d or 'unknown'})\n{r}" for n, d, r in got)
+    mx = ThreadPoolExecutor(max_workers=1)
+    fut = mx.submit(chat, [{"role": "user", "content": RULES_MERGE + "\n\nPER-DOCUMENT RULES:" + lists}], tier="strong",
+                    purpose="case folder: merge the rules digest", max_tokens=16000, temperature=0, effort="low")
     try:
-        merged = chat([{"role": "user", "content": RULES_MERGE + "\n\nPER-DOCUMENT RULES:" + lists}], tier="strong",
-                      purpose="case folder: merge the rules digest", max_tokens=16000, temperature=0)
-    except Exception as e:  # noqa: BLE001
-        print(f"case: rules merge failed ({str(e)[:120]}): keeping the per-document lists", flush=True)
+        merged = fut.result(timeout=DIGEST_MERGE_S)
+    except Exception as e:  # noqa: BLE001  (timeout or model failure)
+        print(f"case: rules merge not done in time or failed ({str(e)[:120] or 'timeout'}): keeping the per-document lists", flush=True)
         merged = lists
+    mx.shutdown(wait=False, cancel_futures=True)
     path = out / "rules.md"
     path.write_text("# RULES digest of the case folder (every document; newer document wins on conflict)\n"
                     "Documents: " + ", ".join(f"{n} ({d or 'undated'})" for n, d, _ in per) + "\n\n" + merged.strip()
