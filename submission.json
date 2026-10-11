@@ -1,0 +1,13 @@
+{
+  "team": "agent to the fourth",
+  "members": [
+    { "name": "Eren Berk Eraslan", "email": "eraslanerenberk@gmail.com" },
+    { "name": "Barış Yaycı", "email": "barsyayc@gmail.com" }
+  ],
+  "repo": "https://github.com/nagmex210/build-the-builder-final",
+  "commit": "4c9eb6f223568250474c464302d1612c8ced96a2",
+  "run_command": "python3 builder/build.py {case_folder} {mock_url}",
+  "workflow": "submission/final.workflow.json",
+  "trace": "traces/final.log",
+  "mock_url": "https://btb-bank-mock.barsyayc.workers.dev"
+}
