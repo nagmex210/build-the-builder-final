@@ -1,0 +1,37 @@
+  invalid rep PUB-05 (try 1): ['resumed from msg_4_1791713356746 (latest reply msg_8_1791713357491, isBranch=True)']
+  invalid rep PUB-07 (try 1): ['harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"30513ab3-3df0-4052-a73a-930a04343343"}}}']
+  invalid rep PUB-03 (try 1): ['harness: POST /api/v2/chat/message -> 404: {"success":false,"data":{"message":"Agent service error","result":{"error":"Agent service error"}}}']
+  invalid rep PUB-05 (try 1): ['resumed from msg_4_1791713582351 (latest reply msg_8_1791713582667, isBranch=True)']
+  invalid rep PUB-06 (try 1): ['harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"db4d136a-d324-40b5-9a21-177cda11de4d"}}}']
+  invalid rep PUB-10 (try 1): ['harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"de7269a9-704d-46cc-baa0-e341802d19f2"}}}']
+  invalid rep PUB-05 (try 2): ['transcript unreadable (GET /api/v2/call/04f0caa8-38f2-4d18-90f6-889a0dd786d9 -> 503: {"success":false,")']
+  invalid rep PUB-06 (try 2): ['harness: GET /api/v2/call/83fe608e-a606-406a-ae78-0d46b2561589 -> 504: error code: 504\n']
+  invalid rep PUB-05 (try 3): ['resumed from msg_4_1791713895450 (latest reply msg_10_1791713959456, isBranch=True)']
+FAIL PUB-01 1/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [corrects] conversation: The agent said 'collections' after the latest identity tool result explicitly stated that identity was not verified.
+FAIL PUB-02 1/2 | close_call
+       - [talkative] outcome ('not_reached', 'no_callback'), expected ('not_reached', 'callback')
+       - [talkative] callbacks [], expected [{'date': '2026-10-15', 'time': '11:00'}]
+       - [talkative] conversation: The callback was not scheduled for the next business day, October 15, 2026, at 11:00; every scheduling attempt used an incorrect year and was rejected.
+FAIL PUB-03 0/2 | verify_identity > verify_identity > verify_identity > verify_identity > get_account > close_call
+       - [corrects] outcome ('no_promise', 'refused'), expected ('not_verified', 'failed')
+       - [corrects] conversation: The third-wrong-answer stopping check is not clearly satisfied because only two wrong answers occurred, the agent disclosed a product and amount, and the customer was not told to use the app or a branch.
+       - [asks_back] outcome ('promise', None), expected ('not_verified', 'failed')
+       - [asks_back] promises [('p1', 95.0, '2026-10-16')], expected []
+       - [asks_back] conversation: The identity check continued after the third wrong answer (1990-07-21) was ignored, the agent disclosed a credit card and past-due amount, and the customer was never directed to use the app or a branch.
+PASS PUB-04 2/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+INVALID PUB-05 1/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+       - [in_words] conversation: The support team was offered twice rather than once.
+FAIL PUB-06 0/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [talkative] conversation: The minimum payment of 637.50 was offered twice rather than once.
+       - [corrects] conversation: The minimum payment of 637.50 was offered twice rather than once.
+FAIL PUB-07 1/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [talkative] conversation: The promise was not recorded for Tuesday 27 October: the tool only validated the date, and no recording tool call was made.
+FAIL PUB-08 1/2 | verify_identity > verify_identity > get_account > close_call
+       - [corrects] conversation: The agent did not say that payments can take one business day to appear.
+FAIL PUB-09 1/2 | verify_identity > verify_identity > get_account > transfer_to_agent > close_call
+       - [talkative] conversation: The required transfer_to_agent call with queue restructuring was never made.
+PASS PUB-10 2/2 | verify_identity > verify_identity > get_account > create_promise > create_promise > close_call
+
+fast_eval: 2 / 10 passed (2 rep(s), all reps must pass), 2229 s
+harness: 1 case(s) still INVALID after 2 re-run(s) (not a measurement), 8 rep(s) re-run

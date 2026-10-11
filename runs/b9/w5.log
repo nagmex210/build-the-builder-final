@@ -1,0 +1,24 @@
+I found and fixed the cause of the October dates, and proved it with a before/after repro. But I have no fast_eval scores: none of the six evals finished by the deadline because the platform kept returning 500–504 errors. The report is in `runs/b9/w5.md`, committed on `idea/b9-5` (4bfd60a).
+
+**Cause:** when a call comes in through the chat endpoint, the platform skips the code in the workflow's first node. The node name doesn't matter: `start`, `date_facts_setup` and `setup` were all skipped in small test workflows. That first node is where the builder computes the date facts. So on chat the agent never had them, saw the literal text `{{date_facts}}`, and guessed dates from the real calendar (October). The same code node does run if it is reached after the first turn. The official simulation also runs the first node; I saw its code ran in the b8 official A run. So official scores were not affected. Every chat-based measurement was: fast_eval on A, B and the raw briefs, all of brief C, and any chat self-test.
+
+**Before/after:** the same scripted brief C conversation (case C-01, call time 1 Nov) on a copy of the b8 brief C workflow:
+- **Before:** the date code never ran, and the agent asked "Can you pay 380.0 by **17 October**?"
+- **After:** the code ran and it asked "Can you pay 380.00 by **Wednesday 2026-11-11**?", which is the brief's 10-day deadline.
+
+**Builder changes:**
+- **`builder/livevars.py` (new):** after the opening, the call passes through a copy of the start node's code before each next step. The code recalculates everything from the call variables, so running it twice is harmless where the first run worked.
+- **`builder/livevars.py`, live check:** a two-turn real chat that checks the call's events to see whether the start code actually ran. A chat that fails is reported as "inconclusive", not as a code error.
+- **`builder/save.py`:** every save applies the new wiring.
+- **`builder/build.py`:** the build runs the live check, logs it in the trace, and re-applies the wiring if the code didn't run.
+
+**Results:**
+- All four builds (A, B, rA, rB) took 224–272 s. Lint found 0 errors, and the new wiring is present in the saved files.
+- All four live checks came back "inconclusive" because the platform was overloaded at build time. The fix was verified live only through the brief C repro.
+- The six evals (A, B, rA, rB, and brief C before/after) are still running detached, so the tool's 10-minute limit couldn't kill them. They will write `runs/b9/w5/fe-*.json` in the wt5 worktree, uncommitted. Stop them if the merger needs eval slots.
+
+**Expected effect:** official scores shouldn't change. Chat-based scores should rise on date cases. Past fast_eval date failures are probably partly this bug, for example the A cases PUB-04/06 that were one day off yet passed officially.
+
+**Open, not fixed:** when the date check blocks a promise, the agent only sees "DNS resolution failed". It then says the promise could not be recorded and closes the call as a service error. That breaks priority rule 1: a rejected call must give its own reason.
+
+The change is brief-agnostic: it only reads the workflow's structure and copies whatever code the builder generated.

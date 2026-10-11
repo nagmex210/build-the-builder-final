@@ -1,0 +1,27 @@
+  invalid rep PUB-13 (try 1): ['resumed from msg_14_1791713448760 (latest reply msg_17_1791713449256, isBranch=True)']
+  invalid rep PUB-11 (try 1): ['harness: POST /api/v2/chat/message -> 404: {"success":false,"data":{"message":"Agent service error","result":{"error":"Agent service error"}}}']
+  invalid rep PUB-13 (try 2): ['transcript unreadable (GET /api/v2/call/8a0eaa89-c252-4f52-915b-0812e5f3d578 -> 503: {"success":false,")']
+  invalid rep PUB-11 (try 2): ['harness: GET /api/v2/call/c400ecfd-06d2-4b8b-b14f-98805cafcfd1 -> 503: {"success":false,"data":{"message":"API key validation is temporarily unavailable. Retry shortly.","result":null}}']
+  invalid rep PUB-13 (try 3): ['resumed from msg_4_1791713905165 (latest reply msg_6_1791713968862, isBranch=True)']
+  invalid rep PUB-11 (try 3): ['harness: GET /api/v2/call/4039aa5d-5e29-4250-930c-a52d3dd955c8 -> 503: {"success":false,"data":{"message":"API key validation is temporarily unavailable. Retry shortly.","result":null}}']
+INVALID PUB-11 0/1 | verify_identity > verify_identity > get_account > create_promise > create_promise > create_promise > create_promise > create_promise > create_promise
+       - [pieces] outcome (None, None), expected ('promise', None)
+       - [pieces] promises [], expected [('p1', 220.0, '2026-10-16'), ('p2', 640.0, '2026-10-16'), ('p3', 75.0, '2026-10-16')]
+       - [pieces] the call was not closed with close_call
+       - [pieces] conversation: The call fails the single read-back and confirmation check because these were repeated five times, and the one create_promise per product check because multiple calls used invalid product IDs and mostly failed.
+       - [pieces] harness: GET /api/v2/call/4039aa5d-5e29-4250-930c-a52d3dd955c8 -> 503: {"success":false,"data":{"message":"API key validation is temporarily unavailable. Retry shortly.","result":null}}
+FAIL PUB-12 0/1 | verify_identity > verify_identity > verify_identity > verify_identity > get_account
+       - [asks_back] outcome (None, None), expected ('promise', None)
+       - [asks_back] promises [], expected [('p1', 510.0, '2026-10-15')]
+       - [asks_back] notes [], expected [('p2', 'refused'), ('p3', 'refused')]
+       - [asks_back] the call was not closed with close_call
+       - [asks_back] conversation: No credit-card promise or refused notes for the other two products were recorded, two personal-loan attempts and one car-loan attempt were not clearly completed, and tomorrow was incorrectly treated as a past date rather than 2026-10-15.
+INVALID PUB-13 0/1 | verify_identity > verify_identity > verify_identity > get_account > add_note > create_promise > create_promise > add_note
+       - [in_words] outcome (None, None), expected ('promise', None)
+       - [in_words] promises [('p2', 900.0, '2026-10-14')], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]
+       - [in_words] notes [('cc_6604', 'refused'), ('p1', 'refused')], expected []
+       - [in_words] the call was not closed with close_call
+       - [in_words] conversation: The credit card was not recorded for 30 October 2026, the loan was recorded for 14 October rather than its 23 October deadline, the read-back did not name both required dates, and the agent claimed payments were noted before successful recording.
+
+fast_eval: 0 / 3 passed (1 rep(s), all reps must pass), 1371 s
+harness: 2 case(s) still INVALID after 2 re-run(s) (not a measurement), 4 rep(s) re-run

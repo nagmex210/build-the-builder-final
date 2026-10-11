@@ -1,0 +1,2 @@
+  invalid rep PUB-09 (try 1): ['harness: GET /api/v2/call/42c1a267-a975-4a64-9d2e-2b5d3b9ff112 -> 503: {"success":false,"data":{"message":"API key validation is temporarily unavailable. Retry shortly.","result":null}}']
+  invalid rep PUB-09 (try 2): ['harness: chat turn kept timing out']

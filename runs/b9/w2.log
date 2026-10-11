@@ -1,0 +1,28 @@
+The self-test now actually runs, but I could not get a fast_eval score: none of my four evals finished a single case in about 55 minutes. All my work and the report (`runs/b9/w2.md`) are committed on `idea/b9-2`, with the latest commit at `9f92e64`.
+
+**Root cause:** saving a workflow to workspace 2 still works, but every chat turn there answers 402 Insufficient credits. So every b8 self-test played 0 chats, logged "0/0 personas failed", and the fix round and buildcheck's catastrophic check silently did nothing.
+
+**What changed** (in `builder/selftest.py`, `builder/build.py`, `builder/buildcheck.py`):
+- **Probe and fallback:** after copying the workflow to workspace 2, the self-test plays one opening turn there. If that fails (402, 5xx, empty reply), or every chat later gets 402, it falls back to workspace 1 and records why.
+- **Workspace 1 settings:** one play per persona (6 chats instead of 12), at most 6 at a time, round 1 up to 660 s within the 30-minute budget. A slow turn gets another 120 s of waiting, and turns are never resent.
+- **True numbers in the trace:** where the chats ran and why, chats planned and finished, failures, harness errors by reason, and round time. The log says "SELF-TEST DID NOT RUN: 0 valid chats of N" when nothing finished. buildcheck now warns when fewer than 3 chats finished instead of passing silently.
+- **One persona per brief gate:** the persona writer first lists the brief's gates, then writes one persona per gate, the most error-prone ones first if there are more gates than personas. Both lists are in the trace.
+- **Fix round:** it now needs at least 3 finished chats, and at least half of those planned, not every planned chat. Otherwise the one-play fallback could never trigger it.
+- **Build exit:** the build now exits as soon as it prints its result. Before, a timed-out chat thread kept the process alive for minutes after `BUILD END`.
+
+**Evidence:**
+
+| Build | Code version | Chats finished | Failed a check |
+|---|---|---|---|
+| w2-A, w2-rB | first version (12 chats in parallel) | 0/12, correctly reported as "did not run" | – |
+| w2-B | first version | 3/12 | 1 |
+| w2-rA | first version | 1/12 | 1 |
+| w2-A2 | final | 6/6, in workspace 1 | 0 |
+
+- The w2-A2 round took 475 s and the whole build 1092 s (18 min). That is inside the 30-minute limit but longer than the champion's 3–4 min, which only matters for the build-time tie-break.
+- With 0 failures, w2-A2 needed no fix round, so the fix round has still not been exercised in this batch.
+- w2-rB2 failed before its self-test because the platform returned a 500 on the final save. The build reported that correctly; it is not caused by this change.
+
+**Score: not measured.** The eval logs show only invalid reps (500, 404 "Agent service error", 504, timeouts, branch resumes) while about 20 fast_evals from all workers were running. I stopped mine at 09:23 to commit within the limit. In none of the scored builds (w2-A, B, rA, rB) did the fix round run, so those agents are what the champion builder would have produced; the champion is 13/26 (A 4, B 1, rA 8, rB 0).
+
+The change works on any brief: the fallback and counts are about the platform, and the gates are read from the brief at build time.

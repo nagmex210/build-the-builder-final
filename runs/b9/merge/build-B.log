@@ -1,0 +1,174 @@
+builder: slot=main-B tools=/home/ubuntu/btb/repo/tools/openapi.json briefs=/home/ubuntu/btb/repo/briefs/brief-a.md /home/ubuntu/btb/repo/briefs/brief-b.md
+trace: /home/ubuntu/btb/repo/runs/traces/main-B-20261011-092641.jsonl
+BUILD START 2026-10-11T09:26:41Z slot=main-B
+clean slot: moved 6 old file(s) of this slot out of the kit to /tmp/btb-old-main-B-5wz0um4v
+[test] datecalc: generated date/amount code run locally on 5 dates and fake products -> ok (40 s)
+[model call 2026-10-11T09:27:21] gpt-6-luna (Azure, btb/llm.py): extract calendar/amount spec for code steps
+[test] A1 situations: hardship, dispute, already_paid, cannot_pay_refused, restructuring, callback
+[model] build agent: Claude Agent SDK, claude-opus-5-5, skill build-phone-agent, budget 12 min
+[model call 2026-10-11T09:27:29] gpt-4.1-mini (Azure, btb/llm.py): A1: list the brief's situations after the account lookup (router + specialist routes)
+[model call 2026-10-11T09:27:31Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 1: tools Skill
+  [Skill] {'skill': 'build-phone-agent', 'args': 'Slot: main-B'}
+[model call 2026-10-11T09:27:33Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 2: text
+[model call 2026-10-11T09:27:33] gpt-6-luna (Azure, btb/llm.py): A3: extract the brief's mandatory sentences as fixed text
+[model call 2026-10-11T09:27:34Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 3: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat briefs/brief-a.md briefs/brief-b.md; python3 -c "\nimport json;d=json.load(op
+    -> # Brief A: Freya Bank, early-stage collections, one product Freya Bank is fictional. Every customer, debt and payment here is synthetic. This brief has the density of a real bank specification. Read all of it. Most failed cases come from one rule that was skipped. ## 1. The job Freya Bank calls customers who are 1 to 45 days late on one product. The agent finds the customer, checks identity, state ...
+[model call 2026-10-11T09:27:35Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 4: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; cat .claude/skills/build-phone-agent/routing.md; cat examples/base-agent.json | h
+    -> # Workflow structure and routing recipe A shape that works for any collections-style brief. Fill every rule, value, field name, enum, outcome and reason from THE BRIEF and THE TOOL API FILE you were given. Node names below are suggestions; stage contents come from the brief. ## Principle The agent model is small. It follows one short task well and many mixed tasks badly. So: - one conversation nod ...
+[model call 2026-10-11T09:27:38Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 5: text
+[model call 2026-10-11T09:27:40Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 6: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; python3 -c "\nimport json;d=json.load(open(\'out/main-B.calc.json\'));print(d[\'e
+    -> TODAY: Friday 2026-10-23 (a business day) Tomorrow: Saturday 2026-10-24 Next business day after today: Tuesday 2026-10-27 Last business day of this week: Friday 2026-10-23 <- that is TODAY Last business day of next week: Friday 2026-10-30 Last business day of this month: Friday 2026-10-30 DEADLINE for band "early" (days_late 1 to 7): Thursday 2026-11-12 = 12 business days after today; persuasion a ...
+[model call 2026-10-11T09:27:42Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 7: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; sed -n 171,290p docs/tools-and-code.md; sed -n 447,486p docs/workflow-format.md; 
+    -> ### A `pre_actions` node ```json { "name": "fetch_order", "node_type": "api_request", "passthrough": true, "passthrough_default_transition": "present", "on_enter": { "type": "silent" }, "pre_actions": [ { "type": "function", "config": { "timeoutMs": 10000, "maxRetries": 2 }, "function": { "name": "get_order", "handler": "__function__:api_call", "description": "Get the order.", "parameters": { "typ ...
+[model call 2026-10-11T09:27:44Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 8: text
+[model call 2026-10-11T09:28:43Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 9: tools Bash
+  [Bash] {'command': 'mkdir -p /home/ubuntu/btb/repo/out; cat > /home/ubuntu/btb/repo/out/main-B.gen.py <<\'EOF\'\nimport json\nc
+    -> ERROR load_account: response_mapping inside a pre_action is ignored; put it on the node 1 errors, 0 warnings [ "situation 'callback': no specialist node" ]
+[model call 2026-10-11T09:28:45Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 10: text
+[model call 2026-10-11T09:28:45Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 11: text
+The first draft is written; lint and the situations check found two fixes, which I'm making now before saving.
+[model call 2026-10-11T09:28:49Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 12: tools Bash
+  [Bash] {'command': 'python3 - <<\'EOF\'\ns=open(\'out/main-B.gen.py\').read()\ns=s.replace(""",post=calc["account_post_process_
+    -> 0 errors, 0 warnings [] {"hardened_tools": ["schedule_callback", "close_call", "transfer_to_agent", "verify_identity", "close_call", "transfer_to_agent", "get_account", "close_call", "create_promise", "add_note", "close_call", "transfer_to_agent", "create_promise", "add_note", "close_call", "add_note", "close_call", "add_note", "close_call", "add_note", "close_call", "transfer_to_agent", "close_ca ...
+[model call 2026-10-11T09:28:59Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 13: tools Bash
+  [Bash] {'command': 'timeout 60 python3 -c "import freya,json; print(str(freya.api(\'POST\',\'/api/v2/chat/message\',{\'workflow
+    -> {'response': "Hello, I'm Freya Bank's digital assistant, and this call is being taped. Am I speaking with Ms Lee?", 'callId': '40a3ce6d-fdab-48ad-8fd8-7936a14bc92d', 'messageId': 'msg_4_1791710941134'}
+[model call 2026-10-11T09:29:11Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 14: text
+[model call 2026-10-11T09:29:11Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 15: text
+I built and saved the main-B workflow, and a one-turn chat test opened the call correctly. I did not run any practice cases or a fuller chat.
+
+**How it's built:**
+- The call starts with the date code node unchanged, then goes opening → identity → account lookup → router → negotiate.
+- The account post-process hook is set verbatim on `get_account`.
+- `{{date_facts}}` and the "never compute a date yourself" instruction are in every node that handles dates or callbacks.
+- The rules no code step computes are written into the negotiate node in the brief's words.
+- Each exit situation from the extraction has its own node. The situations check passes with no problems and lint shows 0 errors.
+
+**Additions beyond the extracted list:**
+- **`callback` node:** the first situations check failed because it was missing. I added it, reached from the opening node.
+- **`human` node:** the brief's rule 42 (a customer who insists on a human is transferred to the `general` queue and closed as `transferred`/`human`) wasn't in the extracted list, so I added a node for it.
+- **One product only:** under Brief B, a dispute or "already paid" about one product is noted in the negotiate node and the call continues with the others. The call only leaves to the `dispute` or `already_paid` node when no other product is left.
+
+**Brief vs. extracted list:** the extracted `callback` situation leaves out Brief A rule 7 (ask once for another time; if that is also outside the window, close as `not_reached`/`no_callback`). I followed the brief and put that rule in both the opening and callback nodes.
+
+workflow_id 0e92e0fa-2e50-4314-8434-33760d22f246, agent_id bce0c1bc-a68b-436e-a37b-88db6b717c99. Brief differs from the extracted situations: added `human` (rule 42) and the `no_callback` branch (rule 7).
+
+done: 10 turns, 102 s
+final save (build): {'workflow_id': '0e92e0fa-2e50-4314-8434-33760d22f246', 'agent_id': 'bce0c1bc-a68b-436e-a37b-88db6b717c99', 'version': 30}; lint: 0 errors, 0 warnings
+buildcheck: 0 error(s), 0 warning(s)
+live variables: computed variables live (ran in ['date_facts_setup__again_identity'], errors [])
+[model call 2026-10-11T09:30:48] gpt-6-astra (Azure, btb/llm.py): self-simulation: write personas + ledger checks from the brief
+workspace 2 cannot chat (402 Insufficient credits); self-test in workspace 1
+[model call 2026-10-11T09:31:03] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T09:31:05] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T09:31:07] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T09:31:08] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T09:31:10] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T09:31:25] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T09:31:29] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T09:31:30] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T09:31:32] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T09:31:34] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T09:31:46] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T09:31:53] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T09:31:57] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T09:32:04] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T09:32:04] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T09:32:04] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T09:32:17] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T09:32:31] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T09:32:44] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T09:32:48] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T09:33:02] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T09:33:03] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T09:33:06] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T09:33:22] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T09:33:36] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T09:33:58] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T09:33:59] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T09:34:10] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T09:34:12] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T09:34:24] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T09:35:06] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T09:35:29] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T09:36:22] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T09:36:31] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+[model call 2026-10-11T09:36:42] gpt-4.1-mini (Azure, btb/llm.py): self-simulation: persona turn
+self-test 1: 5/6 persona chats played in workspace 1 (workspace 2 cannot chat (402 Insufficient credits)), 3 failed a check (8 checks), 1 harness errors
+[model call 2026-10-11T09:40:31Z] claude-opus-5-5 (Claude Agent SDK) self-test fix turn 1: text
+[model call 2026-10-11T09:40:33Z] claude-opus-5-5 (Claude Agent SDK) self-test fix turn 2: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; wc -c out/main-B.workflow.json; python3 -c "\nimport json;w=json.load(open(\'out/
+    -> 966548 out/main-B.workflow.json { "nodes": { "date_facts_setup": { "name": "date_facts_setup", "node_type": "code", "passthrough": true, "passthrough_default_transition": "opening", "on_enter": { "type": "silen ['nodes', 'global_nodes', 'initial_node', 'system_prompt', 'test_variables'] 9:1. `get_account` returns one to three products. Each has its own `past_due`, `days_late` and floor. 15:7. Read ...
+[model call 2026-10-11T09:40:37Z] claude-opus-5-5 (Claude Agent SDK) self-test fix turn 3: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; python3 - <<\'E\'\nimport json;w=json.load(open(\'out/main-B.workflow.json\'))\nf
+    -> date_facts_setup code 26190 [None] opening conversation 104194 [None, None, None] identity conversation 50704 [None, None, None] load_account api_request 64543 [None] router conversation 20421 [None, None, None, None, None, None, None, None] negotiate conversation 178162 [None, None, None, None, None, None, None] hardship conversation 185649 [None] dispute conversation 30391 [None] already_paid co ...
+[model call 2026-10-11T09:40:39Z] claude-opus-5-5 (Claude Agent SDK) self-test fix turn 4: text
+[model call 2026-10-11T09:40:40Z] claude-opus-5-5 (Claude Agent SDK) self-test fix turn 5: tools Bash
+  [Bash] {'command': "cd /home/ubuntu/btb/repo; python3 - <<'E'\nimport json;d=json.load(open('out/main-B.selftest1.json'))\ns=js
+    -> <class 'dict'> ['personas', 'where', 'fallback_why', 'planned', 'n', 'n_failed', 'n_checks_failed', 'harness_errors', 'seconds', 'rows'] c770dcfd 9953 d86eba48 12478 463be838 17917
+[model call 2026-10-11T09:40:44Z] claude-opus-5-5 (Claude Agent SDK) self-test fix turn 6: tools Bash
+  [Bash] {'command': "cd /home/ubuntu/btb/repo; python3 - <<'E'\nimport json;d=json.load(open('out/main-B.selftest1.json'))\nr=d[
+    -> ['title', 'customer', 'script', 'checks', 'tools', 'call_id', 'turns', 'transcript', 'harness_error', 'failed'] ===== c770dcfd-53ea-4659-8187-ee34d20dbab9 {"title": "His sister offers tomorrow evening", "customer": "PUB-01", "script": "Daniel's sister answers and says Daniel is out. She first offers tomorrow at half past seven in the evening. If asked for another time, she corrects herself: Thursd ...
+[model call 2026-10-11T09:40:47Z] claude-opus-5-5 (Claude Agent SDK) self-test fix turn 7: text
+[model call 2026-10-11T09:40:47Z] claude-opus-5-5 (Claude Agent SDK) self-test fix turn 8: tools Bash
+  [Bash] {'command': "cd /home/ubuntu/btb/repo; python3 - <<'E'\nimport json;w=json.load(open('out/main-B.workflow.json'))\nprint
+    -> {"customer_id": "c_test", "first_name": "Ann", "last_name": "Lee", "title": "Ms", "now": "2026-10-14T11:00"} ['name', 'node_type', 'tools', 'task_message', 'role_message', 'on_enter', 'transitions', 'max_node_turns', 'passthrough', 'pre_actions', 'response_mapping', 'extraction_schema', 'interruptible'] ## name 10 "callback" ## node_type 14 "conversation" ## tools 85212 [{"type": "function", "conf ...
+[model call 2026-10-11T09:40:51Z] claude-opus-5-5 (Claude Agent SDK) self-test fix turn 9: text
+[model call 2026-10-11T09:40:51Z] claude-opus-5-5 (Claude Agent SDK) self-test fix turn 10: text
+Callback node prompt read; checking how DATE FACTS lists callback days, then the negotiate/dispute issues.
+[model call 2026-10-11T09:40:52Z] claude-opus-5-5 (Claude Agent SDK) self-test fix turn 11: tools Bash
+  [Bash] {'command': "cd /home/ubuntu/btb/repo; python3 - <<'E'\nimport json,re;w=json.load(open('out/main-B.workflow.json'))\ns=
+    -> omise_dates_min_gap_days') is not None: L.append('GAP: two dates promised in this call must be at least ' + str(SPEC.get('promise_dates_min_gap_days')) + ' calendar days apart (count it in CALENDAR).') cb = SPEC.get('callback') or {} if cb.get('business_days_ahead') is not None: days = [t] x = t for _ in range(int(cb.get('business_days_ahead') or 0)): x = next_bd(x) days.append(x) win = (' between ...
+[model call 2026-10-11T09:41:00Z] claude-opus-5-5 (Claude Agent SDK) self-test fix turn 12: text
+[model call 2026-10-11T09:41:02Z] claude-opus-5-5 (Claude Agent SDK) self-test fix turn 13: tools Bash
+  [Bash] {'command': "cd /home/ubuntu/btb/repo; python3 - <<'E'\nimport json;w=json.load(open('out/main-B.workflow.json'))\nfor k
+    -> ##### dispute ## THIS SITUATION (from the brief) FIRST RULE (brief): Do not argue or take a promise The customer has just told you their situation. Respond to it now, ONCE, in the brief's order. Never repeat a sentence you or an earlier node already said in this call. EVERY OFFER AND QUESTION OF THIS SITUATION IS MADE AT MOST ONCE PER CALL (even if you enter this node again): before you speak, loo ...
+[model call 2026-10-11T09:41:07Z] claude-opus-5-5 (Claude Agent SDK) self-test fix turn 14: text
+[model call 2026-10-11T09:41:08Z] claude-opus-5-5 (Claude Agent SDK) self-test fix turn 15: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; python3 - <<\'E\'\nimport json;w=json.load(open(\'out/main-B.workflow.json\'))\nf
+    -> dispute ['add_note', 'close_call'] already_paid ['add_note', 'close_call'] cannot_pay_refused ['add_note', 'close_call'] negotiate ['create_promise', 'add_note', 'close_call', 'check_promise_date'] callback ['schedule_callback', 'close_call'] 7527 add_note :: this promise.' If result has offer_instead, offer exactly that value. If create_promise fails: try once more; if it fails again, say you cou ...
+[model call 2026-10-11T09:41:19Z] claude-opus-5-5 (Claude Agent SDK) self-test fix turn 16: text
+[model call 2026-10-11T09:41:19Z] claude-opus-5-5 (Claude Agent SDK) self-test fix turn 17: text
+[model call 2026-10-11T09:41:19Z] claude-opus-5-5 (Claude Agent SDK) self-test fix turn 18: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; f=out/main-B.workflow.json; for p in \'END: for each product without a promise ca
+    -> 1 :: END: for each product without a promise call add_note 1 :: Outside: ask once for another time; if also outside, close not_reached/no_callback without scheduling. 1 :: As soon as the customer answers about paying (yes, a date, an amount, too much, a no, a question about the payment) call transition_to_negotiate without speaking. 4 :: or claims it was closed or paid off in the past." 4 :: this  ...
+[model call 2026-10-11T09:41:21Z] claude-opus-5-5 (Claude Agent SDK) self-test fix turn 19: tools Read
+  [Read] {'file_path': '/home/ubuntu/btb/repo/out/main-B.workflow.json', 'limit': 3}
+[model call 2026-10-11T09:41:22Z] claude-opus-5-5 (Claude Agent SDK) self-test fix turn 20: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; grep -n -o -F \'or claims it was closed or paid off in the past."\' out/main-B.wo
+    -> 821:or claims it was closed or paid off in the past." 825:or claims it was closed or paid off in the past." 1199:or claims it was closed or paid off in the past." 1203:or claims it was closed or paid off in the past."
+[model call 2026-10-11T09:41:24Z] claude-opus-5-5 (Claude Agent SDK) self-test fix turn 21: text
+[model call 2026-10-11T09:41:26Z] claude-opus-5-5 (Claude Agent SDK) self-test fix turn 22: tools Edit
+  [Edit] {'replace_all': False, 'file_path': '/home/ubuntu/btb/repo/out/main-B.workflow.json', 'old_string': 'As soon as the cust
+[model call 2026-10-11T09:41:28Z] claude-opus-5-5 (Claude Agent SDK) self-test fix turn 23: tools Edit
+  [Edit] {'replace_all': False, 'file_path': '/home/ubuntu/btb/repo/out/main-B.workflow.json', 'old_string': 'END: for each produ
+[model call 2026-10-11T09:41:30Z] claude-opus-5-5 (Claude Agent SDK) self-test fix turn 24: tools Edit
+  [Edit] {'replace_all': False, 'file_path': '/home/ubuntu/btb/repo/out/main-B.workflow.json', 'old_string': 'Outside: ask once f
+[model call 2026-10-11T09:41:31Z] claude-opus-5-5 (Claude Agent SDK) self-test fix turn 25: text
+Edits done; checking the JSON loads.
+[model call 2026-10-11T09:41:32Z] claude-opus-5-5 (Claude Agent SDK) self-test fix turn 26: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/repo; python3 -c "import json;w=json.load(open(\'out/main-B.workflow.json\'));print(\'o
+    -> ok 17
+[model call 2026-10-11T09:41:39Z] claude-opus-5-5 (Claude Agent SDK) self-test fix turn 27: text
+[model call 2026-10-11T09:41:39Z] claude-opus-5-5 (Claude Agent SDK) self-test fix turn 28: text
+I made three prompt edits to `out/main-B.workflow.json`, and the file still loads with python3. I didn't touch the start code node or the account post_process_code, didn't save to Freya, and didn't re-run any tests, so none of these fixes has been confirmed by a call yet.
+
+- **His sister offers tomorrow evening (no callback scheduled): fixed.** This failure was real. With "now" on Wednesday 14 October, Thursday 15 October at 19:00 is the next business day and inside the 10:00–19:00 window, so the brief requires a callback. The agent turned it down anyway and kept asking. The callback prompt now says to check the second offered time against the allowed callback days, that exactly 10:00 and 19:00 count as inside, and to schedule it straight away without asking again or suggesting a time.
+- **Pressure for an unauthorized exception (notes and a second close after the call was closed): fixed.** This failure was real: the agent closed the call and then tried to add notes and close again. The negotiate prompt's end step now says to add every note first, that close_call is the very last tool, and that no tool may be called after it.
+- **One promise, one payment claim, one dispute (no promise recorded): fixed.** This failure was real, because Brief B rule 9 says a dispute or "already paid" claim on one product doesn't end the call. The agent went into the dispute/already-paid situations, which can't record promises, so it refused the card promise. The router prompt now sends a claim that covers only some products to negotiate, where the claim is noted and a promise can still be taken for the other products. It only goes to dispute or already-paid when the claim covers every product.
+
+done: 16 turns, 69 s
+final pass failed: PUT /api/v2/workflow/0e92e0fa-2e50-4314-8434-33760d22f246 -> 504: error code: 504
+
+final pass failed: PUT /api/v2/workflow/0e92e0fa-2e50-4314-8434-33760d22f246 -> 504: error code: 504
+
+buildcheck (shipped): 0 problem(s)
+[freya] slot main-B: workflow_id=0e92e0fa-2e50-4314-8434-33760d22f246 agent_id=bce0c1bc-a68b-436e-a37b-88db6b717c99 version=30 (published)
+[freya] EXPORT FAILED: GET /api/v2/workflow/0e92e0fa-2e50-4314-8434-33760d22f246 -> 504: error code: 504
+
+BUILD END 2026-10-11T09:44:40Z (1079 s); trace scrubbed (0 secret(s) replaced): /home/ubuntu/btb/repo/runs/traces/main-B-20261011-092641.jsonl
+{"workflow_id": "0e92e0fa-2e50-4314-8434-33760d22f246", "agent_id": "bce0c1bc-a68b-436e-a37b-88db6b717c99"}

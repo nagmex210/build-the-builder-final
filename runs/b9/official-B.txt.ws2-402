@@ -1,0 +1,17 @@
+workspace 2: main-B -> agent ec9fbf58-6328-4272-9aa2-0ebec3797db2
+Traceback (most recent call last):
+  File "/home/ubuntu/btb/ws2/tools/run_cases.py", line 121, in <module>
+    if __name__ == "__main__": main()
+                               ^^^^^^
+  File "/home/ubuntu/btb/ws2/tools/run_cases.py", line 67, in main
+    rows, sim_id, it_id, status, took, med = run_once(a.agent_id, cases, ids)
+                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/btb/ws2/tools/run_cases.py", line 88, in run_once
+    sim_id, it_id, status = freya.run_simulation(agent_id, f"cases {time.strftime('%H:%M:%S')}", {ids[c["id"]]: sessions[c["id"]] for c in cases})
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/btb/ws2/freya.py", line 91, in run_simulation
+    sim = api("POST", "/api/v2/simulations", {
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/btb/ws2/freya.py", line 19, in api
+    raise RuntimeError(f"{method} {path} -> {e.code}: {e.read().decode()[:1500]}") from None
+RuntimeError: POST /api/v2/simulations -> 402: {"error":"Insufficient credits","message":"Insufficient credits — please top up","info":"Insufficient credits — please top up","detail":"Insufficient credits — please top up"}

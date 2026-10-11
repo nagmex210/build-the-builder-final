@@ -1,0 +1,21 @@
+The gate graph is built and committed on `idea/b9-1`, but only one score came back before 09:30: raw-A scored **4/10** against the champion's 8/10. That build had a bug I added, fixed since. The A, B, raw-B, brief C and fixed raw-A evals were still running at the hard limit. Freya was returning many 500 and 504 errors, so a lot of runs had to be redone. So I can't yet say whether B or brief C improved, or whether single-product A dropped. The report is `runs/b9/w1.md`.
+
+**What I changed** (started from idea/b8-1, merged main with no conflicts):
+- **Gate extraction:** the new `builder/gategraph.py` asks one model call, in parallel with the other build steps, to list the brief's rules as gates. A gate is an AND/OR/NOT/XOR/AT-MOST-k/AT-LEAST-k/CHAIN check over a fixed set of call facts, plus the brief clause it came from.
+- **Lint and offline tests:** the builder drops gates it can't safely enforce and tests each remaining one at its limit (k passes, k+1 is blocked). A gate that fails its test is not installed. The trace lists every gate, its test result, what was dropped, and the rules that couldn't be turned into gates.
+- **The five b8-1 hand-written gates are now data** and always present: no tool after `close_call`, one note per product, promise or note per product but not both, no refusal note before the budget is used, no close while a product is unresolved.
+- **Evaluated in code:** `builder/gates.py` checks the gates in the note, promise, transfer and close hooks. Only "a second note or promise for the same product" is a hard block. Every other block is given once, with its own reason, and then the call goes through, so a wrongly extracted gate can't trap a call.
+- **Hook size:** the gate code only goes into the hooks that make decisions, not the account hook, and there is no second copy of the date library. The largest hook on the B build is 55 KB, well under 110 KB, and the hook check found 0 errors.
+- **Builds:** all five succeeded in 246–462 s. The builds extracted 8–16 gates each, and every installed gate passed its offline test.
+
+**Bugs I found and fixed:**
+1. **Promise retry refused:** after a failed promise, the retry was refused as a "second promise" (raw-A PUB-10). Counts now include only writes that succeeded. b8-1's original note gate had the same weakness.
+2. **Transfer gates never ran:** the transfer hook crashed silently on an empty field list.
+3. **Transfer blocked after a note:** an extracted gate blocked the transfer the brief requires. The lint now drops caps that the guarded action can't raise.
+4. **Extraction fell back to defaults on raw-B:** one malformed model answer crashed the gate test, so raw-B's first build got only the five default gates. Both causes are handled now.
+
+**Other raw-A failures:** PUB-06 (dates, floor offered twice) and PUB-09 (restructuring transfer missing) also appear in the b8 fast results on main, so I don't count them against the gate graph. PUB-03 (identity check went on after the third wrong answer) is in the identity gate, which I didn't change. PUB-01 (text-message sentence) and PUB-02 (callback date) come from prompt wording and date handling, not the gates.
+
+**Which code each build has:** only the second raw-A build (`a65e2026…`) has all four fixes. A and B were built before any of them. raw-B and C were rebuilt with fix 4 only. The report lists the workflow ids. Results will land in uncommitted `runs/b9/w1-*.fast.*` files.
+
+**Recommendation:** don't merge on these numbers. Rebuild A, B, raw-B and C on the latest commit and measure them first. I found no brief-specific values in `builder/`: every gate beyond the five defaults is read from the brief at build time.

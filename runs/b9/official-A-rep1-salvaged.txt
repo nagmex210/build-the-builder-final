@@ -1,0 +1,16 @@
+PASS PUB-01 | verify_identity > verify_identity > get_account > create_promise > close_call | call b00c392e-5432-47b3-afeb-0f9abef8c3e0
+PASS PUB-02 | schedule_callback > close_call | call 1324e27b-103f-4839-b9bf-996813882d77
+FAIL PUB-03 | verify_identity > verify_identity > verify_identity > close_call | call 4e7c852f-535c-43da-acf1-be92fa1e681c
+       - conversation: The assistant failed the requirement that 'the check ends after the third wrong answer'. After the customer provided a third incorrect date of birth in [Message 7], the assistant ignored the system instruction to stop and instead requested the da
+PASS PUB-04 | verify_identity > verify_identity > get_account > create_promise > close_call | call 292af2e9-1331-4916-a345-82ce9f4f4e10
+FAIL PUB-05 | verify_identity > verify_identity > get_account > close_call | call bfec590e-5c08-45df-a366-ac4b6cbddebc
+       - conversation: The agent failed the criterion to offer the support team only once. The offer was first made in Message 8 and then repeated in Message 10 despite the user having already declined the transfer in Message 9. Other criteria were met: the agent provi
+FAIL PUB-06 | verify_identity > verify_identity > get_account > create_promise > close_call | call a139a6ee-a524-4219-bfa5-a1349f4387b3
+       - conversation: The agent violated the 'offered once' criterion by presenting the minimum payment of 637.50 in both Message 8 and Message 10. Additionally, the second mention of the minimum payment in Message 10 did not include the necessary note that the rest o
+PASS PUB-07 | verify_identity > verify_identity > get_account > create_promise > close_call | call b5b4da2d-92c4-4272-b5f0-e3eafc2d823c
+PASS PUB-08 | verify_identity > verify_identity > get_account > close_call | call 778220e3-8ff2-4a39-918c-610f52de579e
+PASS PUB-09 | verify_identity > verify_identity > get_account > transfer_to_agent > close_call | call 081ba409-57e2-4c70-8a3e-3204039ec919
+FAIL PUB-10 | verify_identity > verify_identity > get_account > create_promise > create_promise > close_call | call 0fe9bd32-7213-4055-bc70-de05dcb0463c
+       - conversation: The conversation failed one of the specific success criteria. Specifically, the agent mentioned the word 'recorded' in Message 0 ('this call is recorded'), which occurred before any successful function calls (the first successful tool call was ve
+
+6 / 10 passed (salvaged simulation db90aab7-3e2a-4b7d-97f3-32e81c1eee7b, status completed)

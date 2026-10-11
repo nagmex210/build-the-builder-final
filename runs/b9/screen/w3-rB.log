@@ -1,0 +1,3 @@
+  invalid rep PUB-12 (try 1): ['harness: GET /api/v2/call/b4e85e42-57c1-40b4-b646-b558b2bb2833 -> 504: error code: 504\n']
+  invalid rep PUB-12 (try 2): ['harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"ea5b8d64-a043-451f-b36b-7af30bf8996f"}}}']
+  invalid rep PUB-12 (try 3): ['harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"9880044d-8acc-4ef4-b3d0-4e216a9214e7"}}}']

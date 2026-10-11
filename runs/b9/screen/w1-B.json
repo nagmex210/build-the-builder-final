@@ -1,0 +1,138 @@
+{
+ "workflow_id": "df7a2f58-3c37-4da3-8b5a-8618e4f4a798",
+ "passed": 0,
+ "total": 3,
+ "invalid": 2,
+ "rows": [
+  {
+   "id": "PUB-11",
+   "style": "pieces",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 220.0, '2026-10-16'), ('p2', 640.0, '2026-10-16'), ('p3', 75.0, '2026-10-16')]",
+    "the call was not closed with close_call",
+    "conversation: The call fails the single read-back and confirmation check because these were repeated five times, and the one create_promise per product check because multiple calls used invalid product IDs and mostly failed.",
+    "harness: GET /api/v2/call/4039aa5d-5e29-4250-930c-a52d3dd955c8 -> 503: {\"success\":false,\"data\":{\"message\":\"API key validation is temporarily unavailable. Retry shortly.\",\"result\":null}}"
+   ],
+   "call_id": "4039aa5d-5e29-4250-930c-a52d3dd955c8",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise",
+    "create_promise"
+   ],
+   "turns": 25,
+   "invalid": true,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "d58b7240-469b-43ed-9a0c-cbe7c6982f55",
+     "invalid": true,
+     "replays": []
+    },
+    {
+     "call_id": "c400ecfd-06d2-4b8b-b14f-98805cafcfd1",
+     "invalid": true,
+     "replays": []
+    },
+    {
+     "call_id": "4039aa5d-5e29-4250-930c-a52d3dd955c8",
+     "invalid": true,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-12",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [], expected [('p1', 510.0, '2026-10-15')]",
+    "notes [], expected [('p2', 'refused'), ('p3', 'refused')]",
+    "the call was not closed with close_call",
+    "conversation: No credit-card promise or refused notes for the other two products were recorded, two personal-loan attempts and one car-loan attempt were not clearly completed, and tomorrow was incorrectly treated as a past date rather than 2026-10-15."
+   ],
+   "call_id": "8f16215b-7d2f-4104-9958-5bead1cf7731",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account"
+   ],
+   "turns": 16,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "8f16215b-7d2f-4104-9958-5bead1cf7731",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-13",
+   "style": "in_words",
+   "pass": false,
+   "failed": [
+    "outcome (None, None), expected ('promise', None)",
+    "promises [('p2', 900.0, '2026-10-14')], expected [('p1', 300.0, '2026-10-30'), ('p2', 900.0, '2026-10-23')]",
+    "notes [('cc_6604', 'refused'), ('p1', 'refused')], expected []",
+    "the call was not closed with close_call",
+    "conversation: The credit card was not recorded for 30 October 2026, the loan was recorded for 14 October rather than its 23 October deadline, the read-back did not name both required dates, and the agent claimed payments were noted before successful recording."
+   ],
+   "call_id": "c850f614-e333-4a01-92c0-60c90b35f301",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "add_note",
+    "create_promise",
+    "create_promise",
+    "add_note"
+   ],
+   "turns": 23,
+   "invalid": true,
+   "replays": [
+    "resumed from msg_4_1791713905165 (latest reply msg_6_1791713968862, isBranch=True)",
+    "resumed from msg_14_1791714477205 (latest reply msg_17_1791714477743, isBranch=True)"
+   ],
+   "tries": [
+    {
+     "call_id": "d0c5db22-d435-4c22-9b3c-013c89ce3054",
+     "invalid": true,
+     "replays": [
+      "resumed from msg_14_1791713448760 (latest reply msg_17_1791713449256, isBranch=True)"
+     ]
+    },
+    {
+     "call_id": "8a0eaa89-c252-4f52-915b-0812e5f3d578",
+     "invalid": true,
+     "replays": [
+      "transcript unreadable (GET /api/v2/call/8a0eaa89-c252-4f52-915b-0812e5f3d578 -> 503: {\"success\":false,\")"
+     ]
+    },
+    {
+     "call_id": "c850f614-e333-4a01-92c0-60c90b35f301",
+     "invalid": true,
+     "replays": [
+      "resumed from msg_4_1791713905165 (latest reply msg_6_1791713968862, isBranch=True)",
+      "resumed from msg_14_1791714477205 (latest reply msg_17_1791714477743, isBranch=True)"
+     ]
+    }
+   ]
+  }
+ ]
+}

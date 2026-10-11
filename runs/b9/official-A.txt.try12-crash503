@@ -1,0 +1,16 @@
+Traceback (most recent call last):
+  File "/home/ubuntu/btb/repo/tools/run_cases.py", line 121, in <module>
+    if __name__ == "__main__": main()
+                               ^^^^^^
+  File "/home/ubuntu/btb/repo/tools/run_cases.py", line 67, in main
+    rows, sim_id, it_id, status, took, med = run_once(a.agent_id, cases, ids)
+                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/btb/repo/tools/run_cases.py", line 88, in run_once
+    sim_id, it_id, status = freya.run_simulation(agent_id, f"cases {time.strftime('%H:%M:%S')}", {ids[c["id"]]: sessions[c["id"]] for c in cases})
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/btb/repo/freya.py", line 103, in run_simulation
+    s = api("GET", f"/api/v2/simulations/{sim_id}"); s = s.get("simulation") or s
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/btb/repo/freya.py", line 19, in api
+    raise RuntimeError(f"{method} {path} -> {e.code}: {e.read().decode()[:1500]}") from None
+RuntimeError: GET /api/v2/simulations/db90aab7-3e2a-4b7d-97f3-32e81c1eee7b -> 503: {"success":false,"data":{"message":"API key validation is temporarily unavailable. Retry shortly.","result":null}}

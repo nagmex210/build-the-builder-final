@@ -1,0 +1,3 @@
+  invalid rep PUB-12 (try 1): ['harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"76de24fb-b55b-4265-84eb-c2888d699c35"}}}']
+  invalid rep PUB-12 (try 2): ['harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"93973be5-e668-431c-89e1-9f31017d4cae"}}}']
+  invalid rep PUB-12 (try 3): ['harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"19a126fe-f15f-491b-8198-df4f530ae39f"}}}']

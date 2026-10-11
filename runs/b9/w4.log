@@ -1,0 +1,23 @@
+I built the "once-only in code" mechanism on `idea/b9-4`, but it has no score: no fast eval returned before the 09:30 limit. The report is at `runs/b9/w4.md`, committed as 29996ae.
+
+**What I found first.** In the b8 transcripts I read, the second offer came in the very next turn of the same node, with no tool call in between. In PUB-06 (b8 raw-A fast eval) the floor 637.50 was repeated after "what do you think I should pay?". The official PUB-05 judge text shows the same shape: the support offer was made twice, in messages 8 and 10. A counter inside a tool never sees such a repeat, and a "once per call" line in the prompt depends on the model's memory.
+
+**What changed** (new `builder/once.py`, wired into `builder/save.py`; small edits in `situations.py` and `guards.py`):
+- **Entry code node:** each exit situation whose own `once_only` list (read from the brief at build time) is non-empty gets one. It counts entries and sets a state of either "first entry: say these lines once now" or "re-entry: already said, never again". That makes hand-off re-entry (M40) a fact set by code.
+- **Talk/after split:** the situation node is split into a `_talk` node, which speaks the entry turn, and an `_after` node with the same tools and exits. When the customer replies, the call moves to `_after`, whose instructions start with "everything this situation says once was already said; never restate it".
+- **Call-wide said-list (`{{once_said}}`):** it is shown in every conversation node after the account lookup. The floor-check tool adds the floor the first time it computes it, so the next turn shows it as offered without the model calling anything.
+- **Scope:** on A, B, raw-A and raw-B this applies to the hardship exit and the "ask once whether you can help" exit.
+
+**Problems on the way:**
+- **`loop_prompt` doesn't exist:** the platform rejects it ("Unrecognized key"), although `docs/workflow-format.md` describes it. That is why I used the talk/after split instead.
+- **I broke the check tool and fixed it:** in my second version, an edit made the floor-check tool's pre-hook fail to compile. Every build from that version had a broken `check_promise_date`. Lint reported it, but buildcheck did not stop the save. I fixed it (932daa9), ran the hook locally on the A spec (first ask gives the floor, second ask says already offered), and killed the evals running on the broken builds.
+- **Builds and evals:** after the fix only A and raw-A were rebuilt (189 s and 194 s, lint clean). The saved B and raw-B agents still have the broken check tool, so don't score them. A narrow eval (PUB-05 and PUB-06, 2 reps) on the fixed A and raw-A ran for 21 minutes without returning; about 31 fast_eval processes were running on the platform. It dies with this session.
+
+**For the merger:**
+- Measure 932daa9 or later.
+- Wire lint's hook-compile errors into buildcheck's repair round, so a broken hook can't be saved again.
+- **Risks:**
+  - The talk-to-after move can also fire right after a tool call in the entry turn.
+  - Not verified live: whether `{{once_said}}` is re-rendered on every turn, or only when a node is entered.
+
+The change is brief-agnostic: situation names, once-only items and floor values all come from the brief and the account at build time.

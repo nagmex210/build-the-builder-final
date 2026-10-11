@@ -340,3 +340,65 @@ rA 10, rB 3; its other carry-overs (compact SPEC in hooks against M53, b7-1 inve
 check_promise_amount and condition-less transition fixes M46/M47) are not on main. Open on main with no fix anywhere:
 lookup failure routed into negotiation (M54), callback date resolved by the model (top date kind). (H) b9 merger: take
 b7-1's id resolver and the compact SPEC if the A18 / A4 branches do not already cover them.
+
+## b9 merge (restarted merger, 10:07-11:4x UTC): NOT KEPT (platform outage; official evidence incomplete and below the champion)
+
+Context: the first b9 merger hung ~1 h on a Freya outage (09:30-10:05) after building merge/b9 = main + w5 livevars +
+w2 self-sim fallback + a final-save 5xx retry (9bd7f75). The workers' own evals were all lost (NOT MEASURED). I re-used
+those merge/b9 builds (main-A/B/rA/rB/C, 889-1079 s with the ws1 self-test; lint 0, buildcheck 0, the `__again_` livevars
+nodes present on the platform in all five) and measured them plus worker screens. The platform stayed degraded during
+this merge (chat 500/404 "Agent service error", 503 "API key validation temporarily unavailable", 504 on reads, a
+second hang ~10:50-11:00): fast_evals took 23-40 min each; workspace 2 answers 402 to simulations too, so every
+official run went serially through workspace 1.
+
+Workers (all NOT MEASURED by themselves; diff greps: no brief values, case ids, codes or dates hard-coded in any branch):
+- w1 A18 gate graph (gategraph.py: gates extracted as data, linted, boundary-tested offline, evaluated in the
+  write/close/transfer hooks; from idea/b8-1). My screen: B 0/3 (1 rep; invalid product ids, calls not closed, promises
+  on wrong dates; this build has no M59 fix, so chat dates are blind). A/rB screens stopped for slots. Not merged.
+- w2 self-simulation that actually runs (ws2 402 -> ws1 fallback, 6 personas one per brief gate, true counts in the
+  trace, fix round needs >= max(3, n/2) chats, os._exit after the result). Evidence: w2-A2 6/6 chats; on the merge
+  builds 3/6, 5/6 (B: fix round ran, its save 504'd twice), 4/6, 2/6, C 0/6 under load. Cost: build 173-236 s -> 889-1079 s.
+  In merge/b9.
+- w3 A4 per-turn tool gating (gating.py: resolved-state node copies without write tools, hand-off node with close
+  only, own-reason refusals for 2nd note/promise, writes after close/transfer, close before every item has a record).
+  Screens (1 rep): see table below. Not merged (no official run possible in time; overlaps w1's hook refusals).
+- w4 once-only in code (once.py: entry counter code node, talk/after split, call-wide once_said). Its own narrow eval
+  on rA PUB-05/06: 0/2 (floor still offered twice). Screen A: see below. Not merged.
+- w5 WILD live-variable probe: FOUND the cause of the C October dates: the chat endpoint skips the INITIAL node's
+  pre_actions, so DATE FACTS never existed in any chat call (fast_eval, brief C, chat self-test); the official simulation
+  runs it. livevars.py re-runs the start chain on the opening's exits; before/after repro on C-01 (Oct 17 -> Wed
+  2026-11-11). Verified here in an official transcript: the start code runs twice, both succeed, no side effect.
+  In merge/b9.
+
+Merged candidate merge/b9 (9bd7f75), measured:
+- OFFICIAL A rep 1 (simulation db90aab7; its run_cases died on a 503 while polling, scored by btb/salvage_sim.py from
+  the ledger + the official judge): 6/10. Fails: PUB-05 support offer twice, PUB-06 floor 637.50 twice (the known
+  once-only residuals, M62), PUB-03 the model asked the DOB a 4th time instead of calling verify on the 3rd answer
+  (customer added a question; model behaviour, not livevars: the identity_failed route worked once verify was called),
+  PUB-10 judge: "recorded" said in the opening ("this call is recorded") before any write (judge strictness on a
+  mandatory line; the champion's opening has the same sentence).
+  Champion (b8): A 8/10 (runs 8, 9), B 3/3, rA 9/10, rB 3/3.
+- OFFICIAL A rep 2 (simulation 6e7825a2), B, rA, rB: LOST to the second outage (the rep-2 simulation stayed "running"
+  with 3 inconclusive runs; every GET on it 504'd from ~10:47; B/rA/rB never started; workspace 2: 402).
+- fast (reps 2, random): rA 2/10 (champion 8/10): PUB-03 0/2 (identity continued after the 3rd wrong answer),
+  PUB-05/06 once-only twice, PUB-02 callback year wrong, PUB-07/08/09 1/2. A, B, rB, C did not finish in 60 min.
+- Screens (1 rep, worker builds as shipped, no M59 fix in w1/w3/w4): w1-B 0/3; w3 A/B/rB and w4-A did not finish.
+Decision: NOT KEPT. main stays the b8 champion builder (a575bbf). Accept rule: official A+B and rA+rB must not drop and the
+gain must repeat; the only official run we have is A 6/10 vs the champion's 8 and 9, and fast rA dropped 8 -> 2. No
+(a)/(b) evidence; w5's (c) case is real but it is bundled with w2's x4 build time and its unverified fix round.
+merge/b9 is pushed as a branch for the archive.
+Kept on main (harness only, no builder change): btb/run_cases_retry.py (run_cases with GET 5xx retries; a POST retries
+only on 503) and btb/salvage_sim.py (score an official simulation whose run_cases died).
+Hypotheses (H) for the b10 merger / final rehearsal:
+- (H) w5 livevars (idea/b9-5 381aa28 + b300c7d) is a BUG FIX with a before/after repro (runs/b9/w5/repro_c01_*.txt,
+  M59): without it every chat measurement (fast_eval date cases, all of brief C, any chat self-test) runs with no DATE
+  FACTS. It fits the b10 "BUG HUNT, workflow side" family; the b10 merger can keep it on its repro + official A/B.
+- (H) w2's ws1 self-test makes builds 15-18 min under load (30-min cap) and runs a Claude fix round whose edits are not
+  officially verified (the B fix round's save 504'd twice); if taken, cap it hard and keep the trace honesty part
+  (true chat counts, "SELF-TEST DID NOT RUN") even when the fix round is off.
+- (H) PUB-03 kind: a 3rd wrong identity answer mixed with a question is not sent to verify; the identity node needs a
+  code/route fact "answer pending -> call verify" (M61 neighbourhood).
+- Platform: in this session ws2 answered 402 to simulations too; plan the final rehearsal for one serial workspace.
+b10 families: the owner's five (BUG HUNT pipeline, BUG HUNT workflow, SIMPLIFY, STABILITY, SUBMISSION CHECK) written
+verbatim to runs/next_families.txt; the owner note's families block is removed from merger_notes.md (handled), its b10
+merger instruction kept.

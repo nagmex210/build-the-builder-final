@@ -1,0 +1,6 @@
+  invalid rep PUB-13 (try 1): ['harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"1a3df6fa-301d-453c-8eeb-9cb2c5e598e7"}}}']
+  invalid rep PUB-13 (try 2): ['harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"0b0069d5-3828-437d-ba3a-2571d4c1f291"}}}']
+  invalid rep PUB-13 (try 3): ['harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"6ce8d6b5-88e8-4f77-800c-7c8086213562"}}}']
+  invalid rep PUB-12 (try 1): ['harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"71a18bdb-787f-45bf-bd0c-ba014ef121d1"}}}']
+  invalid rep PUB-12 (try 2): ['harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"ec34603e-e575-4ca4-962c-3bb1992ef3ce"}}}']
+  invalid rep PUB-12 (try 3): ['harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"191542e0-6c56-4559-b964-bf518fe1b7e1"}}}']

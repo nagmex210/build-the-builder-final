@@ -1,0 +1,38 @@
+I built A4 per-turn tool gating and committed it on `idea/b9-3`, but it has no score: none of the five fast evals produced a single case result before the 09:30 limit. The report is `runs/b9/w3.md`.
+
+**What changed:**
+- **`builder/gating.py` (new):** a fixed post-pass that runs last on every save, so it re-applies cleanly each time.
+- **State set by tool code, not prompts:** one variable per item once its promise or note succeeds, plus "all items resolved", "transferred", "callback" and "closed".
+- **Tool presence:** each node that can record promises or notes routes, on a variable condition, to a copy of itself with those tools removed once every item has its record. Each node with a transfer tool routes, after a successful transfer, to a node whose only tool is close.
+- **Refusals with the code's own reason:** nothing reaches the bank and it doesn't count as a failed attempt. Refused are:
+  - a note after the same item's promise, or a second promise or note for an item;
+  - any call after close, a second close, or a second transfer;
+  - a promise or note after a transfer;
+  - close while items are still unrecorded. This applies only when the workflow has a note tool, never after a transfer or callback, and only once per call, so a legitimate close without notes can't loop.
+- **`builder/save.py`:** calls the new pass. Setting `BTB_GATING=0` turns it off.
+
+**Checks:**
+- Applied twice to the b8 champion's saved A, B, rB and C workflows: no lint or hook errors.
+- A local run of the hooks on a two-item case gave the expected refusals, state and counters.
+- All four live builds took 191–304 s and finished with 0 lint errors and 0 build-check problems. The gate routes were installed in each.
+- The first C build failed on platform 503/504 errors. The rebuild saved fine in 220 s.
+
+**Evals:**
+- The first launch was killed by the 10-minute tool timeout. I relaunched them detached at about 08:30.
+- About 25 evals from all workers were sharing the platform. By 09:24 the only output was one raw-B chat turn that timed out.
+- The evals are still running and will write to `runs/b9/w3logs/w3-*.eval.*` in `wt3`; anything written after my last commit is not committed. The workflow ids to re-score are listed in the report. The champion's fast score to beat is 13/26.
+
+**Failure kinds it should remove**, by construction rather than measurement:
+- duplicate writes after success, including re-sends with different values that the existing duplicate check misses;
+- a note after the same item's promise, or a second note for an item;
+- any tool call after close;
+- writes after a transfer.
+
+It does not stop notes made before a transfer; that is a brief rule and would need a flag read from the brief. Closing with items unrecorded is only partly covered, because it is refused once.
+
+**Risks to look for in transcripts:**
+- The confirmation might be said twice when the call moves into the copy node.
+- A customer who changes a recorded promise is now refused.
+- A brief that wants notes on promised items too would be blocked.
+
+The change is brief-agnostic: it uses only the fixed tool names, the `*_id` field in the promise/note body, item ids from the live account lookup, and the built workflow's own node names.
