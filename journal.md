@@ -335,3 +335,8 @@ PUB-03 identity 2/2; mechanisms: no stale/broken build shipped (buildcheck + cle
 code, tool names normalised, hooks checked for the platform size limit, no raw placeholders in mandatory lines.
 Hypotheses (H) for b9: once-only limits need code flags (the only official A residuals); the self-sim has been a
 no-op since workspace 2 ran out of credits; per-item gates (b8-1) are the A18 base.
+Post-merge note (after reading the analyst's b8 mechanisms.md): merge/b7 66d7282 measured post-fix official A 9, B 2,
+rA 10, rB 3; its other carry-overs (compact SPEC in hooks against M53, b7-1 invented-id resolver M7, b7-2
+check_promise_amount and condition-less transition fixes M46/M47) are not on main. Open on main with no fix anywhere:
+lookup failure routed into negotiation (M54), callback date resolved by the model (top date kind). (H) b9 merger: take
+b7-1's id resolver and the compact SPEC if the A18 / A4 branches do not already cover them.
