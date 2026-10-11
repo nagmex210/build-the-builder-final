@@ -212,18 +212,9 @@ try:
         vars['guard_block_' + _T] = ''
         _o2 = str(vars.get('guard_offer_' + _T) or '')
         vars['guard_offer_' + _T] = ''
-        try:
-            _n = int(vars.get('tool_failures_' + _T) or 0)
-            if _n > 0:
-                vars['tool_failures_' + _T] = _n - 1
-        except Exception:
-            pass
-        try:
-            _n = int(vars.get('tool_successes_' + _T) or 0)
-            if _n > 0:
-                vars['tool_successes_' + _T] = _n - 1          # the no-op answered 200: not a recorded success
-        except Exception:
-            pass
+        # b10-w2: no counter change here. The no-op answers 200, so harden's post-hook did not count this block as a
+        # failure; decrementing tool_failures here erased an EARLIER real failure (the model then saw "failure number 1"
+        # twice and retried past the brief's limit).
         if vars.get('last_tool_failed') == _T:
             vars['last_tool_failed'] = ''
         result.pop('header', None)

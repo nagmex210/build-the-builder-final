@@ -78,17 +78,27 @@ try:
             _n = 1
             if _v is not None:
                 try:
-                    _n = int(_v.get('tool_failures_' + _t) or 0) + 1
+                    _n = int(_v.get('tool_failures_' + _t) or 0) + (0 if _v.get('guard_block_' + _t) else 1)
                 except Exception:
                     _n = 1
                 _v['tool_failures_' + _t] = _n
                 _v['last_tool_failed'] = _t
             _err = _d.get('error') or result.get('message') or 'service error'
-            _msg = ('FAILED: ' + _t + ' was NOT carried out and NOTHING was recorded (error: ' + str(_err) + '). '
-                    'This is failure number ' + str(_n) + ' of ' + _t + ' in this call. Never tell the customer it was '
-                    'recorded, booked, sent or done. Apply the brief rule for a failed tool call: if it allows another '
-                    'attempt, call ' + _t + ' again now with the same values; otherwise tell the customer plainly that '
-                    'it could not be done and continue as the brief says.')
+            if 0 < _sc < 500:
+                # b10-w2: the bank ANSWERED and rejected these values (ok=false with its reason). The same values get the
+                # same answer, so never tell the model to resend them (seen: an unreadable date "call again now with
+                # the same values" next to the identity code's "ask again"; a rejected write re-sent as a duplicate).
+                _msg = ('FAILED: ' + _t + ' was NOT carried out and NOTHING was recorded: the bank rejected the values '
+                        '(error: ' + str(_err) + '). This is failure number ' + str(_n) + ' of ' + _t + ' in this call. '
+                        'Never tell the customer it was recorded, booked, sent or done. Never send the same values '
+                        'again: they get the same answer. Correct the value the error names (ask the customer if '
+                        'needed) and follow the brief.')
+            else:
+                _msg = ('FAILED: ' + _t + ' was NOT carried out and NOTHING was recorded (error: ' + str(_err) + '). '
+                        'This is failure number ' + str(_n) + ' of ' + _t + ' in this call. Never tell the customer it was '
+                        'recorded, booked, sent or done. Apply the brief rule for a failed tool call: if it allows another '
+                        'attempt, call ' + _t + ' again now with the same values; otherwise tell the customer plainly that '
+                        'it could not be done and continue as the brief says.')
             if 'id' in str(_err).lower() and _v is not None and _v.get('known_ids'):
                 _msg += ' Use only these ids, exactly as written: ' + str(_v.get('known_ids')) + '.'
             _d['tool_outcome'] = _msg
