@@ -326,7 +326,12 @@ def prepare(folder, mock_url, slot):
         if contract_txt is None:
             raise SystemExit(f"case folder {folder}: no service contract (OpenAPI json/yaml or a contract text) found")
         print(f"case: service contract {contract_txt.name} is not OpenAPI JSON: converting it (Azure)", flush=True)
-        api = contract_from_text(contract_txt)
+        cached = out / "tools.json"
+        if os.environ.get("BTB_REUSE_PREP") == "1" and cached.exists():
+            print(f"case: reusing the converted contract of the previous run ({cached})", flush=True)
+            api = json.loads(cached.read_text())
+        else:
+            api = contract_from_text(contract_txt)
     set_server(api, mock_url)
     out = KIT / "runs" / "case" / slot      # not out/: the build's clear_slot moves out/<slot>.* away
     out.mkdir(parents=True, exist_ok=True)
@@ -368,7 +373,11 @@ def prepare(folder, mock_url, slot):
     rules = None
     if docs and os.environ.get("BTB_NO_RULES") != "1":
         print(f"case: extracting the rules of {len(docs)} document(s) (Azure, parallel) + merge", flush=True)
-        rules = extract_rules(docs, out)
+        if os.environ.get("BTB_REUSE_PREP") == "1" and (out / "rules.md").exists():
+            print(f"case: reusing the rules digest of the previous run ({out / 'rules.md'})", flush=True)
+            rules = out / "rules.md"
+        else:
+            rules = extract_rules(docs, out)
     (out / "documents.json").write_text(json.dumps([str(folder / n) for n, _, _ in docs], ensure_ascii=False))
     if rules:
         head += (f"RULES DIGEST (primary spec, every document, newer wins on conflict): {rules}. Implement EVERY rule in it; "
