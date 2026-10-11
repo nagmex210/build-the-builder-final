@@ -9,6 +9,9 @@
 #   runs/traces/<name>-<time>.jsonl    the detailed machine trace (scrubbed)
 #   submission/<name>.workflow.json    freya.export_workflow of the built phone agent (what gets scored)
 set -uo pipefail
+# Bash reads a script while it runs it: an edit or `git pull` of this file during a 30-min build made the running
+# submission fail with a syntax error after the build (seen b10). The whole body is one block, parsed before it starts.
+{
 KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 [ $# -ge 2 ] || { echo "usage: bash btb/submit.sh <brief.md> <tool_api.json> [name]" >&2; exit 2; }
 BRIEF="$(realpath "$1")"; TOOLS="$(realpath "$2")"
@@ -20,6 +23,8 @@ ssm() { aws ssm get-parameter --region eu-central-1 --name "$1" --with-decryptio
 [ -n "${FREYA_API_KEY:-}" ] || export FREYA_API_KEY="$(ssm /btb/freya_api_key)"
 [ -n "${FREYA_BANK_TEAM_KEY:-}" ] || export FREYA_BANK_TEAM_KEY="$(ssm /btb/bank_team_key)"
 [ -n "${AZURE_KEY:-}" ] || export AZURE_KEY="$(ssm /btb/azure_key)"
+# the self-test's workspace-2 key: in the environment, so the scrubber and the key check below know its value
+[ -n "${FREYA_API_KEY_2:-}" ] || export FREYA_API_KEY_2="$(ssm /btb/freya_api_key_2 2>/dev/null)"
 [ -n "${CLAUDE_CODE_OAUTH_TOKEN:-}" ] || [ -n "${ANTHROPIC_API_KEY:-}" ] || export CLAUDE_CODE_OAUTH_TOKEN="$(ssm /video-iq/claude_token)"
 export FREYA_API_URL="${FREYA_API_URL:-https://staging-app.freyavoice.ai}" CLAUDE_CODE_DISABLE_BACKGROUND_TASKS=1
 PY="${PYTHON:-python3}"
@@ -50,6 +55,15 @@ if [ -n "$WF" ] && ! "$PY" -c "import json,sys; json.load(open(sys.argv[1]))" "$
 fi
 EXPORT_OK=no
 "$PY" -c "import json,sys; d=json.load(open(sys.argv[1])); assert d['workflow_id']==sys.argv[2] and d['workflow'].get('nodes')" "$EXPORT" "$WF" 2>/dev/null && EXPORT_OK=yes
+# "We load them into our own workspace": load the export the same way, as a dry run (validates, creates nothing).
+LOADS=no
+if [ "$EXPORT_OK" = yes ]; then
+  LOADS="$(cd "$KIT" && "$PY" -c "
+import json, sys, freya
+r = freya.validate_workflow('load-check', json.load(open(sys.argv[1]))['workflow'])
+print('yes' if r.get('valid') else 'NO: ' + json.dumps(r)[:300])" "$EXPORT" 2>&1 | tail -1)"
+  STEPS="$("$PY" "$KIT/builder/wfsummary.py" "$EXPORT" 2>&1)"
+fi
 UNDER=no; [ "$SECS" -lt 1800 ] && UNDER=yes
 {
   echo
@@ -57,7 +71,8 @@ UNDER=no; [ "$SECS" -lt 1800 ] && UNDER=yes
   echo "build exit code : $RC"
   echo "workflow_id     : ${WF:-NONE}"
   echo "agent_id        : ${AG:-NONE}"
-  echo "export          : $EXPORT (loads as json with nodes: $EXPORT_OK)"
+  echo "export          : $EXPORT (loads as json with nodes: $EXPORT_OK; Freya dry-run load: $LOADS)"
+  echo "export contents : ${STEPS:-?}"
   echo "trace (log)     : $LOG"
   echo "trace (jsonl)   : ${JSONL:-NONE}"
   echo "builder commit  : $COMMIT"
@@ -66,9 +81,17 @@ UNDER=no; [ "$SECS" -lt 1800 ] && UNDER=yes
 # Scrub the logs. The export is only checked (below), never rewritten: a changed workflow is not what Freya holds.
 "$PY" "$KIT/btb/scrub.py" "$LOG" ${JSONL:+"$JSONL"}
 LEFT=0
-for v in FREYA_API_KEY FREYA_API_KEY_2 AZURE_KEY FREYA_BANK_TEAM_KEY CLAUDE_CODE_OAUTH_TOKEN; do
+for v in FREYA_API_KEY FREYA_API_KEY_2 AZURE_KEY FREYA_BANK_TEAM_KEY CLAUDE_CODE_OAUTH_TOKEN ANTHROPIC_API_KEY; do
   val="${!v:-}"; [ ${#val} -ge 8 ] || continue
   grep -qF -- "$val" "$LOG" ${JSONL:+"$JSONL"} "$EXPORT" 2>/dev/null && { echo "submit: WARNING $v still found in output files"; LEFT=1; }
 done
-[ "$LEFT" = 0 ] && echo "submit: key check: no key found in $LOG ${JSONL:-} $EXPORT"
-[ "$RC" = 0 ] && [ "$EXPORT_OK" = yes ] && [ "$LEFT" = 0 ]
+# key-shaped strings (JWT, sk-, fak_, ghp_) whose value is not in this environment
+"$PY" -c "
+import re, sys; sys.path.insert(0, sys.argv[1]); from scrub import PATTERNS
+for f in sys.argv[2:]:
+    try: n = len(PATTERNS.findall(open(f, errors='replace').read()))
+    except OSError: continue
+    if n: print(f'submit: WARNING {n} key-shaped string(s) in {f}'); sys.exit(1)" "$KIT/btb" "$LOG" ${JSONL:+"$JSONL"} "$EXPORT" || LEFT=1
+[ "$LEFT" = 0 ] && echo "submit: key check: no key (env values, JWT/sk-/fak_/ghp_ patterns) found in $LOG ${JSONL:-} $EXPORT"
+[ "$RC" = 0 ] && [ "$EXPORT_OK" = yes ] && [ "$LEFT" = 0 ]; exit
+}

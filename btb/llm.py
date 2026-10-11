@@ -35,12 +35,14 @@ def trace(event: dict):
     p = os.environ.get("BTB_TRACE")
     if p:
         with open(p, "a") as f:
-            f.write(json.dumps({"at": time.strftime("%Y-%m-%dT%H:%M:%S"), **event}) + "\n")
+            f.write(json.dumps({"at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), **event}) + "\n")
 
 
 def chat(messages, tier="strong", purpose="", max_tokens=4000, temperature=0.7, effort="medium"):
     last = None
-    for model in CHAINS[tier]:
+    for i, model in enumerate(CHAINS[tier]):
+        if last:      # the previous model failed: that call is in the trace too, with why we fell back
+            trace({"model": CHAINS[tier][i - 1], "purpose": f"{purpose} [FAILED: {last[:120]}; falling back to {model}]"})
         body = {"model": model, "messages": messages}
         if model in REASONING:
             body.update(max_completion_tokens=max_tokens + 8000, reasoning_effort=effort)
@@ -66,6 +68,7 @@ def chat(messages, tier="strong", purpose="", max_tokens=4000, temperature=0.7, 
             except Exception as e:  # noqa: BLE001
                 last = f"{model}: {e}"
                 time.sleep(2)
+    trace({"model": CHAINS[tier][-1], "purpose": f"{purpose} [FAILED: {(last or '')[:120]}; no model left]"})
     raise RuntimeError(f"all models failed: {last}")
 
 

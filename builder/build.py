@@ -76,6 +76,20 @@ ROUND_S = 420                                                      # one round o
 def log(trace, **ev):
     with trace.open("a") as out:
         out.write(json.dumps(ev, default=str) + "\n")
+    if ev.get("event") == "ship":       # every keep/restore decision of a test round goes to the printed trace too
+        print(f"[test] decision: {ev.get('what')}{' (' + str(ev['why']) + ')' if ev.get('why') else ''}", flush=True)
+
+
+def print_round(tag, r):
+    """The printed trace lists every self-test chat with its result, not only the count."""
+    print(f"[test] {tag} ({r['where']}, workflow {r.get('workflow_id') or '?'}; phone agent on Freya's model): "
+          f"{r['n']} valid chat(s), {r['n'] - r['n_failed']} passed every check, {r['n_failed']} failed "
+          f"({r['n_checks_failed']} checks), {len(r['rows']) - r['n']} not usable (platform)", flush=True)
+    for row in r["rows"]:
+        res = ("NOT USABLE: " + str(row["harness_error"])[:120]) if "harness_error" in row else \
+              ("PASS" if not row["failed"] else "FAIL: " + " | ".join(str(m)[:160] for m in row["failed"]))
+        print(f"  [test] persona '{row['title']}' (customer {row.get('customer')}, call {row.get('call_id') or '-'}, "
+              f"{row.get('turns', 0)} turns, tools {' > '.join(row.get('tools') or []) or 'none'}): {res}", flush=True)
 
 
 async def self_simulate(slot, tools, briefs, trace, wf_file, final_pass, options_base):
@@ -112,16 +126,18 @@ async def self_simulate(slot, tools, briefs, trace, wf_file, final_pass, options
         **({"result": f"SELF-TEST DID NOT RUN: 0 of {n_play} chats completed"} if not r1["n"] else {}))
     if not r1["n"]:   # 0/0 used to print like a pass (b8: workspace 2 answered 402 to every chat)
         print(f"self-test 1 ({r1['where']}): SELF-TEST DID NOT RUN: 0 of {n_play} persona chats completed"
-              f"{' (' + '; '.join(errs[:2]) + ')' if errs else ''}", flush=True)
+              f"{' (' + '; '.join(errs[:2]) + ')' if errs else ''}; NO chat ran to the end: the agent was NOT tested", flush=True)
     else:
         print(f"self-test 1 ({r1['where']}): {r1['n_failed']}/{r1['n']} completed persona chats failed a check "
               f"({r1['n_checks_failed']} checks; {n_play - r1['n']} of {n_play} chats did not complete)", flush=True)
+    print_round("self-test 1: personas written from the brief, deterministic ledger checks", r1)
     (KIT / "out" / f"{slot}.selftest1.json").write_text(json.dumps({"personas": personas, **r1}, indent=1, default=str))
     r1_s = time.time() - t_start
     retest_s = min(ROUND_S, r1_s + 60)          # the re-test takes about as long as round 1 did (platform load)
     if not r1["n_failed"] or r1["n"] < len(personas) or left() < retest_s + 90:
-        log(trace, event="ship", what="no fix round", why="self-test did not run (no chat completed)" if not r1["n"] else
-            ("too few valid chats" if r1["n"] < len(personas) else ("no failed check" if not r1["n_failed"] else "no time left")))
+        # a round with no valid chat has no failed check either: say why it is not a pass (seen b10: 12/12 chats 402)
+        log(trace, event="ship", what="no fix round", why=f"self-test did not run: no valid chat ({len(r1['rows'])} not usable): untested, not passed"
+            if not r1["n"] else ("too few valid chats" if r1["n"] < len(personas) else ("no failed check" if not r1["n_failed"] else "no time left")))
         return
     best = wf_file.read_text()
     fails = selftest.failure_text(r1)
@@ -161,10 +177,12 @@ async def self_simulate(slot, tools, briefs, trace, wf_file, final_pass, options
         r2 = await loop.run_in_executor(None, selftest.run_tests, slot, json.loads(wf_file.read_text()), personas, calc_file, r2_budget)
     except Exception as e:  # noqa: BLE001
         r2 = None; log(trace, event="test", what="self-simulation round 2", error=str(e)[:300])
+        print(f"self-test 2 failed to run: {str(e)[:300]}", flush=True)
     if r2:
         log(trace, event="test", what="self-simulation round 2: same personas after the fix", where=r2["where"], n=r2["n"],
             failed=r2["n_failed"], checks_failed=r2["n_checks_failed"], seconds=round(time.time() - t), rows=r2["rows"])
         print(f"self-test 2: {r2['n_failed']}/{r2['n']} personas failed a check ({r2['n_checks_failed']} checks)", flush=True)
+        print_round("self-test 2: same personas after the fix", r2)
     rate = lambda r: (r["n_failed"] / r["n"], r["n_checks_failed"] / r["n"])
     if r2 is None or r2["n"] < len(personas) or rate(r2) > rate(r1):
         (KIT / "out" / f"{slot}.workflow.rejected-fix.json").write_text(wf_file.read_text())
@@ -220,13 +238,14 @@ async def build_check(slot, tools, briefs, trace, wf_file, final_pass, options_b
 
 
 async def claude_stream(prompt, options, trace, label="build agent"):
-    turn, bash_ids = 0, set()
+    turn, bash_ids, seen_models = 0, set(), set()
     with trace.open("a") as out:
         async for message in query(prompt=prompt, options=options):
             out.write(json.dumps({"type": type(message).__name__, **dataclasses.asdict(message)}, default=str) + "\n")
             out.flush()
             if isinstance(message, AssistantMessage):
                 turn += 1
+                seen_models.add(message.model)
                 uses = [b.name for b in message.content if isinstance(b, ToolUseBlock)]
                 print(f"[model call {now()}] {message.model} (Claude Agent SDK) {label} turn {turn}: "
                       f"{'tools ' + ', '.join(uses) if uses else 'text'}", flush=True)
@@ -243,7 +262,15 @@ async def claude_stream(prompt, options, trace, label="build agent"):
                         res = " ".join((res or "").split())
                         print(f"    -> {'ERROR ' if block.is_error else ''}{res[:400]}{' ...' if len(res) > 400 else ''}", flush=True)
             elif isinstance(message, ResultMessage):
-                print(f"\ndone: {message.num_turns} turns, {message.duration_ms / 1000:.0f} s", flush=True)
+                print(f"\ndone: {message.num_turns} turns, {message.duration_ms / 1000:.0f} s"
+                      f"{'' if message.subtype == 'success' else ' (' + str(message.subtype) + ')'}", flush=True)
+                # Claude Code also calls models that never appear as turns (a small model for its own helper tasks):
+                # the SDK reports them only here, per model, so the trace lists them from this summary.
+                for m, u in (getattr(message, "model_usage", None) or {}).items():
+                    u = u if isinstance(u, dict) else {}
+                    print(f"[model call {now()}] {m} (Claude Agent SDK) {label} usage: {u.get('inputTokens', 0) + u.get('cacheReadInputTokens', 0) + u.get('cacheCreationInputTokens', 0)} "
+                          f"input / {u.get('outputTokens', 0)} output tokens"
+                          f"{'' if m in seen_models else '; internal helper calls of Claude Code (no turns of their own, e.g. classifying a command)'}", flush=True)
 
 
 def clear_slot(slot):
@@ -290,6 +317,9 @@ async def run(slot, tools, briefs):
         env={"BASH_DEFAULT_TIMEOUT_MS": "900000", "BASH_MAX_TIMEOUT_MS": "1200000", "CLAUDE_CODE_DISABLE_BACKGROUND_TASKS": "1",
              "BTB_TRACE": str(trace)},
     )
+    with trace.open("a") as out:
+        out.write(json.dumps({"event": "start", "at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(t0)), "slot": slot, "tools": tools,
+                              "briefs": briefs, "model": options.model}) + "\n")
     prompt = (f"Use the build-phone-agent skill. Slot: {slot}. Tool API file: {tools}. Brief files: {' '.join(briefs)}. "
               f"Write the workflow to out/{slot}.workflow.json and save it with slot {slot}. "
               f"Do not run tools/run_cases.py or any practice cases (a new brief comes without them), and do not read "
@@ -364,9 +394,6 @@ async def run(slot, tools, briefs):
         prompt += ("\n\n" + situations.prompt_block(sit_spec) + "\nBefore every save run `python3 builder/situations.py check "
                    f"out/{slot}.workflow.json out/{slot}.situations.json` and fix each problem it lists (or, if the brief "
                    "shows the extracted situation is wrong, say so in your final line).")
-    with trace.open("a") as out:
-        out.write(json.dumps({"event": "start", "at": time.strftime("%Y-%m-%dT%H:%M:%S%z"), "slot": slot, "tools": tools,
-                              "briefs": briefs, "model": options.model}) + "\n")
 
     print(f"[model] build agent: Claude Agent SDK, {options.model}, skill build-phone-agent, budget {BUDGET_S // 60} min", flush=True)
 
@@ -400,6 +427,7 @@ async def run(slot, tools, briefs):
             out.write(json.dumps({"event": "assumptions", "what": "brief self-conflicts and how both rules hold",
                                   "gated_words": cj.get("gated_words"), "conflicts": cj.get("conflicts"),
                                   "deterministic_check": cj.get("self_conflict_check")}) + "\n")
+    print(f"[test] A3 canned sentences: {'extracted' if old_canned.exists() else 'FAILED (' + (canned_err or '')[-160:].strip() + ')'}", flush=True)
     sys.path.insert(0, str(KIT)); sys.path.insert(0, str(KIT / "builder"))
 
     def final_pass(tag):
@@ -407,6 +435,7 @@ async def run(slot, tools, briefs):
             return None
         try:
             from lint_workflow import lint
+            import wfsummary
             from save import finish_and_save
             wf = json.loads(wf_file.read_text())
             names, saved = finish_and_save(slot, wf)
@@ -425,12 +454,16 @@ async def run(slot, tools, briefs):
             sit_spec = json.loads(sit_file.read_text()) if sit_file.exists() else None
             if sit_spec:
                 import situations
+                probs = situations.check(wf, sit_spec)
                 log(trace, event="test", what="A1: router/specialist coverage of the brief's situations (deterministic)",
-                    round=tag, problems=situations.check(wf, sit_spec))
+                    round=tag, problems=probs)
+                print(f"[test] A1 situation coverage ({tag}): {len(probs)} problem(s){': ' + '; '.join(map(str, probs))[:400] if probs else ''}", flush=True)
             with trace.open("a") as out:
                 out.write(json.dumps({"event": "harden+robust+save", "round": tag, "tools": names, "saved": saved}) + "\n")
                 out.write(json.dumps({"event": "test", "what": "structural lint of the saved workflow", "errors": errs, "warnings": warns}) + "\n")
-            print(f"final save ({tag}): {saved}; lint: {len(errs)} errors, {len(warns)} warnings", flush=True)
+            print(f"final save ({tag}): {saved}; lint: {len(errs)} errors, {len(warns)} warnings"
+                  f"{': ' + '; '.join(map(str, errs))[:400] if errs else ''}", flush=True)
+            print(f"[freya] saved workflow ({tag}): {wfsummary.summary(wf)}", flush=True)
             return saved
         except Exception as e:  # noqa: BLE001  keep whatever the agent saved
             print(f"final pass failed: {e}", flush=True)
@@ -469,7 +502,7 @@ async def run(slot, tools, briefs):
         log(trace, event="stale", what="no workflow saved in this run: not reporting the previous build's agent", previous=state)
         state = None
     with trace.open("a") as out:
-        out.write(json.dumps({"event": "end", "at": time.strftime("%Y-%m-%dT%H:%M:%S%z"), "seconds": round(time.time() - t0),
+        out.write(json.dumps({"event": "end", "at": now(), "seconds": round(time.time() - t0),
                               "created": state}) + "\n")
     stop_tail.set(); tailer.join(5)
     if state:
@@ -489,8 +522,11 @@ async def run(slot, tools, briefs):
                     if "-> 5" not in str(e) or attempt == 2:
                         raise
                     time.sleep(10)
-            json.loads(export.read_text())
-            print(f"[freya] exported: {export}", flush=True)
+            import wfsummary
+            got, shipped = wfsummary.summary(json.loads(export.read_text())), wfsummary.summary(json.loads(wf_file.read_text()))
+            print(f"[freya] exported: {export}: {got}", flush=True)
+            if got != shipped:
+                print(f"[freya] WARNING: the export differs from the shipped workflow file ({shipped})", flush=True)
         except Exception as e:  # noqa: BLE001
             print(f"[freya] EXPORT FAILED: {e}", flush=True)
     n = scrub_file(trace)

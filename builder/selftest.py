@@ -449,7 +449,7 @@ def run_tests(slot, wf, scenarios, calc_file, timeout=CHAT_S + 120, reps=2):
                 rows.append({"title": s["title"], "customer": s["cust"]["id"], "failed": [], "tools": [],
                              "harness_error": "chat did not finish in time" if res[i] is None else f"chat crashed: {str(res[i])[:150]}"})
     valid = [r for r in rows if "harness_error" not in r]
-    return {"where": where, "n": len(valid), "n_failed": sum(1 for r in valid if r["failed"]),
+    return {"where": where, "workflow_id": wid, "n": len(valid), "n_failed": sum(1 for r in valid if r["failed"]),
             "n_checks_failed": sum(len(r["failed"]) for r in valid), "rows": rows}
 
 
