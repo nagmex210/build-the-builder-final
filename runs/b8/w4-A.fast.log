@@ -1,1 +1,28 @@
   invalid rep PUB-09 (try 1): ['harness: POST /api/v2/chat/message -> 404: {"success":false,"data":{"message":"Agent service error","result":{"error":"Agent service error"}}}']
+FAIL PUB-01 1/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [corrects] conversation: Identity verification was not clearly satisfied before account access or the word 'collections', because the latest verification result explicitly stated that identity was not verified.
+FAIL PUB-02 0/2 | close_call
+       - [pieces] outcome ('not_reached', 'no_callback'), expected ('not_reached', 'callback')
+       - [pieces] callbacks [], expected [{'date': '2026-10-15', 'time': '11:00'}]
+       - [pieces] conversation: The callback was not scheduled for the next business day, October 15, 2026, at 11:00; the only scheduling attempt used May 14, 2025, and was rejected.
+       - [in_words] outcome ('not_reached', 'no_callback'), expected ('not_reached', 'callback')
+       - [in_words] callbacks [], expected [{'date': '2026-10-15', 'time': '11:00'}]
+       - [in_words] conversation: The callback was not scheduled for the next business day, October 15, 2026, at 11:00; the only scheduling attempt used an incorrect date and was rejected.
+FAIL PUB-03 1/2 | verify_identity > verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+       - [plain] outcome ('promise', None), expected ('not_verified', 'failed')
+       - [plain] promises [('p1', 95.0, '2026-10-14')], expected []
+       - [plain] conversation: The security check continued after the third incorrect birth-date answer, the agent disclosed the credit-card product and amount owed, and the customer was not told to use the app or a branch.
+PASS PUB-04 2/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+PASS PUB-05 2/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+PASS PUB-06 2/2 | verify_identity > verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+FAIL PUB-07 1/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+       - [asks_back] outcome ('no_promise', 'refused'), expected ('promise', None)
+       - [asks_back] promises [], expected [('p1', 540.0, '2026-10-27')]
+       - [asks_back] conversation: The agent did not ask once for the exact payment day, did not reject 26 October and offer the next business day, and did not record a promise for Tuesday 27 October within the early-band deadline.
+PASS PUB-08 2/2 | verify_identity > verify_identity > verify_identity > verify_identity > get_account > close_call
+FAIL PUB-09 1/2 | verify_identity > verify_identity > get_account > transfer_to_agent > close_call
+       - [plain] conversation: The agent describes its own repayment proposal by offering an unsupported minimum payment of 300.
+PASS PUB-10 2/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > close_call
+
+fast_eval: 5 / 10 passed (2 rep(s), all reps must pass), 3009 s
+harness: 0 case(s) still INVALID after 2 re-run(s) (not a measurement), 1 rep(s) re-run

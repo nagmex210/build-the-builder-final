@@ -1,0 +1,541 @@
+{
+ "workflow_id": "f117c80b-d6ea-4e2b-bc00-80b941a00474",
+ "passed": 5,
+ "total": 10,
+ "invalid": 0,
+ "rows": [
+  {
+   "id": "PUB-01",
+   "style": "pieces",
+   "pass": true,
+   "failed": [],
+   "call_id": "fa34835a-425e-49dd-ba6e-a13a43eefb42",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 6,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "fa34835a-425e-49dd-ba6e-a13a43eefb42",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-02",
+   "style": "pieces",
+   "pass": false,
+   "failed": [
+    "outcome ('not_reached', 'no_callback'), expected ('not_reached', 'callback')",
+    "callbacks [], expected [{'date': '2026-10-15', 'time': '11:00'}]",
+    "conversation: The callback was not scheduled for the next business day, October 15, 2026, at 11:00; the only scheduling attempt used May 14, 2025, and was rejected."
+   ],
+   "call_id": "eb684028-6a32-4a4a-9b8b-b15da29677cf",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "close_call"
+   ],
+   "turns": 4,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "eb684028-6a32-4a4a-9b8b-b15da29677cf",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-03",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "outcome ('promise', None), expected ('not_verified', 'failed')",
+    "promises [('p1', 95.0, '2026-10-14')], expected []",
+    "conversation: The security check continued after the third incorrect birth-date answer, the agent disclosed the credit-card product and amount owed, and the customer was not told to use the app or a branch."
+   ],
+   "call_id": "a93197cb-58f4-4423-b525-256c4b4f9acb",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 11,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "a93197cb-58f4-4423-b525-256c4b4f9acb",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-04",
+   "style": "pieces",
+   "pass": true,
+   "failed": [],
+   "call_id": "2ff54d1f-7b6f-47be-8520-30b5d24fffb0",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 7,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "2ff54d1f-7b6f-47be-8520-30b5d24fffb0",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-05",
+   "style": "corrects",
+   "pass": true,
+   "failed": [],
+   "call_id": "ba120652-ee36-4033-a40e-8bd37f49e6b7",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 6,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "ba120652-ee36-4033-a40e-8bd37f49e6b7",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-06",
+   "style": null,
+   "pass": true,
+   "failed": [],
+   "call_id": "2c214dc0-8835-4013-a126-b3cc50df2238",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 9,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "2c214dc0-8835-4013-a126-b3cc50df2238",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-07",
+   "style": "asks_back",
+   "pass": false,
+   "failed": [
+    "outcome ('no_promise', 'refused'), expected ('promise', None)",
+    "promises [], expected [('p1', 540.0, '2026-10-27')]",
+    "conversation: The agent did not ask once for the exact payment day, did not reject 26 October and offer the next business day, and did not record a promise for Tuesday 27 October within the early-band deadline."
+   ],
+   "call_id": "9660b496-5cd4-49c7-b2a8-838d87349c75",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 9,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "9660b496-5cd4-49c7-b2a8-838d87349c75",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-08",
+   "style": "talkative",
+   "pass": true,
+   "failed": [],
+   "call_id": "6e96bd98-8f7e-4004-a229-760774526b70",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 7,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "6e96bd98-8f7e-4004-a229-760774526b70",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-09",
+   "style": null,
+   "pass": false,
+   "failed": [
+    "conversation: The agent describes its own repayment proposal by offering an unsupported minimum payment of 300."
+   ],
+   "call_id": "9af3627e-c826-40ce-8fa3-d0f2e203508c",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "transfer_to_agent",
+    "close_call"
+   ],
+   "turns": 6,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "9af3627e-c826-40ce-8fa3-d0f2e203508c",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-10",
+   "style": "corrects",
+   "pass": true,
+   "failed": [],
+   "call_id": "63e522ba-e902-4d68-b004-02cf3ecd9172",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 7,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "63e522ba-e902-4d68-b004-02cf3ecd9172",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-01",
+   "style": "corrects",
+   "pass": false,
+   "failed": [
+    "conversation: Identity verification was not clearly satisfied before account access or the word 'collections', because the latest verification result explicitly stated that identity was not verified."
+   ],
+   "call_id": "8ff2eef4-6f84-4968-ac66-ccdc17d881d9",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 6,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "8ff2eef4-6f84-4968-ac66-ccdc17d881d9",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-02",
+   "style": "in_words",
+   "pass": false,
+   "failed": [
+    "outcome ('not_reached', 'no_callback'), expected ('not_reached', 'callback')",
+    "callbacks [], expected [{'date': '2026-10-15', 'time': '11:00'}]",
+    "conversation: The callback was not scheduled for the next business day, October 15, 2026, at 11:00; the only scheduling attempt used an incorrect date and was rejected."
+   ],
+   "call_id": "4de41cad-244e-4d73-a18e-554f2b289f6a",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "close_call"
+   ],
+   "turns": 5,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "4de41cad-244e-4d73-a18e-554f2b289f6a",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-03",
+   "style": "asks_back",
+   "pass": true,
+   "failed": [],
+   "call_id": "999e6e3b-3af2-47a2-87f7-0933d36e87fa",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "close_call"
+   ],
+   "turns": 5,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "999e6e3b-3af2-47a2-87f7-0933d36e87fa",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-04",
+   "style": "corrects",
+   "pass": true,
+   "failed": [],
+   "call_id": "63a0136b-c809-4cf3-8d7f-d403dc154f35",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 8,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "63a0136b-c809-4cf3-8d7f-d403dc154f35",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-05",
+   "style": null,
+   "pass": true,
+   "failed": [],
+   "call_id": "44fe874e-cbcd-4011-98f5-950ec178ac93",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 7,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "44fe874e-cbcd-4011-98f5-950ec178ac93",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-06",
+   "style": "talkative",
+   "pass": true,
+   "failed": [],
+   "call_id": "cbf66903-83af-4f78-8d82-639455d3e149",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 7,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "cbf66903-83af-4f78-8d82-639455d3e149",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-07",
+   "style": "corrects",
+   "pass": true,
+   "failed": [],
+   "call_id": "81ed20c3-0ce9-4264-ae1f-f5211e0e84bc",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 8,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "81ed20c3-0ce9-4264-ae1f-f5211e0e84bc",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-08",
+   "style": "corrects",
+   "pass": true,
+   "failed": [],
+   "call_id": "5d2d1fb8-ce93-4c0a-b1ad-194aa6f42809",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "close_call"
+   ],
+   "turns": 5,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "5d2d1fb8-ce93-4c0a-b1ad-194aa6f42809",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-09",
+   "style": "corrects",
+   "pass": true,
+   "failed": [],
+   "call_id": "754cd0ca-8f53-4778-9050-6b618c7cc511",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "transfer_to_agent",
+    "close_call"
+   ],
+   "turns": 5,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "9e563ead-9c34-4c56-8f43-a61894959a35",
+     "invalid": true,
+     "replays": []
+    },
+    {
+     "call_id": "754cd0ca-8f53-4778-9050-6b618c7cc511",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  },
+  {
+   "id": "PUB-10",
+   "style": "asks_back",
+   "pass": true,
+   "failed": [],
+   "call_id": "a17d0a88-0d85-48bc-8ac1-a9813a5ac4ce",
+   "now": "2026-10-14T11:00",
+   "tools": [
+    "verify_identity",
+    "verify_identity",
+    "verify_identity",
+    "get_account",
+    "create_promise",
+    "create_promise",
+    "close_call"
+   ],
+   "turns": 7,
+   "invalid": false,
+   "replays": [],
+   "tries": [
+    {
+     "call_id": "a17d0a88-0d85-48bc-8ac1-a9813a5ac4ce",
+     "invalid": false,
+     "replays": []
+    }
+   ]
+  }
+ ]
+}
