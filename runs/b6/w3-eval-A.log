@@ -1,0 +1,20 @@
+PASS PUB-01 2/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+PASS PUB-02 2/2 | schedule_callback > close_call
+FAIL PUB-03 0/2 | verify_identity > verify_identity > verify_identity > verify_identity > close_call
+       - [asks_back] conversation: The identity check did not end after the third wrong answer: the agent asked another security question and attempted verification again after no attempts remained.
+       - [corrects] outcome ('promise', None), expected ('not_verified', 'failed')
+       - [corrects] promises [('p1', 95.0, '2026-10-14')], expected []
+       - [corrects] conversation: The third-wrong-answer stopping check is not clearly satisfied, the agent disclosed an amount and product, and the customer was not told to use the app or a branch.
+PASS PUB-04 2/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+PASS PUB-05 2/2 | verify_identity > verify_identity > verify_identity > verify_identity > get_account > close_call
+FAIL PUB-06 0/2 | verify_identity > verify_identity > get_account > create_promise > close_call
+       - [corrects] promises [('p1', 2125.1, '2026-10-15')], expected [('p1', 637.5, '2026-10-16')]
+       - [corrects] conversation: The required promise for 637.50 on Friday 16 October was not recorded; instead, the agent recorded 2,125.10 for Thursday 15 October.
+       - [in_words] conversation: The minimum payment was offered twice—first for today and then for Friday—so the check that it be offered once fails.
+PASS PUB-07 2/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > close_call
+PASS PUB-08 2/2 | verify_identity > verify_identity > verify_identity > get_account > close_call
+PASS PUB-09 2/2 | verify_identity > verify_identity > verify_identity > get_account > transfer_to_agent > close_call
+PASS PUB-10 2/2 | verify_identity > verify_identity > verify_identity > get_account > create_promise > create_promise > close_call
+
+fast_eval: 8 / 10 passed (2 rep(s), all reps must pass), 1453 s
+harness: 0 case(s) still INVALID after 2 re-run(s) (not a measurement), 0 rep(s) re-run
