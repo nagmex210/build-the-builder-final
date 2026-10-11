@@ -1,0 +1,56 @@
+[
+ {
+  "role": "system",
+  "message": "{\"event\":\"function_call_start\",\"function\":\"probe_write\",\"args\":{\"url\":\"https://freya-bank-mock.freyavoice.workers.dev/health\",\"method\":\"POST\",\"headers\":{\"Content-Type\":\"application/json\"},\"body\":{\"label\":\"beta\"}}}",
+  "messageId": "msg_4_1791719825758",
+  "secondsFromStart": 21.176585912704468,
+  "nodeId": "talk",
+  "duration": 0,
+  "timestamp": "2026-10-11T11:57:17.689Z"
+ },
+ {
+  "role": "system",
+  "message": "{\"event\":\"function_call_start\",\"function\":\"probe_write\",\"args\":{\"url\":\"https://freya-bank-mock.freyavoice.workers.dev/health\",\"method\":\"POST\",\"headers\":{\"Content-Type\":\"application/json\"},\"body\":{\"label\":\"alpha\"}}}",
+  "messageId": "msg_5_1791719825760",
+  "secondsFromStart": 21.177995204925537,
+  "nodeId": "talk",
+  "duration": 0,
+  "timestamp": "2026-10-11T11:57:18.352Z"
+ },
+ {
+  "role": "system",
+  "message": "{\"event\":\"function_call_start\",\"function\":\"probe_write\",\"args\":{\"url\":\"https://freya-bank-mock.freyavoice.workers.dev/health\",\"method\":\"POST\",\"headers\":{\"Content-Type\":\"application/json\"},\"body\":{\"label\":\"gamma\"}}}",
+  "messageId": "msg_6_1791719825924",
+  "secondsFromStart": 21.34208369255066,
+  "nodeId": "talk",
+  "duration": 0,
+  "timestamp": "2026-10-11T11:57:18.884Z"
+ },
+ {
+  "role": "system",
+  "message": "{\"event\":\"function_call_complete\",\"function\":\"probe_write\",\"result\":{\"status\":\"success\",\"data\":{\"ok\":true,\"trace\":\" pre:alpha post:alpha/noconfig\"},\"message\":\"Successfully executed POST request\",\"status_code\":200,\"header\":{\"Date\":\"Sun, 11 Oct 2026 11:57:05 GMT\",\"Content-Type\":\"application/json\",\"Content-Length\":\"11\",\"Connection\":\"keep-alive\",\"Report-To\":\"{\\\"group\\\":\\\"cf-nel\\\",\\\"max_age\\\":604800,\\\"endpoints\\\":[{\\\"url\\\":\\\"https://a.nel.cloudflare.com/report/v4?s=zokuSVoa35BDpAs0VMCz7W0FFbgxhhUSDXs0GfrY8uPeqNe62qXirJHsC16FcxUPwIxFB%2FZyYQM4BmeomdFVuABTjPO7UjTltmFM%2BmITmXVDodV%2FCfTD9aygIECtxxVJoqHZJgIXvoKvCErMClRAfQG5vvN3kstcCw%3D%3D\\\"}]}\",\"Nel\":\"{\\\"report_to\\\":\\\"cf-nel\\\",\\\"success_fraction\\\":0.0,\\\"max_age\\\":604800}\",\"Server\":\"cloudflare\",\"CF-RAY\":\"a48daf6f1a65dbd7-FRA\",\"alt-svc\":\"h3=\\\":443\\\"; ma=86400\"}}}",
+  "messageId": "msg_7_1791719826043",
+  "secondsFromStart": 21.461535930633545,
+  "nodeId": "talk",
+  "duration": 0,
+  "timestamp": "2026-10-11T11:57:19.333Z"
+ },
+ {
+  "role": "system",
+  "message": "{\"event\":\"function_call_complete\",\"function\":\"probe_write\",\"result\":{\"status\":\"success\",\"data\":{\"ok\":true,\"trace\":\" pre:alpha post:alpha/noconfig\"},\"message\":\"Successfully executed POST request\",\"status_code\":200,\"header\":{\"Date\":\"Sun, 11 Oct 2026 11:57:05 GMT\",\"Content-Type\":\"application/json\",\"Content-Length\":\"11\",\"Connection\":\"keep-alive\",\"Report-To\":\"{\\\"group\\\":\\\"cf-nel\\\",\\\"max_age\\\":604800,\\\"endpoints\\\":[{\\\"url\\\":\\\"https://a.nel.cloudflare.com/report/v4?s=sboxxgvBCMPOMWAckMg7oxtZBZhYNiYsm34ZiZTOsSI9CSQYAcT7elsWiEyPQhhEhLYA8ODOZBGW8sHHMArvnWrFXTtreqzkd8vtR%2BLLDW1gMNb2JE27YmQZKpW4jJUI6YyWIuWvCPPYMN5AYE3or3suDdDJIfVDdQ%3D%3D\\\"}]}\",\"Nel\":\"{\\\"report_to\\\":\\\"cf-nel\\\",\\\"success_fraction\\\":0.0,\\\"max_age\\\":604800}\",\"Server\":\"cloudflare\",\"CF-RAY\":\"a48daf6f19029ac1-FRA\",\"alt-svc\":\"h3=\\\":443\\\"; ma=86400\"}}}",
+  "messageId": "msg_8_1791719826201",
+  "secondsFromStart": 21.619462251663208,
+  "nodeId": "talk",
+  "duration": 0,
+  "timestamp": "2026-10-11T11:57:19.938Z"
+ },
+ {
+  "role": "system",
+  "message": "{\"event\":\"function_call_complete\",\"function\":\"probe_write\",\"result\":{\"status\":\"success\",\"data\":{\"ok\":true,\"trace\":\" pre:gamma post:gamma/noconfig\"},\"message\":\"Successfully executed POST request\",\"status_code\":200,\"header\":{\"Date\":\"Sun, 11 Oct 2026 11:57:06 GMT\",\"Content-Type\":\"application/json\",\"Content-Length\":\"11\",\"Connection\":\"keep-alive\",\"Report-To\":\"{\\\"group\\\":\\\"cf-nel\\\",\\\"max_age\\\":604800,\\\"endpoints\\\":[{\\\"url\\\":\\\"https://a.nel.cloudflare.com/report/v4?s=RoF%2FXrtTVr7NMdL7A6YD9GkFi4XirQDe8G0LytGE3KxeuWeDFc0a13H%2BvlSRF2lbl4LIKMjyKd3ozJ%2FdaOuhoHwD9gTbjwqsSQF7m9AMa3CIqZ5zp3EIq0Rb56D%2BWM2yzrXpto2WRt6sHh6%2BIZP9YlaAXjxhWQltPw%3D%3D\\\"}]}\",\"Nel\":\"{\\\"report_to\\\":\\\"cf-nel\\\",\\\"success_fraction\\\":0.0,\\\"max_age\\\":604800}\",\"Server\":\"cloudflare\",\"CF-RAY\":\"a48daf701e40dbfa-FRA\",\"alt-svc\":\"h3=\\\":443\\\"; ma=86400\"}}}",
+  "messageId": "msg_9_1791719826209",
+  "secondsFromStart": 21.62712264060974,
+  "nodeId": "talk",
+  "duration": 0,
+  "timestamp": "2026-10-11T11:57:20.345Z"
+ }
+]

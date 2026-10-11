@@ -208,22 +208,29 @@ POST = r'''
 try:
     _T = __TOOL__
     _r = vars.get('guard_block_' + _T)
-    if _r and isinstance(result, dict):
+    # b10-w2 (probe on Freya, runs/b10/w2/probe): in a turn with parallel calls of one tool, a post-hook can read a
+    # SIBLING's vars instead of its own pre-hook's, and config is absent in post. So the block flag alone can belong to
+    # another call: the result decides. The tool's success answer carries an id (ACK, from the tool API file): with
+    # it, the bank recorded this call (never reported as blocked); a bare 2xx ok answer without it is our no-op,
+    # i.e. NOT sent, even when the flag was lost (before: "SUCCESS ... recorded" for a promise never sent).
+    _ACK = __ACK__
+    _dd = result.get('data') if isinstance(result, dict) else None
+    _okr = isinstance(_dd, dict) and str(_dd.get('ok')).lower() == 'true' and str(result.get('status') or 'success').lower() in ('success', 'ok')
+    _real = isinstance(_dd, dict) and (bool(_dd.get('already_recorded')) or any(_dd.get(k) not in (None, '') for k in _ACK))
+    if _real or not _okr:
+        _r = ''
+    elif _ACK and not _r:
+        _r = ('one of the values breaks a brief rule (the reason was lost because several ' + _T + ' calls ran in the '
+              'same turn). Call check_promise_date for this product with the customer\'s date and amount, follow its answer, '
+              'and send ' + _T + ' for one product at a time')
+    if isinstance(result, dict) and (_real or _r):
         vars['guard_block_' + _T] = ''
+    if _r and isinstance(result, dict):
         _o2 = str(vars.get('guard_offer_' + _T) or '')
         vars['guard_offer_' + _T] = ''
-        try:
-            _n = int(vars.get('tool_failures_' + _T) or 0)
-            if _n > 0:
-                vars['tool_failures_' + _T] = _n - 1
-        except Exception:
-            pass
-        try:
-            _n = int(vars.get('tool_successes_' + _T) or 0)
-            if _n > 0:
-                vars['tool_successes_' + _T] = _n - 1          # the no-op answered 200: not a recorded success
-        except Exception:
-            pass
+        # b10-w2: no counter change here. The no-op answers 200, so harden's post-hook did not count this block as a
+        # failure; decrementing tool_failures here erased an EARLIER real failure (the model then saw "failure number 1"
+        # twice and retried past the brief's limit).
         if vars.get('last_tool_failed') == _T:
             vars['last_tool_failed'] = ''
         result.pop('header', None)
@@ -501,6 +508,28 @@ def norm_tools(spec):
     return spec
 
 
+def _ack_keys(name):
+    """The id fields of the tool's success answer in the tool API file (BTB_TOOLS_API), e.g. a promise's own id: an
+    answer with one of them came from the bank. [] when the file or the field is not there."""
+    import os
+    try:
+        api = json.loads(pathlib.Path(os.environ.get("BTB_TOOLS_API") or "").read_text())
+    except Exception:  # noqa: BLE001
+        return []
+    for path, ops in (api.get("paths") or {}).items():
+        if str(path).rstrip("/").split("/")[-1] != name or not isinstance(ops, dict):
+            continue
+        for op in ops.values():
+            for code, r in ((op or {}).get("responses") or {}).items() if isinstance(op, dict) else []:
+                if not str(code).startswith("2"):
+                    continue
+                props = ((((r or {}).get("content") or {}).get("application/json") or {}).get("schema") or {}).get("properties") or {}
+                keys = [k for k in props if str(k).endswith(("_id", "_ref"))]
+                if keys:
+                    return keys
+    return []
+
+
 def install(wf, spec):
     if not isinstance(spec, dict) or not isinstance(spec.get("guards"), dict):
         return []
@@ -525,6 +554,8 @@ def install(wf, spec):
         else:
             continue
         s = {**spec, "guards": g}
+        if post == POST:
+            post = POST.replace("__ACK__", repr(_ack_keys(name)))
         for key, body in (("pre_process_code", pre), ("post_process_code", post)):
             if body:
                 old = (t.get(key) or "").split("try:\n    " + MARK)[0]      # replace an earlier guard block

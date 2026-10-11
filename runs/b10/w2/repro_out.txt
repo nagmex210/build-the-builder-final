@@ -1,0 +1,72 @@
+######## before
+R1 sequential: real failure -> guard block -> real failure: which failure number does the model see?
+  1 bank 500    : False | FAILED: create_promise was NOT carried out and NOTHING was recorded (error: service unavailable). This is failure number 1 of create_promise in this c | tool_failures = 1
+  2 guard block : False | NOT RECORDED: create_promise was checked against the brief and NOT sent: Friday 2026-10-30 is after the deadline of product P1; the latest date that c | tool_failures = 0
+  3 bank 500    : False | FAILED: create_promise was NOT carried out and NOTHING was recorded (error: service unavailable). This is failure number 1 of create_promise in this c | tool_failures = 1
+R2 two create_promise in ONE turn, hooks interleaved (pre1 pre2 call1 call2 post1 post2): P1 after deadline, P2 valid
+  sequential  P1 sent to health          model sees: False | NOT RECORDED: create_promise was checked against the brief and NOT sent: Friday 2026-10-30 is after the deadline of product P1; the latest date that c
+  sequential  P2 sent to create_promise  model sees: True | SUCCESS: create_promise was carried out and recorded. Only now may you tell the customer it is recorded. Speak to the customer now. | say_now: SAY EXACTLY, word for word, in your next message: "You will receive a text messa
+  sequential  writes_ok keys: ['create_promise#P2']
+  interleaved P1 sent to health          model sees: True | SUCCESS: create_promise was carried out and recorded. Only now may you tell the customer it is recorded. Speak to the customer now. | say_now: SAY EXACTLY, word for word, in your next message: "You will receive a text messa
+  interleaved P2 sent to create_promise  model sees: True | SUCCESS: create_promise was carried out and recorded. Only now may you tell the customer it is recorded. Speak to the customer now. | say_now: SAY EXACTLY, word for word, in your next message: "You will receive a text messa
+  interleaved writes_ok keys: ['create_promise#P2']
+  sibling-vars P1 sent to health          model sees: True | SUCCESS: create_promise was carried out and recorded. Only now may you tell the customer it is recorded. Speak to the customer now. | say_now: SAY EXACTLY, word for word, in your next message: "You will receive a text messa
+  sibling-vars P2 sent to create_promise  model sees: False | NOT RECORDED: create_promise was checked against the brief and NOT sent: Friday 2026-10-30 is after the deadline of product P1; the latest date that c
+  sibling-vars writes_ok keys: []
+R4 the bank answers 200 ok=false (rejects the values) vs a 500 (service failure): what does the model hear?
+  verify 200 ok=false : FAILED: verify_identity was NOT carried out and NOTHING was recorded (error: answer is not a date. Send it as YYYY-MM-DD.). This is failure number 1 of verify_identity in this call. Never tell the customer it was recorded, booked, sent or done. Apply the brief rule for a failed tool call: if it allows another attempt, call verify_identity again now with the same values; otherwise tell the customer || say_next: The answer could not be read (not counted). Ask for date_of_birth again, clearly. Say nothing about any account.
+  promise 200 ok=false: FAILED: create_promise was NOT carried out and NOTHING was recorded (error: amount must be a number). This is failure number 1 of create_promise in this call. Never tell the customer it was recorded, booked, sent or done. Apply the brief rule for a failed tool call: if it allows another attempt, call create_promise again now with the same values; otherwise tell the customer plainly that it could n
+  promise 500         : FAILED: create_promise was NOT carried out and NOTHING was recorded (error: service unavailable). This is failure number 2 of create_promise in this call. Never tell the customer it was recorded, booked, sent or done. Apply the brief rule for a failed tool call: if it allows another attempt, call create_promise again now with the same values; otherwise tell the customer plainly that it could not b
+R5 identity gate: (a) bank result without a call-wide flag, both answers right; (b) two verify calls in one turn, the stale sibling's result lands last
+  (a) identity_state = asking next | say_next: This answer is correct, but identity is NOT verified yet. Never say th | route -> (stays in identity)
+  (b) identity_state = asking next | route -> (stays in identity)
+R6 negatives (must NOT pass): one right + one wrong without a flag; both right but the bank flag says false; three wrong
+  right+wrong, no flag     identity_state = retry phone_last4 route -> (stays in identity)
+  both right, flag false   identity_state = asking next    route -> (stays in identity)
+  three wrong              identity_state = failed         route -> identity_failed
+R7 an id the model BUILT ('credit_card_2288', 'pl_1234', 'CC_2288') on a multi-product account: what reaches the bank?
+  model sent credit_card_2288   -> request product_id = credit_card_2288
+  model sent pl_1234            -> request product_id = pl_1234
+  model sent CC_2288            -> request product_id = CC_2288
+  model sent loan               -> request product_id = loan
+  model sent p3                 -> request product_id = p3
+R8 regressions: identical re-send of a recorded promise; a bank 500 while a stray block flag is set
+  first send   : True | SUCCESS: create_promise was carried out and recorded. Only now may you tell the cus
+  re-send      : True | ALREADY RECORDED earlier in this call: do not send it again. create_promise for P1 
+  500 + flag   : False | NOT RECORDED: create_promise was checked against the brief and NOT sent: a sibling
+######## after
+R1 sequential: real failure -> guard block -> real failure: which failure number does the model see?
+  1 bank 500    : False | FAILED: create_promise was NOT carried out and NOTHING was recorded (error: service unavailable). This is failure number 1 of create_promise in this c | tool_failures = 1
+  2 guard block : False | NOT RECORDED: create_promise was checked against the brief and NOT sent: Friday 2026-10-30 is after the deadline of product P1; the latest date that c | tool_failures = 1
+  3 bank 500    : False | FAILED: create_promise was NOT carried out and NOTHING was recorded (error: service unavailable). This is failure number 2 of create_promise in this c | tool_failures = 2
+R2 two create_promise in ONE turn, hooks interleaved (pre1 pre2 call1 call2 post1 post2): P1 after deadline, P2 valid
+  sequential  P1 sent to health          model sees: False | NOT RECORDED: create_promise was checked against the brief and NOT sent: Friday 2026-10-30 is after the deadline of product P1; the latest date that c
+  sequential  P2 sent to create_promise  model sees: True | SUCCESS: create_promise was carried out and recorded. Only now may you tell the customer it is recorded. Speak to the customer now. | say_now: SAY EXACTLY, word for word, in your next message: "You will receive a text messa
+  sequential  writes_ok keys: ['create_promise#P2']
+  interleaved P1 sent to health          model sees: False | NOT RECORDED: create_promise was checked against the brief and NOT sent: one of the values breaks a brief rule (the reason was lost because several cr
+  interleaved P2 sent to create_promise  model sees: True | SUCCESS: create_promise was carried out and recorded. Only now may you tell the customer it is recorded. Speak to the customer now. | say_now: SAY EXACTLY, word for word, in your next message: "You will receive a text messa
+  interleaved writes_ok keys: ['create_promise#P2']
+  sibling-vars P1 sent to health          model sees: False | NOT RECORDED: create_promise was checked against the brief and NOT sent: one of the values breaks a brief rule (the reason was lost because several cr
+  sibling-vars P2 sent to create_promise  model sees: True | SUCCESS: create_promise was carried out and recorded. Only now may you tell the customer it is recorded. Speak to the customer now. | say_now: SAY EXACTLY, word for word, in your next message: "You will receive a text messa
+  sibling-vars writes_ok keys: []
+R4 the bank answers 200 ok=false (rejects the values) vs a 500 (service failure): what does the model hear?
+  verify 200 ok=false : FAILED: verify_identity was NOT carried out and NOTHING was recorded: the bank rejected the values (error: answer is not a date. Send it as YYYY-MM-DD.). This is failure number 1 of verify_identity in this call. Never tell the customer it was recorded, booked, sent or done. Never send the same values again: they get the same answer. Correct the value the error names (ask the customer if needed) an || say_next: The answer could not be read (not counted). Ask for date_of_birth again, clearly. Say nothing about any account.
+  promise 200 ok=false: FAILED: create_promise was NOT carried out and NOTHING was recorded: the bank rejected the values (error: amount must be a number). This is failure number 1 of create_promise in this call. Never tell the customer it was recorded, booked, sent or done. Never send the same values again: they get the same answer. Correct the value the error names (ask the customer if needed) and follow the brief.
+  promise 500         : FAILED: create_promise was NOT carried out and NOTHING was recorded (error: service unavailable). This is failure number 2 of create_promise in this call. Never tell the customer it was recorded, booked, sent or done. Apply the brief rule for a failed tool call: if it allows another attempt, call create_promise again now with the same values; otherwise tell the customer plainly that it could not b
+R5 identity gate: (a) bank result without a call-wide flag, both answers right; (b) two verify calls in one turn, the stale sibling's result lands last
+  (a) identity_state = passed | say_next: Identity is verified. Do not ask any security question again. | route -> load_account
+  (b) identity_state = passed | route -> load_account
+R6 negatives (must NOT pass): one right + one wrong without a flag; both right but the bank flag says false; three wrong
+  right+wrong, no flag     identity_state = retry phone_last4 route -> (stays in identity)
+  both right, flag false   identity_state = asking next    route -> (stays in identity)
+  three wrong              identity_state = failed         route -> identity_failed
+R7 an id the model BUILT ('credit_card_2288', 'pl_1234', 'CC_2288') on a multi-product account: what reaches the bank?
+  model sent credit_card_2288   -> request product_id = p1
+  model sent pl_1234            -> request product_id = p2
+  model sent CC_2288            -> request product_id = p1
+  model sent loan               -> request product_id = loan
+  model sent p3                 -> request product_id = p3
+R8 regressions: identical re-send of a recorded promise; a bank 500 while a stray block flag is set
+  first send   : True | SUCCESS: create_promise was carried out and recorded. Only now may you tell the cus
+  re-send      : True | ALREADY RECORDED earlier in this call: do not send it again. create_promise for P1 
+  500 + flag   : False | FAILED: create_promise was NOT carried out and NOTHING was recorded (error: servic
