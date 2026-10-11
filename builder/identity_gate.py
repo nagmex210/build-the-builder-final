@@ -25,7 +25,14 @@ try:
         def _tf(x):
             return str(x).strip().lower() in ('true', '1', 'yes')
         _ks = list(_d.keys())
-        _allk = next((k for k in _ks if 'verif' in str(k).lower() and 'all' in str(k).lower()), None)
+        # Key names differ per bank API: the call-wide flag (all_verified, identity_confirmed, fully_verified ...) and
+        # the per-answer flag (verified, passed, correct, match ...) are found by shape, never by one fixed name.
+        _per_words = ('verif', 'pass', 'correct', 'match', 'valid', 'confirm', 'success')
+        _allk = next((k for k in _ks if any(w in str(k).lower() for w in _per_words)
+                      and any(w in str(k).lower() for w in ('all', 'identity', 'fully', 'complete', 'overall', 'customer'))), None)
+        _ansk = next((k for k in _ks if k != _allk and str(k).lower() in ('verified', 'passed', 'correct', 'match', 'matched', 'valid', 'confirmed', 'success')), None) \
+            or next((k for k in _ks if k != _allk and any(w in str(k).lower() for w in _per_words)
+                     and not any(w in str(k).lower() for w in ('so_far', 'next', 'status', 'state', 'say', 'list'))), None)
         _leftk = next((k for k in _ks if any(w in str(k).lower() for w in ('left', 'remain'))), None)
         _hint = _d.get('hint')
         _fld = ''
@@ -45,17 +52,23 @@ try:
         if _allk is not None and _tf(_d.get(_allk)):
             _state = 'passed'
             _say = 'Identity is verified. Do not ask any security question again.'
-        elif _left is not None and _left <= 0 and not _tf(_d.get('verified')):
+        elif _left is not None and _left <= 0 and not (_ansk is not None and _tf(_d.get(_ansk))):
             _state = 'failed'
             _say = __FAILED__
         elif _hint:
             _state = 'retry ' + _fld
             _say = ('Not counted as a wrong answer (' + str(_hint) + '). Follow the brief\'s rule for this hint and ask '
                     + _fld + ' again. Say nothing about any account.')
-        elif _ok_false and not str(_d.get('verified', '')).strip():
+        elif _ok_false and not (_ansk is not None and str(_d.get(_ansk, '')).strip()):
             _state = 'retry ' + _fld
             _say = 'The answer could not be read (not counted). Ask for ' + _fld + ' again, clearly. Say nothing about any account.'
-        elif _tf(_d.get('verified')):
+        elif _ansk is None:
+            # The response shape is not readable: no verdict from code (a wrong 'WRONG' loops the call); the bank's
+            # own words decide, the gate still holds.
+            _state = 'checking'
+            _say = ('Follow the result\'s own words (what_to_do_next / message) for this answer. Identity is NOT verified yet. '
+                    'Never re-send an answer that already passed. Say nothing about any account.')
+        elif _tf(_d.get(_ansk)):
             _state = 'asking next'
             _say = ('This answer is correct, but identity is NOT verified yet. Never say the customer is verified. '
                     'Ask the next security question the brief requires (never one already passed). Say nothing about any account.')

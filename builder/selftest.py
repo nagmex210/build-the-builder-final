@@ -320,7 +320,9 @@ def _run_one(workflow_id, sc, lib):
             led = ledger(sess["customer_id"])
             ok_tools.append({c["tool"] for c in led.get("calls") or [] if not _failed(c)})
             id_passed.append(any(c["tool"] == "verify_identity" and isinstance(c.get("result"), dict)
-                                 and any("verif" in str(k).lower() and "all" in str(k).lower() and str(x).lower() == "true"
+                                 and any(any(w in str(k).lower() for w in ("verif", "pass", "correct", "match", "valid", "confirm", "success"))
+                                         and any(w in str(k).lower() for w in ("all", "identity", "fully", "complete", "overall", "customer"))
+                                         and str(x).lower() == "true"
                                          for k, x in c["result"].items()) for c in led.get("calls") or []))
             if led.get("calls") and led["calls"][-1]["tool"] == "close_call":
                 break
