@@ -3,7 +3,7 @@ slot. Prints {"workflow_id", "agent_id", "version"}.
 
     python3 builder/save.py <slot> <workflow.json>
 """
-import fcntl, json, os, pathlib, sys
+import fcntl, json, os, pathlib, socket, sys, time, urllib.error
 
 KIT = pathlib.Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(KIT)); sys.path.insert(0, str(KIT / "builder"))
@@ -14,6 +14,33 @@ from canned import apply as apply_canned  # noqa: E402
 from guards import install as install_guards  # noqa: E402
 from identity_gate import apply as apply_identity_gate  # noqa: E402
 from situations import apply as apply_situations  # noqa: E402
+
+
+if os.environ.get("FREYA_WORKSPACE_ID"):   # set once by build.py: one platform call less per save (a 504 there failed builds)
+    freya._ws = os.environ["FREYA_WORKSPACE_ID"]
+
+
+def workspace_id_with_retry(budget_s=180):
+    t0, delay = time.time(), 5
+    while True:
+        try:
+            return freya.workspace_id()
+        except Exception as e:  # noqa: BLE001
+            if not _transient(e) or time.time() - t0 + delay > budget_s:
+                raise
+            time.sleep(delay); delay = min(delay * 2, 40)
+
+
+def _transient(e):
+    """A Freya gateway/server error or a network timeout: the request may succeed when sent again."""
+    if isinstance(e, (urllib.error.URLError, TimeoutError, socket.timeout, ConnectionError)):
+        return True
+    return isinstance(e, RuntimeError) and any(f"-> {c}:" in str(e) for c in (429, 500, 502, 503, 504))
+
+
+def save_with_retry(slot, wf, state_file, budget_s=None):
+    """Kept for callers of b10 w4's name: the same as locked_save."""
+    return locked_save(slot, wf, state_file, budget_s=budget_s)
 
 
 def finish_and_save(slot, wf, canned=None):
@@ -44,21 +71,24 @@ def finish_and_save(slot, wf, canned=None):
     return names, state
 
 
-def locked_save(slot, wf, state_file, tries=4):
+def locked_save(slot, wf, state_file, budget_s=None):
     """freya.save_workflow under an exclusive lock on <state_file>.lock (it reads, then truncates and rewrites the file).
-    A platform 5xx is retried (b9 main-B: the fix round's save and the restore both 504'd once, the build then reported the
-    slot's older version and Freya kept whichever PUT landed). An update PUT of the same workflow is idempotent."""
-    import re, time
-    for attempt in range(tries):
+    A transient platform error (5xx, 429, timeout, connection) is retried with backoff inside a time budget, sleeping
+    OUTSIDE the lock (b9 main-B: the fix round's save and the restore both 504'd once; b10 w4: 10/12 builds FAILED on one
+    5xx inside the final save). A 4xx (the workflow itself is invalid) is raised at once. Every step of save_workflow
+    can be repeated: a PUT replaces the whole definition, publish takes the newest version."""
+    budget_s = int(os.environ.get("BTB_SAVE_RETRY_S", "300")) if budget_s is None else budget_s
+    t0, delay = time.time(), 5
+    while True:
         try:
             with open(str(state_file) + ".lock", "w") as lock:
                 fcntl.flock(lock, fcntl.LOCK_EX)
                 return freya.save_workflow(slot, wf, state_file=str(state_file))
-        except RuntimeError as e:
-            if not re.search(r"-> 5\d\d", str(e)) or attempt == tries - 1:
+        except Exception as e:  # noqa: BLE001
+            if not _transient(e) or time.time() - t0 + delay > budget_s:
                 raise
-            print(f"save {slot}: platform {str(e)[:80]}; retry {attempt + 1}", file=sys.stderr, flush=True)
-            time.sleep(10 + 10 * attempt)
+            print(f"[freya] save {slot}: transient platform error ({str(e)[:120]}); retry in {delay} s", file=sys.stderr, flush=True)
+            time.sleep(delay); delay = min(delay * 2, 40)
 
 
 def read_state(slot, state_file=None):

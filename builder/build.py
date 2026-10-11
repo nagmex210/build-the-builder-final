@@ -44,6 +44,9 @@ def tail_model_calls(trace, stop):
                         e = json.loads(line)
                     except ValueError:
                         continue
+                    if "model_fallback" in e:    # degraded build: a model of the chain failed, the next one answers
+                        print(f"[model fallback {e.get('at', '')}] {e['model_fallback']} failed for: {e.get('purpose') or '-'} "
+                              f"({e.get('error', '')[:120]}); next model of the chain", flush=True)
                     if "type" not in e and "model" in e and "purpose" in e:
                         print(f"[model call {e.get('at', '')}] {e['model']} (Azure, btb/llm.py): {e['purpose'] or '-'}", flush=True)
         except FileNotFoundError:
@@ -294,6 +297,15 @@ def clear_slot(slot):
 async def run(slot, tools, briefs):
     t0 = time.time()
     moved, dest = clear_slot(slot)
+    state_file = KIT / ".freya-agents.json"
+    try:   # the workspace id never changes: fetch it once (with retry) for every save of this run, the agent's included
+        sys.path.insert(0, str(KIT)); sys.path.insert(0, str(KIT / "builder"))
+        from save import workspace_id_with_retry
+        os.environ["FREYA_WORKSPACE_ID"] = workspace_id_with_retry()
+    except Exception as e:  # noqa: BLE001
+        print(f"[freya] workspace id not fetched yet ({str(e)[:120]}); each save fetches it", flush=True)
+    from save import read_state
+    state0 = read_state(slot, state_file)   # the slot before this run (read under the save lock)
     trace = KIT / "runs" / "traces" / f"{slot}-{time.strftime('%Y%m%d-%H%M%S')}.jsonl"
     trace.parent.mkdir(parents=True, exist_ok=True)
     os.environ["BTB_TRACE"] = str(trace)          # btb/llm.py appends its model calls here too
@@ -495,7 +507,13 @@ async def run(slot, tools, briefs):
             print(f"buildcheck (shipped): {len(errs)} problem(s){': ' + '; '.join(errs) if errs else ''}", flush=True)
     from save import read_state
     state = read_state(slot, KIT / ".freya-agents.json")
-    if state and not saved:
+    if state and not saved and state != state0:
+        # Build stability (b10 w4, 2 of 12 builds): the final pass's save failed on the platform, but the build agent had
+        # already saved (hardened, guarded) versions in THIS run. Ship its last save, said plainly, instead of failing.
+        print(f"WARNING: the final save failed; shipping the build agent's last save of this run (version "
+              f"{state.get('version', 1)}); the final deterministic pass is NOT on the platform", flush=True)
+        log(trace, event="ship", what="final save failed: shipping the agent's last save of this run", state=state, before=state0)
+    elif state and not saved:
         # Build reliability (seen b8): the agent failed, nothing was saved in THIS run, and the slot's state still named the
         # previous build's agent, which was then printed as this build's result. A build that saved nothing fails loudly.
         print("BUILD FAILED: nothing was saved in this run; the slot's last agent is a previous build's", flush=True)
@@ -514,14 +532,15 @@ async def run(slot, tools, briefs):
         try:
             sys.path.insert(0, str(KIT))
             import freya
-            for attempt in range(3):   # a GET 504 under load left no export (b9 main-B); a GET is safe to repeat
+            from save import _transient
+            for attempt in range(4):   # a GET 504 under load left no export (b9 main-B, b10 w4); a GET is safe to repeat
                 try:
                     freya.export_workflow(state["workflow_id"], str(export))
                     break
-                except RuntimeError as e:
-                    if "-> 5" not in str(e) or attempt == 2:
+                except Exception as e:  # noqa: BLE001
+                    if attempt == 3 or not _transient(e):
                         raise
-                    time.sleep(10)
+                    time.sleep(10 * (attempt + 1))
             import wfsummary
             got, shipped = wfsummary.summary(json.loads(export.read_text())), wfsummary.summary(json.loads(wf_file.read_text()))
             print(f"[freya] exported: {export}: {got}", flush=True)

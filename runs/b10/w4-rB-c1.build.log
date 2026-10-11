@@ -1,0 +1,82 @@
+builder: slot=w4-rB-c1 tools=/home/ubuntu/btb/wt4/tools/openapi.json briefs=/home/ubuntu/btb/wt4/btb/briefs_raw/brief-a-raw.md /home/ubuntu/btb/wt4/btb/briefs_raw/brief-b-raw.md
+trace: /home/ubuntu/btb/wt4/runs/traces/w4-rB-c1-20261011-120334.jsonl
+BUILD START 2026-10-11T12:03:34Z slot=w4-rB-c1
+[model call 2026-10-11T12:04:08] gpt-6-astra (Azure, btb/llm.py): A1: list the brief's situations after the account lookup (router + specialist routes)
+[test] datecalc: generated date/amount code run locally on 5 dates and fake products -> ok (59 s)
+[test] A1 situations: refused, hardship, already_paid, dispute, restructuring, human
+[model] build agent: Claude Agent SDK, claude-opus-5-5, skill build-phone-agent, budget 12 min
+[model call 2026-10-11T12:04:33] gpt-6-astra (Azure, btb/llm.py): extract calendar/amount spec for code steps
+[model call 2026-10-11T12:04:38] gpt-6-astra (Azure, btb/llm.py): A3: extract the brief's mandatory sentences as fixed text
+[model call 2026-10-11T12:04:40Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 1: tools Skill
+  [Skill] {'skill': 'build-phone-agent'}
+[model call 2026-10-11T12:04:41Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 2: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; cat btb/briefs_raw/brief-a-raw.md btb/briefs_raw/brief-b-raw.md; ls builder docs o
+    -> ## 1. Internal email **From:** Mara Chen, Operations Manager, Freya Bank **To:** Vendor delivery team **Subject:** Early-stage calling — one-product handover Hi team, Here’s the material for the early-stage collections calls. Freya Bank is fictional, and every customer, debt and payment in this project is synthetic. We’re calling customers who are 1 to 45 days late on one product. The job is to fi ...
+[model call 2026-10-11T12:04:45Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 3: text
+[model call 2026-10-11T12:04:46Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 4: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; cat .claude/skills/build-phone-agent/routing.md; cat docs/workflow-format.md | hea
+    -> # Workflow structure and routing recipe A shape that works for any collections-style brief. Fill every rule, value, field name, enum, outcome and reason from THE BRIEF and THE TOOL API FILE you were given. Node names below are suggestions; stage contents come from the brief. ## Principle The agent model is small. It follows one short task well and many mixed tasks badly. So: - one conversation nod ...
+[model call 2026-10-11T12:04:48Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 5: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; cat examples/base-agent.json | head -c 6000; echo; python3 -c "\nimport json;d=jso
+    -> { "nodes": { "identity": { "name": "identity", "tools": [ { "type": "function", "config": { "timeoutMs": 12000, "maxRetries": 0 }, "function": { "name": "verify_identity", "handler": "__function__:api_call", "parameters": { "type": "object", "properties": { "url": { "type": "string", "default": "https://freya-bank-mock.freyavoice.workers.dev/v1/verify_identity" }, "body": { "type": "object", "requ ...
+[model call 2026-10-11T12:04:52Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 6: text
+[model call 2026-10-11T12:04:53Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 7: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; python3 -c "\nimport json;d=json.load(open(\'tools/openapi.json\'));print(d.get(\'
+    -> [{'url': 'https://freya-bank-mock.freyavoice.workers.dev/v1'}] "p1: band early, deadline Wednesday 2026-10-28, floor None\np2: band late, deadline Tuesday 2026-10-20, floor None" { "main": { "name": "pays", "summary": "State every late product, past-due amount and days late, one sentence per product before asking for anything; ask for all products in full today, otherwise negotiate in account orde ...
+[model call 2026-10-11T12:04:56Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 8: text
+[model call 2026-10-11T12:04:57Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 9: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; grep -n "post_process_code\\|response_mapping" docs/tools-and-code.md | head -20; 
+    -> 39: "response_mapping": [ 56:| `response_mapping` | Tool level, for tools in `tools`. Maps the result to variables | 58:| `post_process_code` | Python hook that runs after the call | 166:| `response_mapping` lives | On the **node** | On the **tool** | 200: "response_mapping": [ 223:## `response_mapping` 225:`response_mapping` copies values from a call result into named variables. It needs no model ...
+[model call 2026-10-11T12:05:00Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 10: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; sed -n 30,40p docs/tools-and-code.md; sed -n 380,392p docs/tools-and-code.md; sed 
+    -> "properties": { "customer_id": { "type": "string", "default": "{{customer_id}}" }, "order_number": { "type": "string", "description": "Order number, digits only", "default": "{{order_number}}" } }, "required": ["order_number"] } } } }, "response_mapping": [ { "path": "data.status", "variable": "order_status" } "type": "object", "properties": { "url": { "type": "string", "default": "https://api.exa ...
+[model call 2026-10-11T12:05:02Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 11: text
+[model call 2026-10-11T12:05:02Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 12: text
+Writing the workflow generator now.
+[model call 2026-10-11T12:06:00Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 13: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; cat > out/w4-rB-c1.gen.py <<\'EOF\'\nimport json\ncalc=json.load(open(\'out/w4-rB-
+    -> dict_keys(['name', 'triggers', 'rules', 'tools', 'close', 'back_to_main', 'first_line', 'once_only', 'promise_allowed'])
+[model call 2026-10-11T12:06:05Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 14: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; sed -i \'s/e.get("promise")=="never"/e.get("promise_allowed")=="never"/; s/e.get("
+    -> ERROR Exit code 1 Traceback (most recent call last): File "/home/ubuntu/btb/wt4/out/w4-rB-c1.gen.py", line 102, in <module> if e.get("once_only") and e["once_only"]!="-": task+="Once per call only: "+e["once_only"]+" (never repeat a sentence already said in the call).\n" ~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~ TypeError: can only concatenate str (not "list") to str Traceback (most recent call last): File  ...
+[model call 2026-10-11T12:06:11Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 15: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; sed -i \'s/if e.get("once_only") and e\\["once_only"\\]!="-": task+="Once per call
+    -> 0 errors, 0 warnings []
+[model call 2026-10-11T12:06:15Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 16: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; python3 builder/save.py w4-rB-c1 out/w4-rB-c1.workflow.json 2>&1 | tail -8'}
+    -> {"hardened_tools": ["schedule_callback", "transfer_to_agent", "close_call", "verify_identity", "transfer_to_agent", "close_call", "get_account", "close_call", "create_promise", "add_note", "close_call", "add_note", "close_call", "create_promise", "transfer_to_agent", "add_note", "close_call", "add_note", "close_call", "add_note", "close_call", "transfer_to_agent", "close_call", "transfer_to_agent" ...
+[model call 2026-10-11T12:06:20Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 17: text
+Saved. Quick start check:
+[model call 2026-10-11T12:06:21Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 18: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; timeout 60 python3 -c "import freya,json; print(str(freya.api(\'POST\',\'/api/v2/c
+    -> ERROR Exit code 124
+[model call 2026-10-11T12:07:24Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 19: text
+[model call 2026-10-11T12:07:26Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 20: tools Bash
+  [Bash] {'command': 'cd /home/ubuntu/btb/wt4; timeout 90 python3 -c "import freya,json; print(str(freya.api(\'POST\',\'/api/v2/c
+    -> ERROR Exit code 1 Traceback (most recent call last): File "<string>", line 1, in <module> File "/home/ubuntu/btb/wt4/freya.py", line 19, in api raise RuntimeError(f"{method} {path} -> {e.code}: {e.read().decode()[:1500]}") from None RuntimeError: POST /api/v2/chat/message -> 504: error code: 504
+[model call 2026-10-11T12:08:35Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 21: text
+[model call 2026-10-11T12:08:35Z] claude-opus-5-5 (Claude Agent SDK) build agent turn 22: text
+I built and saved the workflow for slot w4-rB-c1, but I couldn't confirm it starts a chat. The one-turn start check failed twice: the first try hit my 60-second timeout, and the second came back 504 (gateway timeout). That isn't the 500 the build instructions say means the workflow can't start, so the platform may just have been slow, but it's unconfirmed. The lint check shows 0 errors and the situations check shows no problems. I didn't run the rule-by-rule review against the brief before time ran out.
+
+- **Structure:** the call starts at the given date code node, then goes opening → identity → account lookup (with the given hook pasted in unchanged) → router → negotiate. Each of the six exit situations (refused, hardship, already_paid, dispute, restructuring, human) has its own node, and every node that can close the call ends at a hang_up node.
+- **Prompts:** every node that handles dates includes `{{date_facts}}` and the "never compute a date yourself" instruction. The two date rules no code step computes are written into the identity and negotiate nodes in the brief's words.
+- **Failed promise recording:** after a failed `create_promise`, the agent tries that product once more. After a second failure it keeps the other recorded promises and notes that product as `service_error`, as Brief B's memo requires.
+- **Brief vs extracted situations and date facts:** I found no conflicts. The deadlines (12 business days for 1–7 days late, 7 for 8–45) match the memo, and so do the attempt counts (1 and 2).
+
+Files are in `out/`:
+- w4-rB-c1.workflow.json
+- w4-rB-c1.gen.py
+
+workflow_id e708ae20-52d2-4274-ac58-0578fc11e2b7, agent_id 0a857f22-e78e-4812-a5b5-c2fd0e9fccaf
+
+done: 15 turns, 241 s
+final save (build): {'workflow_id': 'e708ae20-52d2-4274-ac58-0578fc11e2b7', 'agent_id': '0a857f22-e78e-4812-a5b5-c2fd0e9fccaf', 'version': 2}; lint: 0 errors, 0 warnings
+buildcheck: 0 error(s), 0 warning(s)
+[model call 2026-10-11T12:09:07] gpt-6-astra (Azure, btb/llm.py): self-simulation: write personas + ledger checks from the brief
+self-test: no valid chat in workspace 2 (POST /api/v2/chat/message -> 402: {"error":"Insufficient credits","message":"Insufficient credits — ); playing the round in workspace 1
+self-test 1 (workspace 1): 0/0 personas failed a check (0 checks)
+buildcheck (shipped): 0 problem(s)
+[freya] slot w4-rB-c1: workflow_id=e708ae20-52d2-4274-ac58-0578fc11e2b7 agent_id=0a857f22-e78e-4812-a5b5-c2fd0e9fccaf version=2 (published)
+[freya] exported: /home/ubuntu/btb/wt4/submission/w4-rB-c1.workflow.json
+BUILD END 2026-10-11T12:16:12Z (760 s); trace scrubbed (0 secret(s) replaced): /home/ubuntu/btb/wt4/runs/traces/w4-rB-c1-20261011-120334.jsonl
+{"workflow_id": "e708ae20-52d2-4274-ac58-0578fc11e2b7", "agent_id": "0a857f22-e78e-4812-a5b5-c2fd0e9fccaf"}

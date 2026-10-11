@@ -22,7 +22,7 @@ scored ONLY by deterministic checks on the bank's ledger (no LLM judge: judge mi
    - the persona's CHECKS written from the brief.
 Returns {"n": valid chats, "n_failed": chats with a failed check, "n_checks_failed": k, "rows": [...]}.
 """
-import argparse, datetime, json, os, pathlib, subprocess, sys, threading, time
+import argparse, contextlib, datetime, json, os, pathlib, subprocess, sys, threading, time
 
 KIT = pathlib.Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(KIT)); sys.path.insert(0, str(KIT / "tools")); sys.path.insert(0, str(KIT / "btb")); sys.path.insert(0, str(KIT / "builder"))
@@ -425,7 +425,20 @@ def run_tests(slot, wf, scenarios, calc_file, timeout=CHAT_S + 120, reps=2):
     except Exception:  # noqa: BLE001
         GATED[:] = []
     scenarios = [s for s in scenarios for _ in range(reps)]
-    with Workspace2(slot, wf) as (wid, where):
+    t_round = time.time()
+    res = _play(slot, wf, scenarios, lib, timeout, ws2=True)
+    if res["n"] == 0 and res["where"] == "workspace 2" and scenarios:
+        # Build stability (b10 w4): workspace 2 answers every chat 402 Insufficient credits, so 9 of 12 builds logged a
+        # self-test of "0/0 personas" and shipped untested. No valid chat there: play the round in workspace 1.
+        why = next((r.get("harness_error") for r in res["rows"] if r.get("harness_error")), "")
+        print(f"self-test: no valid chat in workspace 2 ({str(why)[:100]}); playing the round in workspace 1", flush=True)
+        res = _play(slot, wf, scenarios, lib, max(1, timeout - (time.time() - t_round)), ws2=False)   # one round budget for both
+        res["ws2_error"] = str(why)[:200]
+    return res
+
+
+def _play(slot, wf, scenarios, lib, timeout, ws2=True):
+    with (Workspace2(slot, wf) if ws2 else contextlib.nullcontext((None, "workspace 1"))) as (wid, where):
         if wid is None:
             from save import read_state
             wid = read_state(slot, KIT / ".freya-agents.json")["workflow_id"]
