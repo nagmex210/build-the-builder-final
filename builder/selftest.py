@@ -144,7 +144,7 @@ def _key2():
 class Workspace2:
     """Switch the freya client to workspace 2 for the self-test (restored on exit). Copies the workflow there."""
     def __init__(self, slot, wf):
-        self.slot, self.wf, self.used = slot, wf, False
+        self.slot, self.wf = slot, wf
 
     def __enter__(self):
         self.old = (freya.HEADERS["Authorization"], freya._ws, os.environ.get("FREYA_WORKSPACE_ID"))
@@ -154,7 +154,6 @@ class Workspace2:
                 freya.HEADERS["Authorization"] = "Bearer " + k; freya._ws = None; os.environ.pop("FREYA_WORKSPACE_ID", None)
                 from save import locked_save    # parallel builds share this state file too
                 st = locked_save("st-" + self.slot, self.wf, KIT / ".freya-agents-ws2.json")
-                self.used = True
                 return st["workflow_id"], "workspace 2"
             except Exception as e:  # noqa: BLE001
                 print(f"workspace 2 unavailable ({str(e)[:150]}); self-test in workspace 1", flush=True)

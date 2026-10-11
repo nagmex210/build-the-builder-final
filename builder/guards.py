@@ -150,7 +150,7 @@ try:
             vars['guard_block_' + _T] = '; '.join(_why)
             vars['guard_offer_' + _T] = ' and '.join(_off)
             config['url'] = noop_url(config.get('url'))
-        elif _df and _G.get('promise_date_field') and SPEC.get('promise_dates_min_gap_days'):
+        elif _df and SPEC.get('promise_dates_min_gap_days'):
             try:
                 _prev = json.loads(vars.get('guard_promised_dates') or '{}')
             except Exception:

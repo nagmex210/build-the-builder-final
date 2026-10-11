@@ -1,0 +1,3 @@
+  invalid rep PUB-13 (try 1): ['harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"a1c3865a-3e65-49be-a5ee-80dedea7374c"}}}']
+  invalid rep PUB-13 (try 2): ['harness: POST /api/v2/chat/message -> 500: {"success":false,"data":{"message":"Internal server error","result":{"requestId":"4fc3133b-fa33-44d7-902d-18143fa287b8"}}}']
+  invalid rep PUB-13 (try 3): ['harness: chat turn kept timing out']

@@ -27,7 +27,6 @@ def lint(w):
     ends = {k for k, n in nodes.items() if n.get("node_type") == "end_call"}
     if not ends:
         warns.append("no end_call node: only an end_call tool can hang up")
-    tool_names = set()
     for k, n in allnodes.items():
         nt = n.get("node_type", "conversation")
         trs = n.get("transitions", []) or []
@@ -77,7 +76,6 @@ def lint(w):
         for tool in (n.get("tools", []) or []) + (n.get("pre_actions", []) or []):
             f = tool.get("function", {})
             name = f.get("name")
-            tool_names.add(name)
             for code_key in ("pre_process_code", "post_process_code"):
                 code = tool.get(code_key) or ""
                 if "{{" in code or "}}" in code:
@@ -141,7 +139,6 @@ def lint(w):
     for k in seen:
         if k not in can_end:
             errs.append(f"{k}: no path from this node to an end_call node")
-    # variables used in prompts that nothing can set
     return errs, warns
 
 

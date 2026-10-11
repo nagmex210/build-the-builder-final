@@ -207,8 +207,6 @@ try:
     if isinstance(_kn, str) and _kn:
         _kn = _json.loads(_kn)
     _b = config.get('body') if isinstance(config, dict) else None
-    if isinstance(_b, str):
-        _b = None
     if isinstance(_kn, dict) and isinstance(_b, dict):
         for _k, _ids in _kn.items():
             if _k in _b and _ids:
