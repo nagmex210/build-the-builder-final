@@ -1,159 +1,161 @@
 # Mechanisms (maintained by the standing analyst)
 
-General rules only: no case ids, names, brief values or scenario details. Evidence is in runs/analyst/<batch>.md and
-fix/cases:runs/mechanisms.md. Last update: after batch b6 workers (2026-10-11 ~03:15 UTC).
+General rules only: no case ids, names, brief values or scenario details. Evidence is in runs/analyst/<batch>.md
+(b7: `git show merge/b7:runs/analyst/b7.md`, never merged to main) and fix/cases:runs/mechanisms.md.
+Last update: after batch b8 workers + the aborted b7 merge (2026-10-11 ~07:40 UTC).
+
+## 0. Read first (b8)
+
+- **The b7 merge candidate after its two fixes (merge/b7 66d7282) beat the champion OFFICIALLY on every brief**:
+  A 9/10, B 2/3, rA 10/10, rB 3/3 = 24 vs champion (b6) 7+2+10+1 = 20; fast 14/26 vs 12; C 3/12 vs 1-2. The abort
+  was on the PRE-fix 0/3 raw-B (hook over the size limit, M53). Re-measure it or carry its fixes (section 4).
+- **Self-simulation has been a no-op since b7**: workspace 2 answers 402 Insufficient credits, every build logs
+  "self-test 1: 0/0 personas" and the trace still says a self-test ran (M55). All b7 merge and b8 builds lack it.
+- **Platform hook limit 131072 bytes (code + data)**; main's biggest hooks are 88-107 KB (M53).
 
 ## 1. Failure kinds (running counts, primary kind per failing run, platform-dead runs excluded)
 
-| kind | b1-b2 | b3 | b4 | b5 | b6 (240 fast, digest) | total | at fault |
-|---|---|---|---|---|---|---|---|
-| dates: deadline used as the TARGET (holiday / valid earlier / own day answered with the deadline); callback date resolved by the model (stale year, outside window) | 17 | 1 | 17 | ~38 | ~8 | ~81 | builder |
-| amounts: invented "minimum" (small round number) named before the labelled floor | 7 | 0 | 8 | ~22 | ~17 | ~54 | builder |
-| tool order / duplicates (invented ids then retries; re-sent writes after success; no-op answer without routing fields) | 24 | 2 | 15 | ~17 | ~22 | ~80 | builder |
-| per-item attempts / outcome counted wrong | 7 | 1 | 13 | ~16 | ~10 | ~47 | builder |
-| multi-product binding (one date for all, values swapped, an item never written) | (per-item) | - | 28 | ~10 | ~9 | ~47 | builder |
-| identity gate (one passed answer read as "verified", no stop at 0 left, volunteered answer never checked) | 8 | 2 | 6 | ~10 | ~11 | ~37 | builder |
-| wrong route: cannot pay -> own plan instead of the brief's transfer | 3 | 0 | 8 | ~9 | ~8 | ~28 | builder |
-| "once only" broken (floor twice; support/sympathy twice incl. hand-off re-entry) | 0 | 0 | 12 | ~6 | ~7 | ~25 | builder |
-| mandatory wording | 6 | 1 | 2 | 7 | 2 | 18 | builder |
-| honesty ("noted"/"I have you down" before the tool says so) | 0 | 2 | 1 | 3 | 2 | 8 | builder |
-| call ended without close (model goodbye -> platform end_call; node max-turns -> end node) | some | - | 3 official | 1 official | fast cannot see it | | builder+platform |
-| build defect shipped (inner agent's hook raises on every call; required field dropped) | - | - | - | 1 official B 0/3 | caught by w1 hookcheck | | builder |
-| harness: fast judge misses lines/tools that ARE in the transcript; persona answers the "wrong" identity data right | 11 | 6 | ~42 | 19 | 24 | ~102 | harness |
-| platform: timeouts / branch-resume replays (INVALID) | heavy | ~55/69 | low | 30 | ~19 (one rA eval 15/20) | - | platform |
+| kind | b1-b5 | b6 | b7 | b8 (63 fails, digest) | total | at fault |
+|---|---|---|---|---|---|---|
+| dates: deadline as TARGET; callback date resolved by the model (stale year, outside window) | ~73 | ~8 | ~20 | 5 (all callback, stale year) | ~106 | builder |
+| amounts: invented "minimum" before the labelled floor | ~37 | ~17 | ~19 | 3 (only where the check tool was not called) | ~76 | builder |
+| tool order / duplicates (invented ids then retries; re-sent writes after success) | ~58 | ~22 | ~6 | 7 | ~93 | builder |
+| per-item attempts / outcome counted wrong (incl. counteroffer counted as a refusal) | ~37 | ~10 | ~8 | 6 | ~61 | builder |
+| multi-product binding (one date for all, values swapped, an item never written) | ~38 | ~9 | ~8 | 4 | ~59 | builder |
+| identity gate (verdict misread, no stop at 0 left, answer never checked, parallel verify) | ~26 | ~11 | ~16 | 5 | ~58 | builder |
+| wrong route (own plan instead of transfer; router with no matching transition loops) | ~20 | ~8 | ~8 | 7 | ~43 | builder |
+| "once only" broken (floor twice; support/sympathy twice) | ~18 | ~7 | ~1 | 3 | ~29 | builder |
+| mandatory wording / honesty | ~29 | 4 | ~13 | 1 | ~47 | builder |
+| call ended without close (goodbye -> platform end_call; max node turns) | official only | - | official rB 2/3, A 1/2 | - | | builder+platform |
+| build defect shipped (hook raises; field dropped; hook over size limit; unbound {{var}}; stale slot reused) | 1 official | caught | rB 0/3, B 0/3 official (pre-fix) | 2 branches 0-1/10 (size), 2/9 builds (w3) | | builder |
+| harness: fast judge misses what IS in the transcript; persona leaks correct identity data | ~78 | 24 | ~18 | 4 | ~124 | harness |
+| platform: timeouts / branch-resume / 402 / 404 under load | heavy | ~19 | 8 | 16 (most = hook size, really builder) | - | platform |
 
-b6: 108/240 worker fast calls pass. Dates fell from ~38 to ~8 since check_promise_date (b5-4, in main). Official
-(b5 merge): the only official residual on brief A is the identity gate (0/4 on the merged build); fast-only heavy
-kinds: invented floor (official 4/4 pass), callback date.
+b8: 110 digested calls (8 evals; most worker evals did not finish under load), 47 pass. With the amount check
+(b8-4) no invented round figure appeared where the check was called; callback dates are now the top date kind.
 
 ## 2. General mechanisms (each holds for ANY collections brief)
 
 Values and dates
-M1. Show only this customer's facts and tag only their own deadlines. Necessary, not sufficient (M27).
-M2. Dates and amounts are computed in code, one labelled line per product; a guard on the write tool blocks a
-    below-floor amount / after-deadline date with the reason and the right value (2xx, ok=false: M11). The model
-    recovers from the block, but the block comes after the offer, so "offered once" is already broken.
-M3. Every date/amount rule in the brief reaches code or is listed "not computed, apply yourself"; a schema with no slot
-    drops it silently. Includes call-wide caps (a total per call across items) and stage order (M34).
-M27. The value to OFFER comes from code, not only the value to RECORD. Dates: the code-only check tool answers "keep
-    the customer's day" or the one date to offer: works (dates ~38 -> ~8). Amounts: still open. The labelled floor IS
-    in the lookup result (twice, under two names) and the model still names a small round "minimum" on the turn after
-    "too much"; then after the guard block it offers the floor with the deadline instead of the agreed day. Needed: a
-    code-rendered offer sentence (the result's SAY NEXT for "cannot pay the full amount" = the floor sentence with the
-    customer's/next valid day) or a check_promise_amount tool. Callbacks need the same: the model resolves relative
-    callback days itself (stale year, day outside the window) despite the date facts.
+M1/M2. Show only this customer's facts; compute dates/amounts in code, one labelled line per product; a guard on the
+    write blocks a wrong value with reason + right value (2xx ok=false), but too late for "offered once" (M27).
+M3. Every date/amount rule reaches code or is listed "not computed, apply yourself"; a schema with no slot drops it
+    silently (call-wide caps, stage order M34).
+M27. The value to OFFER comes from code. Dates: a code-only check tool answering "keep the customer's day" / the one
+    date (dates ~38 -> ~8). Amounts: a code-only amount check (customer's amount, or 0 for "too much / you tell me")
+    answering the one sentence removed every invented minimum where it was called (b7-2 4/4, b8-4 all read calls);
+    official floor-twice case 2/2 on merge/b7 (1/2 in every earlier official run). Residuals: the model names a
+    figure WITHOUT calling the check (on a plan-request path), or restates the floor from memory with the day (judge:
+    second offer): the first answer must say "amount settled, ask only for the day". Callback days still have no
+    code path: stale year, valid slot answered "cannot" even after the tool listed the allowed day (b8 5/5 date fails).
+M50. Calendar semantics are brief rules (weekend days, holidays, same-day cut-off, "next <weekday>"): spec fields
+    with a trace line each, never one bank's calendar wired in.
 M28. A customer's own date or amount is never a refusal; the deadline is an upper bound, never a target.
 
 Identity and privacy
-M4. A gate's terminal state is decided by code and routed by structure. Identity: code writes identity_state
-    (passed / asking next / retry / failed) + one say_next per state into every verify result; a transition on
-    state == failed goes to a terminal node that says the referral line once and closes (b6-4: 2/2 on the failing
-    case where prompt lines alone went 0/4 officially).
-M29. A per-answer success field ("this answer correct") is read by the model as "identity verified": it says so,
-    moves to the account and, with no account loaded, INVENTS an amount. Every result needs an overall verdict line;
-    at 0 left the terminal route, not a prompt line, must fire (a NOT VERIFIED text line was ignored 2/4 officially).
-M5. One answer, one check: every answer (also one volunteered mid-sentence or "corrected" before checking) goes to the
-    check tool at once; never re-send a passed or earlier wrong answer (pre-hook block).
-M18. Before identity passes no account content at all; the opening's purpose words count too (a gate list of
-    debt words must include the brief's own purpose words: M33).
+M4/M29. Identity terminal state is decided by code and routed by structure (identity_state + say_next per state;
+    failed -> terminal node). A per-answer success field is read as "verified"; text lines were ignored, routes held.
+M5. One answer, one check (also volunteered, corrected, in words, in pieces); never re-send. An answer the model
+    answers with "go on" is never checked: the bank's count lags, the gate never reaches 0. Two verify calls in one
+    turn: the route can fire on a stale sibling result (M20).
+M18. Before identity passes no account content, including the opening's purpose words (M33).
 
 Tool calls and state
-M7. Ids are copied from a listed line, never built: the model writes the display id (card digits, type label) and the
-    retry breaks "one write per item". b6: the top multi-item failure on all 5 branches; the resolver exists
-    on an old branch and is still not in main (carry-over).
-M12. Several tool calls in ONE turn run in parallel: close + notes in one turn lands notes after close.
-M20/M32. Hook state is not reliable across one parallel turn (sibling hooks miss each other's writes; same-tool
-    siblings share one result variable). Never decide from writes issued in the same turn; one call per message.
-M37. Idempotency for writes is needed (a courtesy turn after success re-sends the write; the bank answers "already
-    exists"; the model notes a service error), but dedup must touch only state-changing writes and its no-op answer
-    must carry every field the outgoing routes test. Dedup applied to a check tool returned an answer without the
-    all-verified field: routing stuck in identity, model improvised (4 calls).
-M44. After a successful terminal write (promise, transfer) the node still holds the write tool, so a goodbye turn
-    re-triggers it. Route on success to a wrap-up node without write tools, or make the write idempotent (M37).
-M19. Routes out of a guarded tool test the result's ok field only (success_count counts guard no-ops).
-M8/M11. A guard never blanks fields; a block is a 2xx with ok=false and the reason.
-M30. Extraction is not a data path for values the model agreed ("yes" extracts nothing). Per-item values come from a
-    tool call's explicit arguments: live-verified (settle tool with args, b6-2).
-M38. An OPTIONAL bookkeeping tool is called only on the happy path (settle called for promises, never for refusals:
-    the per-item refusal counter never ran). A counter must sit on a path the model cannot skip: the write tool and
-    close refuse until every item is settled, or one check call before every offer returns the attempt number.
+M7. Ids are copied from a listed line, never built. A code "ids to use" list + repair/refusal of an unlisted id in the
+    write pre-hook (b7-1) and any code tool that answers an unknown id with the real list (b8-1/4/5) make the model
+    retry with the right id. A refused NOTE is not re-sent: the model closes instead.
+M12/M20/M32. Parallel tool calls in one turn: order not guaranteed, sibling hooks miss each other's state writes.
+    Keep per-item state in SEPARATE call variables (one JSON ledger is overwritten by a sibling); one call per message.
+M37/M44. Writes are idempotent and dedup touches only writes; but a "do not send again" answer does not stop the
+    model re-sending on every courtesy turn (b8: 2 items x several re-sends). After the last write route to a node
+    without write tools.
+M19/M8/M11. Routes out of a guarded tool test its ok field only; a block is 2xx ok=false with its own reason.
+M30/M38. Per-item values come from explicit tool arguments, not extraction. An OPTIONAL tool runs only on the happy
+    path: b8 per-item gates were consulted AFTER the model had already made the next offer. A counter must sit on a
+    path the model needs anyway (see M56).
+M54. A failed account lookup (5xx, sandbox error) must route to a service-error/close path. An unconditional
+    lookup -> negotiate transition lets the model negotiate with invented ids, amounts and deadlines (b8: every call
+    of two hook-oversize builds; also on the held-out brief's error path).
 
 Per-item and once-only
-M13. Per-item counters (attempts, outcome) live in code per item and are shown each turn; the late-band ladder
-    otherwise spills onto an early-band item.
-M21. "Once only" limits are call-wide; keep a flag per limit in state and show it every turn (floor re-offered
-    with a new date is a second offer).
-M23. Multi-product: bind amount, date and id per item; the read-back names every item; a late "same date for all"
-    must not overwrite an item whose own date was already valid; every item gets its write.
+M13/M21. Per-item counters and call-wide "once only" flags live in code and are shown each turn.
+M56. A per-item gate fails in two ways (b8-1 live): (a) the model calls it late, after speaking the next offer;
+    (b) the model labels the event: a counteroffer (a day or an amount of their own) was sent as "declined"
+    and the item noted refused (2/3 calls). Rules: the model passes WHAT the customer said (a date / an amount /
+    nothing), code classifies (a proposal goes to the value check, never counts); count attempts where the model
+    must go anyway to get the value it will say (each floor/date offer comes from the check tool, so the check call
+    IS the attempt counter), and block the write/close of an item whose budget state disagrees.
+M23. Multi-product: bind amount, date, id per item; a late "same date for all" never overwrites an item's own valid
+    date; every item gets its write (needs per-item agreed values in code).
 
 Routes, hand-offs, closing
-M22. A required exit (cannot pay even the floor / plan request -> transfer) needs named triggers and its own
-    transition in EVERY node where it can come up; else the model invents a plan and closes as refused.
-M31/M40. Router + specialists: the hand-off must be silent AND structural. A router that speaks and transitions in
-    the same turn leaves the next customer turn on the router (platform branch-resume), which hands off again and
-    the specialist repeats its offer; prompt rules ("hand off silently", "once per call") did not stop it (4/4).
-    Use a code flag set on specialist entry that the router checks, or on_enter first-entry-only speech.
-M26. The goodbye belongs to the platform after close succeeded (end node spoken_message on the close ok route); the
-    platform's DEFAULT agent_config ships an end_call tool + "use it after you say goodbye": a model goodbye before
-    close gets a platform hang-up with no outcome. Overriding agent_config after every save removes that path
-    (b6-5, persists live; only the official simulator can show the effect). A brief that orders the goodbye BEFORE
-    close needs the goodbye and the close in one message; that brings back "goodbye without close" (b5-1 v1: 18/20).
-M35. A node that loops (identity never resolved) hits the platform's max node turns and jumps to the end node with
-    no close: no outcome. Terminal states must be reached by routes long before max turns; keep max turns high.
-M6/M24/M10. Close is last and the prompt alone does not order it; platform-spoken text is verbatim; a mandatory line
-    tied to an event goes in that tool's success result ("say exactly ...").
-M14. To a third party any sentence about payment, debt or the account discloses the purpose.
-M15. After a "no" to a read-back ask what to change; never repeat the same read-back.
-M16. Under platform load a chat can replay an old message; route on persisted call variables.
-M33. Rewording a mandatory text to dodge a literal judge keeps the brief's content AND position.
-M34. The builder's fixed stage order (opening -> identity -> account) can contradict the brief; stage order is a rule.
+M22. A required exit (cannot pay even the floor / plan request -> transfer) needs triggers + a transition in EVERY
+    node where it can come up.
+M31/M40/M46/M48. Router + specialists: the hand-off is silent and structural; every tool-call transition needs an
+    explicit condition; a router that sees account content but has no write tool negotiates and fakes the write; a
+    router whose only exit is a failure branch loops "is that correct?" to max turns ("No transition matched").
+    Check at build time: from every node holding account content, a route to the write tools exists.
+M26/M35. The goodbye belongs to the platform after close succeeded; override the default end_call agent_config.
+    A looping node hits max node turns and ends with no close (official only): code-route to a wrap-up node.
+M6/M24/M10/M14/M15/M16/M33/M34. Close is last (code, not prompt); mandatory lines in the tool result verbatim;
+    any payment word to a third party discloses; after "no" ask what to change; route on persisted vars under
+    replays; reworded mandatory text keeps content and position; stage order is a brief rule.
 
 Build robustness
-M9. A failing build step never takes the build down (falls through to the deterministic final pass). But a missing
-    Claude login yields a ~1-minute "build" with no build agent and no error (seen again on 2 workers in b6).
-M45. The inner build agent can ship hooks that raise on every call (a post-hook referencing the request name):
-    every tool call errors, nobody passes identity, and the self-sim revert restores an equally broken version.
-    Dry-run every hook at save and repair/lint it; check API-required fields. A merger's diagnosis from the build log
-    alone was wrong: read a self-sim call's tool results before blaming a field.
-M17/M25. Best-of-N / LLM mistake counts cannot pick builds; deterministic ledger checks in self-sim find real kinds;
-    one play per persona is too noisy for keep/revert.
+M9. A failing step never takes the build down. A run that saved nothing must FAIL, never print the previous build's
+    ids (seen b6 x2, b7, b8: missing Claude login -> "build" in ~1 min exporting the old agent).
+M53. The platform caps one hook's code + data at 131072 bytes; over it, EVERY call of that tool errors with
+    function_call_error. Seen 3 times (b7 merge raw-B account hook 136 KB -> official 0/3; b8-1 on C 156 KB; b8-5
+    158 KB -> 0/10). main's hooks are 88-107 KB: a longer brief (more holidays/bands/rule text in the hex SPEC) can
+    cross it. Embed only the functions and spec keys a hook uses; fail the build check on any hook > ~110 KB.
+M57. Local builds reuse the slot's old files (out/<slot>.workflow.prev.json, an old generator script): the inner
+    agent edited them instead of building from the brief (2/9 builds, b8-3), so one commit measured an older
+    builder. On Sunday the slot is new: clear the slot before every test build.
+M58. Static defects the model then reads raw (unbound {{var}} in a prompt) appear in ~8% of builds; a deterministic
+    post-build check + one EDIT round fixed every one in < 20 s (b8-3). Reachability: an unreachable negotiate node
+    (b8-4 B build) is a static defect too.
+M45/M47/M49/M51. Dry-run every hook at save (post hooks get vars, not config); raise the SDK buffer; finalizers strip
+    their own old blocks by signature; read API keys by shape, not A/B's names.
+M55. A self-test that ran 0 chats must say so in the trace and fall back (workspace 1, or offline personas); a
+    silent 0/0 is reported as a pass and disables every fix round that depends on it.
+M17/M25/M52. LLM mistake counts / best-of-N cannot pick builds; rule TEXT coverage is 92-97% already: remaining
+    failures are structural (who decides a value, which node holds which tool, which state routes).
 
 ## 3. What carries the calls that pass (keep intact)
 
 - Structural routing on tool-result fields (identity -> account on the all-verified field; close -> end on ok).
 - Account loaded by a code path; products, band, deadline, floor in state first.
-- Code answers the model can copy: check tool's "offer exactly <date>", guard's NOT RECORDED + right value,
-  identity say_next per state, what_to_do_next / SAY NEXT lines: said word for word.
-- Short decision chains; each extra rule decision left to the model is a coin-flip point.
-- Hardship: one sympathy sentence, one support offer, no persuasion, close. Tool failure: retry once, "recorded"
-  only after SUCCESS. Multi-product: all items stated before the first ask, one combined read-back.
+- Code answers the model can copy: date/amount check "offer exactly ...", guard NOT RECORDED + right value,
+  identity say_next, SAY NEXT lines; an unknown id answered with the real ids.
+- Short decision chains; each extra decision left to the model is a coin-flip point.
+- Hardship: one sympathy sentence, one support offer, close. Multi-product: all items before the first ask, one
+  combined read-back.
 
-## 4. Carry-overs (fix exists on a non-champion branch; champion main f4dbaf0 still shows the failure)
+## 4. Carry-overs (fix exists off main; champion main 37451d5 still shows the failure)
 
 | failure kind still on main | branch / commit with the fix | status |
 |---|---|---|
-| identity: per-answer field read as verified, no terminal at 0 left, invented amount (M4/M29, top OFFICIAL residual) | idea/b6-4 c7ea014 identity_gate.py (+ selftest privacy lint) | fast 2/2 on the case; needs official |
-| invented product ids + retries (M7), top multi-item failure | merge/b2 880dc5e + e859772 harden id resolver (`ids_to_use`) | **still not in main**; 14 b6 failures on all branches |
-| duplicate write after success -> service error (M37/M44); hook that raises (M45); API-required field dropped | idea/b6-1 d73d17a..c2145da (harden idempotency, hookcheck.py, apicheck.py) | first version stuck identity routing (M37); fixed in c2145da, unmeasured |
-| platform default end_call path (M26) | idea/b6-5 899dd95 override_agent_config | official only; take the override, weigh the pre-close goodbye mode separately |
-| specialists' own clause / once-per-call / plan-request -> transfer (M22/M31) | idea/b6-3 11893d4 + 5db9db6 situations.apply | best fast A (8/10); hand-off re-entry (M40) open |
-| per-item value path (M30) | idea/b6-2 2dc4330 settle_item | value path works; counter unused (M38): needs a mandatory gate |
-| invented floor (M27 amounts) | none | **open, top fast failure** |
-| callback date resolved by the model (M27) | none (check_promise_date covers promises only) | open |
-| node loops to max turns -> end without close (M35) | none | open, official-only |
-| build "succeeds" with no build agent when the Claude login is missing (M9) | none | **open, Sunday risk**: fail loudly |
+| hook over 128 KB (M53); tool names with '/' in the calc spec -> no guard (official B 0/3) | merge/b7 66d7282 (compact spec) + cedb5ea | **official on merge/b7: A 9, B 2, rA 10, rB 3 (best ever)**; add a size gate (b8-1 fc3beb3 `_put` cap, b8-5 83381f9) |
+| invented floor / floor twice (M27) | idea/b7-2 0e86b1b check_promise_amount; idea/b8-4 39e86d1..af9d73e (amount in check_promise_date + floor_offered count) | b7-2 is in merge/b7 (official floor case 2/2); b8-4 rA 6/10 = champion, A 5/10 (noise) |
+| silent stale build when nothing saved (M9); stale slot files (M57); unbound vars / reachability (M58) | idea/b8-3 d3b1ed9, 1454263, bbfc17e buildcheck.py | measured: 2/9 -> 0/9 defects, 2/9 -> 0/9 stale reuse; no score effect expected |
+| condition-less transitions (M46), SDK buffer (M47) | idea/b7-2 8d47ffc, 4723aef (in merge/b7) | pure robustness |
+| invented ids + retries (M7) | idea/b7-1 e9dfe52 + cca104a (in merge/b7) | official rB 3/3 on merge/b7 |
+| per-item attempts (owner target, official B residual 1/2) | idea/b8-1 gates.py (close gate, note gate, item_gate), idea/b8-2 itemgate.py (separate vars), idea/b8-5 policy.py | b8-1 rB 0/3 fast (gate late + counteroffer labelled refusal, M56); b8-2/b8-5 v2 unmeasured |
+| lookup failure routes into negotiation (M54) | none | open |
+| self-test 0 chats reported as run (M55) | none | **open: A17 is currently a no-op** |
+| callback date resolved by the model (M27) | none | open, top date kind |
+| platform end_call path (M26) | idea/b6-5 899dd95 | official only |
+| calendar semantics (M50), call-wide cap (M3), stage order (M34) | none | open, held-out C |
 
 ## 5. Variance sources (pass in one run, fail in another)
 
-- a value left to the model among several candidates (which floor, which date, which item's id): M2/M7/M23/M27;
-- parallel tool calls in one turn (order of close vs notes; lost or shared hook state): M12/M20/M32;
-- per-item and "once only" counts in the model's head (M13/M21); optional bookkeeping tools skipped (M38);
-- the simulated customer: "what do you suggest?" makes the model invent a floor; fast personas may give CORRECT
-  identity data on a case that expects failure, revise every item to one date, or never ask for a plan;
-- the fast judge: transcript fetched before the final turns are saved (closing lines and late close_call look
-  missing; ~10% of b6 failures); official judge reads the recording notice as a premature "recorded" claim;
-- platform: 5xx, branch-resume replays under load (a router hand-off is especially exposed: M40); the box-wide eval
-  slot lock has no queue order, and a 10-minute tool cap killed builds mid self-sim, so several b6 scores are of
-  pre-self-sim saves (not comparable to full builds);
-- fast vs official: official-only kinds (identity terminal, hang-up without close, opening wording) and fast-heavy
-  kinds (invented floor, callback date): fast_eval alone cannot rank identity/goodbye/agent_config changes.
+- a value left to the model among candidates (floor, date, item id): M2/M7/M23/M27; a label left to the model
+  (refusal vs counteroffer): M56;
+- parallel tool calls (order, lost hook state): M12/M20; optional tools skipped or called late: M38/M56;
+- the simulated customer: "you tell me" -> floor restated; fast personas leak correct identity data, revise every
+  item to one date;
+- the fast judge: transcript fetched before final turns (~10%); fast B lower bound (merge/b7: fast B 1/3, rB 2/3 vs
+  official 2/3, 3/3): never rank B changes by one fast case;
+- the BUILD: stale slot files (M57), static defects (M58), hook size near the limit (M53), self-sim silently off
+  (M55): the same commit builds different agents; compare builds made under the same conditions;
+- platform: 402/404/5xx, branch-resume under load (20+ parallel fast_evals in b8: most never finished).
