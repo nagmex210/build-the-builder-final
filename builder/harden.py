@@ -46,7 +46,7 @@ try:
                 _wq, _wok = [], dict()
             _prev = _wok.get(_t + '#' + str(_wq[0])) if (len(_wq) == 2 and isinstance(_wok, dict)) else None
             _err0 = str(_d.get('error') or result.get('message') or '').lower()
-            _ack = all(str(k).endswith('_id') for k in _d.keys() if k not in ('ok', 'error', 'tool_outcome', 'what_to_do_next', 'message'))
+            _ack = all(str(k).endswith(('_id', '_ref')) for k in _d.keys() if k not in ('ok', 'error', 'tool_outcome', 'what_to_do_next', 'message'))
             _bare = not [k for k in _d.keys() if k not in ('ok', 'status', 'message', 'what_to_do_next', 'tool_outcome')]
             if _v.get('dup_hit_' + _t) and _bare:
                 # only the no-op's bare answer: a parallel sibling of the same tool (M20 shares the flag) keeps its own result
@@ -72,7 +72,7 @@ try:
                 _failed = False
             elif not _failed and _ack and len(_wq) == 2 and isinstance(_wok, dict) and not _v.get('guard_block_' + _t):
                 _wok[_t + '#' + str(_wq[0])] = dict(fp=_wq[1], ids=dict((k, x) for k, x in _d.items()
-                                                                       if str(k).endswith('_id') and isinstance(x, (str, int))))
+                                                                       if str(k).endswith(('_id', '_ref')) and isinstance(x, (str, int))))
                 _v['writes_ok'] = _json.dumps(_wok)
         if _failed:
             _n = 1
@@ -98,7 +98,7 @@ try:
             _keys = [k for k in _d.keys() if k not in ('ok', 'error', 'tool_outcome', 'what_to_do_next')]
             if _same:
                 pass
-            elif __WRITE__ and all(str(k).endswith('_id') for k in _keys):
+            elif __WRITE__ and all(str(k).endswith(('_id', '_ref')) for k in _keys):
                 _d['tool_outcome'] = ('SUCCESS: ' + _t + ' was carried out and recorded. Only now may you tell the '
                                       'customer it is recorded. Speak to the customer now.')
             if _v is not None and str(_d.get('verified')).lower() == 'true':
@@ -206,7 +206,7 @@ try:
                 return str(round(float(str(x).replace(',', '').strip()), 2))
             except Exception:
                 return str(x).strip().lower()
-        _pk = '|'.join(str(_bq.get(k)) for k in sorted(_bq) if str(k).endswith('_id') and k != 'customer_id')
+        _pk = '|'.join(str(_bq.get(k)) for k in sorted(_bq) if str(k).endswith(('_id', '_ref', '_no', '_number', '_index')) and not str(k).startswith('customer'))
         _fp = '|'.join(str(k) + '=' + _nv(_bq.get(k)) for k in sorted(_bq)
                        if not (isinstance(_bq.get(k), str) and len(str(_bq.get(k)).split()) >= 4))
         vars['write_req_' + __TOOL__] = _json.dumps([_pk, _fp])
