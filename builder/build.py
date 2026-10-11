@@ -102,6 +102,11 @@ async def self_simulate(slot, tools, briefs, trace, wf_file, final_pass, options
     log(trace, event="test", what="self-simulation round 1: deterministic ledger checks", where=r1["where"], n=r1["n"],
         failed=r1["n_failed"], checks_failed=r1["n_checks_failed"], seconds=round(time.time() - t_start), rows=r1["rows"])
     print(f"self-test 1 ({r1['where']}): {r1['n_failed']}/{r1['n']} personas failed a check ({r1['n_checks_failed']} checks)", flush=True)
+    if r1["n"] == 0:   # not a pass: no chat produced a result (platform errors); say so in the trace (b10 w4)
+        errs = sorted({str(r.get("harness_error", ""))[:80] for r in r1["rows"]})
+        print(f"SELF-TEST DID NOT RUN: 0 valid chats of {len(r1['rows'])} (platform: {'; '.join(errs)[:300]}); "
+              "the build is shipped WITHOUT a self-simulation result", flush=True)
+        log(trace, event="test", what="self-simulation did not run: no valid chat (the build is untested)", errors=errs)
     (KIT / "out" / f"{slot}.selftest1.json").write_text(json.dumps({"personas": personas, **r1}, indent=1, default=str))
     r1_s = time.time() - t_start
     retest_s = min(ROUND_S, r1_s + 60)          # the re-test takes about as long as round 1 did (platform load)
